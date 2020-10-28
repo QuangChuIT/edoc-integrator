@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.bkav.edoc</groupId>
+    <artifactId>edoc-integrator</artifactId>
+    <version>6.2.28</version>
+    <modules>
+        <module>edoc-service</module>
+        <module>edoc-webapp</module>
+        <module>edoc-transform</module>
+    </modules>
+
+    <packaging>pom</packaging>
+
+    <name>Edoc Integrator Version 2.0</name>
+
+    <url>https://bkav.com.vn</url>
+
+    <repositories>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>wso2.releases</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+
+        <repository>
+            <id>wso2.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+
+    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-core</artifactId>
+                <version>${synapse.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2.wso2</groupId>
+                <artifactId>axis2</artifactId>
+                <version>${wso2.axis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${common.logging.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xsom</groupId>
+                <artifactId>xsom</artifactId>
+                <version>${xsom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom2</artifactId>
+                <version>${jdom2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${redis.clients.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${com.google.code.gson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>${commons-validator.version}</version>
+            </dependency>
+
+            <!-- MySQL database driver -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
+
+            <!-- Hibernate framework -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${org.hibernate.version}</version>
+            </dependency>
+            <!-- Ehcache 3.x -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-ehcache</artifactId>
+                <version>${org.hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>java-jwt</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>7.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+
+            <!-- Hibernate library dependency end -->
+            <dependency>
+                <groupId>javax.transaction</groupId>
+                <artifactId>jta</artifactId>
+                <version>${jta.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
+            <dependency>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>stax2-api</artifactId>
+                <version>${stax2-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.spy</groupId>
+                <artifactId>spymemcached</artifactId>
+                <version>${memcached.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client -->
+            <dependency>
+                <groupId>org.apache.oltu.oauth2</groupId>
+                <artifactId>org.apache.oltu.oauth2.client</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${quartz.scheduler.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-jobs</artifactId>
+                <version>${quartz.scheduler.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <preparationGoals>clean install</preparationGoals>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>${maven.buildnumber.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <source>1.8</source>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!--This parameter disables doclint-->
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <synapse.version>2.1.7-wso2v142</synapse.version>
+        <wso2.axis.version>1.6.1.wso2v20</wso2.axis.version>
+        <common.logging.version>1.1.1</common.logging.version>
+        <xsom.version>20140925</xsom.version>
+        <jdom2.version>2.0.3</jdom2.version>
+        <redis.clients.version>3.2.0</redis.clients.version>
+        <com.google.code.gson.version>2.8.6</com.google.code.gson.version>
+        <commons-validator.version>1.4.0</commons-validator.version>
+        <mysql-connector.version>8.0.16</mysql-connector.version>
+        <org.hibernate.version>5.2.17.Final</org.hibernate.version>
+        <org.ehcache.version>3.3.1</org.ehcache.version>
+        <org.hibernate.javax.persistence.version>1.0.0.Final</org.hibernate.javax.persistence.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <cglib.version>2.2</cglib.version>
+        <jta.version>1.1</jta.version>
+        <commons-codec.version>1.10</commons-codec.version>
+        <jersey.version>1.19.4</jersey.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <stax2-api.version>3.0.1</stax2-api.version>
+        <log4j.version>1.2.17</log4j.version>
+        <quartz.scheduler.version>2.3.2</quartz.scheduler.version>
+        <memcached.version>2.12.3</memcached.version>
+        <!--Maven Plugin Version-->
+        <carbon.p2.plugin.version>5.1.2</carbon.p2.plugin.version>
+        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
+        <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
+    </properties>
+</project>

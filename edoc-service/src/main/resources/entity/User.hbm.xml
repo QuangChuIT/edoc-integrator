@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.User" table="user_">
+        <id name="userId" type="java.lang.Long">
+            <column name="userId"/>
+            <generator class="identity"/>
+        </id>
+        <property name="emailAddress" type="string"/>
+        <property name="username" type="string"/>
+        <property name="password" type="string"/>
+        <property name="displayName" type="string"/>
+        <many-to-one name="dynamicContact" class="com.bkav.edoc.service.database.entity.EdocDynamicContact"
+                     fetch="select">
+            <column name="organization_id"/>
+        </many-to-one>
+        <property name="status" type="boolean"/>
+        <property name="createDate" type="timestamp"/>
+        <property name="modifiedDate" type="timestamp"/>
+        <property name="lastLoginDate" type="timestamp"/>
+        <property name="lastLoginIP" type="string"/>
+        <property name="sso" type="boolean" column="sso"/>
+    </class>
+</hibernate-mapping>

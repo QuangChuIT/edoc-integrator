@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocDocumentType" table="edoc_document_type">
+        <id name="documentType" type="java.lang.Integer">
+            <column name="edoc_document_type"/>
+            <generator class="identity"/>
+        </id>
+        <property name="value" type="string" column="value"/>
+    </class>
+</hibernate-mapping>

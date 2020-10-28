@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+    <definition name="main.layout" template="/layout/_layout.jsp">
+        <put-attribute name="title" value="Edoc Web Application"/>
+        <put-attribute name="header" value="/layout/_header.jsp"/>
+        <put-attribute name="menu" value="/layout/_menu.jsp"/>
+        <put-attribute name="body" value="/layout/_body.jsp"/>
+    </definition>
+
+    <definition name="error.layout" template="/layout/_error.jsp">
+        <put-attribute name="title" value="Edoc Web Application"/>
+        <put-attribute name="header" value="/layout/_header.jsp"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="public.layout" template="/layout/_public.jsp">
+        <put-attribute name="title" value="Thống kê gửi nhận"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="homePage" extends="main.layout">
+        <put-attribute name="body" value="/views/edoc/index.jsp"/>
+        <put-attribute name="title" expression="Trang chủ - Hệ thống liên thông văn bản"/>
+    </definition>
+
+    <definition name="draftPage" extends="main.layout">
+        <put-attribute name="body" value="/views/edoc/draft.jsp"/>
+        <put-attribute name="title" expression="Văn bản rác - Hệ thống liên thông văn bản"/>
+    </definition>
+
+    <definition name="uploadFilePage" extends="main.layout">
+        <put-attribute name="body" value="/views/edoc/uploadFile.jsp"/>
+        <put-attribute name="title" expression="Upload file"/>
+    </definition>
+
+    <definition name="errorPage" extends="error.layout">
+        <put-attribute name="body" value="/views/error.jsp"/>
+        <put-attribute name="title" expression="Hệ thống lỗi - Hệ thống liên thông văn bản"/>
+    </definition>
+
+    <definition name="publicReport" extends="public.layout">
+        <put-attribute name="body" value="/views/public.jsp"/>
+    </definition>
+
+    <definition name="publicReportDetail" extends="public.layout">
+        <put-attribute name="body" value="/views/public_detail.jsp"/>
+    </definition>
+</tiles-definitions>

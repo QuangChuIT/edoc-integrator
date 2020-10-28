@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocAttachment" table="edoc_attachment">
+        <id name="attachmentId" type="java.lang.Long">
+            <column name="attachment_id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="organDomain" type="string" column="organ_domain"/>
+        <property name="name" type="string" column="name"/>
+        <property name="createDate" type="timestamp" column="create_date"/>
+        <property name="fullPath" type="string" column="full_path"/>
+        <property name="type" type="string" column="type_"/>
+        <property name="size" type="string" column="size_"/>
+        <property name="toOrganDomain" type="string" column="to_organ_domain"/>
+        <many-to-one name="document" class="com.bkav.edoc.service.database.entity.EdocDocument" fetch="select">
+            <column name="document_id"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

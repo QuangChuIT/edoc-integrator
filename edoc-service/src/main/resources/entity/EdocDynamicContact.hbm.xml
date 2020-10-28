@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocDynamicContact" table="edoc_dynamiccontact">
+        <id name="id" type="java.lang.Long">
+            <column name="Id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="address" type="string" column="address"/>
+        <property name="parent" type="string" column="parent"/>
+        <property name="domain" type="string" column="domain"/>
+        <property name="email" type="string" column="email"/>
+        <property name="name" type="string" column="name"/>
+        <property name="type" type="string" column="type"/>
+        <property name="fax" type="string" column="fax"/>
+        <property name="inCharge" type="string" column="in_charge"/>
+        <property name="telephone" type="string" column="telephone"/>
+        <property name="version" type="string" column="version"/>
+        <property name="website" type="string" column="website"/>
+        <property name="status" type="boolean" column="status"/>
+        <property name="token" type="string" column="token"/>
+        <set name="users" table="user_" cascade="all"
+             inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="organization_id"/>
+            </key>
+            <one-to-many class="com.bkav.edoc.service.database.entity.User"/>
+        </set>
+    </class>
+</hibernate-mapping>

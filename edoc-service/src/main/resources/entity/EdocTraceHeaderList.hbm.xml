@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocTraceHeaderList" table="edoc_trace_header_list">
+        <id name="documentId" type="java.lang.Long">
+            <column name="document_id"/>
+            <generator class="foreign">
+                <param name="property">document</param>
+            </generator>
+        </id>
+        <property name="businessDocReason" type="string" column="business_doc_reason"/>
+        <property name="paper" type="int" column="paper"/>
+        <property name="department" type="string" column="department"/>
+        <property name="staff" type="string" column="staff"/>
+        <property name="mobile" type="string" column="mobile"/>
+        <property name="email" type="string" column="email"/>
+        <property name="businessInfo" type="string" column="business_info"/>
+        <property name="businessDocType" column="business_doc_type">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.bkav.edoc.service.database.entity.EdocTraceHeaderList$BusinessDocType</param>
+            </type>
+        </property>
+        <one-to-one name="document" class="com.bkav.edoc.service.database.entity.EdocDocument"
+                    constrained="true"/>
+        <set name="traceHeaders" table="edoc_trace_header" inverse="true" lazy="true" fetch="select" cascade="all">
+            <key>
+                <column name="document_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.bkav.edoc.service.database.entity.EdocTraceHeader"/>
+        </set>
+    </class>
+</hibernate-mapping>

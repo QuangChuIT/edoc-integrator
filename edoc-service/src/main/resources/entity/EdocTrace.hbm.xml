@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocTrace" table="edoc_trace">
+        <id name="traceId" type="java.lang.Long">
+            <column name="trace_id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="timeStamp" type="timestamp" column="time_stamp"/>
+        <property name="serverTimeStamp" type="timestamp" column="server_time_stamp"/>
+        <property name="organizationInCharge" type="string" column="organization_in_charge"/>
+        <property name="organName" type="string" column="organ_name"/>
+        <property name="organAdd" type="string" column="organ_add"/>
+        <property name="email" type="string" column="email"/>
+        <property name="telephone" type="string" column="telephone"/>
+        <property name="fromOrganDomain" type="string" column="from_organ_domain"/>
+        <property name="fax" type="string" column="fax"/>
+        <property name="website" type="string" column="website"/>
+        <property name="toOrganDomain" type="string" column="to_organ_domain"/>
+        <property name="code" type="string" column="code_"/>
+        <property name="staffName" type="string" column="staff_name"/>
+        <property name="comment" type="string" column="comment_"/>
+        <property name="promulgationDate" type="timestamp" column="promulgation_date"/>
+        <property name="department" type="string" column="department"/>
+        <property name="statusCode" type="int" column="status_code"/>
+        <property name="enable" type="boolean" column="enable"/>
+        <property name="edxmlDocumentId" type="string" column="edxml_document_id"/>
+        <property name="staffEmail" type="string" column="staff_email"/>
+        <property name="staffMobile" type="string" column="staff_mobile"/>
+        <many-to-one name="document" class="com.bkav.edoc.service.database.entity.EdocDocument" fetch="select">
+            <column name="document_id"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

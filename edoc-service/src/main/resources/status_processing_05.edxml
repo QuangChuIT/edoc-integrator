@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edXML xmlns="http://www.mic.gov.vn/TBT/QCVN_102_2016">
+  <edXML:edXMLEnvelope xmlns:edXML="http://www.mic.gov.vn/TBT/QCVN_102_2016">
+    <edXML:edXMLHeader>
+      <edXML:MessageHeader>
+        <edXML:From>
+			<edXML:OrganId>000.00.00.H41</edXML:OrganId>
+			<edXML:OrganName>UBND Tỉnh Nghệ An</edXML:OrganName>
+			<edXML:OrganizationInCharge>UBND Tỉnh Nghệ An</edXML:OrganizationInCharge>
+			<edXML:OrganAdd>Số 03, đường Trường Thi, Thành phố Vinh, Tỉnh Nghệ An, Việt Nam</edXML:OrganAdd>
+			<edXML:Email>nghean@gov.vn</edXML:Email>
+			<edXML:Telephone>0383 840418</edXML:Telephone>
+			<edXML:Fax>0383 843049</edXML:Fax>
+			<edXML:Website>www.nghean.vn</edXML:Website>
+        </edXML:From>
+        <edXML:ResponseFor>
+			<edXML:OrganId>000.00.00.G22</edXML:OrganId>
+			<edXML:Code>7816/VPCP-TTĐT</edXML:Code>
+			<edXML:PromulgationDate>2015/09/30</edXML:PromulgationDate>
+			<edXML:DocumentId>000.00.00.G22,2015/09/30,7816/VPCP-TTĐT</edXML:DocumentId>
+        </edXML:ResponseFor>
+		<edXML:StaffInfo>    
+			<edXML:Department>Phong hanh chinh</edXML:Department>         
+			<edXML:Staff>Nguyen thi ngoc tram</edXML:Staff>
+			<edXML:Mobile>84912000001</edXML:Mobile>
+			<edXML:Email>ngoctram@nghean.vn</edXML:Email>
+		</edXML:StaffInfo>
+        <edXML:StatusCode>05</edXML:StatusCode>
+        <edXML:Description>Đang xử lý văn bản đến</edXML:Description>
+        <edXML:Timestamp>2015/09/20 11:08:36</edXML:Timestamp>
+      </edXML:MessageHeader>
+    </edXML:edXMLHeader>
+  </edXML:edXMLEnvelope>
+</edXML>

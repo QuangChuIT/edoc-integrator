@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocNotification" table="edoc_notification">
+        <id name="notificationId" type="java.lang.Long">
+            <column name="notification_id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="receiverId" type="string" column="receiver_id"/>
+        <property name="sendNumber" type="int" column="send_number"/>
+        <property name="dateCreate" type="timestamp" column="create_date"/>
+        <property name="modifiedDate" type="timestamp" column="modified_date"/>
+        <property name="dueDate" type="timestamp" column="due_date"/>
+        <property name="taken" column="taken" type="boolean"/>
+        <many-to-one name="document" class="com.bkav.edoc.service.database.entity.EdocDocument" fetch="select">
+            <column name="document_id"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

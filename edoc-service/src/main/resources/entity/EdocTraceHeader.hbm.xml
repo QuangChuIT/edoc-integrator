@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocTraceHeader" table="edoc_trace_header">
+        <id name="traceHeaderId" type="java.lang.Long">
+            <column name="trace_header_id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="organDomain" type="string" column="organ_domain"/>
+        <property name="timeStamp" type="date" column="time_stamp"/>
+        <many-to-one name="traceHeaderList" class="com.bkav.edoc.service.database.entity.EdocTraceHeaderList"
+                     fetch="select">
+            <column name="document_id" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>

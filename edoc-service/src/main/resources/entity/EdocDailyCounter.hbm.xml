@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.EdocDailyCounter" table="edoc_dailycounter">
+        <id name="dailyCounterId" type="java.lang.Long">
+            <column name="dailyCounterId"/>
+            <generator class="identity"/>
+        </id>
+        <property name="organDomain" type="string" column="organDomain"/>
+        <property name="dateTime" type="timestamp" column="dateTime"/>
+        <property name="sent" column="sent" type="int"/>
+        <property name="received" column="received" type="int"/>
+    </class>
+</hibernate-mapping>

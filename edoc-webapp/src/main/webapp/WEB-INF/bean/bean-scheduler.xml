@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        default-init-method="afterPropertiesSet"
+        default-destroy-method="destroy"
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--Declare scheduler for public stat-->
+    <bean name="statDocumentJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.StatDocumentJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="statDocumentBean" value-ref="statDocumentBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="statDocumentTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="statDocumentJobDetail"/>
+        <property name="cronExpression" value="0 */2 * ? * *"/>
+        <!--<property name="cronExpression" value="0 0 1 ? * *"/>-->
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="statDocumentTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
+
+    <!--Declare scheduler for Get documents from VPCP-->
+    <bean name="getDocumentJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetDocumentJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="getDocumentBean" value-ref="getDocumentBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="getDocumentTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="getDocumentJobDetail"/>
+        <property name="cronExpression" value="0 */15 * ? * *"/>
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="getDocumentTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
+
+    <!--Declare scheduler for Get status from VPCP-->
+    <bean name="getStatusJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetStatusJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="getStatusVPCPBean" value-ref="getStatusVPCPBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="getStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="getStatusJobDetail"/>
+        <!--<property name="cronExpression" value="0 */15 * ? * *"/>-->
+        <property name="cronExpression" value="0 0 2 ? * *"/>
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="getStatusTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
+</beans>

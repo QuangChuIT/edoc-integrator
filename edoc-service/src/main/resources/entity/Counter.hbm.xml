@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.Counter" table="counter_">
+        <id name="name" type="java.lang.String">
+            <column name="name"/>
+            <generator class="native"/>
+        </id>
+        <property name="currentId" type="java.lang.Long" column="currentId"/>
+    </class>
+</hibernate-mapping>

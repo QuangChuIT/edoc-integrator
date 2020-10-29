@@ -55,6 +55,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
     public EdocDocument checkExistDocument(String edXmlDocumentId) {
         Session currentSession = openCurrentSession();
         try {
+            LOGGER.info("Check exist document for edxml document id " + edXmlDocumentId + " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed from EdocDocument ed where ed.edXMLDocId = :edXMLDocId");
             Query<EdocDocument> query = currentSession.createQuery(sql.toString());

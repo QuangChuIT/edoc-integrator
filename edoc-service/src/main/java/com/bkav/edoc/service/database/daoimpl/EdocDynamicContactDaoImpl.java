@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, Long> implements EdocDynamicContactDao {
@@ -67,7 +68,7 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
             Long count = query.uniqueResult();
             result = count > 0L;
         } catch (Exception e) {
-            LOGGER.error("Error when check permission for organId " + organId);
+            LOGGER.error("Error when check permission for organId " + organId + " cause " + Arrays.toString(e.getStackTrace()));
         } finally {
             if (session != null) {
                 session.close();

@@ -25,6 +25,7 @@ $(function () {
 
     $(".edoc-draft-table").hide();
     $(".edoc-report-table").hide();
+    $(".edoc-table-user").hide();
 
     $("#exportReportPDF").on("click", function (e) {
         e.preventDefault();

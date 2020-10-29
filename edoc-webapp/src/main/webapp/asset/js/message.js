@@ -118,7 +118,12 @@ let user_message = {
     "user_last_login_ip" : "Địa chỉ IP truy cập",
     "user_is_on_sso" : "Đồng bộ SSO",
     "user_is_on_sso_true" : "Đã đồng bộ",
-    "user_is_on_sso_false" : "Chưa đồng bộ"
+    "user_is_on_sso_false" : "Chưa đồng bộ",
+    "user_import_from_excel_success": "Nhập dữ liệu người dùng từ Excel thành công",
+    "user_import_invalid_format_file": "Sai định dạng file",
+    "user_import_from_excel_fail": "Nhập dữ liệu người dùng thất bại",
+    "user_import_from_excel_conflic": "Dữ liệu bị trùng",
+    "user_import_from_excel_invalid_column": "Các thông tin cột không đúng!"
 };
 
 let organ_message = {

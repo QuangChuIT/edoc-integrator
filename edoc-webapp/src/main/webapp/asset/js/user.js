@@ -87,4 +87,32 @@ $(document).ready(function () {
         });
     });
 });
-
+$(document).on("change", "#importExcel", function (e) {
+    //stop submit the form, we will post it manually.
+    e.preventDefault();
+    let form = $('#formImportUser')[0];
+    let data = new FormData(form);
+    $.ajax({
+        type: "POST",
+        enctype: 'multipart/form-data',
+        url: "/import/-/user/upload",
+        data: data,
+        processData: false, //prevent jQuery from automatically transforming the data into a query string
+        contentType: false,
+        cache: false,
+        success: function (response) {
+            console.log(response.code);
+            if (response.code === 201)
+                $.notify(user_message.user_import_from_excel_success, "success");
+            else if (response.code === 200)
+                $.notify(user_message.user_import_invalid_format_file, "error");
+            else if (response.code === 409)
+                $.notify(user_message.user_import_from_excel_conflic, "error");
+            else if (response.code === 400)
+                $.notify(user_message.user_import_from_excel_invalid_column, "error");
+        },
+        error: (e) => {
+            $.notify(user_message.user_import_from_excel_fail, "error");
+        }
+    });
+});

@@ -84,10 +84,7 @@ public class EdocDynamicContactService {
     }
 
     public EdocDynamicContact findContactByDomain(String organDomain) {
-        dynamicContactDaoImpl.openCurrentSession();
-        EdocDynamicContact dynamicContact = dynamicContactDaoImpl.findByDomain(organDomain);
-        dynamicContactDaoImpl.closeCurrentSession();
-        return dynamicContact;
+        return dynamicContactDaoImpl.findByDomain(organDomain);
     }
 
     public OrganizationCacheEntry findByDomain(String organDomain) {

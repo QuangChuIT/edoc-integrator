@@ -442,7 +442,6 @@
             </li>
         {{/each}}
     </ul>
-
 </script>
 <script id="edocDraftActionTemplate" type="text/x-jquery-tmpl">
     <div>

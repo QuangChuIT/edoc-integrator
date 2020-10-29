@@ -432,6 +432,7 @@ $(document).ready(function () {
                 $('#search-edoc').val(),
             ).draw();
         } else if (edocDocument.appSetting.mode === "userManage") {
+            $(".edoc-table-user").show();
             $("#dataTables-user").DataTable().search(
                 $("#search-edoc").val(),
             ).draw();

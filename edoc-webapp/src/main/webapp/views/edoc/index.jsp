@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page trimDirectiveWhitespaces="true" %>
+
 <div class="edoc-content">
     <div class="edoc-table">
         <div class="table-responsive">
@@ -18,6 +19,23 @@
     </div>
     <div class="edoc-table-user">
         <div class="table-responsive">
+            <form class="form-horizontal" id="formImportUser" method="POST" enctype="multipart/form-data">
+                <div class="row user-import" id="user-import">
+<%--                    <a href="#importExcel" data-rel="popup" data-position-to="window" data-transition="fade"--%>
+<%--                       class="btn btn-primary import-excel-button">--%>
+<%--                        <i class="fa fa-arrow-circle-up fa-fw"></i>--%>
+<%--                        <spring:message code="edoc.import.report"/></a>--%>
+                    <a class="btn btn-primary import-excel-button">
+                        <i class="fa fa-arrow-circle-up fa-fw"></i>
+                        <spring:message code="edoc.import.report"/>
+                        <input type="file" name="importExcel" id="importExcel" class="form-control">
+                    </a>
+                    <button class="btn btn-success adduser-button" id="addUser">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        <spring:message code="edoc.button.add.user"/>
+                    </button>
+                </div>
+            </form>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-user">
             </table>
         </div>

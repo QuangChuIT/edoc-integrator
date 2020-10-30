@@ -60,13 +60,14 @@ public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
 
     @Override
     public void createUser(User user) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         try {
             session.beginTransaction();
             this.persist(user);
             session.getTransaction().commit();
+            LOGGER.info("Create user success with user name " + user.getUsername());
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error create user with user name " + user.getUsername() + " cause" + user.getUsername());
             if (session != null) {
                 session.getTransaction().rollback();
             }

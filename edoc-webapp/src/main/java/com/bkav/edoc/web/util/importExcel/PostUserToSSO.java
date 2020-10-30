@@ -37,16 +37,17 @@ public class PostUserToSSO {
         return Base64.getEncoder().encodeToString(str.getBytes());
     }
 
-    public static String postUser(String userName, String password, String url, String json) throws IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    public static String postUser(String userName, String password, String url, String json)
+            throws IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
 
         String strBase64 = PostUserToSSO.getBase64Encode(userName, password);
         String result = "";
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
                 builder.build());
         CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(
-                sslsf).build();
+                sslConnectionSocketFactory).build();
         try {
             HttpPost httpPost = new HttpPost(url);
             StringEntity entity = new StringEntity(json);
@@ -95,16 +96,16 @@ public class PostUserToSSO {
     public static String createJson(User user) {
         JSONObject json = new JSONObject();
         JSONObject name = new JSONObject();
-        name.put("givenName",user.getUsername());
+        name.put("givenName", user.getUsername());
         JSONArray email = new JSONArray();
         email.put(user.getEmailAddress());
         JSONObject organization = new JSONObject();
         organization.put("organization", user.getDynamicContact().getDomain());
-        json.put("name",name);
-        json.put("emails",email);
-        json.put("userName",user.getUsername());
-        json.put("password","123abc@A");
-        json.put("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",organization);
+        json.put("name", name);
+        json.put("emails", email);
+        json.put("userName", user.getUsername());
+        json.put("password", "123abc@A");
+        json.put("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", organization);
         return json.toString();
     }
 }

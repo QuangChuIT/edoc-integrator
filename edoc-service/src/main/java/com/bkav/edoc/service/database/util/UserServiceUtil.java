@@ -28,4 +28,8 @@ public class UserServiceUtil {
     public static void updateUser(User user) {
         USER_SERVICE.updateUser(user);
     }
+
+    public static void createUser(User user) {
+        USER_SERVICE.createUser(user);
+    }
 }

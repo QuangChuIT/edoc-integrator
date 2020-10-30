@@ -53,9 +53,7 @@ public class UserService {
     }
 
     public void createUser(User user) {
-        userDao.openCurrentSession();
         userDao.createUser(user);
-        userDao.closeCurrentSession();
     }
 
     public UserCacheEntry getUserById(long userId) {

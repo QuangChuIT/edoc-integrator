@@ -6,10 +6,13 @@ import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRequest;
-import com.bkav.edoc.web.util.*;
+import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ReadExcelUtil;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class UserRestController {
@@ -105,8 +111,9 @@ public class UserRestController {
     @RequestMapping(method = RequestMethod.POST,
             value = "/import/-/user/upload")
     public ResponseEntity<Response> importUserFromExcel(@RequestParam("importExcel") MultipartFile file) {
+        List<User> users;
+        LOGGER.info("API import user from excel invoke !!!!!!!!!!!!!!!!!!!!!!!!!");
         List<String> errors = new ArrayList<>();
-        List<User> users = new ArrayList<>();
         try {
             String extension = AttachmentGlobalUtil.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
             if (!(extension.equals("xlsx") || extension.equals("xls"))) {
@@ -118,7 +125,8 @@ public class UserRestController {
             } else {
                 if (checkHeaderExcelFileForUser(file)) {
                     users = ReadExcelUtil.readExcelFileForUser(file);
-                    // ReadExcelUtil.PushExcelDataToSSO(users);
+                    LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
+                    ReadExcelUtil.PushExcelDataToSSO(users);
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                     errors.add(readFileSuccess);
                     Response response = new Response(201);
@@ -138,8 +146,8 @@ public class UserRestController {
         }
     }
 
-    private boolean checkHeaderExcelFileForUser (MultipartFile file) throws IOException {
-        Boolean flag = false;
+    private boolean checkHeaderExcelFileForUser(MultipartFile file) throws IOException {
+        boolean flag = false;
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
@@ -150,7 +158,7 @@ public class UserRestController {
         Row row = rowIterator.next();
 
         //For each row iterate through each columns
-        Iterator <Cell> cellIterator = row.cellIterator();
+        Iterator<Cell> cellIterator = row.cellIterator();
 
         String stt = messageSourceUtil.getMessage("user.import.excel.header.stt", null);
         String userName = messageSourceUtil.getMessage("user.import.excel.header.username", null);
@@ -163,19 +171,14 @@ public class UserRestController {
             Cell cell = cellIterator.next();
             if (colIndex == 0 && cell.getStringCellValue().equals(stt)) {
                 colIndex++;
-                continue;
             } else if (colIndex == 1 && cell.getStringCellValue().equals(userName)) {
                 colIndex++;
-                continue;
             } else if (colIndex == 2 && cell.getStringCellValue().equals(password)) {
                 colIndex++;
-                continue;
             } else if (colIndex == 3 && cell.getStringCellValue().equals(email)) {
                 colIndex++;
-                continue;
             } else if (colIndex == 4 && cell.getStringCellValue().equals(fullName)) {
                 colIndex++;
-                continue;
             } else if (colIndex == 5 && cell.getStringCellValue().equals(organDomain)) {
                 flag = true;
             }

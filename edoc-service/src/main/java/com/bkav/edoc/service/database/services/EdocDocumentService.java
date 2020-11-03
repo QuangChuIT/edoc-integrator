@@ -22,6 +22,7 @@ import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -86,7 +87,6 @@ public class EdocDocumentService {
             Query<Long> query = session.createQuery(queryDocument);
             query.setParameter("organDomain", organId);
             Long count = query.uniqueResult();
-            System.out.println(count);
             result = Math.toIntExact(count);
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));

@@ -1,4 +1,4 @@
-package com.bkav.edoc.web.util.importExcel;
+package com.bkav.edoc.web.util.ExcelService;
 
 import com.bkav.edoc.service.database.entity.User;
 import org.apache.http.HttpEntity;
@@ -43,10 +43,8 @@ public class PostUserToSSO {
         String result = "";
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                builder.build());
-        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(
-                sslsf).build();
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         try {
             HttpPost httpPost = new HttpPost(url);
             StringEntity entity = new StringEntity(json);
@@ -103,7 +101,7 @@ public class PostUserToSSO {
         json.put("name",name);
         json.put("emails",email);
         json.put("userName",user.getUsername());
-        json.put("password","123abc@A");
+        json.put("password",user.getPassword());
         json.put("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",organization);
         return json.toString();
     }

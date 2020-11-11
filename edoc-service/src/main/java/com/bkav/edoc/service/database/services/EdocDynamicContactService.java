@@ -159,4 +159,8 @@ public class EdocDynamicContactService {
         dynamicContactDaoImpl.createContact(contact);
         dynamicContactDaoImpl.closeCurrentSession();
     }
+
+    public boolean deleteOrgan(long organId) {
+        return dynamicContactDaoImpl.deleteOrgan(organId);
+    }
 }

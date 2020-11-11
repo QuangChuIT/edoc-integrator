@@ -153,6 +153,133 @@
     <!-- /.modal-content -->
 </div>
 
+<div class="modal fade" id="formAddUser" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-user fa-fw"></i>
+                    <spring:message code="edoc.add.user.title"/>
+                </span>
+            </div>
+            <div class="modal-body user-detail" id="edoc-add-user">
+                <form class="form-horizontal" id="addNewUser" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="addDisplayName">
+                                <spring:message code="user.add.new.fullName"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <textarea class="form-control" required rows="2" id="addDisplayName"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="addUserName">
+                                <spring:message code="user.add.new.userName"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" required id="addUserName" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="addOrganDomain">
+                                <spring:message code="user.add.new.organ"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <%--<textarea class="form-control" required rows="5" id="toOrgan"></textarea>--%>
+                            <select class="form-control to-organ" multiple id="addOrganDomain">
+                                <%
+                                    for (OrganizationCacheEntry organization : organizationCacheEntries) {
+                                %>
+                                <option value="<%=organization.getDomain()%>">
+                                    <%=organization.getName()%>
+                                </option>
+                                <%
+                                    }
+                                %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="addEmailAddress">
+                                <spring:message code="user.add.new.emailAddress"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" id="addEmailAddress" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="password">
+                                <spring:message code="user.add.new.password"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input id="password" type="password" class="form-control" name="password" value="">
+                            <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <button class="btn btn-success" id="btn-addUser-confirm">
+                                <spring:message code="edoc.button.confirm"/>
+                            </button>
+                            <button class="btn btn-danger" id="btn-addUser-cancel">
+                                <spring:message code="edoc.button.cancel"/>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formPermission" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-shield fa-fw"></i>
+                    <spring:message code="user.header.permission"/>
+                </span>
+            </div>
+            <div class="modal-body user-detail" id="permission">
+                <form class="form-horizontal" id="permissionForm" method="PUT" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            Test
+                        </div>
+                    </div>
+                    <hr>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script id="edocDetailTemplate" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">
         <div class="form-group">
@@ -452,7 +579,6 @@
             <i class="fa fa-trash fa-fw"></i>
         </a>
     </div>
-
 </script>
 <script id="edocSubjectTemplate" type="text/x-jquery-tmpl">
     <div>
@@ -579,7 +705,6 @@
             </div>
         </div>
     </form>
-
 </script>
 <script id="organNameTemplate" type="text/x-jquery-tmpl">
 <div>

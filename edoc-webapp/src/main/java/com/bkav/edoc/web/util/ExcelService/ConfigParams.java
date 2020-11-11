@@ -1,4 +1,4 @@
-package com.bkav.edoc.web.util.importExcel;
+package com.bkav.edoc.web.util.ExcelService;
 
 public class ConfigParams {
     public static final String IS_USERNAME = "IS.username";

@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDynamicContactDao;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.kernel.string.StringPool;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -101,6 +102,33 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
             LOGGER.error(e);
             session.getTransaction().rollback();
         }
+    }
+
+    @Override
+    public boolean deleteOrgan(long organId) {
+        Session session = openCurrentSession();
+        boolean result;
+        try {
+            session.beginTransaction();
+            EdocDynamicContact organ = this.findById(organId);
+            if (organ == null) {
+                LOGGER.error("Error delete organ not found document with id " + organId);
+                result = false;
+            } else {
+                session.delete(organ);
+                session.getTransaction().commit();
+                result = true;
+            }
+        } catch (Exception e) {
+            result = false;
+            LOGGER.error("Error delete organ with id " + organId + " cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return result;
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);

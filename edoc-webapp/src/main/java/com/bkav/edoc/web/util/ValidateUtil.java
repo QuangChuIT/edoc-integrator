@@ -1,10 +1,23 @@
 package com.bkav.edoc.web.util;
 
+import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
+import com.bkav.edoc.service.util.AttachmentGlobalUtil;
+import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.DocumentRequest;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ValidateUtil {
@@ -51,5 +64,78 @@ public class ValidateUtil {
         }
 
         return errors;
+    }
+
+    public List<String> validateAddUser(AddUserRequest addUserRequest) {
+        List<String> errors = new ArrayList<>();
+        if (addUserRequest.getDisplayName().equals("")) {
+            errors.add(messageSourceUtil.getMessage("user.error.displayName", null));
+        }
+
+        if (addUserRequest.getOrganDomain().equals("")) {
+            errors.add(messageSourceUtil.getMessage("edoc.error.organ", null));
+        }
+
+        if (addUserRequest.getUserName().equals("")) {
+            errors.add(messageSourceUtil.getMessage("edoc.error.username", null));
+        }
+
+        if (addUserRequest.getEmailAddress().equals("")) {
+            errors.add(messageSourceUtil.getMessage("edoc.error.email.address", null));
+        }
+
+        if (addUserRequest.getPassword().equals("")) {
+            errors.add(messageSourceUtil.getMessage("edoc.error.password", null));
+        }
+
+        return errors;
+    }
+
+    public boolean checkExtensionFile(MultipartFile file) {
+        String extension = AttachmentGlobalUtil.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
+        if (!(extension.equals("xlsx") || extension.equals("xls")))
+            return false;
+        else
+            return true;
+    }
+
+    public boolean checkHeaderExcelFileForUser (MultipartFile file) throws IOException {
+        Boolean flag = false;
+
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //Iterate through each row from first sheet
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        Row row = rowIterator.next();
+
+        //For each row iterate through each columns
+        Iterator<Cell> cellIterator = row.cellIterator();
+
+        int colIndex = 0;
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            if (colIndex == 0 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(1).getHeaderName())) {
+                colIndex++;
+                continue;
+            } else if (colIndex == 1 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(2).getHeaderName())) {
+                colIndex++;
+                continue;
+            } else if (colIndex == 2 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(3).getHeaderName())) {
+                colIndex++;
+                continue;
+            } else if (colIndex == 3 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(4).getHeaderName())) {
+                colIndex++;
+                continue;
+            } else if (colIndex == 4 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(5).getHeaderName())) {
+                colIndex++;
+                continue;
+            } else if (colIndex == 5 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(6).getHeaderName())) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 }

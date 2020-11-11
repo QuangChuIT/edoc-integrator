@@ -17,4 +17,6 @@ public interface EdocDynamicContactDao {
     void updateContact(EdocDynamicContact edocDynamicContact);
 
     void createContact(EdocDynamicContact contact);
+
+    boolean deleteOrgan(long organId);
 }

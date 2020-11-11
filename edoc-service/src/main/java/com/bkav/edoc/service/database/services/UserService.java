@@ -47,6 +47,13 @@ public class UserService {
         return user;
     }
 
+    public List<User> findAll() {
+        userDao.openCurrentSession();
+        List<User> users = userDao.findAll();
+        userDao.closeCurrentSession();
+        return users;
+    }
+
     public void updateUser(User user) {
         userDao.openCurrentSession();
         userDao.updateUser(user);
@@ -107,5 +114,9 @@ public class UserService {
             userDao.closeCurrentSession();
         }
         return userCacheEntries;
+    }
+
+    public boolean deleteUser(long userId) {
+        return userDao.deleteUser(userId);
     }
 }

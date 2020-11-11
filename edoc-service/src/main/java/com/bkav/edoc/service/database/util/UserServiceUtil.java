@@ -17,6 +17,10 @@ public class UserServiceUtil {
         return USER_SERVICE.getAllUsers();
     }
 
+    public static List<User> getUser() {
+        return USER_SERVICE.findAll();
+    }
+
     public static List<UserCacheEntry> getUsers(boolean onSSO) {
         return USER_SERVICE.getUsers(onSSO);
     }
@@ -27,5 +31,13 @@ public class UserServiceUtil {
 
     public static void updateUser(User user) {
         USER_SERVICE.updateUser(user);
+    }
+
+    public static void createUser(User user) {
+        USER_SERVICE.createUser(user);
+    }
+
+    public static boolean deleteUser(long userId) {
+        return USER_SERVICE.deleteUser(userId);
     }
 }

@@ -119,11 +119,18 @@ let user_message = {
     "user_is_on_sso" : "Đồng bộ SSO",
     "user_is_on_sso_true" : "Đã đồng bộ",
     "user_is_on_sso_false" : "Chưa đồng bộ",
+    "manage_remove_user": "Xóa người dùng",
+    "manage_permission_user": "Phân quyền",
+    "manage_edit_user": "Chỉnh sửa",
     "user_import_from_excel_success": "Nhập dữ liệu người dùng từ Excel thành công",
     "user_import_invalid_format_file": "Sai định dạng file",
     "user_import_from_excel_fail": "Nhập dữ liệu người dùng thất bại",
     "user_import_from_excel_conflic": "Dữ liệu bị trùng",
-    "user_import_from_excel_invalid_column": "Các thông tin cột không đúng!"
+    "user_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
+    "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công",
+    "user_export_to_excel_fail": "Xuất dữ liệu người dùng thất bại!",
+    "user_add_new_success": "Tạo người dùng mới thành công",
+    "user_add_new_fail": "Tạo người dùng mới thất bại",
 };
 
 let organ_message = {
@@ -147,5 +154,14 @@ let organ_message = {
     "organ_token_change" : "Tạo token",
     "organ_token_revoke" : "Thu hồi",
     "organ_status_active": "Đang hoạt động",
-    "organ_status_deactive" : "Ngừng hoạt động"
+    "organ_status_deactive" : "Ngừng hoạt động",
+    "manage_remove_organ": "Xóa đơn vị",
+    "manage_edit_organ": "Chỉnh sửa",
+    "organ_import_from_excel_success": "Nhập dữ liệu đơn vị từ Excel thành công",
+    "organ_import_invalid_format_file": "Sai định dạng file",
+    "organ_import_from_excel_fail": "Nhập dữ liệu đơn vị thất bại",
+    "organ_import_from_excel_conflic": "Dữ liệu bị trùng",
+    "organ_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
+    "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công",
+    "organ_export_to_excel_fail": "Xuất dữ liệu đơn vị thất bại!"
 };

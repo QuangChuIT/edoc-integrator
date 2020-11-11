@@ -45,4 +45,8 @@ public class EdocDynamicContactServiceUtil {
     public static void updateContact(EdocDynamicContact contact) {
         DYNAMIC_CONTACT_SERVICE.updateContact(contact);
     }
+
+    public static boolean deleteContact(long organId) {
+        return DYNAMIC_CONTACT_SERVICE.deleteOrgan(organId);
+    }
 }

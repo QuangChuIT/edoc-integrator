@@ -1,16 +1,15 @@
 package com.bkav.edoc.web.controller;
 
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
-import com.bkav.edoc.service.database.entity.User;
-import com.bkav.edoc.service.database.util.UserServiceUtil;
-import com.bkav.edoc.service.util.AttachmentGlobalUtil;
+import com.bkav.edoc.service.database.entity.*;
+import com.bkav.edoc.service.database.util.*;
+import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRequest;
 import com.bkav.edoc.web.util.*;
-import com.bkav.edoc.web.util.ReadExcelUtil;
+import com.bkav.edoc.web.util.ExcelUtil;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +17,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 @RestController
 public class UserRestController {
 
     private final MessageSourceUtil messageSourceUtil;
+    private final ValidateUtil validateUtil;
 
-    public UserRestController(MessageSourceUtil messageSourceUtil) {
+    public UserRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil) {
         this.messageSourceUtil = messageSourceUtil;
+        this.validateUtil = validateUtil;
     }
 
 
-    @RequestMapping(value = "/users",
+    @RequestMapping(value = "/public/-/users",
             method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
@@ -82,7 +82,7 @@ public class UserRestController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/user/{userId}", //
+    @RequestMapping(value = "/public/-/user/{userId}", //
             method = RequestMethod.GET, //
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
@@ -103,85 +103,105 @@ public class UserRestController {
      * Excel File Upload
      */
     @RequestMapping(method = RequestMethod.POST,
-            value = "/import/-/user/upload")
-    public ResponseEntity<Response> importUserFromExcel(@RequestParam("importExcel") MultipartFile file) {
+            value = "/public/-/user/import")
+    public ResponseEntity<?> importUserFromExcel(@RequestParam("importUserFromExcel") MultipartFile file) {
         List<String> errors = new ArrayList<>();
-        List<User> users = new ArrayList<>();
+        long numOfUser = 0;
         try {
-            String extension = AttachmentGlobalUtil.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
-            if (!(extension.equals("xlsx") || extension.equals("xls"))) {
+            if (validateUtil.checkExtensionFile(file)) {
+                if(validateUtil.checkHeaderExcelFileForUser(file)) {
+                    List<User> users = ExcelUtil.importUserFromExcel(file);
+                    numOfUser = ExcelUtil.PushUsersToSSO(users);
+                    String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
+                    errors.add(readFileSuccess);
+                    return new ResponseEntity<>(numOfUser, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(numOfUser, HttpStatus.NOT_ACCEPTABLE);
+                }
+            } else {
                 String invalidFormat = messageSourceUtil.getMessage("edoc.message.user.file.format.error", null);
                 LOGGER.error(invalidFormat);
                 errors.add(invalidFormat);
-                Response response = new Response(200);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                if (checkHeaderExcelFileForUser(file)) {
-                    users = ReadExcelUtil.readExcelFileForUser(file);
-                    // ReadExcelUtil.PushExcelDataToSSO(users);
-                    String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
-                    errors.add(readFileSuccess);
-                    Response response = new Response(201);
-                    return new ResponseEntity<>(response, HttpStatus.CREATED);
-                }
-
-                // Return response invalid column...
-                Response response = new Response(400);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(numOfUser, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             String uploadExcelError = messageSourceUtil.getMessage("edoc.message.file.upload.error", null);
             LOGGER.error(uploadExcelError + e.getMessage());
             errors.add(uploadExcelError);
-            Response response = new Response(400);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(numOfUser, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private boolean checkHeaderExcelFileForUser (MultipartFile file) throws IOException {
-        Boolean flag = false;
-        InputStream inputStream = file.getInputStream();
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
-
-        //Iterate through each row from first sheet
-        Iterator<Row> rowIterator = sheet.iterator();
-
-        Row row = rowIterator.next();
-
-        //For each row iterate through each columns
-        Iterator <Cell> cellIterator = row.cellIterator();
-
-        String stt = messageSourceUtil.getMessage("user.import.excel.header.stt", null);
-        String userName = messageSourceUtil.getMessage("user.import.excel.header.username", null);
-        String password = messageSourceUtil.getMessage("user.import.excel.header.password", null);
-        String email = messageSourceUtil.getMessage("user.import.excel.header.email", null);
-        String fullName = messageSourceUtil.getMessage("user.import.excel.header.fullname", null);
-        String organDomain = messageSourceUtil.getMessage("user.import.excel.header.organDomain", null);
-        int colIndex = 0;
-        while (cellIterator.hasNext()) {
-            Cell cell = cellIterator.next();
-            if (colIndex == 0 && cell.getStringCellValue().equals(stt)) {
-                colIndex++;
-                continue;
-            } else if (colIndex == 1 && cell.getStringCellValue().equals(userName)) {
-                colIndex++;
-                continue;
-            } else if (colIndex == 2 && cell.getStringCellValue().equals(password)) {
-                colIndex++;
-                continue;
-            } else if (colIndex == 3 && cell.getStringCellValue().equals(email)) {
-                colIndex++;
-                continue;
-            } else if (colIndex == 4 && cell.getStringCellValue().equals(fullName)) {
-                colIndex++;
-                continue;
-            } else if (colIndex == 5 && cell.getStringCellValue().equals(organDomain)) {
-                flag = true;
+    @DeleteMapping(value = "/public/-/user/delete/{userId}")
+    public HttpStatus deleteUser(@PathVariable("userId") Long userId) {
+        if (userId == null) {
+            return HttpStatus.BAD_REQUEST;
+        } else {
+            boolean deleteResult = UserServiceUtil.deleteUser(userId);
+            if (deleteResult) {
+                return HttpStatus.OK;
+            } else {
+                return HttpStatus.INTERNAL_SERVER_ERROR;
             }
         }
-        return flag;
     }
+
+    @RequestMapping(value = "/public/-/user/create", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> createUser(@RequestBody AddUserRequest addUserRequest) {
+        List<String> errors = new ArrayList<>();
+        try {
+            String message = "";
+            int code = 200;
+            if (addUserRequest != null) {
+                errors = validateUtil.validateAddUser(addUserRequest);
+                if (errors.size() == 0) {
+                    String fullName = addUserRequest.getDisplayName();
+                    String userName = addUserRequest.getUserName();
+                    String emailAddress = addUserRequest.getEmailAddress();
+                    List<String> organDomains = addUserRequest.getOrganDomain();
+                    String organDomain = organDomains.get(0);
+                    String password = addUserRequest.getPassword();
+                    EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+
+                    User newUser = new User();
+                    newUser.setDisplayName(fullName);
+                    newUser.setUsername(userName);
+                    newUser.setEmailAddress(emailAddress);
+                    newUser.setDynamicContact(organization);
+                    Date currentDate = new Date();
+                    newUser.setCreateDate(currentDate);
+                    newUser.setModifiedDate(currentDate);
+                    newUser.setStatus(true);
+                    newUser.setPassword(password);
+
+                    UserServiceUtil.createUser(newUser);
+                    message = messageSourceUtil.getMessage("user.message.create.success", null);
+                } else {
+                    code = 400;
+                    message = messageSourceUtil.getMessage("user.message.create.fail", null);
+                }
+            }
+            Response response = new Response(code, errors, message);
+            return new ResponseEntity<>(response, HttpStatus.valueOf(code));
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
+    public HttpStatus ExportUserToExcel() throws IOException {
+        boolean result;
+        List<User> users = UserServiceUtil.getUser();
+        result = ExcelUtil.exportUserToExcel(users);
+        if(result)
+            return HttpStatus.OK;
+        else
+            return HttpStatus.BAD_REQUEST;
+    }
+
+
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);
 }

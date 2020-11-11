@@ -39,7 +39,7 @@ let edocDocument = {
                 type: "GET"
             },
             drawCallback: function () {
-                $.contextMenu({
+                $(this).contextMenu({
                     selector: 'tbody tr td',
                     callback: function (key, options) {
                         let id = options.$trigger[0].parentElement.id;
@@ -49,7 +49,7 @@ let edocDocument = {
                     },
                     items: {
                         /*"edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
+                        /*"cut": {name: "Cut", icon: "cut"},
                         copy: {name: "Copy", icon: "copy"},
                         "paste": {name: "Paste", icon: "paste"},*/
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
@@ -457,9 +457,11 @@ $(document).ready(function () {
                 edocDocument.renderDaftTable();
                 $(".edoc-table-draft").show();
             } else if (dataMode === "userManage") {
+                $("#user-import-excel").show();
                 userManage.renderUserDatatable();
                 $(".edoc-table-user").show();
             } else if (dataMode === "organManage") {
+                $("#organ-import-excel").show();
                 organManage.renderOrganDatatable();
                 $(".edoc-table-organ").show();
             } else {

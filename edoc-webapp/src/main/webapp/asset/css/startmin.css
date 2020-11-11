@@ -127,6 +127,14 @@ table.dataTable thead .sorting:after {
         width: 550px !important;
     }
 
+    #formAddUser .modal-dialog {
+        width: 550px !important;
+    }
+
+    #formPermission .modal-dialog {
+        width: 450px !important;
+    }
+
     #organDetail .modal-dialog {
         width: 550px !important;
     }
@@ -514,8 +522,29 @@ ul.nav a.active {
     border: 0 !important;
 }
 
+#formPermission .modal-content {
+    top: 200px;
+    border-radius: 0 !important;
+    border: 0 !important;
+}
+
 .user-table .table-bordered {
     border: none !important;
+}
+
+#formAddUser .modal-content {
+    top: 150px;
+    border-radius: 0 !important;
+    border: 0 !important;
+}
+
+.field-icon {
+    float: right;
+    margin-right: 12px;
+    margin-left: -25px;
+    margin-top: -25px;
+    position: relative;
+    z-index: 2;
 }
 
 /*style for modal detail*/
@@ -602,12 +631,17 @@ ul.nav a.active {
     padding: 10px 0;
 }
 
-/*adding user or import from excel*/
+/*adding user/organ or import from excel*/
 .user-import {
     padding: 10px 0;
 }
 
 .adduser-button {
+    margin: 0 5px;
+    border-radius: 0 !important;
+}
+
+.addorgan-button {
     margin: 0 5px;
     border-radius: 0 !important;
 }
@@ -630,6 +664,14 @@ ul.nav a.active {
     font-size: 200px !important;
     direction: ltr;
     cursor: pointer;
+}
+
+#user-import-excel {
+    display:none;
+}
+
+#organ-import-excel {
+    display:none;
 }
 
 

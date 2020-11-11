@@ -23,9 +23,8 @@ $(function () {
         $('#' + t + 'C' + " ul li a").removeClass("active");
     });
 
-    $(".edoc-draft-table").hide();
+    $(".edoc-table-draft").hide();
     $(".edoc-report-table").hide();
-    $(".edoc-table-user").hide();
 
     $("#exportReportPDF").on("click", function (e) {
         e.preventDefault();

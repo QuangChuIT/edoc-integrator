@@ -17,4 +17,6 @@ public interface UserDao {
     boolean checkExist(String username);
 
     List<User> getUsers(boolean onSSO);
+
+    boolean deleteUser(long userId);
 }

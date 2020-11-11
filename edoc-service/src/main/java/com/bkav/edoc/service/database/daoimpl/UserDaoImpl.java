@@ -1,6 +1,7 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.UserDao;
+import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.User;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -99,6 +100,33 @@ public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
         query.where(builder.equal(root.get("sso"), onSSO));
         Query<User> userQuery = session.createQuery(query);
         return userQuery.getResultList();
+    }
+
+    @Override
+    public boolean deleteUser(long userId) {
+        Session session = openCurrentSession();
+        boolean result;
+        try {
+            session.beginTransaction();
+            User user = this.findById(userId);
+            if (user == null) {
+                LOGGER.error("Error delete user not found document with id " + userId);
+                result = false;
+            } else {
+                session.delete(user);
+                session.getTransaction().commit();
+                result = true;
+            }
+        } catch (Exception e) {
+            result = false;
+            LOGGER.error("Error delete user with id " + userId + " cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return result;
     }
 
     private final static Logger LOGGER = Logger.getLogger(UserDaoImpl.class);

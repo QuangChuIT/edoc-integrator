@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.UserRole" table="user_role">
+        <id name="Id" type="java.lang.Long">
+            <column name="userRoleId"/>
+            <generator class="identity"/>
+        </id>
+        <property name="userId" type="long"/>
+        <property name="roleId" type="long"/>
+    </class>
+</hibernate-mapping>

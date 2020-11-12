@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
                 return documents.get(0);
             }
         } catch (Exception e) {
-            LOGGER.error("Error check Exist document for edxml document id " + edXmlDocumentId);
+            LOGGER.error("Error check Exist document for edxml document id " + edXmlDocumentId + " cause " + Arrays.toString(e.getStackTrace()));
         } finally {
             if (currentSession != null) {
                 currentSession.close();

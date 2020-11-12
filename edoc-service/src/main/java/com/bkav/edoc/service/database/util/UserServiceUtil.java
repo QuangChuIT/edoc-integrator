@@ -32,4 +32,9 @@ public class UserServiceUtil {
     public static void createUser(User user) {
         USER_SERVICE.createUser(user);
     }
+
+
+    public static void main(String[] args) {
+        getAllUsers();
+    }
 }

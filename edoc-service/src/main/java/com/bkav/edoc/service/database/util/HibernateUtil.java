@@ -3,17 +3,20 @@ package com.bkav.edoc.service.database.util;
 import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cache.ehcache.EhCacheRegionFactory;
+import org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 
 import java.util.Properties;
 
 public class HibernateUtil {
 
-    private static SessionFactory sessionFactory = null;
+    private static StandardServiceRegistry serviceRegistry;
+    private static SessionFactory sessionFactory;
 
     public static synchronized SessionFactory getSessionFactory() {
         try {
@@ -26,26 +29,28 @@ public class HibernateUtil {
                 settings.put(Environment.USER, PropsUtil.get(Environment.USER));
                 settings.put(Environment.PASS, PropsUtil.get(Environment.PASS));
                 settings.put(Environment.DIALECT, PropsUtil.get(Environment.DIALECT));
-                settings.put(Environment.MAX_FETCH_DEPTH, PropsUtil.get(Environment.MAX_FETCH_DEPTH));
-                settings.put(Environment.ENABLE_LAZY_LOAD_NO_TRANS, PropsUtil.get(Environment.ENABLE_LAZY_LOAD_NO_TRANS));
+                //settings.put(Environment.MAX_FETCH_DEPTH, PropsUtil.get(Environment.MAX_FETCH_DEPTH));
+                //settings.put(Environment.ENABLE_LAZY_LOAD_NO_TRANS, PropsUtil.get(Environment.ENABLE_LAZY_LOAD_NO_TRANS));
                 settings.put(Environment.SHOW_SQL, PropsUtil.get(Environment.SHOW_SQL));
-                settings.put(Environment.POOL_SIZE, PropsUtil.get(Environment.POOL_SIZE));
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, PropsUtil.get(Environment.CURRENT_SESSION_CONTEXT_CLASS));
-                settings.put(Environment.AUTO_CLOSE_SESSION, PropsUtil.get(Environment.AUTO_CLOSE_SESSION));
-                settings.put(Environment.C3P0_MIN_SIZE, PropsUtil.get(Environment.C3P0_MIN_SIZE));
-                settings.put(Environment.C3P0_CONFIG_PREFIX + "initialPoolSize", 5);
-                settings.put(Environment.C3P0_MAX_STATEMENTS, PropsUtil.get(Environment.C3P0_MAX_STATEMENTS));
-                settings.put(Environment.C3P0_MAX_SIZE, PropsUtil.get(Environment.C3P0_MAX_SIZE));
-                settings.put(Environment.C3P0_TIMEOUT, PropsUtil.get(Environment.C3P0_TIMEOUT));
-                settings.put(Environment.C3P0_ACQUIRE_INCREMENT, PropsUtil.get(Environment.C3P0_ACQUIRE_INCREMENT));
-                settings.put(Environment.C3P0_IDLE_TEST_PERIOD, PropsUtil.get(Environment.C3P0_IDLE_TEST_PERIOD));
+                //settings.put(Environment.POOL_SIZE, PropsUtil.get(Environment.POOL_SIZE));
+                //settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, PropsUtil.get(Environment.CURRENT_SESSION_CONTEXT_CLASS));
+                //settings.put(Environment.AUTO_CLOSE_SESSION, PropsUtil.get(Environment.AUTO_CLOSE_SESSION));
+                // HikariCP settings
+                settings.put("hibernate.connection.provider_class", HikariCPConnectionProvider.class);
+                // Maximum waiting time for a connection from the pool
+                settings.put("hibernate.hikari.connectionTimeout", "20000");
+                // Minimum number of ideal connections in the pool
+                settings.put("hibernate.hikari.minimumIdle", "20");
+                // Maximum number of actual connection in the pool
+                settings.put("hibernate.hikari.maximumPoolSize", "300");
+                // Maximum time that a connection is allowed to sit ideal in the pool
+                settings.put("hibernate.hikari.idleTimeout", "300000");
                 // Enable second level cache (default value is true)
                 settings.put(Environment.USE_SECOND_LEVEL_CACHE, true);
-
                 // Enable Query cache
                 settings.put(Environment.USE_QUERY_CACHE, true);
-                // Specify cache provider
-                settings.put("hibernate.cache.region.factory_class", EhCacheRegionFactory.class);
+                settings.put("net.sf.ehcache.configurationResourceName", "ehcache.xml");
+                settings.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class);
 
                 configuration.setProperties(settings);
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/EdocDocument.hbm.xml"));
@@ -62,7 +67,7 @@ public class HibernateUtil {
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/User.hbm.xml"));
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/Counter.hbm.xml"));
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/EdocDailyCounter.hbm.xml"));
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+                serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             }
             return sessionFactory;
@@ -75,7 +80,9 @@ public class HibernateUtil {
 
     public static void shutdown() {
         // Close caches and connection pools
-        getSessionFactory().close();
+        if (serviceRegistry != null) {
+            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(HibernateUtil.class);

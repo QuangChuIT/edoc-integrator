@@ -22,7 +22,6 @@ import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -236,7 +235,8 @@ public class EdocDocumentService {
             currentSession.getTransaction().commit();
             return document;
         } catch (Exception e) {
-            LOGGER.error("Error when save document for organ domain " + messageHeader.getFrom().getOrganId());
+            LOGGER.error("Error when save document for organ domain "
+                    + messageHeader.getFrom().getOrganId() + " cause " + Arrays.toString(e.getStackTrace()));
             if (currentSession != null) {
                 currentSession.getTransaction().rollback();
             }

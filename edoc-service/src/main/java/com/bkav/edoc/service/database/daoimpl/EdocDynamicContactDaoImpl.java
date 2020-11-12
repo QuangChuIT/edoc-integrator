@@ -61,14 +61,17 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT count(*) from EdocDynamicContact edc where edc.domain=:domain and token=:token and edc.status=true");
-            Query<Long> query = session.createQuery(sql.toString());
+            sql.append("SELECT edc from EdocDynamicContact edc where edc.domain=:domain and token=:token and edc.status=true");
+            Query<EdocDynamicContact> query = session.createQuery(sql.toString());
             query.setParameter("domain", organId);
             query.setParameter("token", token);
-            Long count = query.uniqueResult();
-            result = count > 0L;
+            List<EdocDynamicContact> dynamicContacts = query.list();
+            if (dynamicContacts != null && dynamicContacts.size() > 0) {
+                result = true;
+            }
+            LOGGER.info("Check permission success for organ " + organId);
         } catch (Exception e) {
-            LOGGER.error("Error when check permission for organId " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+            LOGGER.error("Error when check permission for organId " + organId + " cause " + e.getMessage());
         } finally {
             if (session != null) {
                 session.close();

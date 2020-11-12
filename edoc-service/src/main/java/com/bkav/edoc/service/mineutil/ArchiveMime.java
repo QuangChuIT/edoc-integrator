@@ -126,13 +126,14 @@ public class ArchiveMime {
         LOGGER.info("Success convert message header in create mine with attachment size " + attachmentsByEntity.size());
         traceHeaderDocument = xmlUtil.getTraceHeaderDoc(ed.getHeader()
                 .getTraceHeaderList(), ns);
+        LOGGER.info(ed.getHeader().getTraceHeaderList().toString());
         LOGGER.info("Success convert trace header list in create mine with attachment size " + attachmentsByEntity.size());
         List<Reference> references = new ArrayList<>();
 
         long dataAttSize = 0L;
 
         // Create attachment
-        if (attachmentsByEntity != null) {
+        if (attachmentsByEntity.size() > 0) {
             attachments = new Attachments();
             for (Attachment attachment : attachmentsByEntity) {
                 InputStream attStream = attachment.getInputStream();

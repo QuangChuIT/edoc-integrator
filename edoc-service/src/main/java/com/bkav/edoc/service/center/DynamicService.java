@@ -499,9 +499,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error when get document " + ex + " with documentId " + documentId);
+            LOGGER.error("Error get document " + ex + " with documentId " + documentId);
             errorList.add(new Error("M.GetDocument",
-                    "Error when process get document " + ex.getMessage() + " with documentId " + documentId));
+                    "Error process get document " + ex.getMessage() + " with documentId " + documentId));
 
             report = new Report(false, new ErrorList(errorList));
 

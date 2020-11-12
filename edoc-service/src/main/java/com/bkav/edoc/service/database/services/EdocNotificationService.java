@@ -12,10 +12,7 @@ import com.bkav.edoc.service.xml.base.header.Organization;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -45,12 +42,13 @@ public class EdocNotificationService {
                 notification.setDocument(document);
                 notification.setTaken(false);
                 notificationDaoImpl.persist(notification);
-                LOGGER.error("Save edoc notification success for document " + document.getDocumentId() + " and code " + document.getDocCode());
+                LOGGER.info("Save edoc notification success for document " + document.getDocumentId() + " and code " + document.getDocCode());
                 notifications.add(notification);
             }
             currentSession.getTransaction().commit();
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error save notification for document id " +
+                    document.getDocumentId() + " doc code " + document.getDocCode() + " cause " + Arrays.toString(e.getStackTrace()));
             if (currentSession != null) {
                 currentSession.getTransaction().rollback();
             }

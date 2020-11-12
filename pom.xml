@@ -72,19 +72,16 @@
                 <artifactId>commons-logging</artifactId>
                 <version>${common.logging.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.sun.xsom</groupId>
                 <artifactId>xsom</artifactId>
                 <version>${xsom.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.jdom</groupId>
                 <artifactId>jdom2</artifactId>
                 <version>${jdom2.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
@@ -95,20 +92,17 @@
                 <artifactId>gson</artifactId>
                 <version>${com.google.code.gson.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
             </dependency>
-
             <!-- MySQL database driver -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
             </dependency>
-
             <!-- Hibernate framework -->
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -124,9 +118,8 @@
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache</artifactId>
-                <version>${ehcache}</version>
+                <version>${net.ehcache}</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
@@ -147,75 +140,86 @@
                 <artifactId>java-jwt</artifactId>
                 <version>3.1.0</version>
             </dependency>
-
             <dependency>
                 <groupId>com.nimbusds</groupId>
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>7.3</version>
             </dependency>
-
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
             </dependency>
-
             <!-- Hibernate library dependency end -->
             <dependency>
                 <groupId>javax.transaction</groupId>
                 <artifactId>jta</artifactId>
                 <version>${jta.version}</version>
             </dependency>
-
             <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>stax2-api</artifactId>
                 <version>${stax2-api.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
-
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>net.spy</groupId>
                 <artifactId>spymemcached</artifactId>
                 <version>${memcached.version}</version>
             </dependency>
-
             <!-- https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client -->
             <dependency>
                 <groupId>org.apache.oltu.oauth2</groupId>
                 <artifactId>org.apache.oltu.oauth2.client</artifactId>
                 <version>1.0.2</version>
             </dependency>
-
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>${quartz.scheduler.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz-jobs</artifactId>
                 <version>${quartz.scheduler.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${org.slf4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${org.slf4j}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.google.inject/guice -->
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -285,14 +289,16 @@
         <mysql-connector.version>6.0.6</mysql-connector.version>
         <org.hibernate.version>5.2.17.Final</org.hibernate.version>
         <org.ehcache.version>3.3.1</org.ehcache.version>
-        <ehcache>2.10.6</ehcache>
-        <org.hibernate.javax.persistence.version>1.0.0.Final</org.hibernate.javax.persistence.version>
+        <net.ehcache>2.10.3</net.ehcache>
+        <guava.version>24.1.1-jre</guava.version>
         <dom4j.version>1.6.1</dom4j.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <cglib.version>2.2</cglib.version>
         <jta.version>1.1</jta.version>
+        <guice.version>4.2.0</guice.version>
         <commons-codec.version>1.10</commons-codec.version>
         <jersey.version>1.19.4</jersey.version>
+        <org.slf4j>1.7.25</org.slf4j>
         <servlet-api.version>2.5</servlet-api.version>
         <stax2-api.version>3.0.1</stax2-api.version>
         <log4j.version>1.2.17</log4j.version>

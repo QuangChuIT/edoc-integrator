@@ -11,7 +11,6 @@ import com.bkav.edoc.service.xml.base.header.StaffInfo;
 import com.bkav.edoc.service.xml.base.header.TraceHeader;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import java.util.ArrayList;
@@ -91,42 +90,40 @@ public class EdocTraceHeaderListService {
      * @return
      */
     public TraceHeaderList getTraceHeaderListByDocId(long documentId) {
-        traceHeaderListDaoImpl.openCurrentSession();
-
         TraceHeaderList traceHeaderList = null;
         // get list trace
         EdocTraceHeaderList edocTraceHeaderList = traceHeaderListDaoImpl.getTraceHeaderListByDocId(documentId);
+        if (edocTraceHeaderList != null) {
+            //Hibernate.initialize(edocTraceHeaderList.getTraceHeaders());
+            Set<EdocTraceHeader> edocTraceHeaders = edocTraceHeaderList.getTraceHeaders();
 
-        Hibernate.initialize(edocTraceHeaderList.getTraceHeaders());
-        Set<EdocTraceHeader> edocTraceHeaders = edocTraceHeaderList.getTraceHeaders();
+            traceHeaderList = new TraceHeaderList();
 
-        traceHeaderList = new TraceHeaderList();
+            Business business = new Business();
+            business.setPaper(edocTraceHeaderList.getPaper());
+            business.setBusinessDocReason(edocTraceHeaderList.getBusinessDocReason());
+            business.setBusinessDocType(edocTraceHeaderList.getBusinessDocType().ordinal());
+            String businessInfo = edocTraceHeaderList.getBusinessInfo();
+            StaffInfo staffInfo = new StaffInfo();
+            staffInfo.setMobile(edocTraceHeaderList.getMobile());
+            staffInfo.setStaff(edocTraceHeaderList.getStaff());
+            staffInfo.setEmail(edocTraceHeaderList.getEmail());
+            staffInfo.setDepartment(edocTraceHeaderList.getDepartment());
+            business.setStaffInfo(staffInfo);
 
-        Business business = new Business();
-        business.setPaper(edocTraceHeaderList.getPaper());
-        business.setBusinessDocReason(edocTraceHeaderList.getBusinessDocReason());
-        business.setBusinessDocType(edocTraceHeaderList.getBusinessDocType().ordinal());
-        String businessInfo = edocTraceHeaderList.getBusinessInfo();
-        StaffInfo staffInfo = new StaffInfo();
-        staffInfo.setMobile(edocTraceHeaderList.getMobile());
-        staffInfo.setStaff(edocTraceHeaderList.getStaff());
-        staffInfo.setEmail(edocTraceHeaderList.getEmail());
-        staffInfo.setDepartment(edocTraceHeaderList.getDepartment());
-        business.setStaffInfo(staffInfo);
+            List<TraceHeader> traceHeaders = new ArrayList<>();
+            for (EdocTraceHeader edocTraceHeader : edocTraceHeaders) {
+                // add trace header
+                TraceHeader traceHeader = new TraceHeader();
+                traceHeader.setOrganId(edocTraceHeader.getOrganDomain());
+                traceHeader.setTimestamp(edocTraceHeader.getTimeStamp());
+                traceHeaders.add(traceHeader);
+            }
 
-        List<TraceHeader> traceHeaders = new ArrayList<>();
-        for (EdocTraceHeader edocTraceHeader : edocTraceHeaders) {
-            // add trace header
-            TraceHeader traceHeader = new TraceHeader();
-            traceHeader.setOrganId(edocTraceHeader.getOrganDomain());
-            traceHeader.setTimestamp(edocTraceHeader.getTimeStamp());
-            traceHeaders.add(traceHeader);
+            traceHeaderList.setTraceHeaders(traceHeaders);
+            traceHeaderList.setBusiness(business);
+            traceHeaderList.setBusinessInfo(businessInfo);
         }
-
-        traceHeaderList.setTraceHeaders(traceHeaders);
-        traceHeaderList.setBusiness(business);
-        traceHeaderList.setBusinessInfo(businessInfo);
-        traceHeaderListDaoImpl.closeCurrentSession();
         return traceHeaderList;
     }
 

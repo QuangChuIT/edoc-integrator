@@ -44,6 +44,26 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return selectedAttachmentNames.containsAll(attachmentNames);
     }
 
+    public EdocDocument getDocumentById(long documentId) {
+        Session session = openCurrentSession();
+        EdocDocument document = null;
+        try {
+            session.beginTransaction();
+            document = this.findById(documentId);
+            if (document == null) {
+                LOGGER.error("Not found document with document id " + documentId);
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error find document with document id " + documentId + " in database !!!!!!!!!!!" + " cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return document;
+    }
+
     public List<EdocDocument> selectForDailyCounter(Date date) {
         Session session = getCurrentSession();
         StringBuilder sql = new StringBuilder();

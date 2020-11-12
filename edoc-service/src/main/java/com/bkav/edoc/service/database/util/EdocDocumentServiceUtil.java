@@ -44,12 +44,12 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocument(documentId);
     }
 
-    public static void createDocument(EdocDocument document) {
-        DOCUMENT_SERVICE.addDocument(document);
+    public static EdocDocument createDocument(EdocDocument document) {
+        return DOCUMENT_SERVICE.addDocument(document);
     }
 
-    public static void createDocumentDetail(EdocDocumentDetail documentDetail) {
-        EDOC_DOCUMENT_DETAIL_SERVICE.addDocumentDetail(documentDetail);
+    public static EdocDocumentDetail createDocumentDetail(EdocDocumentDetail documentDetail) {
+        return EDOC_DOCUMENT_DETAIL_SERVICE.addDocumentDetail(documentDetail);
     }
 
     public static void addDocumentToPending(List<String> toOrgans, long documentId) {

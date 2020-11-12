@@ -400,8 +400,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
             map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
         } catch (Exception e) {
-            LOGGER.error("Error when update traces " + e);
-            errorList.add(new Error("M.UpdateTraces", "Error when process get update " + e.getMessage()));
+            LOGGER.error("Error when update traces cause " + Arrays.toString(e.getStackTrace()));
+            errorList.add(new Error("M.UpdateTraces", "Error when process get update " + Arrays.toString(e.getStackTrace())));
 
             report = new Report(false, new ErrorList(errorList));
 
@@ -473,9 +473,11 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                         .getKey(String.valueOf(documentId), RedisKey.GET_ENVELOP_FILE), String.class);
                 Document savedDoc = null;
                 if (savedDocStr != null) {
+                    LOGGER.info("Found edxml of document with id " + documentId + " in cache !!!!!!!!!!!!!!!");
                     savedDoc = xmlUtil.getDocumentFromFile(new ByteArrayInputStream(savedDocStr.getBytes(StandardCharsets.UTF_8)));
                 }
                 if (savedDoc != null) {
+                    LOGGER.info("Create mime from edxml file of document with id " + documentId + " in cache !!!!!!!!!!!!!!!");
                     map = archiveMime.createMime(savedDoc, attachmentsByEntity);
                 } else {
                     // get info in db
@@ -484,12 +486,22 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     // TODO: Get Trace for edXML Message in here
                     TraceHeaderList traceHeaderList = traceHeaderListService.getTraceHeaderListByDocId(documentId);
                     LOGGER.info("Get trace header list success for document id " + documentId);
-                    // parse business info
-                    mapper.parseBusinessInfo(traceHeaderList);
 
-                    Ed ed = new Ed(new Header(messageHeader, traceHeaderList));
-                    map = archiveMime.createMime(ed, attachmentsByEntity);
-                    LOGGER.info("Create ed success for get document " + documentId);
+                    if (messageHeader != null && traceHeaderList != null) {
+                        // parse business info
+                        mapper.parseBusinessInfo(traceHeaderList);
+                        Ed ed = new Ed(new Header(messageHeader, traceHeaderList));
+                        LOGGER.info("Initial Ed success for document id " + documentId + " !!!!!!!!!!!!!!!!!!!!!!!!");
+                        map = archiveMime.createMime(ed, attachmentsByEntity);
+                        LOGGER.info("Create ed success for get document " + documentId);
+                    } else {
+                        errorList.add(new Error("M.GetDocument",
+                                "Get trace header list or get message header from database null !!!!!!!!!!!!!!!!!!"));
+                        report = new Report(false, new ErrorList(errorList));
+                        Document bodyChildDocument = xmlUtil.convertEntityToDocument(
+                                Report.class, report);
+                        map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
+                    }
                 }
             } else {
                 errorList.add(new Error("M.GetDocument", "OrganId and documentId required!"));
@@ -499,9 +511,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error get document " + ex + " with documentId " + documentId);
+            LOGGER.error("Error get document  with documentId " + documentId + " cause " + Arrays.toString(ex.getStackTrace()));
             errorList.add(new Error("M.GetDocument",
-                    "Error process get document " + ex.getMessage() + " with documentId " + documentId));
+                    "Error process get document " + Arrays.toString(ex.getStackTrace()) + " with documentId " + documentId));
 
             report = new Report(false, new ErrorList(errorList));
 
@@ -618,7 +630,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                         attachmentsEntity, strDocumentId, attachmentCacheEntries, errorList);
                 if (document == null) {
                     report = new Report(false, new ErrorList(errorList));
-                    
+
                     bodyChildDocument = xmlUtil.convertEntityToDocument(Report.class, report);
 
                     map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);

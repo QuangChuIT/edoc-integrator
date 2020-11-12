@@ -36,7 +36,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -267,7 +270,7 @@ public class XmlUtil {
         // staff info
         OMElement staffInfoNode = getStaffInfoNode(business.getStaffInfo(), ns);
         businessNode.addChild(staffInfoNode);
-
+        LOGGER.error("Business " + business.toString());
         // replacement info list
         if (business.getBusinessDocType() == EdocTraceHeaderList.BusinessDocType.REPLACE.ordinal()) {
             OMElement replacementInfoListNode = getReplacementInfoListNode(business.getReplacementInfoList(), ns);
@@ -284,25 +287,27 @@ public class XmlUtil {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         OMElement replacementInfoListNode = factoryOM.createOMElement("ReplacementInfoList", ns);
+        if (replacementInfoList != null) {
+            if (replacementInfoList.getReplacementInfo() != null && replacementInfoList.getReplacementInfo().size() > 0) {
+                for (ReplacementInfo replacementInfo : replacementInfoList.getReplacementInfo()) {
+                    OMElement replacementInfoNode = factoryOM.createOMElement("ReplacementInfo", ns);
 
-        for (ReplacementInfo replacementInfo : replacementInfoList.getReplacementInfo()) {
-            OMElement replacementInfoNode = factoryOM.createOMElement("ReplacementInfo", ns);
+                    OMElement documentIdNode = factoryOM.createOMElement("DocumentId", ns);
+                    documentIdNode.setText(replacementInfo.getDocumentId());
+                    replacementInfoNode.addChild(documentIdNode);
 
-            OMElement documentIdNode = factoryOM.createOMElement("DocumentId", ns);
-            documentIdNode.setText(replacementInfo.getDocumentId());
-            replacementInfoNode.addChild(documentIdNode);
+                    OMElement organIdListNode = factoryOM.createOMElement("OrganIdList", ns);
+                    for (String organId : replacementInfo.getOrganIdList().getOrganId()) {
+                        OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
+                        organIdNode.setText(organId);
+                        organIdListNode.addChild(organIdNode);
+                    }
+                    replacementInfoNode.addChild(organIdListNode);
 
-            OMElement organIdListNode = factoryOM.createOMElement("OrganIdList", ns);
-            for (String organId : replacementInfo.getOrganIdList().getOrganId()) {
-                OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
-                organIdNode.setText(organId);
-                organIdListNode.addChild(organIdNode);
+                    replacementInfoListNode.addChild(replacementInfoNode);
+                }
             }
-            replacementInfoNode.addChild(organIdListNode);
-
-            replacementInfoListNode.addChild(replacementInfoNode);
         }
-
         return replacementInfoListNode;
     }
 
@@ -310,30 +315,33 @@ public class XmlUtil {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         OMElement businessDocumentInfoNode = factoryOM.createOMElement("BusinessDocumentInfo", ns);
+        if (businessDocumentInfo != null) {
+            OMElement documentInfoNode = factoryOM.createOMElement("DocumentInfo", ns);
+            documentInfoNode.setText(businessDocumentInfo.getDocumentInfo() == null ? "" : businessDocumentInfo.getDocumentInfo());
+            businessDocumentInfoNode.addChild(documentInfoNode);
 
-        OMElement documentInfoNode = factoryOM.createOMElement("DocumentInfo", ns);
-        documentInfoNode.setText(businessDocumentInfo.getDocumentInfo());
-        businessDocumentInfoNode.addChild(documentInfoNode);
+            OMElement documentReceiverNode = factoryOM.createOMElement("DocumentReceiver", ns);
+            documentReceiverNode.setText(businessDocumentInfo.getDocumentReceiver() == null ? "" : businessDocumentInfo.getDocumentReceiver());
+            businessDocumentInfoNode.addChild(documentReceiverNode);
 
-        OMElement documentReceiverNode = factoryOM.createOMElement("DocumentReceiver", ns);
-        documentReceiverNode.setText(businessDocumentInfo.getDocumentReceiver());
-        businessDocumentInfoNode.addChild(documentReceiverNode);
+            OMElement receiverListNode = factoryOM.createOMElement("ReceiverList", ns);
+            if (businessDocumentInfo.getReceiverList().getReceiver() != null && businessDocumentInfo.getReceiverList().getReceiver().size() > 0) {
+                for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
+                    OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
 
-        OMElement receiverListNode = factoryOM.createOMElement("ReceiverList", ns);
-        for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
-            OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
+                    OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
+                    receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
+                    receiverNode.addChild(receiverTypeNode);
 
-            OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
-            receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
-            receiverNode.addChild(receiverTypeNode);
+                    OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
+                    organIdNode.setText(String.valueOf(receiver.getOrganId()));
+                    receiverNode.addChild(organIdNode);
 
-            OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
-            organIdNode.setText(String.valueOf(receiver.getOrganId()));
-            receiverNode.addChild(organIdNode);
-
-            receiverListNode.addChild(receiverNode);
+                    receiverListNode.addChild(receiverNode);
+                }
+            }
+            businessDocumentInfoNode.addChild(receiverListNode);
         }
-        businessDocumentInfoNode.addChild(receiverListNode);
 
         return businessDocumentInfoNode;
     }

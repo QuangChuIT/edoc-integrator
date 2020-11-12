@@ -16,10 +16,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class EdocTraceService {
 
@@ -30,71 +27,70 @@ public class EdocTraceService {
             "dd/MM/yyyy");
 
     public boolean updateTrace(MessageStatus status) {
-        // get info from status
-        String fromOrganDomain = status.getFrom().getOrganId();
-        String fromOrganName = status.getFrom().getOrganName();
-        String fromOrganAdd = status.getFrom().getOrganAdd();
-        String telephone = status.getFrom().getTelephone();
-        String fax = status.getFrom().getFax();
-        String website = status.getFrom().getWebsite();
-        String organInCharge = status.getFrom().getOrganizationInCharge();
-        String toOrganDomain = status.getResponseFor().getOrganId();
-        String code = status.getResponseFor().getCode();
-        String documentId = status.getResponseFor().getDocumentId();
-        Date promulgationDate = status.getResponseFor().getPromulgationDate();
-
-        // get other info
-        String statusCodeStr = status.getStatusCode();
-        Integer statusCode = null;
-        try {
-            if (statusCodeStr != null && !statusCodeStr.isEmpty()) {
-                statusCode = Integer.parseInt(statusCodeStr);
-            }
-        } catch (NumberFormatException e) {
-            LOGGER.error(e);
-        }
-        String description = status.getDescription();
-        Date timestamp = status.getTimestamp();
-        // get info staff info
-        String department = status.getStaffInfo().getDepartment();
-        String email = status.getStaffInfo().getEmail();
-        String mobile = status.getStaffInfo().getMobile();
-        String staff = status.getStaffInfo().getStaff();
-
         Session currentSession = traceDaoImpl.openCurrentSession();
-        // search document by from organ domain and code
-        documentDaoImpl.setCurrentSession(currentSession);
-        EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
-        if (edocDocument == null) {
-            return false;
-        }
-
-        // set info to edoc trace
-        EdocTrace edocTrace = new EdocTrace();
-        edocTrace.setFromOrganDomain(fromOrganDomain);
-        edocTrace.setOrganName(fromOrganName);
-        edocTrace.setOrganAdd(fromOrganAdd);
-        edocTrace.setToOrganDomain(toOrganDomain);
-        edocTrace.setCode(code);
-        edocTrace.setPromulgationDate(promulgationDate);
-        edocTrace.setEdxmlDocumentId(documentId);
-        edocTrace.setStatusCode(statusCode);
-        edocTrace.setComment(description);
-        edocTrace.setTimeStamp(timestamp);
-        edocTrace.setDepartment(department);
-        edocTrace.setEmail(email);
-        edocTrace.setStaffMobile(mobile);
-        edocTrace.setStaffName(staff);
-        edocTrace.setServerTimeStamp(new Date());
-        edocTrace.setFax(fax);
-        edocTrace.setTelephone(telephone);
-        edocTrace.setWebsite(website);
-        edocTrace.setOrganizationInCharge(organInCharge);
-        edocTrace.setDocument(edocDocument);
-        edocTrace.setEdxmlDocumentId(documentId);
-        edocTrace.setEnable(true);
-        // insert trace to db
         try {
+            // get info from status
+            String fromOrganDomain = status.getFrom().getOrganId();
+            String fromOrganName = status.getFrom().getOrganName();
+            String fromOrganAdd = status.getFrom().getOrganAdd();
+            String telephone = status.getFrom().getTelephone();
+            String fax = status.getFrom().getFax();
+            String website = status.getFrom().getWebsite();
+            String organInCharge = status.getFrom().getOrganizationInCharge();
+            String toOrganDomain = status.getResponseFor().getOrganId();
+            String code = status.getResponseFor().getCode();
+            String documentId = status.getResponseFor().getDocumentId();
+            Date promulgationDate = status.getResponseFor().getPromulgationDate();
+
+            // get other info
+            String statusCodeStr = status.getStatusCode();
+            Integer statusCode = null;
+            try {
+                if (statusCodeStr != null && !statusCodeStr.isEmpty()) {
+                    statusCode = Integer.parseInt(statusCodeStr);
+                }
+            } catch (NumberFormatException e) {
+                LOGGER.error(e);
+            }
+            String description = status.getDescription();
+            Date timestamp = status.getTimestamp();
+            // get info staff info
+            String department = status.getStaffInfo().getDepartment();
+            String email = status.getStaffInfo().getEmail();
+            String mobile = status.getStaffInfo().getMobile();
+            String staff = status.getStaffInfo().getStaff();
+            // search document by from organ domain and code
+            documentDaoImpl.setCurrentSession(currentSession);
+            EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
+            if (edocDocument == null) {
+                return false;
+            }
+
+            // set info to edoc trace
+            EdocTrace edocTrace = new EdocTrace();
+            edocTrace.setFromOrganDomain(fromOrganDomain);
+            edocTrace.setOrganName(fromOrganName);
+            edocTrace.setOrganAdd(fromOrganAdd);
+            edocTrace.setToOrganDomain(toOrganDomain);
+            edocTrace.setCode(code);
+            edocTrace.setPromulgationDate(promulgationDate);
+            edocTrace.setEdxmlDocumentId(documentId);
+            edocTrace.setStatusCode(statusCode);
+            edocTrace.setComment(description);
+            edocTrace.setTimeStamp(timestamp);
+            edocTrace.setDepartment(department);
+            edocTrace.setEmail(email);
+            edocTrace.setStaffMobile(mobile);
+            edocTrace.setStaffName(staff);
+            edocTrace.setServerTimeStamp(new Date());
+            edocTrace.setFax(fax);
+            edocTrace.setTelephone(telephone);
+            edocTrace.setWebsite(website);
+            edocTrace.setOrganizationInCharge(organInCharge);
+            edocTrace.setDocument(edocDocument);
+            edocTrace.setEdxmlDocumentId(documentId);
+            edocTrace.setEnable(true);
+            // insert trace to db
             currentSession.beginTransaction();
             traceDaoImpl.persist(edocTrace);
             String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
@@ -108,8 +104,9 @@ public class EdocTraceService {
                 MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
             }
             currentSession.getTransaction().commit();
+            return true;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error update trace with status " + status.toString() + " cause " + Arrays.toString(e.getStackTrace()));
             if (currentSession != null) {
                 currentSession.getTransaction().rollback();
             }
@@ -118,7 +115,7 @@ public class EdocTraceService {
             traceDaoImpl.closeCurrentSession();
         }
 
-        return true;
+
     }
 
     private void saveEdocTraceCache(EdocTrace trace, String responseForOrganId) {

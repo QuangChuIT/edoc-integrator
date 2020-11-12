@@ -29,12 +29,12 @@ public class HibernateUtil {
                 settings.put(Environment.USER, PropsUtil.get(Environment.USER));
                 settings.put(Environment.PASS, PropsUtil.get(Environment.PASS));
                 settings.put(Environment.DIALECT, PropsUtil.get(Environment.DIALECT));
-                //settings.put(Environment.MAX_FETCH_DEPTH, PropsUtil.get(Environment.MAX_FETCH_DEPTH));
-                //settings.put(Environment.ENABLE_LAZY_LOAD_NO_TRANS, PropsUtil.get(Environment.ENABLE_LAZY_LOAD_NO_TRANS));
+                settings.put(Environment.MAX_FETCH_DEPTH, PropsUtil.get(Environment.MAX_FETCH_DEPTH));
+                settings.put(Environment.ENABLE_LAZY_LOAD_NO_TRANS, PropsUtil.get(Environment.ENABLE_LAZY_LOAD_NO_TRANS));
                 settings.put(Environment.SHOW_SQL, PropsUtil.get(Environment.SHOW_SQL));
                 //settings.put(Environment.POOL_SIZE, PropsUtil.get(Environment.POOL_SIZE));
-                //settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, PropsUtil.get(Environment.CURRENT_SESSION_CONTEXT_CLASS));
-                //settings.put(Environment.AUTO_CLOSE_SESSION, PropsUtil.get(Environment.AUTO_CLOSE_SESSION));
+                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, PropsUtil.get(Environment.CURRENT_SESSION_CONTEXT_CLASS));
+                settings.put(Environment.AUTO_CLOSE_SESSION, PropsUtil.get(Environment.AUTO_CLOSE_SESSION));
                 // HikariCP settings
                 settings.put("hibernate.connection.provider_class", HikariCPConnectionProvider.class);
                 // Maximum waiting time for a connection from the pool
@@ -42,15 +42,15 @@ public class HibernateUtil {
                 // Minimum number of ideal connections in the pool
                 settings.put("hibernate.hikari.minimumIdle", "20");
                 // Maximum number of actual connection in the pool
-                settings.put("hibernate.hikari.maximumPoolSize", "300");
+                settings.put("hibernate.hikari.maximumPoolSize", "30000");
                 // Maximum time that a connection is allowed to sit ideal in the pool
                 settings.put("hibernate.hikari.idleTimeout", "300000");
                 // Enable second level cache (default value is true)
-                settings.put(Environment.USE_SECOND_LEVEL_CACHE, true);
+                /*settings.put(Environment.USE_SECOND_LEVEL_CACHE, true);
                 // Enable Query cache
                 settings.put(Environment.USE_QUERY_CACHE, true);
-                settings.put("net.sf.ehcache.configurationResourceName", "ehcache.xml");
-                settings.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class);
+                settings.put("net.sf.ehcache.configurationResourceName", "./ehcache.xml");
+                settings.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class);*/
 
                 configuration.setProperties(settings);
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/EdocDocument.hbm.xml"));

@@ -47,10 +47,7 @@ public class EdocDocumentService {
     }
 
     public EdocDocument getDocument(long documentId) {
-        documentDaoImpl.openCurrentSession();
-        EdocDocument result = documentDaoImpl.findById(documentId);
-        documentDaoImpl.closeCurrentSession();
-        return result;
+        return documentDaoImpl.getDocumentById(documentId);
     }
 
     public List<EdocDocument> findAll() {
@@ -83,7 +80,7 @@ public class EdocDocumentService {
                     queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_DRAFT_TMP, paginationCriteria);
                     break;
             }
-            Query<Long> query = session.createQuery(queryDocument);
+            Query<Long> query = session.createQuery(queryDocument, Long.class);
             query.setParameter("organDomain", organId);
             Long count = query.uniqueResult();
             result = Math.toIntExact(count);
@@ -119,7 +116,7 @@ public class EdocDocumentService {
                     queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_DRAFT_TMP, paginationCriteria);
                     break;
             }
-            Query<EdocDocument> query = session.createQuery(queryDocument);
+            Query<EdocDocument> query = session.createQuery(queryDocument, EdocDocument.class);
             query.setParameter("organDomain", organId);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
@@ -454,15 +451,15 @@ public class EdocDocumentService {
         return mapper.modelToMessageHeader(document, detail);
     }
 
-    //KienNDc-InsertDocument
     public EdocDocument addDocument(EdocDocument edocDocument) {
         Session currSession = documentDaoImpl.openCurrentSession();
         try {
             currSession.beginTransaction();
             documentDaoImpl.persist(edocDocument);
             currSession.getTransaction().commit();
+            return edocDocument;
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error save document to database cause " + Arrays.toString(e.getStackTrace()));
             if (currSession != null) {
                 currSession.getTransaction().rollback();
             }
@@ -470,7 +467,6 @@ public class EdocDocumentService {
         } finally {
             documentDaoImpl.closeCurrentSession();
         }
-        return edocDocument;
     }
 
     public void updateDocument(long documentId) {

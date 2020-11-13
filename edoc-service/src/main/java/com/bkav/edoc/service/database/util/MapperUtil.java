@@ -126,7 +126,8 @@ public class MapperUtil {
             documentCacheEntry.setNotifications(notificationCacheEntries);
             return documentCacheEntry;
         } catch (Exception e) {
-            LOGGER.error("Error convert document model to cache entry with document id" + document.getDocumentId() + " clause " + e);
+            LOGGER.error("Error convert document model to cache entry with document id "
+                    + document.getDocumentId() + " clause " + Arrays.toString(e.getStackTrace()));
             return null;
         }
     }
@@ -252,7 +253,7 @@ public class MapperUtil {
         String fromOrgan = trace.getFromOrganDomain();
         String toOrgan = trace.getToOrganDomain();
         OrganizationCacheEntry fromOrganCache = EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(fromOrgan);
-        OrganizationCacheEntry toOrganCache =EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(toOrgan);
+        OrganizationCacheEntry toOrganCache = EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(toOrgan);
         traceCacheEntry.setFromOrgan(fromOrganCache);
         traceCacheEntry.setToOrgan(toOrganCache);
 

@@ -42,7 +42,8 @@ public class EdocNotificationService {
                 notification.setDocument(document);
                 notification.setTaken(false);
                 notificationDaoImpl.persist(notification);
-                LOGGER.info("Save edoc notification success for document " + document.getDocumentId() + " and code " + document.getDocCode());
+                LOGGER.info("Save edoc notification success for document " + document.getDocumentId()
+                        + " and code " + document.getDocCode());
                 notifications.add(notification);
             }
             currentSession.getTransaction().commit();

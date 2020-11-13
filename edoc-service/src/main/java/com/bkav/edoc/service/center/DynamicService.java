@@ -254,13 +254,13 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             try {
                 responseDocument = xmlUtil.convertEntityToDocument(GetTraceResponse.class, response);
             } catch (Exception ex) {
-                LOGGER.error("Error when build response for get traces !!!!! " + ex.getMessage());
+                LOGGER.error("Error build response for get traces !!!!! " + ex.getMessage());
             }
 
             map.put(StringPool.CHILD_BODY_KEY, responseDocument);
 
         } catch (Exception e) {
-            LOGGER.error("Error when get traces " + e);
+            LOGGER.error("Error get traces " + e);
             errorList.add(new Error("M.GetTraces", "Error when process get traces " + e.getMessage()));
 
             report = new Report(false, new ErrorList(errorList));

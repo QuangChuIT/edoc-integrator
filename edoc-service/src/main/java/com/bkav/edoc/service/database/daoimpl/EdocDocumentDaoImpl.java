@@ -97,17 +97,24 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
     public EdocDocument searchDocumentByOrganDomainAndCode(String toOrganDomain, String code) {
         Session currentSession = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
-                "and ed.docCode = :code");
-        Query<EdocDocument> query = currentSession.createQuery(sql.toString());
-        query.setParameter("fromOrganDomain", toOrganDomain);
-        query.setParameter("code", code);
-        List<EdocDocument> result = query.list();
-        if (result != null && result.size() > 0) {
-            return result.get(0);
+        try{
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
+                    "and ed.docCode = :code");
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString());
+            query.setParameter("fromOrganDomain", toOrganDomain);
+            query.setParameter("code", code);
+            List<EdocDocument> result = query.list();
+            if (result != null && result.size() > 0) {
+                return result.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            LOGGER.error("Error find document by organ domain an code with organ domain "
+                    + toOrganDomain + " code " + code + " cause " + Arrays.toString(e.getStackTrace()));
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -176,11 +183,9 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("page", Integer.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("size", Integer.class, ParameterMode.IN);
-
             storedProcedureQuery.setParameter("organId", organId);
             storedProcedureQuery.setParameter("page", start);
             storedProcedureQuery.setParameter("size", size);
-
             return storedProcedureQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();

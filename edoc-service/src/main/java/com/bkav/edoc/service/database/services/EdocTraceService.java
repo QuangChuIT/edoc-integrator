@@ -63,9 +63,9 @@ public class EdocTraceService {
             documentDaoImpl.setCurrentSession(currentSession);
             EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
             if (edocDocument == null) {
+                LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
                 return false;
             }
-
             // set info to edoc trace
             EdocTrace edocTrace = new EdocTrace();
             edocTrace.setFromOrganDomain(fromOrganDomain);
@@ -114,8 +114,6 @@ public class EdocTraceService {
         } finally {
             traceDaoImpl.closeCurrentSession();
         }
-
-
     }
 
     private void saveEdocTraceCache(EdocTrace trace, String responseForOrganId) {

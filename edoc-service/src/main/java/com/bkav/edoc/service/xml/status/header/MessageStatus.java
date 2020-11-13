@@ -129,6 +129,9 @@ public class MessageStatus extends BaseElement implements IMessageHeader {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this.getClass()).add("ResponseFor", this.responseFor).add("From", this.from).add("StatusCode", this.statusCode).add("Description", this.description).add("Timestamp", this.timestamp).add("StaffInfo", this.staffInfo).toString();
+        return MoreObjects.toStringHelper(this.getClass()).add("ResponseFor", this.responseFor)
+                .add("From", this.from).add("StatusCode", this.statusCode)
+                .add("Description", this.description).add("Timestamp", this.timestamp)
+                .add("StaffInfo", this.staffInfo).toString();
     }
 }

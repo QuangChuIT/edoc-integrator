@@ -51,7 +51,7 @@ let userManage = {
                         "edit": {name: user_message.manage_edit_user, icon: "edit"},
                         "delete": {name: user_message.manage_remove_user, icon: "delete"},
                         "sep1": "---------",
-                        "permission": {name: user_message.manage_permission_user, icon: "fa fa-shield"}
+                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"}
                     }
                 });
             },

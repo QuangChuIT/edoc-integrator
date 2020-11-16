@@ -264,21 +264,59 @@
                     <spring:message code="user.header.permission"/>
                 </span>
             </div>
-            <div class="modal-body user-detail" id="permission">
-                <form class="form-horizontal" id="permissionForm" method="PUT" enctype="multipart/form-data">
+            <div class="modal-body user-detail">
+                <form class="form-horizontal" id="permissionForm" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                        </div>
-                        <div class="col-md-9 col-sm-6 col-xs-12">
-                            Test
+                        <div class="col-md-5 col-sm-6 col-xs-12"></div>
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                                    <span class="permission-role"><spring:message code="user.role.permission.admin"/></span>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <span class="permission-role"><spring:message code="user.role.permission.user"/></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <hr>
+                    <hr class="permission-hr">
+                    <div class="form-group" id="userPermission">
+                    </div>
+                    <hr class="permission-hr">
+                    <div class="form-group">
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-5 col-sm-6 col-xs-12">
+                            <button class="btn btn-success" id="permission-confirm">
+                                <spring:message code="edoc.button.confirm"/>
+                            </button>
+                            <button class="btn btn-danger" id="permission-cancel">
+                                <spring:message code="edoc.button.cancel"/>
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script id="displayNamePermissionTemplate" type="text/x-jquery-tmpl">
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <span class="permission-role">${displayName}</span>
+    </div>
+    <div class="col-md-1 col-sm-6 col-xs-12"></div>
+    <div class="col-md-7 col-sm-6 col-xs-12">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="checkbox" id="adminRoleSelected" value="1"/><br/>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="checkbox" id="userRoleSelected" value="2"/><br/>
+            </div>
+        </div>
+    </div>
+</script>
 
 <script id="edocDetailTemplate" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">

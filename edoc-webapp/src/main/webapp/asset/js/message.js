@@ -131,6 +131,8 @@ let user_message = {
     "user_export_to_excel_fail": "Xuất dữ liệu người dùng thất bại!",
     "user_add_new_success": "Tạo người dùng mới thành công",
     "user_add_new_fail": "Tạo người dùng mới thất bại",
+    "user_set_permission_success": "Phân quyền người dùng thành công",
+    "user_set_permission_fail": "Phân quyền người dùng thất bại"
 };
 
 let organ_message = {

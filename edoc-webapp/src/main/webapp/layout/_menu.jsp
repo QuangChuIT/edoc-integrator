@@ -6,6 +6,11 @@
 <%@ page import="com.bkav.edoc.service.kernel.util.Base64" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.bkav.edoc.service.database.entity.EdocDynamicContact" %>
+<%@ page import="com.bkav.edoc.service.database.util.UserServiceUtil" %>
+<%@ page import="com.bkav.edoc.service.database.util.UserRoleServiceUtil" %>
+<%@ page import="com.bkav.edoc.service.database.entity.User" %>
+<%@ page import="com.bkav.edoc.service.database.entity.UserRole" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -15,8 +20,10 @@
     String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
     String userLogin = new String(Base64.decode(organCookie), StandardCharsets.UTF_8);
     OrganizationCacheEntry organizationCacheEntry = new Gson().fromJson(userLogin, OrganizationCacheEntry.class);
-    //remove this organ login from list
-    organizationCacheEntries.remove(organizationCacheEntry);
+    EdocDynamicContact contact = EdocDynamicContactServiceUtil.findDynamicContactById(organizationCacheEntry.getId());
+    User user = UserServiceUtil.getUserByOrgan(contact);
+    UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
+    long role = userRole.getRoleId();
 %>
 <div class="edoc-action">
     <button class="btn btn-lg btn-create-edoc">
@@ -72,7 +79,9 @@
                 <span class="menu-title"><spring:message code="menu.document.draft"/></span>
             </a>
         </li>
-<%--        <c:if test="check permission of user login">--%>
+        <%
+            if(role == 1) {
+        %>
         <li>
             <a href="javascript:void(0)" data-mode="system" class="system-management-menu not-click">
                 <i class="fa fa-cogs fa-fw"></i>
@@ -91,7 +100,9 @@
             </ul>
             <!-- /.nav-second-level -->
         </li>
-<%--        </c:if>--%>
+        <%
+            }
+        %>
     </ul>
 </nav>
 <nav id="reportTabC" class="navbar-default sidebar fade in tab-container">

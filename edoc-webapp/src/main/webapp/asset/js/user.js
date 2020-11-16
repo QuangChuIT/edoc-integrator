@@ -1,3 +1,4 @@
+let userId;
 let userManage = {
     userSetting: {
         host: "/public/-/user/",
@@ -26,6 +27,11 @@ let userManage = {
                     selector: 'tr',
                     callback: function (key, options) {
                         let id = options.$trigger[0].id;
+                        userId = id;
+                        // check id superadmin account.
+                        // if (id == "") {
+                        //     alert("Not edit in superadmin account!!!");
+                        // }
                         let m = "clicked: " + key + ' ' + id;
                         console.log(m);
                         switch(key) {
@@ -36,24 +42,16 @@ let userManage = {
                                 $('#user-menu').click();
                                 break;
                             case "permission":
-                                permissionClick();
+                                console.log(userId);
+                                permissionClick(userId);
                                 break;
                         }
                     },
                     items: {
                         "edit": {name: user_message.manage_edit_user, icon: "edit"},
-                        /*"cut": {name: "Cut", icon: "cut"},
-                        copy: {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},*/
-                        /*"permission": {name: user_message.manage_permission_user, icon: function() {
-                                return 'fa fa-shield';
-                            }},*/
                         "delete": {name: user_message.manage_remove_user, icon: "delete"},
                         "sep1": "---------",
-                        "permission": {name: user_message.manage_permission_user, icon: ""},
-                        /*"quit": {name: "Quit", icon: function(){
-                                return 'context-menu-icon context-menu-icon-quit';
-                            }}*/
+                        "permission": {name: user_message.manage_permission_user, icon: "fa fa-shield"}
                     }
                 });
             },
@@ -162,7 +160,36 @@ let userManage = {
             });
         }
     },
-    renderPermissionTable: function() {
+    createUserRole: function() {
+        let roleId;
+        if ($("#adminRoleSelected").is(":checked")) {
+            roleId = $("#adminRoleSelected").val();
+        } else if ($("#userRoleSelected").is(":checked")) {
+            roleId = $("#userRoleSelected").val();
+        }
+        let userRoleRequest = {
+            "userId": userId,
+            "roleId": roleId,
+        }
+        console.log(userRoleRequest);
+        $.ajax({
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            url: "/public/-/create/role/",
+            data: JSON.stringify(userRoleRequest),
+            cache: false,
+            success: function(response) {
+                if (response.code === 201) {
+                    $.notify(user_message.user_set_permission_success, "success");
+                } else if (response.code === 200) {
+                    $.notify(user_message.user_set_permission_success, "success");
+                }
+            },
+            error: function() {
+                $.notify(user_message.user_set_permission_fail, "error");
+            }
+        })
+        $('#formPermission').modal('toggle');
 
     }
 }
@@ -205,6 +232,14 @@ $(document).ready(function () {
         tags: true,
         maximumSelectionLength: 1
     });
+    $(document).on('click', 'input[type="checkbox"]', function() {
+        $('input[type="checkbox"]').not(this).prop('checked', false);
+    });
+    $(document).on("click", "#permission-confirm", function(e) {
+        e.preventDefault();
+        console.log(userId);
+        userManage.createUserRole(userId);
+    });
 });
 $(document).on("change", "#importUserFromExcel", function (e) {
     //stop submit the form, we will post it manually.
@@ -237,11 +272,6 @@ $(document).on("change", "#importUserFromExcel", function (e) {
     });
 });
 
-$(document).on("contextmenu", "#dataTables-user>tbody>tr", function (event) {
-    event.preventDefault();
-    console.log("right click to delete user");
-});
-
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
     $.ajax({
@@ -261,7 +291,6 @@ $(document).on('click', '#exportUserToExcel', function (e) {
 })
 
 $(".toggle-password").click(function() {
-
     $(this).toggleClass("fa-eye fa-eye-slash");
     let input = $($(this).attr("toggle"));
     if (input.attr("type") == "password") {
@@ -271,10 +300,6 @@ $(".toggle-password").click(function() {
     }
 });
 
-$(document).on("contextmenu", "#dataTables-user>tbody>tr", function (event) {
-    event.preventDefault();
-    console.log("right click to delete user");
-});
 $(document).on("click", "#btn-addUser-confirm", function (event) {
     event.preventDefault();
     userManage.createUser();
@@ -282,6 +307,11 @@ $(document).on("click", "#btn-addUser-confirm", function (event) {
 $(document).on("click", "#btn-addUser-cancel", function (event) {
     event.preventDefault();
     $("#formAddUser").modal('toggle');
+});
+
+$(document).on("click", "#permission-cancel", function (event) {
+    event.preventDefault();
+    $("#formPermission").modal('toggle');
 });
 
 function validateUser(displayName, userName, organDomain, password, emailAddress) {
@@ -338,7 +368,12 @@ function validateUser(displayName, userName, organDomain, password, emailAddress
     }
 }
 
-function permissionClick() {
+function permissionClick(userId) {
+    $.get("/public/-/user/" + userId, function (data) {
+        console.log(data);
+        $('#userPermission').empty();
+        $('#displayNamePermissionTemplate').tmpl(data).appendTo('#userPermission');
+    });
     $('#formPermission').modal({
         backdrop: 'static',
         keyboard: false

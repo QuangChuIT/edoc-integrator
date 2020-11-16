@@ -1,6 +1,5 @@
 package com.bkav.edoc.web.controller;
 
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.*;

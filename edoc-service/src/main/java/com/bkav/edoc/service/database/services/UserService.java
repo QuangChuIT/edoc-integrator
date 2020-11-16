@@ -1,7 +1,9 @@
 package com.bkav.edoc.service.database.services;
 
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.UserDaoImpl;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
@@ -57,6 +59,7 @@ public class UserService {
     public void updateUser(User user) {
         userDao.openCurrentSession();
         userDao.updateUser(user);
+        userDao.closeCurrentSession();
     }
 
     public void createUser(User user) {
@@ -114,6 +117,13 @@ public class UserService {
             userDao.closeCurrentSession();
         }
         return userCacheEntries;
+    }
+
+    public User getUserByOrgan(EdocDynamicContact organ) {
+        userDao.openCurrentSession();
+        User user = userDao.findByOrgan(organ);
+        userDao.closeCurrentSession();
+        return user;
     }
 
     public boolean deleteUser(long userId) {

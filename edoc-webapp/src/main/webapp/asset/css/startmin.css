@@ -528,6 +528,12 @@ ul.nav a.active {
     border: 0 !important;
 }
 
+.permission-hr {
+    margin-top: 0px;
+    margin-bottom: 25px;
+}
+
+
 .user-table .table-bordered {
     border: none !important;
 }
@@ -672,6 +678,10 @@ ul.nav a.active {
 
 #organ-import-excel {
     display:none;
+}
+
+.permission-role {
+    font-weight: 600;
 }
 
 

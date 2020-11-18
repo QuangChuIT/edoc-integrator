@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, Long> implements EdocDynamicContactDao {
@@ -22,7 +21,7 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain=:domain");
-            Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString());
+            Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
             query.setParameter("domain", domain);
             List<EdocDynamicContact> result = query.list();
             if (result != null && result.size() > 0) {
@@ -41,7 +40,7 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = getCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain");
-        Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString());
+        Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
         query.setParameter("domain", StringPool.PERCENT + domain + StringPool.PERCENT);
         return query.list();
     }
@@ -51,7 +50,7 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = getCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain");
-        Query<Long> query = currentSession.createQuery(sql.toString());
+        Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
         query.setParameter("domain", StringPool.PERCENT + organDomain + StringPool.PERCENT);
         return query.uniqueResult();
     }
@@ -62,14 +61,17 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT count(*) from EdocDynamicContact edc where edc.domain=:domain and token=:token and edc.status=true");
-            Query<Long> query = session.createQuery(sql.toString());
+            sql.append("SELECT edc from EdocDynamicContact edc where edc.domain=:domain and token=:token and edc.status=true");
+            Query<EdocDynamicContact> query = session.createQuery(sql.toString(), EdocDynamicContact.class);
             query.setParameter("domain", organId);
             query.setParameter("token", token);
-            Long count = query.uniqueResult();
-            result = count > 0L;
+            List<EdocDynamicContact> dynamicContacts = query.list();
+            if (dynamicContacts != null && dynamicContacts.size() > 0) {
+                result = true;
+            }
+            LOGGER.info("Check permission success for organ " + organId);
         } catch (Exception e) {
-            LOGGER.error("Error when check permission for organId " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+            LOGGER.error("Error when check permission for organId " + organId + " cause " + e.getMessage());
         } finally {
             if (session != null) {
                 session.close();

@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +44,26 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return selectedAttachmentNames.containsAll(attachmentNames);
     }
 
+    public EdocDocument getDocumentById(long documentId) {
+        Session session = openCurrentSession();
+        EdocDocument document = null;
+        try {
+            session.beginTransaction();
+            document = this.findById(documentId);
+            if (document == null) {
+                LOGGER.error("Not found document with document id " + documentId);
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error find document with document id " + documentId + " in database !!!!!!!!!!!" + " cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return document;
+    }
+
     public List<EdocDocument> selectForDailyCounter(Date date) {
         Session session = getCurrentSession();
         StringBuilder sql = new StringBuilder();
@@ -65,7 +86,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
                 return documents.get(0);
             }
         } catch (Exception e) {
-            LOGGER.error("Error check Exist document for edxml document id " + edXmlDocumentId);
+            LOGGER.error("Error check Exist document for edxml document id " + edXmlDocumentId + " cause " + Arrays.toString(e.getStackTrace()));
         } finally {
             if (currentSession != null) {
                 currentSession.close();
@@ -76,17 +97,24 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
     public EdocDocument searchDocumentByOrganDomainAndCode(String toOrganDomain, String code) {
         Session currentSession = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
-                "and ed.docCode = :code");
-        Query<EdocDocument> query = currentSession.createQuery(sql.toString());
-        query.setParameter("fromOrganDomain", toOrganDomain);
-        query.setParameter("code", code);
-        List<EdocDocument> result = query.list();
-        if (result != null && result.size() > 0) {
-            return result.get(0);
+        try{
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
+                    "and ed.docCode = :code");
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString());
+            query.setParameter("fromOrganDomain", toOrganDomain);
+            query.setParameter("code", code);
+            List<EdocDocument> result = query.list();
+            if (result != null && result.size() > 0) {
+                return result.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            LOGGER.error("Error find document by organ domain an code with organ domain "
+                    + toOrganDomain + " code " + code + " cause " + Arrays.toString(e.getStackTrace()));
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -155,11 +183,9 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("page", Integer.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("size", Integer.class, ParameterMode.IN);
-
             storedProcedureQuery.setParameter("organId", organId);
             storedProcedureQuery.setParameter("page", start);
             storedProcedureQuery.setParameter("size", size);
-
             return storedProcedureQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();

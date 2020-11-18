@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import java.util.Arrays;
+
 public class EdocDocumentDetailService {
 
     private final EdocDocumentDetailDaoImpl documentDetailDaoImpl = new EdocDocumentDetailDaoImpl();
@@ -43,15 +45,17 @@ public class EdocDocumentDetailService {
         }
     }
 
-    public void addDocumentDetail(EdocDocumentDetail edocDocumentDetail) {
+    public EdocDocumentDetail addDocumentDetail(EdocDocumentDetail edocDocumentDetail) {
         Session session = documentDetailDaoImpl.openCurrentSession();
         try {
             session.beginTransaction();
             documentDetailDaoImpl.persist(edocDocumentDetail);
             session.getTransaction().commit();
+            return edocDocumentDetail;
         } catch (Exception e) {
-            log.error(e);
+            log.error("Error save document detail cause " + Arrays.toString(e.getStackTrace()));
             if (session != null) session.getTransaction().rollback();
+            return null;
         } finally {
             assert session != null;
             session.close();

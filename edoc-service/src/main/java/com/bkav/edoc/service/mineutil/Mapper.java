@@ -6,7 +6,6 @@ package com.bkav.edoc.service.mineutil;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.services.EdocDynamicContactService;
 import com.bkav.edoc.service.resource.StringPool;
-import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.ed.header.*;
@@ -20,9 +19,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class Mapper {
 
@@ -35,8 +34,9 @@ public class Mapper {
     }
 
     public MessageHeader modelToMessageHeader(EdocDocument document, EdocDocumentDetail detail) {
-        MessageHeader messageHeader = new MessageHeader();
+        MessageHeader messageHeader = null;
         try {
+            messageHeader = new MessageHeader();
             Organization from = new Organization();
             from.setOrganId(document.getFromOrganDomain());
             // TODO: Can lay thong tin don vi roi insert vao
@@ -136,7 +136,7 @@ public class Mapper {
 
             String[] appendixesStrings = detail.getAppendixes().split("#");
             List<String> appendixes = new ArrayList<>();
-            if (appendixesStrings.length == 1 && appendixesStrings[0] == null){
+            if (appendixesStrings.length == 1 && appendixesStrings[0] == null) {
                 appendixes.add(StringPool.DEFAULT_STRING);
             } else {
                 Collections.addAll(appendixes, appendixesStrings);
@@ -163,7 +163,8 @@ public class Mapper {
             messageHeader.setSteeringType(document.getDocumentDetail().getSteeringType().ordinal());
             messageHeader.setOtherInfo(other);
         } catch (Exception e) {
-            LOGGER.error("Error when convert document to message header with document id " + document.getDocumentId() + " cause " + e);
+            LOGGER.error("Error when convert document to message header with document id " + document.getDocumentId()
+                    + " cause " + Arrays.toString(e.getStackTrace()));
         }
         return messageHeader;
 

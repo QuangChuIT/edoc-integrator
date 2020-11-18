@@ -1,10 +1,7 @@
 package com.bkav.edoc.web.vpcp;
 
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
-import com.bkav.edoc.service.database.entity.EdocAttachment;
-import com.bkav.edoc.service.database.entity.EdocDocument;
-import com.bkav.edoc.service.database.entity.EdocDocumentDetail;
-import com.bkav.edoc.service.database.entity.EdocNotification;
+import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.*;
 import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.util.CommonUtil;
@@ -111,26 +108,45 @@ public class ServiceVPCP {
                                 EdocDocument edocDocument = MapperUtil.modelToEdocDocument(messageHeader);
                                 edocDocument.setReceivedExt(true);
                                 edocDocument.setDocumentExtId(item.getId());
-                                EdocDocumentServiceUtil.createDocument(edocDocument);
+                                edocDocument = EdocDocumentServiceUtil.createDocument(edocDocument);
+                                if (edocDocument == null) {
+                                    continue;
+                                }
                                 // create document detail
                                 EdocDocumentDetail documentDetail = MapperUtil.modelToDocumentDetail(messageHeader);
                                 documentDetail.setDocument(edocDocument);
-                                EdocDocumentServiceUtil.createDocumentDetail(documentDetail);
+                                documentDetail = EdocDocumentServiceUtil.createDocumentDetail(documentDetail);
+                                if (documentDetail == null) {
+                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
+                                    continue;
+                                }
                                 // create trace header list
                                 //Get trace header list
                                 TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
                                 String businessInfo = CommonUtil.getBusinessInfo(traceHeaderList);
-                                EdocTraceHeaderListServiceUtil.addTraceHeaderList(traceHeaderList, businessInfo, edocDocument);
+                                EdocTraceHeaderList edocTraceHeaderList = EdocTraceHeaderListServiceUtil
+                                        .addTraceHeaderList(traceHeaderList, businessInfo, edocDocument);
+                                if (edocTraceHeaderList == null) {
+                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
+                                    continue;
+                                }
                                 //Get attachment
                                 List<Attachment> attachments = ed.getAttachments();
                                 List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
                                 Set<EdocAttachment> edocAttachments = EdocAttachmentServiceUtil.addAttachments(edocDocument, attachments
                                         , attachmentCacheEntries);
-                                LOGGER.warn(attachmentCacheEntries);
+                                if (attachmentCacheEntries.size() == 0) {
+                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
+                                    continue;
+                                }
                                 edocDocument.setAttachments(edocAttachments);
                                 // Add notification
                                 Set<EdocNotification> notifications = EdocNotificationServiceUtil.addNotifications(messageHeader.getToes(),
                                         messageHeader.getDueDate(), edocDocument);
+                                if (notifications.size() == 0) {
+                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
+                                    continue;
+                                }
                                 EdocDocumentServiceUtil.addDocumentToPendingCached(thisOrganizations, edocDocument.getDocumentId());
                                 edocDocument.setNotifications(notifications);
                                 LOGGER.info("Done save document vpcp from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
@@ -285,5 +301,6 @@ public class ServiceVPCP {
     public static void main(String[] args) throws IOException, ParserException {
         ServiceVPCP.getInstance().GetDocumentsTest();
     }
+
     private final static Logger LOGGER = Logger.getLogger(com.bkav.edoc.service.vpcp.ServiceVPCP.class);
 }

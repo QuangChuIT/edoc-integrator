@@ -79,8 +79,7 @@ public class EdocDynamicContactService {
     }
 
     public boolean checkPermission(String organId, String token) {
-        boolean result = dynamicContactDaoImpl.checkPermission(organId, token);
-        return result;
+        return dynamicContactDaoImpl.checkPermission(organId, token);
     }
 
     public EdocDynamicContact findContactByDomain(String organDomain) {

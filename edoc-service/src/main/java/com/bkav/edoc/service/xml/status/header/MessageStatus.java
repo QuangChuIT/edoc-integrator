@@ -118,7 +118,7 @@ public class MessageStatus extends BaseElement implements IMessageHeader {
                 } else if ("Description".equals(childrenElement.getName())) {
                     messageStatus.setDescription(childrenElement.getText());
                 } else if ("Timestamp".equals(childrenElement.getName())) {
-                    messageStatus.setTimestamp(DateUtils.parse(childrenElement.getTextTrim(), DateUtils.DEFAULT_DATE_FORMAT_REVERSE));
+                    messageStatus.setTimestamp(DateUtils.parse(childrenElement.getTextTrim(), DateUtils.DEFAULT_DATETIME_FORMAT));
                 } else if ("StaffInfo".equals(childrenElement.getName())) {
                     messageStatus.setStaffInfo(StaffInfo.fromNode(childrenElement));
                 }
@@ -129,6 +129,9 @@ public class MessageStatus extends BaseElement implements IMessageHeader {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this.getClass()).add("ResponseFor", this.responseFor).add("From", this.from).add("StatusCode", this.statusCode).add("Description", this.description).add("Timestamp", this.timestamp).add("StaffInfo", this.staffInfo).toString();
+        return MoreObjects.toStringHelper(this.getClass()).add("ResponseFor", this.responseFor)
+                .add("From", this.from).add("StatusCode", this.statusCode)
+                .add("Description", this.description).add("Timestamp", this.timestamp)
+                .add("StaffInfo", this.staffInfo).toString();
     }
 }

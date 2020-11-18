@@ -187,30 +187,6 @@ public class ExcelService {
             headerCell.setCellStyle(headerStyle);
         }
 
-//        headerCell = header.createCell(0);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(1).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(1);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(2).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(2);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(3).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(3);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(4).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(4);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(5).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(5);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(6).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
         int numRow = 1;
@@ -243,7 +219,7 @@ public class ExcelService {
             cell.setCellStyle(style);
             numRow++;
         }
-        File currDir = new File("/home/huynq/edoc/ExportExcel/Danh_sach_tai_khoan.xlsx");
+        File currDir = new File("C:\\Users\\Public\\Desktop\\Danh_sach_tai_khoan.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);
@@ -290,50 +266,6 @@ public class ExcelService {
             headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(j).getHeaderName());
             headerCell.setCellStyle(headerStyle);
         }
-
-//        headerCell = header.createCell(0);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(1).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(1);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(2).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(2);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(3).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(3);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(4).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(4);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(5).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(5);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(6).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(6);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(7).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(7);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(8).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(8);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(9).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(9);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(10).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
-//
-//        headerCell = header.createCell(10);
-//        headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(11).getHeaderName());
-//        headerCell.setCellStyle(headerStyle);
 
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
@@ -387,7 +319,7 @@ public class ExcelService {
             cell.setCellStyle(style);
             numRow++;
         }
-        File currDir = new File("/home/huynq/edoc/ExportExcel/Danh_sach_to_chuc.xlsx");
+        File currDir = new File("C:\\Users\\Public\\Desktop\\Danh_sach_to_chuc.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);

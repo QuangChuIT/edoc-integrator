@@ -502,6 +502,13 @@ ul.nav a.active {
     color: #000000 !important;
 }
 
+.user-detail .select2 {
+    width: 359px !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #000000 !important;
+}
+
 .user-content table.dataTable {
     margin-top: 0 !important;
     border-left: 0 !important;

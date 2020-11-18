@@ -29,9 +29,10 @@ let userManage = {
                         let id = options.$trigger[0].id;
                         userId = id;
                         // check id superadmin account.
-                        // if (id == "") {
-                        //     alert("Not edit in superadmin account!!!");
-                        // }
+                        if (id == "1") {
+                            alert("Không thể chỉnh sửa, xóa tài khoản super-admin!!!");
+                            return;
+                        }
                         let m = "clicked: " + key + ' ' + id;
                         console.log(m);
                         switch(key) {
@@ -49,9 +50,9 @@ let userManage = {
                     },
                     items: {
                         "edit": {name: user_message.manage_edit_user, icon: "edit"},
-                        "delete": {name: user_message.manage_remove_user, icon: "delete"},
+                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"},
                         "sep1": "---------",
-                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"}
+                        "delete": {name: user_message.manage_remove_user, icon: "delete"}
                     }
                 });
             },
@@ -190,7 +191,6 @@ let userManage = {
             }
         })
         $('#formPermission').modal('toggle');
-
     }
 }
 $(document).ready(function () {
@@ -230,7 +230,8 @@ $(document).ready(function () {
     });
     $("#addOrganDomain").select2({
         tags: true,
-        maximumSelectionLength: 1
+        maximumSelectionLength: 1,
+        width: "auto"
     });
     $(document).on('click', 'input[type="checkbox"]', function() {
         $('input[type="checkbox"]').not(this).prop('checked', false);

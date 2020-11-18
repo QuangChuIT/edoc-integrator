@@ -198,7 +198,7 @@
                         </div>
                         <div class="col-md-9 col-sm-6 col-xs-12">
                             <%--<textarea class="form-control" required rows="5" id="toOrgan"></textarea>--%>
-                            <select class="form-control to-organ" multiple id="addOrganDomain">
+                            <select class="form-control" multiple id="addOrganDomain">
                                 <%
                                     for (OrganizationCacheEntry organization : organizationCacheEntries) {
                                 %>

@@ -1,17 +1,3 @@
-// let organButtons = '<form class="form-horizontal" id="formImportUser" method="POST" enctype="multipart/form-data">\n' +
-//     '                <div class="row user-import" id="organ-import">\n' +
-//     '                    <a class="btn btn-primary import-excel-button">\n' +
-//     '                        <i class="fa fa-arrow-circle-up fa-fw"></i>\n' +
-//     '                        <spring:message code="edoc.import.report"/>\n' +
-//     '                        <input type="file" name="importExcel" id="importExcel" class="form-control">\n' +
-//     '                    </a>\n' +
-//     '                    <button class="btn btn-success adduser-button" id="addOrgan">\n' +
-//     '                        <i class="glyphicon glyphicon-plus"></i>\n' +
-//     '                        <spring:message code="edoc.button.add.organ"/>\n' +
-//     '                    </button>\n' +
-//     '                </div>\n' +
-//     '            </form>';
-
 let organManage = {
     organSetting: {
         host: "/contact/-/document/contacts",
@@ -51,7 +37,7 @@ let organManage = {
                         }
                     },
                     items: {
-                        "edit": {name: organ_message.manage_edit_organ, icon: "edit"},
+                        // "edit": {name: organ_message.manage_edit_organ, icon: "edit"},
                         /*"cut": {name: "Cut", icon: "cut"},
                         copy: {name: "Copy", icon: "copy"},
                         "paste": {name: "Paste", icon: "paste"},*/

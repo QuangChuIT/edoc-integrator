@@ -55,10 +55,10 @@
                         <i class="fa fa-arrow-circle-down fa-fw"></i>
                         <spring:message code="edoc.export.report"/>
                     </button>
-                    <button class="btn btn-success addorgan-button" id="addOrgan">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <spring:message code="edoc.button.add.organ"/>
-                    </button>
+<%--                    <button class="btn btn-success addorgan-button" id="addOrgan">--%>
+<%--                        <i class="glyphicon glyphicon-plus"></i>--%>
+<%--                        <spring:message code="edoc.button.add.organ"/>--%>
+<%--                    </button>--%>
                 </div>
             </form>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-organ">

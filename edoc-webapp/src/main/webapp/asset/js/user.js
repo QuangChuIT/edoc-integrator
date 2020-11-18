@@ -49,9 +49,9 @@ let userManage = {
                     },
                     items: {
                         "edit": {name: user_message.manage_edit_user, icon: "edit"},
-                        "delete": {name: user_message.manage_remove_user, icon: "delete"},
+                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"},
                         "sep1": "---------",
-                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"}
+                        "delete": {name: user_message.manage_remove_user, icon: "delete"}
                     }
                 });
             },
@@ -190,7 +190,6 @@ let userManage = {
             }
         })
         $('#formPermission').modal('toggle');
-
     }
 }
 $(document).ready(function () {

@@ -80,7 +80,7 @@
             </a>
         </li>
         <%
-            if(role == 1) {
+            if(role == 0 || role == 1) {
         %>
         <li>
             <a href="javascript:void(0)" data-mode="system" class="system-management-menu not-click">

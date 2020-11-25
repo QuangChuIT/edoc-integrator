@@ -44,7 +44,6 @@ let edocDocument = {
                     callback: function (key, options) {
                         let id = options.$trigger[0].parentElement.id;
                         let m = "clicked: " + key + ' ' + id;
-                        console.log(m);
                         instance.deleteDocument(id);
                     },
                     items: {
@@ -266,7 +265,6 @@ let edocDocument = {
                 "attachmentIds": attachmentIds,
                 "draft": isDraft
             };
-            console.log(documentRequest);
             $.ajax({
                 type: "POST",
                 contentType: "application/json;charset=utf-8",
@@ -313,7 +311,6 @@ let draftDocument = {
             url: "/document/-/draft/delete/" + edocDraftId,
             cache: false,
             success: function (response) {
-                console.log(response.code);
                 if (response.code === 200) {
                     window.localEdocStorage.clearAttachments();
                     $.notify(app_message.edoc_delete_draft_success, "success");
@@ -372,9 +369,7 @@ $(document).ready(function () {
     });
     $("#dataTables-edoc").on('click', 'tbody>tr', function () {
         let documentId = $(this).attr("id");
-        console.log(documentId);
         $.get("/document/" + documentId, function (data) {
-            console.log(data);
             data.attachments.forEach(function (key, index) {
                 console.log(key.fileType + " " + index);
             });
@@ -476,7 +471,6 @@ $(document).ready(function () {
     $("#dataTablesDraftDoc").mouseenter('tbody>tr', function () {
         $(".delete-draft").on('click', function () {
             let edocDraftId = $(this).attr("data-id");
-            console.log(edocDraftId);
             draftDocument.setDraftDocumentId(edocDraftId);
             $('#delete-confirm-modal').modal({
                 backdrop: 'static',
@@ -486,10 +480,8 @@ $(document).ready(function () {
 
         $(".edit-draft").on('click', function () {
             let edocDraftId = $(this).attr("data-id");
-            console.log(edocDraftId);
             draftDocument.setDraftDocumentId(edocDraftId);
             $.get("/document/" + edocDraftId, function (data) {
-                console.log(data);
                 $("#detail-draft-document").empty();
                 $("#draftDetailTemplate").tmpl(data).appendTo("#detail-draft-document");
             })
@@ -507,7 +499,6 @@ $(document).ready(function () {
 
 $(document).on("contextmenu", "#dataTables-edoc>tbody>tr", function (event) {
     event.preventDefault();
-    console.log("right click to end document");
 });
 $(document).on("click", ".show-trace-comment", function (event) {
     event.preventDefault();

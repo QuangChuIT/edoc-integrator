@@ -1,15 +1,12 @@
 package com.bkav.edoc.web.payload;
 
 import java.io.Serializable;
-import java.util.List;
 
-public class AddUserRequest implements Serializable {
+public class EditUserRequest implements Serializable {
     private long userId;
     private String displayName;
-    private String userName;
     private String emailAddress;
-    private List<String> organDomain;
-    private String password;
+    private String organDomain;
 
     public long getUserId() {
         return userId;
@@ -27,14 +24,6 @@ public class AddUserRequest implements Serializable {
         this.displayName = displayName;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getEmailAddress() {
         return emailAddress;
     }
@@ -43,19 +32,11 @@ public class AddUserRequest implements Serializable {
         this.emailAddress = emailAddress;
     }
 
-    public List<String> getOrganDomain() {
+    public String getOrganDomain() {
         return organDomain;
     }
 
-    public void setOrganDomain(List<String> organDomain) {
+    public void setOrganDomain(String organDomain) {
         this.organDomain = organDomain;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

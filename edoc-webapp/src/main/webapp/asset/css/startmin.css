@@ -131,11 +131,23 @@ table.dataTable thead .sorting:after {
         width: 550px !important;
     }
 
+    #formEditUser .modal-dialog {
+        width: 550px !important;
+    }
+
+    #formEditOrgan .modal-dialog {
+        width: 550px !important;
+    }
+
     #formPermission .modal-dialog {
         width: 450px !important;
     }
 
     #organDetail .modal-dialog {
+        width: 550px !important;
+    }
+
+    #formAddOrgan .modal-dialog {
         width: 550px !important;
     }
 
@@ -376,7 +388,8 @@ ul.nav a.active {
     color: #576ACC;
 }
 
-#organDetail .modal-content {
+#organDetail .modal-content,
+#formAddOrgan .modal-content {
     top: 150px;
     border-radius: 0 !important;
     border: 0 !important;
@@ -509,6 +522,13 @@ ul.nav a.active {
     color: #000000 !important;
 }
 
+#editOrganDomain {
+    width: 359px !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #000000 !important;
+}
+
 .user-content table.dataTable {
     margin-top: 0 !important;
     border-left: 0 !important;
@@ -523,14 +543,12 @@ ul.nav a.active {
     vertical-align: middle;
 }
 
-#userInfo .modal-content {
+#userInfo .modal-content,
+#formPermission .modal-content,
+#formAddUser .modal-content,
+#formEditUser .modal-content,
+#formEditOrgan .modal-content {
     top: 150px;
-    border-radius: 0 !important;
-    border: 0 !important;
-}
-
-#formPermission .modal-content {
-    top: 200px;
     border-radius: 0 !important;
     border: 0 !important;
 }
@@ -543,12 +561,6 @@ ul.nav a.active {
 
 .user-table .table-bordered {
     border: none !important;
-}
-
-#formAddUser .modal-content {
-    top: 150px;
-    border-radius: 0 !important;
-    border: 0 !important;
 }
 
 .field-icon {

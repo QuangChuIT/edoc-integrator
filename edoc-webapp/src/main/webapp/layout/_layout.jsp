@@ -197,7 +197,6 @@
                             <span class="required">*</span>
                         </div>
                         <div class="col-md-9 col-sm-6 col-xs-12">
-                            <%--<textarea class="form-control" required rows="5" id="toOrgan"></textarea>--%>
                             <select class="form-control" multiple id="addOrganDomain">
                                 <%
                                     for (OrganizationCacheEntry organization : organizationCacheEntries) {
@@ -252,6 +251,103 @@
     </div>
 </div>
 
+<div class="modal fade" id="formAddOrgan" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-users fa-fw"></i>
+                    <spring:message code="edoc.add.organ.title"/>
+                </span>
+            </div>
+            <div class="modal-body organ-detail" id="edoc-add-organ">
+                <form class="form-horizontal" id="addNewOrgan" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="name">
+                                <spring:message code="organ.add.new.name"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <textarea class="form-control" required rows="2" id="name"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="domain">
+                                <spring:message code="organ.add.new.domain"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" required id="domain" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="address">
+                                <spring:message code="organ.add.new.address"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" required id="address" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="email">
+                                <spring:message code="organ.add.new.email"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" id="email" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="inCharge">
+                                <spring:message code="organ.add.new.inCharge"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" id="inCharge" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <label class="control-label" for="telephone">
+                                <spring:message code="organ.add.new.telephone"/>
+                            </label>
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <input type="text" class="form-control" id="telephone" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <button class="btn btn-success" id="btn-addOrgan-confirm">
+                                <spring:message code="edoc.button.confirm"/>
+                            </button>
+                            <button class="btn btn-danger" id="btn-addOrgan-cancel">
+                                <spring:message code="edoc.button.cancel"/>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="formPermission" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -283,19 +379,45 @@
                     <div class="form-group" id="userPermission">
                     </div>
                     <hr class="permission-hr">
-                    <div class="form-group">
-                        <div class="col-md-7 col-sm-6 col-xs-12">
-                        </div>
-                        <div class="col-md-5 col-sm-6 col-xs-12">
-                            <button class="btn btn-success" id="permission-confirm">
-                                <spring:message code="edoc.button.confirm"/>
-                            </button>
-                            <button class="btn btn-danger" id="permission-cancel">
-                                <spring:message code="edoc.button.cancel"/>
-                            </button>
-                        </div>
+                    <div class="form-group" id="btn-userPermission">
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formEditUser" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-user fa-fw"></i>
+                    <spring:message code="edoc.edit.user.title"/>
+                </span>
+            </div>
+            <div class="modal-body user-detail" id="edoc-edit-user">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formEditOrgan" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-users fa-fw"></i>
+                    <spring:message code="edoc.edit.organ.title"/>
+                </span>
+            </div>
+            <div class="modal-body organ-detail" id="edoc-edit-organ">
             </div>
         </div>
     </div>
@@ -315,6 +437,18 @@
                 <input type="checkbox" id="userRoleSelected" value="2"/><br/>
             </div>
         </div>
+    </div>
+</script>
+<script id="btnUserPermissionTemplate" type="text/x-jquery-tmpl">
+    <div class="col-md-7 col-sm-6 col-xs-12">
+    </div>
+    <div class="col-md-5 col-sm-6 col-xs-12">
+        <button class="btn btn-success" data-id="${userId}" id="permission-confirm">
+            <spring:message code="edoc.button.confirm"/>
+        </button>
+        <button class="btn btn-danger" id="permission-cancel">
+            <spring:message code="edoc.button.cancel"/>
+        </button>
     </div>
 </script>
 
@@ -744,6 +878,144 @@
         </div>
     </form>
 </script>
+<script id="editUserTemplate" type="text/x-jquery-tmpl">
+    <form class="form-horizontal" id="editUser" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editDisplayName">
+                    ${user_message.user_table_header_fullName}
+                </label>
+                <span class="required">*</span>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <textarea class="form-control" required rows="2" id="editDisplayName">${displayName}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editOrganDomain">
+                    ${user_message.user_table_header_organize}
+                </label>
+                <span class="required">*</span>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <select class="form-control" id="editOrganDomain">
+                    <option value="${organization.domain}">${organization.name}</option>
+                    <%
+                        for (OrganizationCacheEntry organization : organizationCacheEntries) {
+                    %>
+                    <option value="<%=organization.getDomain()%>">
+                        <%=organization.getName()%>
+                    </option>
+                    <%
+                        }
+                    %>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editEmailAddress">
+                    ${user_message.user_table_header_email}
+                </label>
+                <span class="required">*</span>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editEmailAddress" value="${emailAddress}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12"></div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <button class="btn btn-success" data-id="${userId}" id="btn-editUser-confirm">
+                    <spring:message code="edoc.button.user.update"/>
+                </button>
+                <button class="btn btn-danger" id="btn-editUser-cancel">
+                    <spring:message code="edoc.button.cancel"/>
+                </button>
+            </div>
+        </div>
+    </form>
+</script>
+
+<script id="editOrganTemplate" type="text/x-jquery-tmpl">
+    <form class="form-horizontal" id="editOrgan" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editName">
+                    ${organ_message.organ_table_header_name}
+                </label>
+                <span class="required">*</span>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <textarea class="form-control" rows="2" id="editName">${name}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label " for="editInCharge">
+                    ${organ_message.organ_table_header_incharge}
+                </label>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editInCharge" value="${inCharge}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editDomain">
+                    ${organ_message.organ_table_header_domain}
+                </label>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editDomain" value="${domain}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editTelephone">
+                    ${organ_message.organ_table_header_phonenumber}
+                </label>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editTelephone" value="${telephone}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editEmail">
+                    ${organ_message.organ_table_header_email}
+                </label>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editEmail" value="${email}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <label class="control-label" for="editAddress">
+                    ${organ_message.organ_table_header_address}
+                </label>
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <input type="text" class="form-control" id="editAddress" value="${address}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <button class="btn btn-success" data-id="${id}" id="btn-edit-organ-confirm">
+                    ${organ_message.organ_btn_confirm}
+                </button>
+                <button class="btn btn-danger" data-id="${id}" id="btn-edit-organ-cancel">
+                    ${organ_message.organ_btn_cancel}
+                </button>
+            </div>
+        </div>
+    </form>
+</script>
+
 <script id="organNameTemplate" type="text/x-jquery-tmpl">
 <div>
     <a href=javascript:void(0)" title="${name}" data-id="${id}"

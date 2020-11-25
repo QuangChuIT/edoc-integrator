@@ -132,7 +132,11 @@ let user_message = {
     "user_add_new_success": "Tạo người dùng mới thành công",
     "user_add_new_fail": "Tạo người dùng mới thất bại",
     "user_set_permission_success": "Phân quyền người dùng thành công",
-    "user_set_permission_fail": "Phân quyền người dùng thất bại"
+    "user_set_permission_fail": "Phân quyền người dùng thất bại",
+    "user_delete_success": "Xóa người dùng thành công",
+    "user_delete_fail": "Xóa người dùng thất bại",
+    "user_edit_success": "Cập nhật người dùng thành công",
+    "user_edit_fail": "Cập nhật người dùng thất bại"
 };
 
 let organ_message = {
@@ -165,5 +169,13 @@ let organ_message = {
     "organ_import_from_excel_conflic": "Dữ liệu bị trùng",
     "organ_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
     "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công",
-    "organ_export_to_excel_fail": "Xuất dữ liệu đơn vị thất bại!"
+    "organ_export_to_excel_fail": "Xuất dữ liệu đơn vị thất bại!",
+    "organ_delete_success": "Xóa đơn vị thành công",
+    "organ_delete_fail": "Xóa đơn vị thất bại",
+    "organ_add_new_success": "Thêm mới đơn vị thành công",
+    "organ_add_new_fail": "Thêm mới đơn vị thất bại",
+    "organ_edit_success": "Cập nhật đơn vị thành công",
+    "organ_edit_fail": "Cập nhật đơn vị thất bại",
+    "organ_btn_confirm": "Cập nhật",
+    "organ_btn_cancel": "Hủy"
 };

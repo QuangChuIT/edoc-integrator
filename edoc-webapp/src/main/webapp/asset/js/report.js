@@ -24,7 +24,6 @@ let edocReport = {
     renderStat: function () {
         let instance = this;
         $.get("/public/-/document/stat", function (data, status) {
-            console.log(status);
             $("#publicContent").empty();
             $('#edocPublicStatTmpl').tmpl(data).appendTo('#publicContent');
             $("#totalReport").text(data.total);

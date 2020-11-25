@@ -3,8 +3,8 @@ package com.bkav.edoc.web.controller;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.*;
-import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.web.payload.AddUserRequest;
+import com.bkav.edoc.web.payload.EditUserRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRequest;
 import com.bkav.edoc.web.util.*;
@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class UserRestController {
@@ -83,6 +81,38 @@ public class UserRestController {
         }
         response = new Response(400, new ArrayList<>(), "Bad request");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value = "/public/-/user/edit", method = RequestMethod.PUT, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> editUser(@RequestBody EditUserRequest editUserRequest) {
+        List<String> errors = new ArrayList<>();
+        try {
+            String message = "";
+            int code = 200;
+            if (editUserRequest != null) {
+                if (errors.size() == 0) {
+                    String organDomain = editUserRequest.getOrganDomain();
+                    EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+                    User user = UserServiceUtil.findUserById(editUserRequest.getUserId());
+                    user.setDisplayName(editUserRequest.getDisplayName());
+                    user.setEmailAddress(editUserRequest.getEmailAddress());
+                    user.setDynamicContact(organization);
+
+                    UserCacheEntry userCacheEntry = MapperUtil.modelToUserCache(user);
+                    UserServiceUtil.updateUser(user);
+                    message = messageSourceUtil.getMessage("user.message.edit.success", null);
+                } else {
+                    code = 400;
+                    message = messageSourceUtil.getMessage("user.message.edit.fail", null);
+                }
+            }
+            Response response = new Response(code, errors, message);
+            return new ResponseEntity<>(response, HttpStatus.valueOf(code));
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", null));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/public/-/user/{userId}", //
@@ -156,6 +186,7 @@ public class UserRestController {
     @RequestMapping(value = "/public/-/user/create", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Response> createUser(@RequestBody AddUserRequest addUserRequest) {
         List<String> errors = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         try {
             String message = "";
             int code = 200;
@@ -181,7 +212,9 @@ public class UserRestController {
                     newUser.setStatus(true);
                     newUser.setPassword(password);
 
-                    UserServiceUtil.createUser(newUser);
+//                    UserServiceUtil.createUser(newUser);
+                    users.add(newUser);
+                    long numUserSuccess = ExcelUtil.PushUsersToSSO(users);
                     message = messageSourceUtil.getMessage("user.message.create.success", null);
                 } else {
                     code = 400;
@@ -206,6 +239,31 @@ public class UserRestController {
             return HttpStatus.OK;
         else
             return HttpStatus.BAD_REQUEST;
+    }
+
+    @RequestMapping(value = "/user/-/create/admin", method = RequestMethod.POST)
+    public HttpStatus CreateAdminUser() {
+        if (UserServiceUtil.checkExistUserByUserName(messageSourceUtil.getMessage("user.create.admin.username", null))) {
+            return HttpStatus.OK;
+        } else {
+            User user = new User();
+            user.setUsername(messageSourceUtil.getMessage("user.create.admin.username", null));
+            user.setPassword(messageSourceUtil.getMessage("user.create.admin.password", null));
+            user.setDisplayName(messageSourceUtil.getMessage("user.create.admin.displayname", null));
+            Date currentDate = new Date();
+            user.setCreateDate(currentDate);
+            user.setModifiedDate(currentDate);
+            user.setStatus(true);
+            user.setSso(true);
+
+            UserServiceUtil.createUser(user);
+
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getUserId());
+            userRole.setRoleId(1);
+            UserRoleServiceUtil.createUserRole(userRole);
+            return HttpStatus.CREATED;
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);

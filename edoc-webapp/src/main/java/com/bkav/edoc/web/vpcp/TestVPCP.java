@@ -1,15 +1,9 @@
 package com.bkav.edoc.web.vpcp;
 
-import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
-import com.bkav.edoc.service.database.entity.EdocAttachment;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDocumentDetail;
-import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.util.*;
-import com.bkav.edoc.service.util.CommonUtil;
-import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Organization;
-import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import com.bkav.edoc.service.xml.base.parser.ParserException;
 import com.bkav.edoc.service.xml.base.util.UUidUtils;
 import com.bkav.edoc.service.xml.ed.Ed;
@@ -20,9 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TestVPCP {
@@ -47,20 +39,6 @@ public class TestVPCP {
         documentDetail.setDocument(edocDocument);
         EdocDocumentServiceUtil.createDocumentDetail(documentDetail);
         // create trace header list
-        //Get trace header list
-        TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
-        String businessInfo = CommonUtil.getBusinessInfo(traceHeaderList);
-        EdocTraceHeaderListServiceUtil.addTraceHeaderList(traceHeaderList, businessInfo, edocDocument);
-        //Get attachment
-        List<Attachment> attachments = ed.getAttachments();
-        List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-        Set<EdocAttachment> edocAttachments = EdocAttachmentServiceUtil.addAttachments(edocDocument, attachments, attachmentCacheEntries);
-        edocDocument.setAttachments(edocAttachments);
-        // Add notification
-        Set<EdocNotification> notifications = EdocNotificationServiceUtil.addNotifications(messageHeader.getToes(), messageHeader.getDueDate(), edocDocument);
-        EdocDocumentServiceUtil.addDocumentToPendingCached(thisOrganizations, edocDocument.getDocumentId());
-        edocDocument.setNotifications(notifications);
-        System.out.println(edocDocument.getDocumentId());
     }
 
     private static List<Organization> filterOrgan(List<Organization> organizations) {

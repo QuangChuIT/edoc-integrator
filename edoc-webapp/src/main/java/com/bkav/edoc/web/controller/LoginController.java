@@ -62,6 +62,7 @@ public class LoginController {
         String tokenSSO = getTokenSSO(request, response, code);
 
         if (tokenSSO == null) {
+            LOGGER.error("Get token error for sso !!!!!!!");
             response.sendRedirect("/errors");
         } else {
             response.sendRedirect(redirect_url);
@@ -160,12 +161,12 @@ public class LoginController {
             session.setAttribute("responseObject", responseObject);
 
             if (idToken != null) {
+                LOGGER.info("Get id token successfully from sso " + idToken);
                 DecodedJWT claims = JwtService.getClaims(idToken);
                 String tokenIn = claims.getSubject();
                 String organization = claims.getClaim("organization").asString();
-                String sid = claims.getClaim("sid").asString();
-                System.out.println("sid--------------------> " + sid);
                 if (tokenIn != null && organization != null) {
+                    LOGGER.info("Get subject and organization success !!!!");
                     long expiredValue = claims.getExpiresAt().getTime();
                     long startValue = claims.getIssuedAt().getTime();
                     long cookiesAgeValue = expiredValue - startValue;
@@ -174,6 +175,7 @@ public class LoginController {
                     UserCacheEntry userCacheEntry = userService.findByUsername(tokenIn);
                     OrganizationCacheEntry organLogin = EdocDynamicContactServiceUtil.findByDomain(organization);
                     if (userCacheEntry != null && organLogin != null) {
+                        LOGGER.info("Get user and organization success !!!!");
                         token = tokenIn;
                         // Create sso cookie with username
                         Cookie ssoCookie = CookieUtil.create(OAuth2Constants.TOKEN_SSO, token, isUseSecure, cookiesAge, host_);
@@ -187,6 +189,7 @@ public class LoginController {
                         userService.updateUser(userLogin);
                         String userJson = gson.toJson(userCacheEntry);
                         String userEncodeValue = Base64.encode(userJson.getBytes(StandardCharsets.UTF_8));
+                        LOGGER.info("Cookies user and organization success  1 !!!!");
                         Cookie userLoginCookies = CookieUtil.create(OAuth2Constants.USER_LOGIN, userEncodeValue, false, cookiesAge, host_);
                         response.addCookie(userLoginCookies);
                         session.setAttribute("authenticated", true);
@@ -197,15 +200,20 @@ public class LoginController {
                         response.addCookie(stateCookie);
                         response.addCookie(idTokenCookie);
                         // Create organization cookies
-
                         Cookie organCookie = CookieUtil.create(OAuth2Constants.ORGANIZATION, organization, isUseSecure, cookiesAge, host_);
                         response.addCookie(organCookie);
                         session.setAttribute("organization", organization);
                         String organJson = gson.toJson(organLogin);
                         String organEncodeValue = Base64.encode(organJson.getBytes(StandardCharsets.UTF_8));
                         Cookie organLoginCookies = CookieUtil.create(OAuth2Constants.ORGANIZATION_INFO, organEncodeValue, isUseSecure, cookiesAge, host_);
+                        LOGGER.info("Cookies user and organization success 2!!!!");
                         response.addCookie(organLoginCookies);
+                        LOGGER.info("Cookies user and organization success 3 !!!!");
+                    } else {
+                        LOGGER.error("Get user and organization fail 4 !!!!");
                     }
+                } else {
+                    LOGGER.error("Get claims not return from sso !!!!!!!");
                 }
             }
         } catch (Exception e) {

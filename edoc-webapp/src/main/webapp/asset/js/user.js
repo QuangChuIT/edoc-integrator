@@ -1,4 +1,3 @@
-let userId;
 let userManage = {
     userSetting: {
         host: "/public/-/user/",
@@ -14,9 +13,6 @@ let userManage = {
     renderUserDatatable: function () {
         let instance = this;
         instance.dataTable = $('#dataTables-user').DataTable({
-            serverSide: true,
-            processing: true,
-            pageLength: 25,
             ajax: {
                 url: "/public/-/users",
                 type: "GET",
@@ -28,31 +24,36 @@ let userManage = {
                     callback: function (key, options) {
                         let id = options.$trigger[0].id;
                         userId = id;
-                        // check id superadmin account.
-                        if (id == "1") {
-                            alert("Không thể chỉnh sửa, xóa tài khoản super-admin!!!");
-                            return;
-                        }
                         let m = "clicked: " + key + ' ' + id;
-                        console.log(m);
                         switch(key) {
                             case "delete":
                                 instance.deleteUser(id);
                                 break;
                             case "edit":
-                                $('#user-menu').click();
+                                editUserClick(userId);
                                 break;
                             case "permission":
-                                console.log(userId);
                                 permissionClick(userId);
                                 break;
                         }
                     },
                     items: {
-                        "edit": {name: user_message.manage_edit_user, icon: "edit"},
-                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield"},
+                        "edit": {name: user_message.manage_edit_user, icon: "edit", disabled: function(key, opt) {
+                            let id = opt.$trigger[0].id;
+                            if (id == '164655867')
+                                    return !this.data('editDisabled');
+                            }},
+                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield", disabled: function(key, opt) {
+                                let id = opt.$trigger[0].id;
+                                if (id == '164655867')
+                                    return !this.data('permissionDisabled');
+                            }},
                         "sep1": "---------",
-                        "delete": {name: user_message.manage_remove_user, icon: "delete"}
+                        "delete": {name: user_message.manage_remove_user, icon: "delete", disabled: function(key, opt) {
+                                let id = opt.$trigger[0].id;
+                                if (id == '164655867')
+                                    return !this.data('daleteDisabled');
+                            }}
                     }
                 });
             },
@@ -103,13 +104,13 @@ let userManage = {
                 type: "DELETE",
                 statusCode: {
                     200: function (response) {
-                        $.notify("Delete user success", "success");
+                        $.notify(user_message.user_delete_success, "success");
                     },
                     400: function (response) {
-                        $.notify("Delete user error", "error");
+                        $.notify(user_message.user_delete_fail, "error");
                     },
                     500: function (response) {
-                        $.notify("Delete user error", "error");
+                        $.notify(user_message.user_delete_fail, "error");
                     }
                 }
             })
@@ -128,7 +129,7 @@ let userManage = {
         //get emailAddress
         let addEmailAddress = $("#addEmailAddress").val();
 
-        if (validateUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
+        if (validateAddUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
             console.log(app_message.edoc_validate_document_request_fail);
         } else {
             let addUserRequest = {
@@ -138,7 +139,6 @@ let userManage = {
                 "password": password,
                 "emailAddress": addEmailAddress
             };
-            console.log(addUserRequest);
             $.ajax({
                 type: "POST",
                 contentType: "application/json;charset=utf-8",
@@ -161,7 +161,46 @@ let userManage = {
             });
         }
     },
-    createUserRole: function() {
+    editUser: function (userId) {
+        //get displayName
+        let editDisplayName = $("#editDisplayName").val();
+        //get organization
+        let editOrganDomain = $("#editOrganDomain").val();
+        //get emailAddress
+        let editEmailAddress = $("#editEmailAddress").val();
+
+        if (validateEditUser(editDisplayName, editOrganDomain, editEmailAddress)) {
+            console.log(app_message.edoc_validate_document_request_fail);
+        } else {
+            let editUserRequest = {
+                "userId": userId,
+                "displayName": editDisplayName,
+                "organDomain": editOrganDomain,
+                "emailAddress": editEmailAddress
+            };
+            $.ajax({
+                type: "PUT",
+                contentType: "application/json;charset=utf-8",
+                url: "/public/-/user/edit",
+                data: JSON.stringify(editUserRequest),
+                cache: false,
+                success: function (response) {
+                    if (response.code === 200) {
+                        $.notify(user_message.user_edit_success, "success");
+                    } else {
+                        $.notify(user_message.user_edit_fail, "error");
+                    }
+                },
+                error: function (error) {
+                    $.notify(user_message.user_edit_fail, "error");
+                }
+            })
+            $("#formEditUser").modal("toggle");
+            $('#edoc-edit-user').empty();
+            $("#user-menu").click();
+        }
+    },
+    createUserRole: function(userId) {
         let roleId;
         if ($("#adminRoleSelected").is(":checked")) {
             roleId = $("#adminRoleSelected").val();
@@ -172,7 +211,6 @@ let userManage = {
             "userId": userId,
             "roleId": roleId,
         }
-        console.log(userRoleRequest);
         $.ajax({
             type: "POST",
             contentType: "application/json;charset=utf-8",
@@ -194,11 +232,11 @@ let userManage = {
     }
 }
 $(document).ready(function () {
+
+    // Show detail of user-login info
     $(".user-info").on('click', function () {
         let userId = $(this).attr("data-id");
-        console.log("user-id" + userId);
         $.get("/public/-/user/" + userId, function (data) {
-            console.log(data);
             $('#user-detail').empty();
             $('#userTemplate').tmpl(data).appendTo('#user-detail');
         });
@@ -208,11 +246,10 @@ $(document).ready(function () {
         });
     });
 
+    // Show info detail of each user in data-table
     $("#dataTables-user").on('click', 'tbody>tr', function () {
         let userId = $(this).attr("id");
-        console.log(userId);
         $.get("/public/-/user/" + userId, function (data) {
-            console.log(data);
             $('#user-detail').empty();
             $('#userTemplate').tmpl(data).appendTo('#user-detail');
         });
@@ -221,6 +258,8 @@ $(document).ready(function () {
             keyboard: false
         });
     });
+
+    // Show form add new user
     $("#addUser").on('click', function(e) {
         e.preventDefault();
         $('#formAddUser').modal({
@@ -228,20 +267,26 @@ $(document).ready(function () {
             keyboard: false
         });
     });
+
+    // Show form edit user
+    $("#")
+
     $("#addOrganDomain").select2({
         tags: true,
         maximumSelectionLength: 1,
         width: "auto"
     });
+    $("#editOrganDomain").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
+    })
     $(document).on('click', 'input[type="checkbox"]', function() {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
-    $(document).on("click", "#permission-confirm", function(e) {
-        e.preventDefault();
-        console.log(userId);
-        userManage.createUserRole(userId);
-    });
 });
+
+// Call ajax to import users from excel file
 $(document).on("change", "#importUserFromExcel", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
@@ -256,8 +301,6 @@ $(document).on("change", "#importUserFromExcel", function (e) {
         contentType: false,
         cache: false,
         success: function (data, response) {
-            console.log(data);
-            console.log(response);
             if (response === "OK")
                 $.notify(user_message.user_import_from_excel_success, "success");
             else if (response === "BAD_REQUEST")
@@ -273,6 +316,7 @@ $(document).on("change", "#importUserFromExcel", function (e) {
     });
 });
 
+// Call ajax to export users to Excel file
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
     $.ajax({
@@ -282,7 +326,6 @@ $(document).on('click', '#exportUserToExcel', function (e) {
         contentType: false,
         cache: false,
         success: function (response) {
-            console.log(response);
             $.notify(user_message.user_export_to_excel_success, "success");
         },
         error: (e) => {
@@ -301,6 +344,7 @@ $(".toggle-password").click(function() {
     }
 });
 
+// Buttons in Add new user form
 $(document).on("click", "#btn-addUser-confirm", function (event) {
     event.preventDefault();
     userManage.createUser();
@@ -310,29 +354,46 @@ $(document).on("click", "#btn-addUser-cancel", function (event) {
     $("#formAddUser").modal('toggle');
 });
 
+// Button in Permission of user modal
+$(document).on("click", "#permission-confirm", function(e) {
+    e.preventDefault();
+    let userId = $(this).attr("data-id");
+    userManage.createUserRole(userId);
+});
 $(document).on("click", "#permission-cancel", function (event) {
     event.preventDefault();
     $("#formPermission").modal('toggle');
 });
 
-function validateUser(displayName, userName, organDomain, password, emailAddress) {
+// Buttons in Edit user form
+$(document).on("click", "#btn-editUser-confirm", function (event) {
+    event.preventDefault();
+    let userId = $(this).attr("data-id");
+    userManage.editUser(userId);
+});
+$(document).on("click", "#btn-editUser-cancel", function (event) {
+    event.preventDefault();
+    $("#formEditUser").modal('toggle');
+});
+
+function validateAddUser(displayName, userName, organDomain, password, emailAddress) {
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (displayName === "") {
-        $("#displayName").notify(
+        $("#addDisplayName").notify(
             "Tên người dùng không được để trống !",
             {position: "right"}
         );
         return true;
     }
-    if (userName == null) {
-        $("#userName").notify(
+    if (userName === "") {
+        $("#addUserName").notify(
             "Tên tài khoản không được để trống !",
             {position: "right"}
         );
         return true;
     }
     if (organDomain === "") {
-        $("#organDomain").notify(
+        $("#addOrganDomain").notify(
             "Đơn vị không được để trống !",
             {position: "right"}
         );
@@ -353,14 +414,47 @@ function validateUser(displayName, userName, organDomain, password, emailAddress
         }
     }
     if (emailAddress === "") {
-        $("#emailAddress").notify(
+        $("#addEmailAddress").notify(
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
         return true;
     } else {
         if (!emailRegex.test(emailAddress)) {
-            $("#emailAddress").notify(
+            $("#addEmailAddress").notify(
+                "Địa chỉ thư điện tử không đúng định dạng!",
+                {position: "right"}
+            );
+            return true;
+        }
+    }
+}
+
+function validateEditUser(displayName, organDomain, emailAddress) {
+    let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+    if (displayName === "") {
+        $("#editDisplayName").notify(
+            "Tên người dùng không được để trống !",
+            {position: "right"}
+        );
+        return true;
+    }
+    if (organDomain === "") {
+        $("#editOrganDomain").notify(
+            "Đơn vị không được để trống !",
+            {position: "right"}
+        );
+        return true;
+    }
+    if (emailAddress === "") {
+        $("#editEmailAddress").notify(
+            "Địa chỉ thư điện tử không được để trống !",
+            {position: "right"}
+        );
+        return true;
+    } else {
+        if (!emailRegex.test(emailAddress)) {
+            $("#editEmailAddress").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
@@ -371,11 +465,22 @@ function validateUser(displayName, userName, organDomain, password, emailAddress
 
 function permissionClick(userId) {
     $.get("/public/-/user/" + userId, function (data) {
-        console.log(data);
         $('#userPermission').empty();
+        $('#btn-userPermission').empty();
         $('#displayNamePermissionTemplate').tmpl(data).appendTo('#userPermission');
+        $('#btnUserPermissionTemplate').tmpl(data).appendTo('#btn-userPermission');
     });
     $('#formPermission').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+}
+function editUserClick(userId) {
+    $.get("/public/-/user/" + userId, function (data) {
+        $('#edoc-edit-user').empty();
+        $('#editUserTemplate').tmpl(data).appendTo('#edoc-edit-user');
+    });
+    $('#formEditUser').modal({
         backdrop: 'static',
         keyboard: false
     });

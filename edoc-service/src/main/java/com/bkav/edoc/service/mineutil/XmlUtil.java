@@ -270,7 +270,7 @@ public class XmlUtil {
         // staff info
         OMElement staffInfoNode = getStaffInfoNode(business.getStaffInfo(), ns);
         businessNode.addChild(staffInfoNode);
-        LOGGER.error("Business " + business.toString());
+        LOGGER.info("Business " + business.toString());
         // replacement info list
         if (business.getBusinessDocType() == EdocTraceHeaderList.BusinessDocType.REPLACE.ordinal()) {
             OMElement replacementInfoListNode = getReplacementInfoListNode(business.getReplacementInfoList(), ns);

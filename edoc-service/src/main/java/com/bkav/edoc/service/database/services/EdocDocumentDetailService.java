@@ -16,13 +16,6 @@ public class EdocDocumentDetailService {
     private final EdocDocumentDetailDaoImpl documentDetailDaoImpl = new EdocDocumentDetailDaoImpl();
     private final Gson gson = new Gson();
 
-    /**
-     * Add document detail
-     *
-     * @param messageHeader
-     * @param document
-     * @return
-     */
     public EdocDocumentDetail addDocumentDetail(MessageHeader messageHeader, EdocDocument document) {
         Session currentSession = documentDetailDaoImpl.openCurrentSession();
         try {

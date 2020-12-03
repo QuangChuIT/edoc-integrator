@@ -6,7 +6,7 @@ import com.bkav.edoc.service.database.entity.UserRole;
 import java.util.List;
 
 public class UserRoleService {
-    private UserRoleDaoImpl userRoleDao = new UserRoleDaoImpl();
+    private final UserRoleDaoImpl userRoleDao = new UserRoleDaoImpl();
 
     public List<UserRole> findAll() {
         userRoleDao.openCurrentSession();

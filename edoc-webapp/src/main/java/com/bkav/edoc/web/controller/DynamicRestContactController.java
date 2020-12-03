@@ -2,9 +2,13 @@ package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.web.payload.AddUserRequest;
+import com.bkav.edoc.web.payload.ContactRequest;
+import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.TokenUtil;
@@ -18,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -79,6 +84,41 @@ public class DynamicRestContactController {
 
     }
 
+    @RequestMapping(value = "/contact/-/update/contact", method = RequestMethod.PUT, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> editContact(@RequestBody ContactRequest contactRequest) {
+        List<String> errors = new ArrayList<>();
+        try {
+            String message = "";
+            int code = 200;
+            if (contactRequest != null) {
+                errors = validateUtil.validateAddOrgan(contactRequest);
+                if (errors.size() == 0) {
+                    EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(contactRequest.getId());
+
+                    organ.setDomain(contactRequest.getDomain());
+                    organ.setName(contactRequest.getName());
+                    organ.setAddress(contactRequest.getAddress());
+                    organ.setEmail(contactRequest.getEmail());
+                    organ.setInCharge(contactRequest.getInCharge());
+                    if (!contactRequest.getTelephone().equals(""))
+                        organ.setTelephone(contactRequest.getTelephone());
+
+                    EdocDynamicContactServiceUtil.updateContact(organ);
+                    message = messageSourceUtil.getMessage("organ.message.edit.success", null);
+                } else {
+                    code = 400;
+                    message = messageSourceUtil.getMessage("organ.message.edit.fail", null);
+                }
+            }
+            Response response = new Response(code, errors, message);
+            return new ResponseEntity<>(response, HttpStatus.valueOf(code));
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", null));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", null));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /*
      * Excel File Upload
      */
@@ -137,6 +177,49 @@ public class DynamicRestContactController {
             } else {
                 return HttpStatus.INTERNAL_SERVER_ERROR;
             }
+        }
+    }
+
+    @RequestMapping(value = "/public/-/organ/create", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> createUser(@RequestBody ContactRequest contactRequest) {
+        List<String> errors = new ArrayList<>();
+        try {
+            String message = "";
+            int code = 200;
+            if (contactRequest != null) {
+                errors = validateUtil.validateAddOrgan(contactRequest);
+                if (errors.size() == 0) {
+                    String name = contactRequest.getName();
+                    String domain = contactRequest.getDomain();
+                    String inChart = contactRequest.getInCharge();
+                    String email = contactRequest.getEmail();
+                    String address = contactRequest.getAddress();
+                    String telephone = contactRequest.getTelephone();
+
+                    EdocDynamicContact organ = new EdocDynamicContact();
+                    organ.setName(name);
+                    organ.setDomain(domain);
+                    organ.setInCharge(inChart);
+                    organ.setAddress(address);
+                    organ.setEmail(email);
+                    organ.setTelephone(telephone);
+                    organ.setStatus(true);
+                    String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
+                    organ.setToken(newToken);
+
+                    EdocDynamicContactServiceUtil.createContact(organ);
+                    message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                } else {
+                    code = 400;
+                    message = messageSourceUtil.getMessage("organ.message.create.fail", null);
+                }
+            }
+            Response response = new Response(code, errors, message);
+            return new ResponseEntity<>(response, HttpStatus.valueOf(code));
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

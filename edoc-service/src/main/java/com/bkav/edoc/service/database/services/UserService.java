@@ -1,9 +1,7 @@
 package com.bkav.edoc.service.database.services;
 
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.UserDaoImpl;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
@@ -31,8 +29,14 @@ public class UserService {
             }
             userDao.closeCurrentSession();
         }
-
         return userCacheEntry;
+    }
+
+    public User findUserByUsername(String username) {
+        userDao.openCurrentSession();
+        User user = userDao.findByUsername(username);
+        userDao.closeCurrentSession();
+        return user;
     }
 
     public boolean checkExist(String username) {
@@ -63,7 +67,9 @@ public class UserService {
     }
 
     public void createUser(User user) {
+        userDao.openCurrentSession();
         userDao.createUser(user);
+        userDao.closeCurrentSession();
     }
 
     public UserCacheEntry getUserById(long userId) {
@@ -75,7 +81,6 @@ public class UserService {
             User user = userDao.findById(userId);
             if (user != null) {
                 userCacheEntry = MapperUtil.modelToUserCache(user);
-                MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, userCacheEntry);
             }
             userDao.closeCurrentSession();
         }
@@ -115,13 +120,6 @@ public class UserService {
             userDao.closeCurrentSession();
         }
         return userCacheEntries;
-    }
-
-    public User getUserByOrgan(EdocDynamicContact organ) {
-        userDao.openCurrentSession();
-        User user = userDao.findByOrgan(organ);
-        userDao.closeCurrentSession();
-        return user;
     }
 
     public boolean deleteUser(long userId) {

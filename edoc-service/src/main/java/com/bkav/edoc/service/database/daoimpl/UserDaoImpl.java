@@ -1,7 +1,6 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.UserDao;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -30,17 +29,6 @@ public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
         return q.uniqueResult();
     }
 
-    public User findByOrgan(EdocDynamicContact organ) {
-        Session currentSession = getCurrentSession();
-        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-        query.select(root);
-        query.where(builder.equal(root.get("dynamicContact"), organ));
-        Query<User> q = currentSession.createQuery(query);
-        return q.uniqueResult();
-    }
-
     public List<User> getAllUser() {
         Session session = getCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -56,7 +44,7 @@ public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
         Session session = getCurrentSession();
         try {
             session.beginTransaction();
-            update(user);
+            session.saveOrUpdate(user);
             session.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);

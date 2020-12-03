@@ -1,13 +1,8 @@
-<%@ page import="com.bkav.edoc.service.database.cache.OrganizationCacheEntry" %>
-<%@ page import="com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil" %>
-<%@ page import="java.util.List" %>
 <%@ page import="com.bkav.edoc.web.auth.CookieUtil" %>
 <%@ page import="com.bkav.edoc.web.OAuth2Constants" %>
 <%@ page import="com.bkav.edoc.service.kernel.util.Base64" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="com.google.gson.Gson" %>
-<%@ page import="com.bkav.edoc.service.database.entity.EdocDynamicContact" %>
-<%@ page import="com.bkav.edoc.service.database.util.UserServiceUtil" %>
 <%@ page import="com.bkav.edoc.service.database.util.UserRoleServiceUtil" %>
 <%@ page import="com.bkav.edoc.service.database.entity.User" %>
 <%@ page import="com.bkav.edoc.service.database.entity.UserRole" %>
@@ -15,13 +10,9 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getAllContacts();
-    String organLogin = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-    String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
-    String userLogin = new String(Base64.decode(organCookie), StandardCharsets.UTF_8);
-    OrganizationCacheEntry organizationCacheEntry = new Gson().fromJson(userLogin, OrganizationCacheEntry.class);
-    EdocDynamicContact contact = EdocDynamicContactServiceUtil.findDynamicContactById(organizationCacheEntry.getId());
-    User user = UserServiceUtil.getUserByOrgan(contact);
+    String userCookie = CookieUtil.getValue(request, OAuth2Constants.USER_LOGIN);
+    String userLog = new String(Base64.decode(userCookie), StandardCharsets.UTF_8);
+    User user = new Gson().fromJson(userLog, User.class);
     UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
     long role = userRole.getRoleId();
 %>

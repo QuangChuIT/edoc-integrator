@@ -3,6 +3,7 @@ package com.bkav.edoc.web.util;
 import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.web.payload.AddUserRequest;
+import com.bkav.edoc.web.payload.ContactRequest;
 import com.bkav.edoc.web.payload.DocumentRequest;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -84,8 +85,33 @@ public class ValidateUtil {
             errors.add(messageSourceUtil.getMessage("edoc.error.email.address", null));
         }
 
-        if (addUserRequest.getPassword().equals("")) {
-            errors.add(messageSourceUtil.getMessage("edoc.error.password", null));
+//        if (addUserRequest.getPassword().equals("")) {
+//            errors.add(messageSourceUtil.getMessage("edoc.error.password", null));
+//        }
+
+        return errors;
+    }
+
+    public List<String> validateAddOrgan(ContactRequest contactRequest) {
+        List<String> errors = new ArrayList<>();
+        if (contactRequest.getName().equals("")) {
+            errors.add(messageSourceUtil.getMessage("organ.error.name", null));
+        }
+
+        if (contactRequest.getDomain().equals("")) {
+            errors.add(messageSourceUtil.getMessage("organ.error.domain", null));
+        }
+
+        if (contactRequest.getAddress().equals("")) {
+            errors.add(messageSourceUtil.getMessage("organ.error.address", null));
+        }
+
+        if (contactRequest.getInCharge().equals("")) {
+            errors.add(messageSourceUtil.getMessage("organ.error.inChrage", null));
+        }
+
+        if (contactRequest.getEmail().equals("")) {
+            errors.add(messageSourceUtil.getMessage("organ.error.email", null));
         }
 
         return errors;

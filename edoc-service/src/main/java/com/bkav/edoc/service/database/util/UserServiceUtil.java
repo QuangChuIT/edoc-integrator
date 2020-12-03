@@ -1,7 +1,6 @@
 package com.bkav.edoc.service.database.util;
 
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.services.UserService;
 
@@ -30,6 +29,10 @@ public class UserServiceUtil {
         return USER_SERVICE.findUserById(userId);
     }
 
+    public static User finUserByUsername(String username) {
+        return USER_SERVICE.findUserByUsername(username);
+    }
+
     public static void updateUser(User user) {
         USER_SERVICE.updateUser(user);
     }
@@ -42,7 +45,7 @@ public class UserServiceUtil {
         return USER_SERVICE.deleteUser(userId);
     }
 
-    public static User getUserByOrgan(EdocDynamicContact organ) {
-        return USER_SERVICE.getUserByOrgan(organ);
+    public static boolean checkExistUserByUserName(String username) {
+        return USER_SERVICE.checkExist(username);
     }
 }

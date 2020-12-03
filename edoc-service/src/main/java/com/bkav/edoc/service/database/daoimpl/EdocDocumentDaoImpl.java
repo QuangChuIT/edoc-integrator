@@ -222,6 +222,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
                 session.delete(document);
                 session.getTransaction().commit();
                 result = true;
+                LOGGER.error("Successfully delete document  with document with id " + documentId);
             }
         } catch (Exception e) {
             result = false;

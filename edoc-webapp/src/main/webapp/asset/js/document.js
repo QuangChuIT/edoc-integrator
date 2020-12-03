@@ -381,6 +381,7 @@ $(document).ready(function () {
             data.code = data.codeNumber + "/" + data.codeNotation;
             $("#" + documentId).removeClass("not-visited");
             $('#edoc-detail').empty();
+            console.log(data);
             $('#edocDetailTemplate').tmpl(data).appendTo('#edoc-detail');
             let attachmentsDoc = data.attachments;
             localStorage.setObj("attachmentsOfDoc", attachmentsDoc);
@@ -503,9 +504,9 @@ $(document).on("contextmenu", "#dataTables-edoc>tbody>tr", function (event) {
 $(document).on("click", ".show-trace-comment", function (event) {
     event.preventDefault();
     let dataId = $(this).attr("data-id");
-    let jqueryDataId = "#" + dataId;
+    console.log(dataId);
     // show hide paragraph on button click
-    $(jqueryDataId).toggle("fast");
+    $("#" + dataId).toggle("fast");
 });
 $(document).on("click", "#btn-publish", function (event) {
     event.preventDefault();

@@ -1,12 +1,14 @@
 package com.bkav.edoc.web.vpcp;
 
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
-import com.bkav.edoc.service.database.entity.*;
-import com.bkav.edoc.service.database.util.*;
+import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
+import com.bkav.edoc.service.database.util.EdocTraceServiceUtil;
 import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.util.CommonUtil;
 import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
+import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import com.bkav.edoc.service.xml.base.parser.ParserException;
@@ -28,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ServiceVPCP {
@@ -101,57 +102,30 @@ public class ServiceVPCP {
                                 LOGGER.info("Parser success document from file " + getEdocResult.getFilePath());
                                 //Get message header
                                 MessageHeader messageHeader = (MessageHeader) ed.getHeader().getMessageHeader();
-                                //filter list organ of current organ on esb
-                                List<Organization> thisOrganizations = filterOrgan(messageHeader.getToes());
-                                messageHeader.setToes(thisOrganizations);
-                                // create document
-                                EdocDocument edocDocument = MapperUtil.modelToEdocDocument(messageHeader);
-                                edocDocument.setReceivedExt(true);
-                                edocDocument.setDocumentExtId(item.getId());
-                                edocDocument = EdocDocumentServiceUtil.createDocument(edocDocument);
-                                if (edocDocument == null) {
-                                    continue;
-                                }
-                                // create document detail
-                                EdocDocumentDetail documentDetail = MapperUtil.modelToDocumentDetail(messageHeader);
-                                documentDetail.setDocument(edocDocument);
-                                documentDetail = EdocDocumentServiceUtil.createDocumentDetail(documentDetail);
-                                if (documentDetail == null) {
-                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
-                                    continue;
-                                }
                                 // create trace header list
                                 //Get trace header list
                                 TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
-                                String businessInfo = CommonUtil.getBusinessInfo(traceHeaderList);
-                                EdocTraceHeaderList edocTraceHeaderList = EdocTraceHeaderListServiceUtil
-                                        .addTraceHeaderList(traceHeaderList, businessInfo, edocDocument);
-                                if (edocTraceHeaderList == null) {
-                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
-                                    continue;
-                                }
                                 //Get attachment
                                 List<Attachment> attachments = ed.getAttachments();
+                                //filter list organ of current organ on esb
+                                List<Organization> thisOrganizations = filterOrgan(messageHeader.getToes());
+                                messageHeader.setToes(thisOrganizations);
+                                StringBuilder documentEsbId = new StringBuilder();
+                                List<Error> errors = new ArrayList<>();
                                 List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-                                Set<EdocAttachment> edocAttachments = EdocAttachmentServiceUtil.addAttachments(edocDocument, attachments
-                                        , attachmentCacheEntries);
-                                if (attachmentCacheEntries.size() == 0) {
-                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
-                                    continue;
+                                EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader, traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
+                                if (document != null) {
+                                    LOGGER.info("Save document from vpcp successfully from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
+                                    document.setDocumentExtId(item.getId());
+                                    document.setReceivedExt(true);
+                                    EdocDocumentServiceUtil.updateDocument(document);
+                                    LOGGER.info("Update document from vpcp successfully for document " + documentEsbId.toString());
+                                    // TODO change status to vpcp
+                                    headerChangeStatus.put("status", "done");
+                                } else {
+                                    LOGGER.error("Error save document from vpcp  with document code " + messageHeader.getCode());
+                                    headerChangeStatus.put("status", "fail");
                                 }
-                                edocDocument.setAttachments(edocAttachments);
-                                // Add notification
-                                Set<EdocNotification> notifications = EdocNotificationServiceUtil.addNotifications(messageHeader.getToes(),
-                                        messageHeader.getDueDate(), edocDocument);
-                                if (notifications.size() == 0) {
-                                    EdocDocumentServiceUtil.deleteDocument(edocDocument.getDocumentId());
-                                    continue;
-                                }
-                                EdocDocumentServiceUtil.addDocumentToPendingCached(thisOrganizations, edocDocument.getDocumentId());
-                                edocDocument.setNotifications(notifications);
-                                LOGGER.info("Done save document vpcp from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
-                                // TODO change status to vpcp
-                                headerChangeStatus.put("status", "done");
                             } else {
                                 headerChangeStatus.put("status", "fail");
                             }
@@ -187,32 +161,12 @@ public class ServiceVPCP {
         //filter list organ of current organ on esb
         List<Organization> thisOrganizations = filterOrgan(messageHeader.getToes());
         messageHeader.setToes(thisOrganizations);
-        // create document
-        EdocDocument edocDocument = MapperUtil.modelToEdocDocument(messageHeader);
-        edocDocument.setReceivedExt(true);
-        edocDocument.setDocumentExtId("e5f4e280-55b3-460f-be38-e57b80bc3b0d");
-        EdocDocumentServiceUtil.createDocument(edocDocument);
-        // create document detail
-        EdocDocumentDetail documentDetail = MapperUtil.modelToDocumentDetail(messageHeader);
-        documentDetail.setDocument(edocDocument);
-        EdocDocumentServiceUtil.createDocumentDetail(documentDetail);
+        //Get attachment
+        List<Attachment> attachments = ed.getAttachments();
         // create trace header list
         //Get trace header list
         TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
         String businessInfo = CommonUtil.getBusinessInfo(traceHeaderList);
-        EdocTraceHeaderListServiceUtil.addTraceHeaderList(traceHeaderList, businessInfo, edocDocument);
-        //Get attachment
-        List<Attachment> attachments = ed.getAttachments();
-        List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-        Set<EdocAttachment> edocAttachments = EdocAttachmentServiceUtil.addAttachments(edocDocument, attachments
-                , attachmentCacheEntries);
-        LOGGER.warn(attachmentCacheEntries);
-        edocDocument.setAttachments(edocAttachments);
-        // Add notification
-        Set<EdocNotification> notifications = EdocNotificationServiceUtil.addNotifications(messageHeader.getToes(),
-                messageHeader.getDueDate(), edocDocument);
-        EdocDocumentServiceUtil.addDocumentToPendingCached(thisOrganizations, edocDocument.getDocumentId());
-        edocDocument.setNotifications(notifications);
         // TODO change status to vpcp
     }
 

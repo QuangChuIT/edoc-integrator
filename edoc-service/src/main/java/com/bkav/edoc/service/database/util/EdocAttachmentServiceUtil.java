@@ -28,10 +28,4 @@ public class EdocAttachmentServiceUtil {
     public static boolean deleteAttachment(EdocAttachment attachment) {
         return attachmentService.deleteAttachment(attachment);
     }
-
-    public static Set<EdocAttachment> addAttachments(EdocDocument document,
-                                                     List<Attachment> attachments, List<AttachmentCacheEntry> edocAttachmentCacheEntries) throws IOException {
-
-        return attachmentService.addAttachments(document, attachments, edocAttachmentCacheEntries);
-    }
 }

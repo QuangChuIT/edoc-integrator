@@ -17,48 +17,6 @@ import java.util.*;
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
 
-    /**
-     * Add notifications
-     *
-     * @param toOrgans
-     * @param duaDate
-     * @param document
-     * @return
-     */
-    public Set<EdocNotification> addNotifications(List<Organization> toOrgans, Date duaDate, EdocDocument document) {
-        Session currentSession = notificationDaoImpl.openCurrentSession();
-        Set<EdocNotification> notifications = new HashSet<>();
-        try {
-            currentSession.beginTransaction();
-            // Insert Notification
-            for (Organization to : toOrgans) {
-                EdocNotification notification = new EdocNotification();
-                Date currentDate = new Date();
-                notification.setDateCreate(currentDate);
-                notification.setModifiedDate(currentDate);
-                notification.setSendNumber(0);
-                notification.setDueDate(duaDate);
-                notification.setReceiverId(to.getOrganId());
-                notification.setDocument(document);
-                notification.setTaken(false);
-                notificationDaoImpl.persist(notification);
-                LOGGER.info("Save edoc notification success for document " + document.getDocumentId()
-                        + " and code " + document.getDocCode());
-                notifications.add(notification);
-            }
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error save notification for document id " +
-                    document.getDocumentId() + " doc code " + document.getDocCode() + " cause " + Arrays.toString(e.getStackTrace()));
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-        } finally {
-            notificationDaoImpl.closeCurrentSession();
-        }
-        return notifications;
-    }
-
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
         try {

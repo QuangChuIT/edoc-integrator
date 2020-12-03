@@ -34,12 +34,6 @@
             <mvc:exclude-mapping path="/public/**"/>
             <bean class="com.bkav.edoc.web.auth.AuthenticationInterceptor"/>
         </mvc:interceptor>
-        <mvc:interceptor>
-            <mvc:mapping path="/admin/**"/>
-            <mvc:exclude-mapping path="/checkLogin/**"/>
-            <mvc:exclude-mapping path="/errors"/>
-            <bean class="com.bkav.edoc.web.auth.AdminInterceptor"/>
-        </mvc:interceptor>
     </mvc:interceptors>
     <context:component-scan base-package="com.bkav.edoc.web"/>
     <!-- Resolves views selected for rendering by @Controllers to .jsp resources

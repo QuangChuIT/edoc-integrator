@@ -685,12 +685,12 @@
                                     </div>
                                     <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
                                         <span style="float:left">${convertToDate(timeStamp).formatDate()}</span>
-                                        <a href="javascript:void(0)" class="show-trace-comment" data-id="${traceId}">
+                                        <a href="javascript:void(0)" class="show-trace-comment" data-id="trace_${traceId}">
                                             ...
                                         </a>
                                     </div>
                                 </div>
-                                <div class="row" id="${traceId}" style="display:none">
+                                <div class="row" id="trace_${traceId}" style="display:none">
                                     <div class="col-md-7 col-sm-6 col-xs-12">
                                         <div class="staff-handler>
                                             <span>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>

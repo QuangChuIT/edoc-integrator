@@ -24,66 +24,6 @@ public class EdocTraceHeaderListService {
     private final EdocTraceHeaderDaoImpl traceHeaderDaoImpl = new EdocTraceHeaderDaoImpl();
 
     /**
-     * Add trace header list
-     *
-     * @param traceHeaderList
-     * @param document
-     * @return
-     */
-    public EdocTraceHeaderList addTraceHeaderList(TraceHeaderList traceHeaderList, String businessInfo, EdocDocument document) {
-        Session currentSession = traceHeaderListDaoImpl.openCurrentSession();
-        try {
-            currentSession.beginTransaction();
-            EdocTraceHeaderList edocTraceHeaderList = new EdocTraceHeaderList();
-            if (traceHeaderList != null && traceHeaderList.getTraceHeaders().size() > 0) {
-                edocTraceHeaderList.setBusinessDocReason(traceHeaderList.getBusiness().getBusinessDocReason());
-                int businessDocType = (int) traceHeaderList.getBusiness().getBusinessDocType();
-                EdocTraceHeaderList.BusinessDocType type = EdocTraceHeaderList.BusinessDocType.values()[businessDocType];
-                edocTraceHeaderList.setBusinessDocType(type);
-                edocTraceHeaderList.setPaper(traceHeaderList.getBusiness().getPaper());
-                edocTraceHeaderList.setBusinessInfo(businessInfo);
-                // get staff info
-                if (traceHeaderList.getBusiness().getStaffInfo() != null) {
-                    StaffInfo staffInfo = traceHeaderList.getBusiness().getStaffInfo();
-                    edocTraceHeaderList.setEmail(staffInfo.getEmail());
-                    edocTraceHeaderList.setDepartment(staffInfo.getDepartment());
-                    edocTraceHeaderList.setMobile(staffInfo.getMobile());
-                    edocTraceHeaderList.setStaff(staffInfo.getStaff());
-                }
-
-                // save to database
-                LOGGER.info("Prepare save trace header list for document id " + document.getDocumentId());
-                edocTraceHeaderList.setDocument(document);
-                traceHeaderListDaoImpl.persist(edocTraceHeaderList);
-                LOGGER.info("Save success trace header list for document id " + document.getDocumentId());
-
-                // get list trace header
-                Set<EdocTraceHeader> edocTraceHeaders = new HashSet<>();
-                for (TraceHeader trace : traceHeaderList.getTraceHeaders()) {
-                    EdocTraceHeader traceHeader = new EdocTraceHeader();
-                    traceHeader.setOrganDomain(trace.getOrganId());
-                    traceHeader.setTimeStamp(trace.getTimestamp());
-                    traceHeader.setTraceHeaderList(edocTraceHeaderList);
-                    traceHeaderDaoImpl.setCurrentSession(currentSession);
-                    traceHeaderDaoImpl.persist(traceHeader);
-                    edocTraceHeaders.add(traceHeader);
-                }
-                edocTraceHeaderList.setTraceHeaders(edocTraceHeaders);
-            }
-            currentSession.getTransaction().commit();
-            return edocTraceHeaderList;
-        } catch (Exception e) {
-            LOGGER.error("Error save trace header list for document id " + document.getDocumentId());
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-            return null;
-        } finally {
-            traceHeaderListDaoImpl.closeCurrentSession();
-        }
-    }
-
-    /**
      * get trace header list by doc id
      *
      * @param documentId

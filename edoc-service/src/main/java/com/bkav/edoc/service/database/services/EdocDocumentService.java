@@ -249,6 +249,8 @@ public class EdocDocumentService {
                     attachmentCacheEntry.setDocumentId(docId);
                     edocAttachmentCacheEntries.add(attachmentCacheEntry);
                     edocAttachmentSet.add(edocAttachment);
+                } else {
+                    return null;
                 }
             }
             document.setAttachments(edocAttachmentSet);

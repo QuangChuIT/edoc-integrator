@@ -55,6 +55,7 @@
     <script src="<c:url value="/asset/js/bootstrap.min.js"/>"></script>
     <!-- Custom Theme JavaScript -->
     <script src="<c:url value="/asset/js/report.js" />"></script>
+    <script src="<c:url value="/asset/js/trace.js" />"></script>
     <script src="<c:url value="/asset/js/datetime.js" />"></script>
     <%--JQuery template--%>
     <script src="<c:url value="/asset/js/jquery.tmpl.min.js"/>"></script>

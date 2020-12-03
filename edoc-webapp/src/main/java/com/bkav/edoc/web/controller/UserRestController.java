@@ -1,26 +1,27 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
-import com.bkav.edoc.service.database.entity.*;
-import com.bkav.edoc.service.database.util.*;
-import com.bkav.edoc.service.util.AttachmentGlobalUtil;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
+import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRequest;
-import com.bkav.edoc.web.util.*;
 import com.bkav.edoc.web.util.ExcelUtil;
+import com.bkav.edoc.web.util.MessageSourceUtil;
+import com.bkav.edoc.web.util.ValidateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
-import java.util.*;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class UserRestController {
@@ -113,7 +114,7 @@ public class UserRestController {
         long numOfUser = 0;
         try {
             if (validateUtil.checkExtensionFile(file)) {
-                if(validateUtil.checkHeaderExcelFileForUser(file)) {
+                if (validateUtil.checkHeaderExcelFileForUser(file)) {
                     List<User> users = ExcelUtil.importUserFromExcel(file);
                     LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
                     numOfUser = ExcelUtil.PushUsersToSSO(users);
@@ -202,7 +203,7 @@ public class UserRestController {
         boolean result;
         List<User> users = UserServiceUtil.getUser();
         result = ExcelUtil.exportUserToExcel(users);
-        if(result)
+        if (result)
             return HttpStatus.OK;
         else
             return HttpStatus.BAD_REQUEST;

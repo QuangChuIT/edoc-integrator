@@ -317,8 +317,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 }*/
             }
         } catch (Exception e) {
-            LOGGER.error("Error when confirm received " + e);
-            errorList.add(new Error("M.ConfirmReceived", "Error when process confirm received " + e.getMessage()));
+            LOGGER.error("Error confirm received " + e);
+            errorList.add(new Error("M.ConfirmReceived", "Error process confirm received " + Arrays.toString(e.getStackTrace())));
         }
 
         if (!errorList.isEmpty()) {

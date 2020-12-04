@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+<!-- =================Appenders for LOG FILE=================-->
+<appender name="LOG" class="org.apache.log4j.DailyRollingFileAppender">
+<param name="Threshold" value="ALL"/>
+<param name="File" value="./log/edoc_web.log"/>
+<param name="Append" value="true"/>
+<param name="DatePattern" value=".yyyyMMdd-HH'.txt'"/>
+<layout class="org.apache.log4j.PatternLayout">
+	<param name="ConversionPattern" value="%5p [%d] - [%-35Z{3}] - %m%n"/>
+</layout>
+</appender>
+
+
+<!-- =================Appenders for CONSOLE=================-->
+<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+	<param name="Target" value="System.out"/>
+	<param name="Threshold" value="OFF"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%5p [%d] - [%-35Z{3}] - %m%n"/>
+	</layout>
+</appender>
+	
+<!-- ====================== -->
+<!-- More Appender -->
+<!-- ====================== -->
+<!-- Buffer events and log them asynchronously -->
+<appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
+	<appender-ref ref="LOG"/>
+	<appender-ref ref="CONSOLE"/>
+</appender>
+
+<!-- Setup the Root category -->
+<root>
+	<appender-ref ref="ASYNC"/>	
+</root>
+</log4j:configuration>

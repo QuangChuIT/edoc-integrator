@@ -18,7 +18,7 @@ public class PublicStatController {
         return "publicReportDetail";
     }
     @RequestMapping(value = "/public/trace", method = RequestMethod.GET)
-    public String publicTrace(@RequestParam String docCode){
+    public String publicTrace(){
         return "publicTracePage";
     }
 }

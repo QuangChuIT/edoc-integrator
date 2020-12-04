@@ -500,6 +500,14 @@ public class EdocDocumentService {
         return documentCacheEntry;
     }
 
+    public DocumentCacheEntry getDocByCodeAndDomain(String docCode, String organDomain) {
+        EdocDocument edocDocument = documentDaoImpl.getDocumentByCodeDomain(docCode, organDomain);
+        if (edocDocument != null) {
+            return MapperUtil.modelToDocumentCached(edocDocument);
+        }
+        return null;
+    }
+
     public MessageHeader getDocumentById(long docId) {
 
         EdocDocument document = this.getDocument(docId);

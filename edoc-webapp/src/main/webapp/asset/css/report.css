@@ -1,0 +1,107 @@
+/*report*/
+#publicContent {
+    padding: 5px;
+    margin: 0;
+}
+body{
+    font-family: "Roboto", sans-serif !important;
+    font-size: 15px !important;
+}
+#publicContent .before {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+}
+
+#publicContent .main {
+    color: #C00000;
+    font-size: 45px;
+    font-weight: bold;
+}
+
+#publicContent .after {
+    color: #1F497D;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: -5px;
+}
+
+#publicContent .sub {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: bold;
+    color: #1F497D;
+}
+
+.report-main .row {
+    margin: 0 !important;
+}
+
+#edocReportTable thead th {
+    background: #576ACC;
+    border: 0 !important;
+    color: #ffffff;
+}
+
+header.public-header {
+    background: #576ACC;
+}
+
+header.public-header h3 {
+    margin: 15px 0 !important;
+    color: #ffffff;
+}
+
+#updateTime {
+    color: #ffffff;
+}
+
+.public-stat-total .label {
+    padding: 5px 10px !important;
+}
+
+.message-filter p {
+    margin: 0 !important;
+}
+
+.message-filter .time-filter {
+    font-weight: 500;
+}
+
+.wr-content {
+    margin-top: 24px;
+    margin-bottom: 50px;
+    float: none;
+}
+
+.col-centered {
+    margin: auto;
+}
+
+.boarder-all {
+    background: #fff;
+    margin-top: 24px;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+.boarder-all .row {
+    margin: 0 !important;
+}
+
+.boarder-all .field-title{
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    cursor: pointer !important;
+    background-color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+.boarder-all .form-control{
+    color: #333 !important;
+}
+.comment-trace{
+    color: #4858AA;
+}

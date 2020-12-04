@@ -44,6 +44,10 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocById(documentId);
     }
 
+    public static DocumentCacheEntry getDocumentByCodeAndDomain(String docCode, String organDomain) {
+        return DOCUMENT_SERVICE.getDocByCodeAndDomain(docCode, organDomain);
+    }
+
     public static EdocDocument getDocument(long documentId) {
         EdocDocument document = DOCUMENT_SERVICE.getDocument(documentId);
         return DOCUMENT_SERVICE.getDocument(documentId);

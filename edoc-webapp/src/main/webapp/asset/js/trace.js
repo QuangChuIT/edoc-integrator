@@ -19,15 +19,61 @@ let edocTrace = {
             return;
         }
         const queryString = window.location.search;
-        console.log(queryString);
         const urlParams = new URLSearchParams(queryString);
         const docCode = urlParams.get('docCode')
-        console.log(docCode);
-        const  documentCode = docCode.split("/");
-        console.log(documentCode);
+        const fromOrgan = urlParams.get("organ");
+        if (docCode !== null && fromOrgan !== null) {
+            let endpoint = "/public/-/document/trace" + "?docCode=" + docCode + "&organ=" + fromOrgan;
+            $.get(endpoint, function (data){
+                let toOrganNames = [];
+                data.toOrgan.forEach(function (organ, index) {
+                    toOrganNames.push(organ["name"]);
+                });
+                data.toOrganName = toOrganNames.join(", ");
+                data.code = data.codeNumber + "/" + data.codeNotation;
+                $("#publicTraceContent").empty();
+                $('#edocPublicTraceTmpl').tmpl(data).appendTo('#publicTraceContent');
+            });
+        } else {
+            console.log("lol");
+        }
     }
 }
 
 $(document).ready(function () {
     edocTrace.init();
 });
+
+function getStatusOfTrace(statusCode) {
+    let message = "";
+    switch (statusCode) {
+        case 1:
+            message = app_message.edoc_status_arrived;
+            break;
+        case 2:
+            message = app_message.edoc_status_refuse;
+            break;
+        case 3:
+            message = app_message.edoc_status_received;
+            break;
+        case 4:
+            message = app_message.edoc_status_assignment;
+            break;
+        case 5:
+            message = app_message.edoc_status_processing;
+            break;
+        case 6:
+            message = app_message.edoc_status_finish;
+            break;
+        case 13:
+            message = app_message.edoc_status_recover;
+            break;
+        case 15:
+            message = app_message.edoc_status_accept_recover;
+            break;
+        case 16:
+            message = app_message.edoc_status_refuse_recover;
+            break;
+    }
+    return message;
+}

@@ -44,6 +44,28 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return selectedAttachmentNames.containsAll(attachmentNames);
     }
 
+    public EdocDocument getDocumentByCodeDomain(String docCode, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed from EdocDocument ed where ed.docCode = :docCode AND ed.toOrganDomain = :organDomain");
+            Query<EdocDocument> query = session.createQuery(sql.toString());
+            query.setParameter("docCode", docCode);
+            query.setParameter("organDomain", organDomain);
+            List<EdocDocument> documents = query.list();
+            if (documents != null && documents.size() > 0) {
+                return documents.get(0);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error find document with document code " + docCode + " in database !!!!!!!!!!!" + " cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+
     public EdocDocument getDocumentById(long documentId) {
         Session session = openCurrentSession();
         EdocDocument document = null;
@@ -97,7 +119,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
     public EdocDocument searchDocumentByOrganDomainAndCode(String toOrganDomain, String code) {
         Session currentSession = getCurrentSession();
-        try{
+        try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
                     "and ed.docCode = :code");
@@ -110,7 +132,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             } else {
                 return null;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("Error find document by organ domain an code with organ domain "
                     + toOrganDomain + " code " + code + " cause " + Arrays.toString(e.getStackTrace()));
             return null;

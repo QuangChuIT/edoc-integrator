@@ -3,16 +3,16 @@ package com.bkav.edoc.service.database.services;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
-import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
-import com.bkav.edoc.service.xml.base.header.Organization;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -91,10 +91,12 @@ public class EdocNotificationService {
             }
             currentSession.getTransaction().commit();
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error remove document pending for organ domain " + domain + " and document " + documentId + " cause " + Arrays.toString(e.getStackTrace()));
             currentSession.getTransaction().rollback();
         } finally {
-            notificationDaoImpl.closeCurrentSession();
+            if (currentSession != null) {
+                    currentSession.close();
+            }
         }
     }
 

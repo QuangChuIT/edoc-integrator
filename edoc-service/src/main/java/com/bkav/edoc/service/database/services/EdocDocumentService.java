@@ -93,8 +93,8 @@ public class EdocDocumentService {
         return result;
     }
 
-    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
-        List<DocumentCacheEntry> entries = new ArrayList<>();
+    public List<EdocDocument> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
+        List<EdocDocument> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
         try {
             String queryDocument = "";
@@ -122,12 +122,13 @@ public class EdocDocumentService {
             query.setFirstResult(pageNumber);
             query.setMaxResults(pageSize);
             List<EdocDocument> documents = query.getResultList();
-            if (documents.size() > 0) {
+            entries = documents;
+            /*if (documents.size() > 0) {
                 for (EdocDocument document : documents) {
                     DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
                     entries.add(documentCacheEntry);
                 }
-            }
+            }*/
             documentDaoImpl.closeCurrentSession();
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
@@ -256,14 +257,17 @@ public class EdocDocumentService {
             document.setAttachments(edocAttachmentSet);
 
             List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
-            boolean sendVPCP = toesVPCP.size() > 0;
             List<Organization> toOrganizations = messageHeader.getToes();
-            Date dueDate = messageHeader.getDueDate();
-            List<Organization> organToPending;
-            if (sendVPCP) {
-                toOrganizations.removeAll(toesVPCP);
+            List<Organization> organToPending = new ArrayList<>();
+            if (toesVPCP.size() > 0) {
+                for (Organization organization : toOrganizations) {
+                    if (!toesVPCP.contains(organization)) {
+                        organToPending.add(organization);
+                    }
+                }
             }
-            organToPending = toOrganizations;
+            Date dueDate = messageHeader.getDueDate();
+
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
             for (Organization to : organToPending) {

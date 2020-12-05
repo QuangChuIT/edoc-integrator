@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +20,9 @@ public class EdocTraceHeaderList implements Serializable {
     private String staff;
     private String mobile;
     private String email;
+    @JsonIgnore
     private EdocDocument document;
+    @JsonIgnore
     private Set<EdocTraceHeader> traceHeaders = new HashSet<>();
     private String businessInfo;
 

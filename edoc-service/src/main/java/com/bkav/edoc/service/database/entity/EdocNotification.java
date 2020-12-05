@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,6 +13,7 @@ public class EdocNotification implements Serializable {
     private Date dateCreate;
     private Date modifiedDate;
     private Date dueDate;
+    @JsonIgnore
     private EdocDocument document;
 
     public EdocNotification() {

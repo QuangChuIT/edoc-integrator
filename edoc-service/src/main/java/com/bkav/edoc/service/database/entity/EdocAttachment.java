@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ public class EdocAttachment implements Serializable, Cloneable {
     private String type;
     private String size;
     private String toOrganDomain;
+    @JsonIgnore
     private EdocDocument document;
 
     public EdocAttachment() {

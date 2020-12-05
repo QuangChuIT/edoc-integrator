@@ -640,6 +640,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 boolean sendVPCP = toesVPCP.size() > 0;
                 // not send to vpcp -> save to cache
                 if (!sendVPCP) {
+                    LOGGER.info("Not send document to VPCP !!!!!!!!");
+                    LOGGER.info(messageHeader.getToes());
                     // save envelop file to cache
                     saveEnvelopeFileCache(envelop, strDocumentId.toString());
                 } else {
@@ -671,7 +673,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.SEND_DOCUMENT_RESPONSE_ID_KEY, docIdResponseElm);
             } catch (Exception e) {
                 LOGGER.error("Error when send document " + Arrays.toString(e.getStackTrace()));
-                errorList.add(new Error("M.SendDocument", "Error when send document to esb " + e.getMessage()));
+                errorList.add(new Error("M.SendDocument", "Error when send document to esb " + Arrays.toString(e.getStackTrace())));
 
                 report = new Report(false, new ErrorList(errorList));
 

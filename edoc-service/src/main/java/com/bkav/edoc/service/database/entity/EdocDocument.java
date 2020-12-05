@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -29,11 +31,16 @@ public class EdocDocument implements Serializable {
     private boolean receivedExt;
     private String fromOrganDomain;
     private Boolean visible;
+    @JsonIgnore
     private EdocDocumentDetail documentDetail;
+    @JsonIgnore
     private EdocTraceHeaderList traceHeaderList;
     private int priority;
+    @JsonIgnore
     private Set<EdocNotification> notifications = new HashSet<>();
+    @JsonIgnore
     private Set<EdocTrace> traces = new HashSet<>();
+    @JsonIgnore
     private Set<EdocAttachment> attachments = new HashSet<>();
 
     public EdocDocument() {

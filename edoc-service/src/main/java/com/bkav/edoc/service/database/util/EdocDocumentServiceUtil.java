@@ -28,7 +28,7 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocuments(organId, start, size);
     }
 
-    public static List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
+    public static List<EdocDocument> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
         return DOCUMENT_SERVICE.getDocumentsFilter(paginationCriteria, organId, mode);
     }
 

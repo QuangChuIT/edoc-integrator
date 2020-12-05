@@ -245,9 +245,9 @@ public class DocumentRestController {
         System.out.println("sort direction " + sortDirection);
         DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
+        List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
         int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
-        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
+        DataTableResult<EdocDocument> dataTableResult = new DataTableResult<>();
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);
         if (!AppUtil.isObjectEmpty(entries)) {

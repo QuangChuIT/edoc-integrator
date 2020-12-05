@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -8,6 +10,7 @@ public class EdocTraceHeader implements Serializable {
     private Long traceHeaderId;
     private String organDomain;
     private Date timeStamp;
+    @JsonIgnore
     private EdocTraceHeaderList traceHeaderList;
 
     public EdocTraceHeader() {

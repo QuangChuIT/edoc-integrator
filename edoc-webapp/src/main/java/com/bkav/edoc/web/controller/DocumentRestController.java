@@ -13,8 +13,7 @@ import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -261,10 +262,14 @@ public class DocumentRestController {
                     dataTableResult.setRecordsFiltered(entries.size());
                 }
             }
-            String response =  gson.toJson(dataTableResult);
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(LocalDateTimeSerializer.class, new LocalDateTimeSerializer());
+            Gson gson = gsonBuilder.setPrettyPrinting().create();
+            String response = gson.toJson(dataTableResult);
             logger.info(response);
             return response;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error(e);
             return "";
         }
@@ -284,9 +289,17 @@ public class DocumentRestController {
         }
     }
 
-    protected static Gson gson;
-    static {
-        gson = (new GsonBuilder()).setDateFormat("dd/MM/yyyy HH:mm:ss").serializeNulls().create();
-    }
     private static final Logger logger = Logger.getLogger(DocumentRestController.class);
+}
+
+class LocalDateTimeSerializer implements JsonSerializer<Date> {
+    private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+    @Override
+    public JsonElement serialize(Date localDateTime, Type srcType, JsonSerializationContext context) {
+        LOGGER.info(FORMATTER.format(localDateTime));
+        return new JsonPrimitive(FORMATTER.format(localDateTime));
+    }
+
+    private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);
 }

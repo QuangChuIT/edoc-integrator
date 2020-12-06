@@ -14,6 +14,7 @@ import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -233,33 +234,40 @@ public class DocumentRestController {
     @RequestMapping(value = "/documents/{mode}", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
-        String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-        int draw = Integer.parseInt(request.getParameter("draw"));
-        String searchValue = request.getParameter("search[value]");
-        String sortColumn = request.getParameter("order[0][column]");
-        //Sorting Direction
-        String sortDirection = request.getParameter("order[0][dir]");
-        System.out.println("draw " + draw);
-        System.out.println("search value " + searchValue);
-        System.out.println("sortColumn " + sortColumn);
-        System.out.println("sort direction " + sortDirection);
-        DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
-        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
-        int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
-        DataTableResult<EdocDocument> dataTableResult = new DataTableResult<>();
-        dataTableResult.setDraw(datatableRequest.getDraw());
-        dataTableResult.setListOfDataObjects(entries);
-        if (!AppUtil.isObjectEmpty(entries)) {
-            dataTableResult.setRecordsTotal(totalCount);
+        try {
+            String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
+            int draw = Integer.parseInt(request.getParameter("draw"));
+            String searchValue = request.getParameter("search[value]");
+            String sortColumn = request.getParameter("order[0][column]");
+            //Sorting Direction
+            String sortDirection = request.getParameter("order[0][dir]");
+            System.out.println("draw " + draw);
+            System.out.println("search value " + searchValue);
+            System.out.println("sortColumn " + sortColumn);
+            System.out.println("sort direction " + sortDirection);
+            DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
+            PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+            List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
+            int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
+            DataTableResult<EdocDocument> dataTableResult = new DataTableResult<>();
+            dataTableResult.setDraw(datatableRequest.getDraw());
+            dataTableResult.setListOfDataObjects(entries);
+            if (!AppUtil.isObjectEmpty(entries)) {
+                dataTableResult.setRecordsTotal(totalCount);
 
-            if (datatableRequest.getPaginationRequest().isFilterByEmpty()) {
-                dataTableResult.setRecordsFiltered(totalCount);
-            } else {
-                dataTableResult.setRecordsFiltered(entries.size());
+                if (datatableRequest.getPaginationRequest().isFilterByEmpty()) {
+                    dataTableResult.setRecordsFiltered(totalCount);
+                } else {
+                    dataTableResult.setRecordsFiltered(entries.size());
+                }
             }
+            String response =  gson.toJson(dataTableResult);
+            logger.info(response);
+            return response;
+        } catch (Exception e){
+            logger.error(e);
+            return "";
         }
-        return new Gson().toJson(dataTableResult);
     }
 
     @DeleteMapping(value = "/document/delete/{documentId}")
@@ -276,5 +284,9 @@ public class DocumentRestController {
         }
     }
 
+    protected static Gson gson;
+    static {
+        gson = (new GsonBuilder()).setDateFormat("dd/MM/yyyy HH:mm:ss").serializeNulls().create();
+    }
     private static final Logger logger = Logger.getLogger(DocumentRestController.class);
 }

@@ -13,7 +13,7 @@ import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -234,7 +236,7 @@ public class DocumentRestController {
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-        int draw = Integer.parseInt(request.getParameter("draw"));
+        /*int draw = Integer.parseInt(request.getParameter("draw"));
         String searchValue = request.getParameter("search[value]");
         String sortColumn = request.getParameter("order[0][column]");
         //Sorting Direction
@@ -242,7 +244,7 @@ public class DocumentRestController {
         System.out.println("draw " + draw);
         System.out.println("search value " + searchValue);
         System.out.println("sortColumn " + sortColumn);
-        System.out.println("sort direction " + sortDirection);
+        System.out.println("sort direction " + sortDirection);*/
         DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
@@ -259,7 +261,11 @@ public class DocumentRestController {
                 dataTableResult.setRecordsFiltered(entries.size());
             }
         }
-        return new Gson().toJson(dataTableResult);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, new LocalDateTimeSerializer());
+
+        Gson gson = gsonBuilder.setPrettyPrinting().create();
+        return gson.toJson(dataTableResult);
     }
 
     @DeleteMapping(value = "/document/delete/{documentId}")
@@ -274,6 +280,17 @@ public class DocumentRestController {
                 return HttpStatus.INTERNAL_SERVER_ERROR;
             }
         }
+    }
+
+    private static final Logger logger = Logger.getLogger(DocumentRestController.class);
+}
+
+class LocalDateTimeSerializer implements JsonSerializer<Date> {
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+    @Override
+    public JsonElement serialize(Date localDateTime, Type srcType, JsonSerializationContext context) {
+        return new JsonPrimitive(formatter.format(localDateTime));
     }
 
     private static final Logger logger = Logger.getLogger(DocumentRestController.class);

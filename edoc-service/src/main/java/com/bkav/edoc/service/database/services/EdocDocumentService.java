@@ -265,6 +265,8 @@ public class EdocDocumentService {
                         organToPending.add(organization);
                     }
                 }
+            } else {
+                organToPending = toOrganizations;
             }
             Date dueDate = messageHeader.getDueDate();
 

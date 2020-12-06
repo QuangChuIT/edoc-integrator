@@ -15,6 +15,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+        long startTime = System.currentTimeMillis();
+        logger.info("Re Handler Request URL::" + httpServletRequest.getRequestURL().toString()
+                + ":: Start Time=" + System.currentTimeMillis());
+        httpServletRequest.setAttribute("startTime", startTime);
         String userLogin = CookieUtil.getValue(httpServletRequest, OAuth2Constants.TOKEN_SSO);
         String organLogin = CookieUtil.getValue(httpServletRequest, OAuth2Constants.ORGANIZATION);
         String userLoginInfo = CookieUtil.getValue(httpServletRequest, OAuth2Constants.USER_LOGIN);
@@ -40,6 +44,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 CookieUtil.clear(httpServletResponse, OAuth2Constants.ORGANIZATION, host);
                 CookieUtil.clear(httpServletResponse, OAuth2Constants.TOKEN_SSO, host);
                 OAuthClientRequest authClientRequest = Oauth2Config.buildOauthRequest(httpServletRequest);
+                logger.warn("Redirect url to sso: " + authClientRequest.getLocationUri());
                 httpServletResponse.sendRedirect(authClientRequest.getLocationUri());
                 return false;
             } catch (Exception e) {
@@ -53,12 +58,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest httpServletRequest,
                            HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+        logger.info(" Post handler Request URL::" + httpServletRequest.getRequestURL().toString()
+                + " Sent to Handler :: Current Time=" + System.currentTimeMillis());
 
     }
 
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-
+        long startTime = (Long) httpServletRequest.getAttribute("startTime");
+        logger.info("After completion Request URL::" + httpServletRequest.getRequestURL().toString()
+                + ":: End Time=" + System.currentTimeMillis());
+        logger.info("After completion Request URL::" + httpServletRequest.getRequestURL().toString()
+                + ":: Time Taken=" + (System.currentTimeMillis() - startTime));
     }
 
     private static final Logger logger = Logger.getLogger(AuthenticationInterceptor.class);

@@ -454,9 +454,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                 if (!acceptToDocument) {
                     errorList.add(new Error(
-                            "M.DOCUMENT",
-                            "Not allow with document !!!!"));
-                    errorList.add(new Error("Error", "Document does not exist !!!!"));
+                            "M.GetDocumentCheckAllow",
+                            "Not find document pending in cache, database docId " + documentId + " organId " + organId));
 
                     report = new Report(false, new ErrorList(errorList));
 

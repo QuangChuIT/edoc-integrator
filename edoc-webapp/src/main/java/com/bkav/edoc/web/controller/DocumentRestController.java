@@ -52,7 +52,7 @@ public class DocumentRestController {
                 return new ResponseEntity<>(document, HttpStatus.OK);
             }
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
@@ -68,7 +68,7 @@ public class DocumentRestController {
             Response response = new Response(200);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
         Response response = new Response(500);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -227,7 +227,8 @@ public class DocumentRestController {
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));
         } catch (Exception e) {
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
-            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500,
+                    errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -235,24 +236,24 @@ public class DocumentRestController {
     @RequestMapping(value = "/documents/{mode}", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
-        try {
-            String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-            int draw = Integer.parseInt(request.getParameter("draw"));
-            String searchValue = request.getParameter("search[value]");
-            String sortColumn = request.getParameter("order[0][column]");
-            //Sorting Direction
-            String sortDirection = request.getParameter("order[0][dir]");
-            System.out.println("draw " + draw);
-            System.out.println("search value " + searchValue);
-            System.out.println("sortColumn " + sortColumn);
-            System.out.println("sort direction " + sortDirection);
-            DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
-            PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-            List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
-            int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
-            DataTableResult<EdocDocument> dataTableResult = new DataTableResult<>();
-            dataTableResult.setDraw(datatableRequest.getDraw());
-            dataTableResult.setListOfDataObjects(entries);
+        String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
+        /*int draw = Integer.parseInt(request.getParameter("draw"));
+        String searchValue = request.getParameter("search[value]");
+        String sortColumn = request.getParameter("order[0][column]");
+        //Sorting Direction
+        String sortDirection = request.getParameter("order[0][dir]");
+        System.out.println("draw " + draw);
+        System.out.println("search value " + searchValue);
+        System.out.println("sortColumn " + sortColumn);
+        System.out.println("sort direction " + sortDirection);*/
+        DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        List<EdocDocument> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
+        int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
+        DataTableResult<EdocDocument> dataTableResult = new DataTableResult<>();
+        dataTableResult.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(entries);
+        if (!AppUtil.isObjectEmpty(entries)) {
             if (!AppUtil.isObjectEmpty(entries)) {
                 dataTableResult.setRecordsTotal(totalCount);
 
@@ -262,17 +263,13 @@ public class DocumentRestController {
                     dataTableResult.setRecordsFiltered(entries.size());
                 }
             }
-
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(LocalDateTimeSerializer.class, new LocalDateTimeSerializer());
-            Gson gson = gsonBuilder.setPrettyPrinting().create();
-            String response = gson.toJson(dataTableResult);
-            logger.info(response);
-            return response;
-        } catch (Exception e) {
-            logger.error(e);
-            return "";
         }
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, new LocalDateTimeSerializer());
+        Gson gson = gsonBuilder.setPrettyPrinting().create();
+        String response = gson.toJson(dataTableResult);
+        LOGGER.info(response);
+        return response;
     }
 
     @DeleteMapping(value = "/document/delete/{documentId}")
@@ -289,7 +286,8 @@ public class DocumentRestController {
         }
     }
 
-    private static final Logger logger = Logger.getLogger(DocumentRestController.class);
+    private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);
+
 }
 
 class LocalDateTimeSerializer implements JsonSerializer<Date> {

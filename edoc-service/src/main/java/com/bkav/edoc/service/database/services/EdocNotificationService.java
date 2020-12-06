@@ -52,12 +52,8 @@ public class EdocNotificationService {
      * @return
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
-        notificationDaoImpl.openCurrentSession();
 
-        boolean checkAllow = notificationDaoImpl.checkAllowWithDocument(documentId, organId);
-
-        notificationDaoImpl.closeCurrentSession();
-        return checkAllow;
+        return notificationDaoImpl.checkAllowWithDocument(documentId, organId);
     }
 
     public List<EdocNotification> findAll() {

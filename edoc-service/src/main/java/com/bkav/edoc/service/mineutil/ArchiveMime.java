@@ -49,7 +49,7 @@ public class ArchiveMime {
         Attachments attachments = null;
         long dataAttSize = 0L;
         // add attachment to attachments of service
-        if (attachmentsByEntity != null) {
+        if (attachmentsByEntity != null && attachmentsByEntity.size() > 0) {
             attachments = new Attachments();
             for (Attachment attachment : attachmentsByEntity) {
                 InputStream attStream = attachment.getInputStream();

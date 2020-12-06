@@ -48,9 +48,6 @@ public class LoginController {
         String session_state = request.getParameter(OAuth2Constants.SESSION_STATE);
         String redirect_url = request.getParameter("return_url");
 
-        System.out.println("Code -----------------> " + code);
-        System.out.println("Session state ----------------> " + session_state);
-
         if (code == null || session_state == null) {
             OAuthClientRequest authRequest = Oauth2Config.buildOauthRequest(request);
             response.sendRedirect(authRequest.getLocationUri());

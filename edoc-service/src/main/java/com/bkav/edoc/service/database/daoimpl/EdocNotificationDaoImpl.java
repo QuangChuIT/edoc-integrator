@@ -49,14 +49,23 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
      * @return
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
-        Session currentSession = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
-        Query<Long> query = currentSession.createQuery(sql.toString());
-        query.setParameter("receiverId", organId);
-        query.setParameter("documentId", documentId);
-        List<Long> result = query.list();
-        return result != null && result.size() != 0;
+        Session currentSession = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
+            Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
+            query.setParameter("receiverId", organId);
+            query.setParameter("documentId", documentId);
+            List<Long> result = query.list();
+            return result != null && result.size() != 0;
+        } catch (Exception e) {
+            LOGGER.error("Error check allow document with document id " + documentId + " organId " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+            return false;
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
     }
 
     public EdocNotification getByOrganAndDocumentId(long documentId, String organDomain) {

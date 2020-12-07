@@ -21,7 +21,7 @@ public class EdocNotificationService {
         Session currentSession = notificationDaoImpl.openCurrentSession();
         try {
             currentSession.beginTransaction();
-            notificationDaoImpl.persist(edocNotification);
+            currentSession.persist(edocNotification);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -29,7 +29,7 @@ public class EdocNotificationService {
                 currentSession.getTransaction().rollback();
             }
         } finally {
-            notificationDaoImpl.closeCurrentSession();
+            notificationDaoImpl.closeCurrentSession(currentSession);
         }
     }
 
@@ -40,8 +40,7 @@ public class EdocNotificationService {
      * @return
      */
     public List<Long> getDocumentIdsByOrganId(String organId) {
-        List<Long> notificationIds = notificationDaoImpl.getDocumentIdsByOrganId(organId);
-        return notificationIds;
+        return notificationDaoImpl.getDocumentIdsByOrganId(organId);
     }
 
     /**
@@ -57,10 +56,7 @@ public class EdocNotificationService {
     }
 
     public List<EdocNotification> findAll() {
-        notificationDaoImpl.openCurrentSession();
-        List<EdocNotification> result = notificationDaoImpl.findAll();
-        notificationDaoImpl.closeCurrentSession();
-        return result;
+        return notificationDaoImpl.findAll();
     }
 
     public void removePendingDocumentId(String domain, long documentId) {
@@ -71,7 +67,7 @@ public class EdocNotificationService {
             EdocNotification edocNotification = notificationDaoImpl.getByOrganAndDocumentId(documentId, domain);
             edocNotification.setTaken(true);
             edocNotification.setModifiedDate(new Date());
-            notificationDaoImpl.saveOrUpdate(edocNotification);
+            currentSession.saveOrUpdate(edocNotification);
             String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
             DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
             if (documentCacheUpdate != null) {
@@ -91,16 +87,14 @@ public class EdocNotificationService {
             currentSession.getTransaction().rollback();
         } finally {
             if (currentSession != null) {
-                    currentSession.close();
+                currentSession.close();
             }
         }
     }
 
     public EdocNotification getByOrganAndDocumentId(long documentId, String organId) {
-        notificationDaoImpl.openCurrentSession();
-        EdocNotification notification = notificationDaoImpl.getByOrganAndDocumentId(documentId, organId);
-        notificationDaoImpl.closeCurrentSession();
-        return notification;
+
+        return notificationDaoImpl.getByOrganAndDocumentId(documentId, organId);
     }
 
     public static void main(String[] args) {

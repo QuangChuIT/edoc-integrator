@@ -2,7 +2,6 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDynamicContactDao;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.kernel.string.StringPool;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -32,26 +31,30 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         } catch (Exception e) {
             LOGGER.error("Error get dynamic contact from organ domain " + domain + " cause " + e.getMessage());
             return null;
+        } finally {
+            currentSession.close();
         }
     }
 
     @Override
     public List<EdocDynamicContact> getDynamicContactsByDomainFilter(String domain) {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain");
         Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
         query.setParameter("domain", StringPool.PERCENT + domain + StringPool.PERCENT);
+        closeCurrentSession(currentSession);
         return query.list();
     }
 
     @Override
     public Long countOrgan(String organDomain) {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain");
         Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
         query.setParameter("domain", StringPool.PERCENT + organDomain + StringPool.PERCENT);
+        closeCurrentSession(currentSession);
         return query.uniqueResult();
     }
 
@@ -73,37 +76,19 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         } catch (Exception e) {
             LOGGER.error("Error when check permission for organId " + organId + " cause " + e.getMessage());
         } finally {
-            if (session != null) {
-                session.close();
-            }
+            closeCurrentSession(session);
         }
         return result;
     }
 
     @Override
     public void updateContact(EdocDynamicContact edocDynamicContact) {
-        Session session = getCurrentSession();
-        try {
-            session.beginTransaction();
-            session.saveOrUpdate(edocDynamicContact);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            session.getTransaction().rollback();
-        }
+        saveOrUpdate(edocDynamicContact);
     }
 
     @Override
     public void createContact(EdocDynamicContact contact) {
-        Session session = getCurrentSession();
-        try {
-            session.beginTransaction();
-            session.save(contact);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            session.getTransaction().rollback();
-        }
+        this.persist(contact);
     }
 
     @Override

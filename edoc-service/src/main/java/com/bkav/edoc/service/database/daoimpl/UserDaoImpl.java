@@ -9,6 +9,7 @@ import org.hibernate.query.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
@@ -19,112 +20,104 @@ public class UserDaoImpl extends RootDaoImpl<User, Long> implements UserDao {
 
     @Override
     public User findByUsername(String username) {
-        Session currentSession = getCurrentSession();
-        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-        query.select(root);
-        query.where(builder.equal(root.get("username"), username));
-        Query<User> q = currentSession.createQuery(query);
-        return q.uniqueResult();
+        Session currentSession = openCurrentSession();
+        try {
+            CriteriaBuilder builder = currentSession.getCriteriaBuilder();
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
+            query.select(root);
+            query.where(builder.equal(root.get("username"), username));
+            Query<User> q = currentSession.createQuery(query);
+            return q.uniqueResult();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
+
     }
 
     public List<User> getAllUser() {
-        Session session = getCurrentSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-        query.select(root);
-        Query<User> q = session.createQuery(query);
-        return q.getResultList();
+        Session session = openCurrentSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
+            query.select(root);
+            Query<User> q = session.createQuery(query);
+            return q.getResultList();
+        } catch (Exception e) {
+            LOGGER.error("Error get all user cause " + e);
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public void updateUser(User user) {
-        Session session = getCurrentSession();
-        try {
-            session.beginTransaction();
-            session.saveOrUpdate(user);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            if (session != null) {
-                closeCurrentSession();
-            }
-        }
+        this.update(user);
     }
 
     @Override
     public void createUser(User user) {
-        Session session = openCurrentSession();
-        try {
-            session.beginTransaction();
-            this.persist(user);
-            session.getTransaction().commit();
-            LOGGER.info("Create user success with user name " + user.getUsername());
-        } catch (Exception e) {
-            LOGGER.error("Error create user with user name " + user.getUsername() + " cause" + user.getUsername());
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            if (session != null) {
-                closeCurrentSession();
-            }
-        }
+        this.persist(user);
     }
 
     @Override
     public boolean checkExist(String username) {
-        Session session = getCurrentSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Long> query = builder.createQuery(Long.class);
-        Root<User> root = query.from(User.class);
-        query.select(builder.count(root.get("username")));
-        query.where(builder.equal(root.get("username"), username));
-        Long result = session.createQuery(query).getSingleResult();
-        return result > 0L;
+        Session session = openCurrentSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Long> query = builder.createQuery(Long.class);
+            Root<User> root = query.from(User.class);
+            query.select(builder.count(root.get("username")));
+            query.where(builder.equal(root.get("username"), username));
+            Long result = session.createQuery(query).getSingleResult();
+            return result > 0L;
+        } catch (Exception e) {
+            LOGGER.error("Error check exist user with username " + username + " cause " + e.getMessage());
+            return false;
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     @Override
     public List<User> getUsers(boolean onSSO) {
-        Session session = getCurrentSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-        query.select(root);
-        query.where(builder.equal(root.get("sso"), onSSO));
-        Query<User> userQuery = session.createQuery(query);
-        return userQuery.getResultList();
+        Session session = openCurrentSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
+            query.select(root);
+            query.where(builder.equal(root.get("sso"), onSSO));
+            Query<User> userQuery = session.createQuery(query);
+            return userQuery.getResultList();
+        } catch (Exception e) {
+            LOGGER.error("Error get user on sso cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     @Override
     public boolean deleteUser(long userId) {
-        Session session = openCurrentSession();
         boolean result;
         try {
-            session.beginTransaction();
             User user = this.findById(userId);
             if (user == null) {
                 LOGGER.error("Error delete user not found document with id " + userId);
                 result = false;
             } else {
-                session.delete(user);
-                session.getTransaction().commit();
+                delete(user);
                 result = true;
             }
         } catch (Exception e) {
             result = false;
             LOGGER.error("Error delete user with id " + userId + " cause " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
         return result;
     }

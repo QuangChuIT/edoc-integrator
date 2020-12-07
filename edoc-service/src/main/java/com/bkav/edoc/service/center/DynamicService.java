@@ -362,7 +362,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             // update trace
             if (!traceService.updateTrace(status)) {
 
-                errorList.add(new Error("M.updateTrace", "Error when process update trace"));
+                errorList.add(new Error("M.updateTrace",
+                        "Error process update trace cause not found document with trace or save error!"));
 
                 report = new Report(false, new ErrorList(errorList));
 
@@ -400,8 +401,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
             map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
         } catch (Exception e) {
-            LOGGER.error("Error when update traces cause " + Arrays.toString(e.getStackTrace()));
-            errorList.add(new Error("M.UpdateTraces", "Error when process get update " + Arrays.toString(e.getStackTrace())));
+            LOGGER.error("Error update traces cause " + Arrays.toString(e.getStackTrace()));
+            errorList.add(new Error("M.UpdateTraces", "Error process get update " + Arrays.toString(e.getStackTrace())));
 
             report = new Report(false, new ErrorList(errorList));
 
@@ -671,8 +672,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 map.put(StringPool.SEND_DOCUMENT_RESPONSE_ID_KEY, docIdResponseElm);
             } catch (Exception e) {
-                LOGGER.error("Error when send document " + Arrays.toString(e.getStackTrace()));
-                errorList.add(new Error("M.SendDocument", "Error when send document to esb " + Arrays.toString(e.getStackTrace())));
+                LOGGER.error("Error send document " + Arrays.toString(e.getStackTrace()));
+                errorList.add(new Error("M.SendDocument", "Error send document to esb error trace" + Arrays.toString(e.getStackTrace())));
 
                 report = new Report(false, new ErrorList(errorList));
 

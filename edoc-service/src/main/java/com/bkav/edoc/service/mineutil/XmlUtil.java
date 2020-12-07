@@ -325,19 +325,21 @@ public class XmlUtil {
             businessDocumentInfoNode.addChild(documentReceiverNode);
 
             OMElement receiverListNode = factoryOM.createOMElement("ReceiverList", ns);
-            if (businessDocumentInfo.getReceiverList().getReceiver() != null && businessDocumentInfo.getReceiverList().getReceiver().size() > 0) {
-                for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
-                    OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
+            if (businessDocumentInfo.getReceiverList() != null) {
+                if (businessDocumentInfo.getReceiverList().getReceiver() != null && businessDocumentInfo.getReceiverList().getReceiver().size() > 0) {
+                    for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
+                        OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
 
-                    OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
-                    receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
-                    receiverNode.addChild(receiverTypeNode);
+                        OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
+                        receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
+                        receiverNode.addChild(receiverTypeNode);
 
-                    OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
-                    organIdNode.setText(String.valueOf(receiver.getOrganId()));
-                    receiverNode.addChild(organIdNode);
+                        OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
+                        organIdNode.setText(String.valueOf(receiver.getOrganId()));
+                        receiverNode.addChild(organIdNode);
 
-                    receiverListNode.addChild(receiverNode);
+                        receiverListNode.addChild(receiverNode);
+                    }
                 }
             }
             businessDocumentInfoNode.addChild(receiverListNode);

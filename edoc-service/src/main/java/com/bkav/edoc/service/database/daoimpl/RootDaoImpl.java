@@ -2,88 +2,114 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.RootDao;
 import com.bkav.edoc.service.database.util.HibernateUtil;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import java.io.Serializable;
 import java.util.List;
 
 public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao<T, Id> {
     private Class<T> clazz;
-    private Session currentSession;
-    private Transaction currentTransaction;
 
     public RootDaoImpl(Class<T> clazz) {
         this.clazz = clazz;
     }
 
     public Session openCurrentSession() {
-        this.currentSession = getSessionFactory().openSession();
-        return currentSession;
+        return getSessionFactory().openSession();
     }
 
     public Session openCurrentSessionWithTransaction() {
-        this.currentSession = getSessionFactory().openSession();
-        this.currentTransaction = currentSession.beginTransaction();
-        return currentSession;
+        return getSessionFactory().openSession();
     }
 
-    public void closeCurrentSession() {
-        this.currentSession.close();
+    public void closeCurrentSession(Session session) {
+        if (session != null) {
+            session.close();
+        }
     }
 
-    public void closeCurrentSessionWithTransaction() {
-        this.currentTransaction.commit();
-        this.currentSession.close();
-    }
 
     private static SessionFactory getSessionFactory() {
         return HibernateUtil.getSessionFactory();
     }
 
-    public Session getCurrentSession() {
-        return this.currentSession;
-    }
-
-    public void setCurrentSession(Session currentSession) {
-        this.currentSession = currentSession;
-    }
-
-    public Transaction getCurrentTransaction() {
-        return currentTransaction;
-    }
-
-    public void setCurrentTransaction(Transaction currentTransaction) {
-        this.currentTransaction = currentTransaction;
-    }
-
     public void persist(T entity) {
-        getCurrentSession().save(entity);
+        Session session = openCurrentSession();
+        try {
+            session.beginTransaction();
+            session.save(entity);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error persist entity " + entity.getClass() + " cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public void update(T entity) {
+        Session session = openCurrentSession();
         try {
-            getCurrentSession().update(entity);
+            session.beginTransaction();
+            session.update(entity);
+            session.getTransaction().commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error update entity " + entity.getClass() + " cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            closeCurrentSession(session);
         }
     }
 
     public T findById(Id id) {
-        return getCurrentSession().get(clazz, id);
+        Session session = openCurrentSession();
+        try {
+            return session.get(clazz, id);
+        } catch (Exception e) {
+            LOGGER.error("Error find by id " + id);
+            return null;
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public void delete(T entity) {
-        getCurrentSession().delete(entity);
+        Session session = openCurrentSession();
+        try {
+            session.delete(entity);
+        } catch (Exception e) {
+            LOGGER.error("Error delete entity + " + entity.getClass() + " cause " + e.getMessage());
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public List<T> findAll() {
-        return (List<T>) getCurrentSession().createQuery("from " + clazz.getName()).list();
+        Session session = openCurrentSession();
+        try {
+            return (List<T>) session.createQuery("from " + clazz.getName()).list();
+        } catch (Exception e) {
+            LOGGER.error("Error find all cause " + e.getMessage());
+            return null;
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public void saveOrUpdate(T entity) {
-        getCurrentSession().saveOrUpdate(entity);
+        Session session = openCurrentSession();
+        try {
+            session.beginTransaction();
+            session.saveOrUpdate(entity);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error save or update entity " + entity.getClass() + " cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public void deleteAll() {
@@ -92,4 +118,6 @@ public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao
             delete(entity);
         }
     }
+
+    private final static Logger LOGGER = Logger.getLogger(RootDaoImpl.class);
 }

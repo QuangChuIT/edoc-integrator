@@ -8,7 +8,9 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class EdocAttachmentService {
     private final EdocAttachmentDaoImpl attachmentDaoImpl = new EdocAttachmentDaoImpl();
@@ -19,7 +21,7 @@ public class EdocAttachmentService {
         Session currentSession = attachmentDaoImpl.openCurrentSession();
         try {
             currentSession.beginTransaction();
-            attachmentDaoImpl.persist(edocAttachment);
+            currentSession.persist(edocAttachment);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -27,7 +29,7 @@ public class EdocAttachmentService {
                 currentSession.getTransaction().rollback();
             }
         } finally {
-            attachmentDaoImpl.closeCurrentSession();
+            attachmentDaoImpl.closeCurrentSession(currentSession);
         }
         return edocAttachment;
     }
@@ -39,29 +41,16 @@ public class EdocAttachmentService {
      * @return
      */
     public List<EdocAttachment> getEdocAttachmentsByDocId(long docId) {
-        attachmentDaoImpl.openCurrentSession();
-
         List<EdocAttachment> attachments = attachmentDaoImpl.getAttachmentsByDocumentId(docId);
-
-        attachmentDaoImpl.closeCurrentSession();
         return attachments;
     }
 
     public EdocAttachment getAttachmentById(Long attachmentId) {
-        attachmentDaoImpl.openCurrentSession();
-
-        EdocAttachment attachment = attachmentDaoImpl.findById(attachmentId);
-
-        attachmentDaoImpl.closeCurrentSession();
-
-        return attachment;
+        return attachmentDaoImpl.findById(attachmentId);
     }
 
     public boolean deleteAttachment(EdocAttachment attachment) {
-        attachmentDaoImpl.openCurrentSession();
-        boolean result = attachmentDaoImpl.deleteAttachment(attachment);
-        attachmentDaoImpl.closeCurrentSession();
-        return result;
+        return attachmentDaoImpl.deleteAttachment(attachment);
     }
 
     /**

@@ -3,7 +3,6 @@ package com.bkav.edoc.service.database.services;
 import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocTraceHeaderDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocTraceHeaderListDaoImpl;
-import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocTraceHeader;
 import com.bkav.edoc.service.database.entity.EdocTraceHeaderList;
 import com.bkav.edoc.service.xml.base.header.Business;
@@ -11,10 +10,8 @@ import com.bkav.edoc.service.xml.base.header.StaffInfo;
 import com.bkav.edoc.service.xml.base.header.TraceHeader;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -68,35 +65,11 @@ public class EdocTraceHeaderListService {
     }
 
     public void createTraceHeaderList(EdocTraceHeaderList edocTraceHeaderList) {
-        Session currentSession = traceHeaderListDaoImpl.openCurrentSession();
-        try {
-            currentSession.beginTransaction();
-            traceHeaderListDaoImpl.persist(edocTraceHeaderList);
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-        } finally {
-            traceHeaderListDaoImpl.closeCurrentSession();
-        }
+        traceHeaderListDaoImpl.persist(edocTraceHeaderList);
     }
 
     public void createTraceHeader(EdocTraceHeader edocTraceHeader) {
-        Session currentSession = traceHeaderDaoImpl.openCurrentSession();
-        try {
-            currentSession.beginTransaction();
-            traceHeaderDaoImpl.persist(edocTraceHeader);
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-        } finally {
-            traceHeaderDaoImpl.closeCurrentSession();
-        }
+        traceHeaderDaoImpl.persist(edocTraceHeader);
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocTraceHeaderListService.class);

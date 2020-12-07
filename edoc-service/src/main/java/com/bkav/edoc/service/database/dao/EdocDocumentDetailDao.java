@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface EdocDocumentDetailDao {
 
-    List<EdocDocumentDetail> getAllDocumentDetailList();
 
     List<EdocDocumentDetail> getAttachmentsByDocumentId(long documentId);
 

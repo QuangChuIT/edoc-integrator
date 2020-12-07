@@ -1,8 +1,6 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.UserRoleDao;
-import com.bkav.edoc.service.database.entity.EdocNotification;
-import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -21,7 +19,7 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
 
     @Override
     public List<UserRole> getUserRole() {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
         Root<UserRole> root = query.from(UserRole.class);
@@ -32,74 +30,56 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
 
     @Override
     public UserRole getRoleByUserId(long userId) {
-        Session currentSession = getCurrentSession();
-        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
-        CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
-        Root<UserRole> root = query.from(UserRole.class);
-        query.select(root);
-        query.where(builder.equal(root.get("userId"), userId));
-        Query<UserRole> q = currentSession.createQuery(query);
-        return q.uniqueResult();
+        Session currentSession = openCurrentSession();
+        try {
+            CriteriaBuilder builder = currentSession.getCriteriaBuilder();
+            CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
+            Root<UserRole> root = query.from(UserRole.class);
+            query.select(root);
+            query.where(builder.equal(root.get("userId"), userId));
+            Query<UserRole> q = currentSession.createQuery(query);
+            return q.uniqueResult();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+
     }
 
     @Override
     public void updateUserRole(UserRole userRole) {
-        Session session = getCurrentSession();
-        try {
-            session.beginTransaction();
-            update(userRole);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            if (session != null) {
-                closeCurrentSession();
-            }
-        }
+        update(userRole);
     }
 
     @Override
     public void createUserRole(UserRole userRole) {
-        Session session = getCurrentSession();
-        try {
-            session.beginTransaction();
-            this.persist(userRole);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            if (session != null) {
-                closeCurrentSession();
-            }
-        }
+        this.persist(userRole);
     }
 
     @Override
-    public boolean checkExistUserId (long userId) {
-        Session session = getCurrentSession();
+    public boolean checkExistUserId(long userId) {
+        Session session = openCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<UserRole> root = query.from(UserRole.class);
         query.select(builder.count(root.get("userId")));
         query.where(builder.equal(root.get("userId"), userId));
         Long result = session.createQuery(query).getSingleResult();
+        closeCurrentSession(session);
         return result > 0L;
     }
 
     public UserRole getUserRoleByUserId(long userId) {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         CriteriaBuilder builder = currentSession.getCriteriaBuilder();
         CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
         Root<UserRole> root = query.from(UserRole.class);
         query.select(root);
         query.where(builder.equal(root.get("userId"), userId));
         Query<UserRole> q = currentSession.createQuery(query);
+        closeCurrentSession(currentSession);
         return q.uniqueResult();
     }
 

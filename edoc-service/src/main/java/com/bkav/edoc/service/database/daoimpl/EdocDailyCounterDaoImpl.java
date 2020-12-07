@@ -17,43 +17,47 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
 
     @Override
     public boolean checkExistCounter(Date date) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT dc from EdocDailyCounter dc where dc.dateTime=:dateTime");
         Query<EdocDailyCounter> query = session.createQuery(sql.toString());
         query.setParameter("dateTime", date);
         List<EdocDailyCounter> edocDailyCounters = query.getResultList();
+        closeCurrentSession(session);
         return edocDailyCounters.size() > 0;
     }
 
     @Override
     public List<EdocDailyCounter> getOverStat(String organDomain) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain = :organDomain");
         Query<EdocDailyCounter> query = session.createQuery(sql.toString());
         query.setParameter("organDomain", organDomain);
+        closeCurrentSession(session);
         return query.getResultList();
     }
 
     @Override
     public List<EdocDailyCounter> getOverStat(String organDomain, Date fromDate, Date toDate) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain = :organDomain and DATE(dateTime) >= DATE(:fromDate) and DATE(dateTime) <= DATE(:toDate)");
         Query<EdocDailyCounter> query = session.createQuery(sql.toString());
         query.setParameter("organDomain", organDomain);
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
+        closeCurrentSession(session);
         return query.getResultList();
     }
 
     @Override
     public Long getStat() {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT sum(dc.sent + dc.received) from EdocDailyCounter dc");
         Query<Long> query = session.createQuery(sql.toString());
+        closeCurrentSession(session);
         return query.uniqueResult();
     }
 

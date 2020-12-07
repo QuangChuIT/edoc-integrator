@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,13 +17,20 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
     }
 
     public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
-        Session currentSession = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:responseForOrganId and et.enable=:enable order by et.timeStamp DESC");
-        Query<EdocTrace> query = currentSession.createQuery(sql.toString());
-        query.setParameter("responseForOrganId", responseForOrganId);
-        query.setParameter("enable", true);
-        return query.list();
+        Session currentSession = openCurrentSession();
+        try{
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:responseForOrganId and et.enable=:enable order by et.timeStamp DESC");
+            Query<EdocTrace> query = currentSession.createQuery(sql.toString());
+            query.setParameter("responseForOrganId", responseForOrganId);
+            query.setParameter("enable", true);
+            return query.list();
+        } catch (Exception e){
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(currentSession);
+        }
     }
 
 

@@ -16,7 +16,6 @@ public interface EdocDocumentDao {
 
     EdocDocument searchDocumentByOrganDomainAndCode(String toOrganDomain, String code);
 
-    List<EdocDocument> findByOranDomain(String organId, String mode, int start, int size);
 
     List<EdocDocument> getAllDocumentList();
 

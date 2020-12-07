@@ -50,10 +50,7 @@ public class EdocDocumentService {
     }
 
     public List<EdocDocument> findAll() {
-        documentDaoImpl.openCurrentSession();
-        List<EdocDocument> result = documentDaoImpl.findAll();
-        documentDaoImpl.closeCurrentSession();
-        return result;
+        return documentDaoImpl.findAll();
     }
 
     public int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
@@ -129,7 +126,6 @@ public class EdocDocumentService {
                     entries.add(documentCacheEntry);
                 }
             }*/
-            documentDaoImpl.closeCurrentSession();
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -304,6 +300,7 @@ public class EdocDocumentService {
             return null;
         } finally {
             if (currentSession != null) {
+                currentSession.flush();
                 currentSession.close();
             }
         }
@@ -323,21 +320,16 @@ public class EdocDocumentService {
      */
     public boolean checkExistDocument(String subject, String codeNumber, String codeNotation,
                                       String promulgationDateStr, String fromOrganDomain, List<Organization> tos, List<String> attachmentNames) {
-        documentDaoImpl.openCurrentSession();
 
         Date promulgationDate = XmlGregorianCalendarUtil.convertToDate(promulgationDateStr, "dd/MM/yyyy");
         String toOrganDomain = CommonUtil.getToOrganDomain(tos);
 
-        boolean check = documentDaoImpl.checkExistDocument(subject, codeNumber, codeNotation, promulgationDate, fromOrganDomain, toOrganDomain, attachmentNames);
-
-        documentDaoImpl.closeCurrentSession();
-        return check;
+        return documentDaoImpl.checkExistDocument(subject, codeNumber, codeNotation, promulgationDate, fromOrganDomain, toOrganDomain, attachmentNames);
     }
 
     public List<EdocDocument> selectForDailyCounter(Date date) {
-        documentDaoImpl.openCurrentSession();
+
         List<EdocDocument> documents = documentDaoImpl.selectForDailyCounter(date);
-        documentDaoImpl.closeCurrentSession();
         return documents;
     }
 
@@ -354,17 +346,7 @@ public class EdocDocumentService {
     }
 
     public void updateDocument(EdocDocument edocDocument) {
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            session.beginTransaction();
-            documentDaoImpl.saveOrUpdate(edocDocument);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error when update document with id " + edocDocument.getDocumentId() + " cause " + Arrays.toString(e.getStackTrace()));
-            session.getTransaction().rollback();
-        } finally {
-            documentDaoImpl.closeCurrentSession();
-        }
+        documentDaoImpl.saveOrUpdate(edocDocument);
     }
 
     /**
@@ -455,38 +437,14 @@ public class EdocDocumentService {
     }
 
     public List<DocumentCacheEntry> getDocuments(String organDomain, int start, int size) {
-        documentDaoImpl.openCurrentSession();
         List<DocumentCacheEntry> documentCacheEntries = new ArrayList<>();
         List<EdocDocument> documents = documentDaoImpl.getDocuments(organDomain, start, size);
         if (documents.size() > 0) {
             documentCacheEntries = ExecutorServiceUtil.getDocumentCacheEntries(documents);
         }
-        documentDaoImpl.closeCurrentSession();
         return documentCacheEntries;
     }
 
-    public List<DocumentCacheEntry> findByOrganIdAndMode(String organDomain, String mode, int start, int size) {
-        List<DocumentCacheEntry> documentCacheEntries;
-        String prefix = organDomain + "_" + mode;
-        String cacheKey = RedisKey.getKey(prefix, RedisKey.GET_LIST_DOCUMENT_KEY);
-        RedisUtil.getInstance().delete(cacheKey);
-        documentCacheEntries = (List<DocumentCacheEntry>) RedisUtil.getInstance().get(cacheKey, Object.class);
-        if (documentCacheEntries == null || documentCacheEntries.size() == 0) {
-            documentCacheEntries = new ArrayList<>();
-            documentDaoImpl.openCurrentSession();
-            List<EdocDocument> documents = documentDaoImpl.findByOranDomain(organDomain, mode, start, size);
-            if (documents.size() > 0) {
-                /*for (EdocDocument document : documents) {
-                    DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
-                    documentCacheEntries.add(documentCacheEntry);
-                }*/
-                documentCacheEntries = ExecutorServiceUtil.getDocumentCacheEntries(documents);
-                RedisUtil.getInstance().set(cacheKey, documentCacheEntries);
-            }
-            documentDaoImpl.closeCurrentSession();
-        }
-        return documentCacheEntries;
-    }
 
     public DocumentCacheEntry getDocById(long documentId) {
         DocumentCacheEntry documentCacheEntry;
@@ -495,13 +453,11 @@ public class EdocDocumentService {
         documentCacheEntry = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
         if (documentCacheEntry == null) {
             LOGGER.info("Found document with id " + documentId + " in cache !!!!!!");
-            documentDaoImpl.openCurrentSession();
             EdocDocument edocDocument = documentDaoImpl.findById(documentId);
             if (edocDocument != null) {
                 documentCacheEntry = MapperUtil.modelToDocumentCached(edocDocument);
                 MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheEntry);
             }
-            documentDaoImpl.closeCurrentSession();
         }
         return documentCacheEntry;
     }
@@ -518,16 +474,18 @@ public class EdocDocumentService {
 
         EdocDocument document = this.getDocument(docId);
 
-        EdocDocumentDetail detail = document.getDocumentDetail();
-
-        return mapper.modelToMessageHeader(document, detail);
+        if (document != null) {
+            EdocDocumentDetail detail = document.getDocumentDetail();
+            return mapper.modelToMessageHeader(document, detail);
+        }
+        return null;
     }
 
     public EdocDocument addDocument(EdocDocument edocDocument) {
         Session currSession = documentDaoImpl.openCurrentSession();
         try {
             currSession.beginTransaction();
-            documentDaoImpl.persist(edocDocument);
+            currSession.persist(edocDocument);
             currSession.getTransaction().commit();
             return edocDocument;
         } catch (Exception e) {
@@ -537,18 +495,15 @@ public class EdocDocumentService {
             }
             return null;
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(currSession);
         }
     }
 
     public void updateDocument(long documentId) {
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            session.beginTransaction();
-            EdocDocument document = documentDaoImpl.findById(documentId);
+        EdocDocument document = documentDaoImpl.findById(documentId);
+        if (document != null) {
             document.setVisited(true);
             documentDaoImpl.update(document);
-            session.getTransaction().commit();
             // update to memcached
             String cacheKey = MemcachedKey.getKey(String.valueOf(document.getDocumentId()), MemcachedKey.DOCUMENT_KEY);
             DocumentCacheEntry documentCacheEntry = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
@@ -556,13 +511,8 @@ public class EdocDocumentService {
                 documentCacheEntry.setVisited(document.getVisited());
                 MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, documentCacheEntry);
             }
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            documentDaoImpl.closeCurrentSession();
+        } else {
+            LOGGER.warn("Update Document Not found document with id " + documentId);
         }
     }
 
@@ -572,7 +522,7 @@ public class EdocDocumentService {
             session.beginTransaction();
             EdocDocument document = documentDaoImpl.findById(documentId);
             document.setDraft(false);
-            documentDaoImpl.update(document);
+            session.update(document);
             session.getTransaction().commit();
             // update to memcached
             String cacheKey = MemcachedKey.getKey(String.valueOf(document.getDocumentId()), MemcachedKey.DOCUMENT_KEY);
@@ -587,7 +537,7 @@ public class EdocDocumentService {
                 session.getTransaction().rollback();
             }
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(session);
         }
     }
 
@@ -610,7 +560,7 @@ public class EdocDocumentService {
                 session.getTransaction().rollback();
             }
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(session);
         }
     }
 

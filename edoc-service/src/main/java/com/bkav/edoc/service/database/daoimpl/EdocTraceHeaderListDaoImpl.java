@@ -33,9 +33,7 @@ public class EdocTraceHeaderListDaoImpl extends RootDaoImpl<EdocTraceHeaderList,
         } catch (Exception e) {
             LOGGER.error("Error get trace header list with document id " + documentId + " cause " + Arrays.toString(e.getStackTrace()));
         } finally {
-            if (currentSession != null) {
-                this.closeCurrentSession();
-            }
+            this.closeCurrentSession(currentSession);
         }
         return edocTraceHeaderList;
     }

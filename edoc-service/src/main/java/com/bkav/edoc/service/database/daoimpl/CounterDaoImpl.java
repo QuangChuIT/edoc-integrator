@@ -14,7 +14,7 @@ public class CounterDaoImpl extends RootDaoImpl<Counter, Long> implements Counte
 
     @Override
     public void reset(String name, int size) throws NoSuchCounterException {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         try {
             session.beginTransaction();
             Counter counter = this.findByName(name);
@@ -22,16 +22,18 @@ public class CounterDaoImpl extends RootDaoImpl<Counter, Long> implements Counte
                 throw new NoSuchCounterException("Not found counter with name " + name);
             }
             counter.setCurrentId(size);
-            this.update(counter);
+            session.update(counter);
             session.getTransaction().commit();
         } catch (Exception e) {
             throw new NoSuchCounterException("Error when get reset counter " + e.getMessage());
+        } finally {
+            closeCurrentSession(session);
         }
     }
 
     @Override
     public void rename(String oldName, String newName) throws NoSuchCounterException {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         try {
             currentSession.beginTransaction();
             Counter counter = this.findByName(oldName);
@@ -39,16 +41,18 @@ public class CounterDaoImpl extends RootDaoImpl<Counter, Long> implements Counte
                 throw new NoSuchCounterException("Not found counter with name " + oldName);
             }
             counter.setName(newName);
-            this.update(counter);
+            currentSession.update(counter);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             throw new NoSuchCounterException("Error when rename counter " + e.getMessage());
+        } finally {
+            closeCurrentSession(currentSession);
         }
     }
 
     @Override
     public long increment(String name, int size) throws NoSuchCounterException {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         long currentId;
         try {
             currentSession.beginTransaction();
@@ -68,13 +72,15 @@ public class CounterDaoImpl extends RootDaoImpl<Counter, Long> implements Counte
             currentSession.persist(counter);
             currentId = counter.getCurrentId();
             currentSession.getTransaction().commit();
+        } finally {
+            closeCurrentSession(currentSession);
         }
         return currentId;
     }
 
     @Override
     public Counter findByName(String name) throws NoSuchCounterException {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT counter FROM Counter counter where counter.name=:name");
@@ -83,6 +89,8 @@ public class CounterDaoImpl extends RootDaoImpl<Counter, Long> implements Counte
             return query.getSingleResult();
         } catch (Exception e) {
             throw new NoSuchCounterException(e.getMessage());
+        } finally {
+            closeCurrentSession(session);
         }
     }
 }

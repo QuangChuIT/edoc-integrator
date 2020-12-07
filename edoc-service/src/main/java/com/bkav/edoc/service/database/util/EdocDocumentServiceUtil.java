@@ -20,10 +20,6 @@ public class EdocDocumentServiceUtil {
     private final static EdocDocumentService DOCUMENT_SERVICE = new EdocDocumentService();
     private final static EdocDocumentDetailService EDOC_DOCUMENT_DETAIL_SERVICE = new EdocDocumentDetailService();
 
-    public static List<DocumentCacheEntry> getListDocumentByOrganDomain(String organDomain, String mode, int start, int length) {
-        return DOCUMENT_SERVICE.findByOrganIdAndMode(organDomain, mode, start, length);
-    }
-
     public static List<DocumentCacheEntry> getDocuments(String organId, int start, int size) {
         return DOCUMENT_SERVICE.getDocuments(organId, start, size);
     }

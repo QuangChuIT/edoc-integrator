@@ -9,42 +9,26 @@ public class UserRoleService {
     private final UserRoleDaoImpl userRoleDao = new UserRoleDaoImpl();
 
     public List<UserRole> findAll() {
-        userRoleDao.openCurrentSession();
-        List<UserRole> userRoles = userRoleDao.findAll();
-        userRoleDao.closeCurrentSession();
-        return userRoles;
+        return userRoleDao.findAll();
     }
 
     public UserRole getRoleByUserId(long userId) {
-        userRoleDao.openCurrentSession();
-        UserRole userRole = userRoleDao.getRoleByUserId(userId);
-        userRoleDao.closeCurrentSession();
-        return userRole;
+        return userRoleDao.getRoleByUserId(userId);
     }
 
     public void createUserRole(UserRole userRole) {
-        userRoleDao.openCurrentSession();
         userRoleDao.createUserRole(userRole);
-        userRoleDao.closeCurrentSession();
     }
 
     public boolean checkExistUserId(long userId) {
-        userRoleDao.openCurrentSession();
-        boolean result = userRoleDao.checkExistUserId(userId);
-        userRoleDao.closeCurrentSession();
-        return result;
+        return userRoleDao.checkExistUserId(userId);
     }
 
     public UserRole getUserRoleByUserId(long userId) {
-        userRoleDao.openCurrentSession();
-        UserRole userRole = userRoleDao.getUserRoleByUserId(userId);
-        userRoleDao.closeCurrentSession();
-        return userRole;
+        return userRoleDao.getUserRoleByUserId(userId);
     }
 
     public void updateUserRole(UserRole userRole) {
-        userRoleDao.openCurrentSession();
         userRoleDao.updateUserRole(userRole);
-        userRoleDao.closeCurrentSession();
     }
 }

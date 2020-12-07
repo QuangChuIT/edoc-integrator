@@ -69,21 +69,19 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
     }
 
     public EdocNotification getByOrganAndDocumentId(long documentId, String organDomain) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
-        Query query = session.createQuery(sql.toString());
+        Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
         query.setParameter("receiverId", organDomain);
         query.setParameter("documentId", documentId);
-        Object resultObj = query.getSingleResult();
-        if (resultObj != null) {
-            return (EdocNotification) resultObj;
-        }
-        return null;
+        EdocNotification resultObj = query.getSingleResult();
+        closeCurrentSession(session);
+        return resultObj;
     }
 
     public void setNotificationTaken(long documentId, String organId) throws SQLException {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE EdocNotification en SET en.taken=:taken where en.receiverId=:receiverId and en.document.id=:documentId");
         Query query = currentSession.createQuery(sql.toString());

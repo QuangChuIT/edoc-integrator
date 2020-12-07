@@ -12,30 +12,18 @@ public class ExcelHeaderService {
     private final ExcelOrganHeaderDaoImpl excelOrganHeaderDao = new ExcelOrganHeaderDaoImpl();
 
     public ExcelUserHeader findUserById(long id) {
-        excelUserHeaderDao.openCurrentSession();
-        ExcelUserHeader header = excelUserHeaderDao.getHeaderById(id);
-        excelUserHeaderDao.closeCurrentSession();
-        return header;
+        return excelUserHeaderDao.getHeaderById(id);
     }
 
     public List<ExcelUserHeader> findAllUserHeader() {
-        excelUserHeaderDao.openCurrentSession();
-        List<ExcelUserHeader> headers = excelUserHeaderDao.getUserHeader();
-        excelUserHeaderDao.closeCurrentSession();
-        return headers;
+        return excelUserHeaderDao.getUserHeader();
     }
 
     public ExcelOrganHeader findOrganById(long id) {
-        excelOrganHeaderDao.openCurrentSession();
-        ExcelOrganHeader header = excelOrganHeaderDao.getHeaderById(id);
-        excelOrganHeaderDao.closeCurrentSession();
-        return header;
+        return excelOrganHeaderDao.getHeaderById(id);
     }
 
     public List<ExcelOrganHeader> findAllOrganHeader() {
-        excelOrganHeaderDao.openCurrentSession();
-        List<ExcelOrganHeader> headers = excelOrganHeaderDao.getOrganHeader();
-        excelOrganHeaderDao.closeCurrentSession();
-        return headers;
+        return excelOrganHeaderDao.getOrganHeader();
     }
 }

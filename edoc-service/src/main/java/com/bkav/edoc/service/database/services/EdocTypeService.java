@@ -11,10 +11,7 @@ public class EdocTypeService {
     private final static EdocDocumentTypeDaoImpl EDOC_TYPE_DAO = new EdocDocumentTypeDaoImpl();
 
     public List<EdocDocumentType> getAllTypes() {
-        EDOC_TYPE_DAO.openCurrentSession();
-        List<EdocDocumentType> edocTypes = EDOC_TYPE_DAO.findAll();
-        EDOC_TYPE_DAO.closeCurrentSession();
-        return edocTypes;
+        return EDOC_TYPE_DAO.findAll();
     }
 
     public EdocDocumentType findById(int documentTypeId) {
@@ -24,12 +21,10 @@ public class EdocTypeService {
         documentType = (EdocDocumentType) MemcachedUtil.getInstance().read(cacheKey);
 
         if (documentType == null) {
-            EDOC_TYPE_DAO.openCurrentSession();
             documentType = EDOC_TYPE_DAO.findById(documentTypeId);
             if (documentType != null) {
                 MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, documentType);
             }
-            EDOC_TYPE_DAO.closeCurrentSession();
         }
         return documentType;
     }

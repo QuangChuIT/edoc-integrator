@@ -32,7 +32,7 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         } catch (Exception e) {
             LOGGER.error("Error get attachments for document with id " + documentId + " cause " + e.getMessage());
         } finally {
-            currentSession.close();
+            closeCurrentSession(currentSession);
         }
         return result;
     }
@@ -59,7 +59,6 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         try (Session session = openCurrentSession()) {
             session.beginTransaction();
             persist(edocAttachment);
-            session.flush();
             session.getTransaction().commit();
             return true;
         } catch (Exception e) {
@@ -72,7 +71,6 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         try (Session session = openCurrentSession()) {
             session.beginTransaction();
             saveOrUpdate(attachment);
-            session.flush();
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,7 +82,7 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         Session session = openCurrentSession();
         try {
             session.beginTransaction();
-            delete(attachment);
+            session.delete(attachment);
             session.getTransaction().commit();
             result = true;
         } catch (Exception e) {
@@ -94,7 +92,7 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
             e.printStackTrace();
         } finally {
             if (session != null) {
-                closeCurrentSession();
+                closeCurrentSession(session);
             }
         }
         return result;

@@ -14,23 +14,25 @@ public class ExcelUserHeaderDaoImpl extends RootDaoImpl<ExcelUserHeader, Long> i
     public ExcelUserHeaderDaoImpl() { super(ExcelUserHeader.class);}
 
     public List<ExcelUserHeader> getUserHeader() {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<ExcelUserHeader> query = builder.createQuery(ExcelUserHeader.class);
         Root<ExcelUserHeader> root = query.from(ExcelUserHeader.class);
         query.select(root);
         Query<ExcelUserHeader> q = session.createQuery(query);
+        closeCurrentSession(session);
         return q.getResultList();
     }
 
     public ExcelUserHeader getHeaderById(long id) {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         CriteriaBuilder builder = currentSession.getCriteriaBuilder();
         CriteriaQuery<ExcelUserHeader> query = builder.createQuery(ExcelUserHeader.class);
         Root<ExcelUserHeader> root = query.from(ExcelUserHeader.class);
         query.select(root);
         query.where(builder.equal(root.get("id"), id));
         Query<ExcelUserHeader> q = currentSession.createQuery(query);
+        closeCurrentSession(currentSession);
         return q.uniqueResult();
     }
 }

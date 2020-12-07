@@ -73,14 +73,20 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
 
     public UserRole getUserRoleByUserId(long userId) {
         Session currentSession = openCurrentSession();
-        CriteriaBuilder builder = currentSession.getCriteriaBuilder();
-        CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
-        Root<UserRole> root = query.from(UserRole.class);
-        query.select(root);
-        query.where(builder.equal(root.get("userId"), userId));
-        Query<UserRole> q = currentSession.createQuery(query);
-        closeCurrentSession(currentSession);
-        return q.uniqueResult();
+        try {
+            CriteriaBuilder builder = currentSession.getCriteriaBuilder();
+            CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
+            Root<UserRole> root = query.from(UserRole.class);
+            query.select(root);
+            query.where(builder.equal(root.get("userId"), userId));
+            Query<UserRole> q = currentSession.createQuery(query);
+            return q.uniqueResult();
+        } catch (Exception e){
+            LOGGER.error("Error get user role by user id " + userId);
+            return null;
+        } finally {
+            closeCurrentSession(currentSession);
+        }
     }
 
     private final static Logger LOGGER = Logger.getLogger(UserDaoImpl.class);

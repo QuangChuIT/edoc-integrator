@@ -264,9 +264,13 @@ public class DocumentRestController {
                 }
             }
         }
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Date.class, new LocalDateTimeSerializer());
-        Gson gson = gsonBuilder.setPrettyPrinting().create();
+
+        Gson gson = new Gson();
+        for(EdocDocument document : entries){
+            String json = gson.toJson(document);
+            System.out.println(json);
+        }
+
         String response = gson.toJson(dataTableResult);
         LOGGER.info(response);
         return response;
@@ -295,8 +299,7 @@ class LocalDateTimeSerializer implements JsonSerializer<Date> {
 
     @Override
     public JsonElement serialize(Date localDateTime, Type srcType, JsonSerializationContext context) {
-        LOGGER.info(FORMATTER.format(localDateTime));
-        return new JsonPrimitive(FORMATTER.format(localDateTime));
+        return new JsonPrimitive("");
     }
 
     private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);

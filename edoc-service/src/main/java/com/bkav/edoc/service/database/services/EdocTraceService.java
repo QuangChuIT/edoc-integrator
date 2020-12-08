@@ -23,9 +23,6 @@ public class EdocTraceService {
     private final EdocTraceDaoImpl traceDaoImpl = new EdocTraceDaoImpl();
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "dd/MM/yyyy");
-
     public boolean updateTrace(MessageStatus status) {
         Session currentSession = traceDaoImpl.openCurrentSession();
         try {

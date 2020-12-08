@@ -12,7 +12,10 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +26,7 @@ import java.util.List;
 
 public class ExcelService {
 
-    public List<User> readExcelFileForUser (MultipartFile file) throws IOException {
+    public List<User> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
 
         InputStream inputStream = file.getInputStream();
@@ -48,7 +51,6 @@ public class ExcelService {
             User user = new User();
 
             int cellIndex = 0;
-            int count = 0;
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -70,10 +72,21 @@ public class ExcelService {
                         break;
 
                     case 5:
-                        String organ_id = currentCell.getStringCellValue();
-                        String[] organDomain = organ_id.split("@");
-                        EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(organDomain[0]);
-                        user.setDynamicContact(organ);
+                        String organ_id = currentCell.getStringCellValue().trim();
+                        EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(organ_id);
+                        if (organ == null) {
+                            // create organ
+                            EdocDynamicContact contact = new EdocDynamicContact();
+                            contact.setDomain(organ_id);
+                            contact.setName(user.getDisplayName());
+                            contact.setEmail(user.getEmailAddress());
+                            String token = TokenUtil.getRandomNumber(organ_id, user.getDisplayName());
+                            contact.setToken(token);
+                            EdocDynamicContactServiceUtil.createContact(contact);
+                            user.setDynamicContact(contact);
+                        } else {
+                            user.setDynamicContact(organ);
+                        }
                         break;
 
                     default:
@@ -88,7 +101,6 @@ public class ExcelService {
             user.setStatus(true);
 
             users.add(user);
-            count++;
         }
         workbook.close();
         return users;
@@ -100,10 +112,7 @@ public class ExcelService {
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(1);
         Iterator<Row> rows = sheet.iterator();
-
-
         int rowNum = 0;
-        int count = 0;
         while (rows.hasNext()) {
             Row currentRow = rows.next();
             // skip & check header
@@ -148,7 +157,6 @@ public class ExcelService {
             String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
             organ.setToken(newToken);
             organs.add(organ);
-            count++;
         }
         workbook.close();
         return organs;
@@ -191,7 +199,7 @@ public class ExcelService {
         style.setWrapText(true);
         int numRow = 1;
 
-        for (User user: users) {
+        for (User user : users) {
             Row row = sheet.createRow(numRow);
 
             Cell cell = row.createCell(0);
@@ -271,7 +279,7 @@ public class ExcelService {
         style.setWrapText(true);
         int numRow = 1;
 
-        for (EdocDynamicContact organ: organs) {
+        for (EdocDynamicContact organ : organs) {
             Row row = sheet.createRow(numRow);
 
             Cell cell = row.createCell(0);
@@ -328,10 +336,10 @@ public class ExcelService {
         return true;
     }
 
-    public long PushExcelDataToSSO (List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        String is_username= PropsUtil.get(ConfigParams.IS_USERNAME);
-        String is_password= PropsUtil.get(ConfigParams.IS_PASSWORD);
-        String is_post_url= PropsUtil.get(ConfigParams.IS_POST_URL);
+    public long PushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
+        String is_password = PropsUtil.get(ConfigParams.IS_PASSWORD);
+        String is_post_url = PropsUtil.get(ConfigParams.IS_POST_URL);
 
         // Count number of user push to sso successfully
         long count = 0;
@@ -339,13 +347,13 @@ public class ExcelService {
         /* Push each user to SSO:
          Convert user object to json
          Then, push json to sso */
-        for (User user: users) {
+        for (User user : users) {
             String json = PostUserToSSO.createJson(user);
             String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
 
             // If push to sso successfully
             // Then, insert user object to database
-            if(out != null) {
+            if (!out.equals("")) {
                 // Set SSO field to true
                 user.setSso(true);
                 UserServiceUtil.createUser(user);

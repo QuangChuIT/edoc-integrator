@@ -20,16 +20,11 @@ public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao
         return getSessionFactory().openSession();
     }
 
-    public Session openCurrentSessionWithTransaction() {
-        return getSessionFactory().openSession();
-    }
-
     public void closeCurrentSession(Session session) {
         if (session != null) {
             session.close();
         }
     }
-
 
     private static SessionFactory getSessionFactory() {
         return HibernateUtil.getSessionFactory();
@@ -78,9 +73,14 @@ public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao
     public void delete(T entity) {
         Session session = openCurrentSession();
         try {
+            session.beginTransaction();
             session.delete(entity);
+            session.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error("Error delete entity + " + entity.getClass() + " cause " + e.getMessage());
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
         } finally {
             closeCurrentSession(session);
         }

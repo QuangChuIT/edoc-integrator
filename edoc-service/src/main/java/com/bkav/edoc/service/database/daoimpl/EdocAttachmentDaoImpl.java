@@ -26,7 +26,7 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ea FROM EdocAttachment ea where ea.document.id=:documentId");
-            Query<EdocAttachment> query = currentSession.createQuery(sql.toString());
+            Query<EdocAttachment> query = currentSession.createQuery(sql.toString(), EdocAttachment.class);
             query.setParameter("documentId", documentId);
             result = query.list();
         } catch (Exception e) {

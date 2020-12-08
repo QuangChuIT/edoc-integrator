@@ -32,7 +32,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             sql.append("SELECT a.`name` FROM edoc_attachment a INNER JOIN edoc_document d ON a.document_id = d.document_id " +
                     "WHERE d.subject = ? AND d.code_number = ? AND d.code_notation = ? " +
                     "AND d.promulgation_date = ? AND d.from_organ_domain = ? AND d.to_organ_domain = ?");
-            Query<String> query = currentSession.createNativeQuery(sql.toString());
+            Query<String> query = currentSession.createNativeQuery(sql.toString(), String.class);
             query.setParameter(0, subject);
             query.setParameter(1, codeNumber);
             query.setParameter(2, codeNotation);
@@ -54,7 +54,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed from EdocDocument ed where ed.docCode = :docCode AND ed.toOrganDomain = :organDomain");
-            Query<EdocDocument> query = session.createQuery(sql.toString());
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("docCode", docCode);
             query.setParameter("organDomain", organDomain);
             List<EdocDocument> documents = query.list();
@@ -94,7 +94,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed from EdocDocument ed where DATE(sentDate)=DATE(:counterDate)");
-            Query<EdocDocument> query = session.createQuery(sql.toString());
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("counterDate", date);
             return query.getResultList();
         } catch (Exception e) {
@@ -112,7 +112,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             LOGGER.info("Check exist document for edxml document id " + edXmlDocumentId + " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed from EdocDocument ed where ed.edXMLDocId = :edXMLDocId");
-            Query<EdocDocument> query = currentSession.createQuery(sql.toString());
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("edXMLDocId", edXmlDocumentId);
             List<EdocDocument> documents = query.list();
             if (documents != null && documents.size() > 0) {
@@ -134,7 +134,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
                     "and ed.docCode = :code");
-            Query<EdocDocument> query = currentSession.createQuery(sql.toString());
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("fromOrganDomain", toOrganDomain);
             query.setParameter("code", code);
             List<EdocDocument> result = query.list();

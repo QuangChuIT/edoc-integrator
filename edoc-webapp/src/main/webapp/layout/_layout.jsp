@@ -465,7 +465,7 @@
         <div class="form-group">
             <div class="col-md-1 col-sm-6 col-xs-12">
                 <label class="control-label " for="toOrganInfo">
-                    ${app_message.edoc_table_header_fromOrgan}
+                    ${app_message.edoc_table_header_toOrgan}
                 </label>
             </div>
             <div class="col-md-11 col-sm-6 col-xs-12">

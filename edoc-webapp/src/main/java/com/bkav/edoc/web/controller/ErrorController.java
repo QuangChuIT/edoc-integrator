@@ -16,7 +16,7 @@ public class ErrorController {
     @RequestMapping(value = "/errors", method = RequestMethod.GET)
     public String renderErrorPage(HttpServletRequest httpRequest, HttpServletResponse response) {
         String host = GetterUtil.getString(PropsUtil.get("edoc.server.host"), "");
-        CookieUtil.clearAllCookies(httpRequest, response, host);
+        /*CookieUtil.clearAllCookies(httpRequest, response, host);*/
         return "errorPage";
     }
 }

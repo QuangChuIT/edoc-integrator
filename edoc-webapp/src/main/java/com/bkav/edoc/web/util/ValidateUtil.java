@@ -73,10 +73,6 @@ public class ValidateUtil {
             errors.add(messageSourceUtil.getMessage("user.error.displayName", null));
         }
 
-        if (addUserRequest.getOrganDomain().equals("")) {
-            errors.add(messageSourceUtil.getMessage("edoc.error.organ", null));
-        }
-
         if (addUserRequest.getUserName().equals("")) {
             errors.add(messageSourceUtil.getMessage("edoc.error.username", null));
         }
@@ -119,14 +115,11 @@ public class ValidateUtil {
 
     public boolean checkExtensionFile(MultipartFile file) {
         String extension = AttachmentGlobalUtil.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
-        if (!(extension.equals("xlsx") || extension.equals("xls")))
-            return false;
-        else
-            return true;
+        return extension.equals("xlsx") || extension.equals("xls");
     }
 
     public boolean checkHeaderExcelFileForUser (MultipartFile file) throws IOException {
-        Boolean flag = false;
+        boolean flag = false;
 
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
@@ -145,19 +138,14 @@ public class ValidateUtil {
             Cell cell = cellIterator.next();
             if (colIndex == 0 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(1).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 1 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(2).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 2 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(3).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 3 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(4).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 4 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(5).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 5 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getUserHeaderById(6).getHeaderName())) {
                 flag = true;
             }

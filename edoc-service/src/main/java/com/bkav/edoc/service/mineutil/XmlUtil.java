@@ -745,6 +745,7 @@ public class XmlUtil {
                 ns);
 
         OMElement type = factoryOM.createOMElement("Type", ns);
+        LOGGER.info(currentHeader);
         String typeString = String.valueOf(currentHeader
                 .getDocumentType().getType());
         type.setText(typeString.isEmpty() ? StringPool.DEAUlt_INTEGER

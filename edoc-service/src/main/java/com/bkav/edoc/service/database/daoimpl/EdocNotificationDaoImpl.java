@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.taken=:taken");
-            Query query = currentSession.createQuery(sql.toString());
+            Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
             query.setParameter("receiverId", organId);
             query.setParameter("taken", false);
             return query.list();
@@ -68,16 +69,21 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         }
     }
 
-    public EdocNotification getByOrganAndDocumentId(long documentId, String organDomain) {
+    public List<EdocNotification> getByOrganAndDocumentId(long documentId, String organDomain) {
         Session session = openCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
-        Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
-        query.setParameter("receiverId", organDomain);
-        query.setParameter("documentId", documentId);
-        EdocNotification resultObj = query.getSingleResult();
-        closeCurrentSession(session);
-        return resultObj;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("receiverId", organDomain);
+            query.setParameter("documentId", documentId);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error("Error get edoc notification by organ " + organDomain + " document id " + documentId + " cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     public void setNotificationTaken(long documentId, String organId) throws SQLException {

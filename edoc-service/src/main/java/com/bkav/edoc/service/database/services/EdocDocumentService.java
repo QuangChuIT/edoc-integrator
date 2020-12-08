@@ -90,8 +90,8 @@ public class EdocDocumentService {
         return result;
     }
 
-    public List<EdocDocument> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
-        List<EdocDocument> entries = new ArrayList<>();
+    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
+        List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
         try {
             String queryDocument = "";
@@ -119,13 +119,14 @@ public class EdocDocumentService {
             query.setFirstResult(pageNumber);
             query.setMaxResults(pageSize);
             List<EdocDocument> documents = query.getResultList();
-            entries = documents;
-            /*if (documents.size() > 0) {
+            if (documents.size() > 0) {
                 for (EdocDocument document : documents) {
                     DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
-                    entries.add(documentCacheEntry);
+                    if (documentCacheEntry != null) {
+                        entries.add(documentCacheEntry);
+                    }
                 }
-            }*/
+            }
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -148,7 +149,7 @@ public class EdocDocumentService {
             currentSession.beginTransaction();
             // prepare get document info from message header
             EdocDocument document = MapperUtil.modelToEdocDocument(messageHeader);
-            documentDaoImpl.persist(document);
+            currentSession.persist(document);
 
             long docId = document.getDocumentId();
 
@@ -247,6 +248,8 @@ public class EdocDocumentService {
                     edocAttachmentCacheEntries.add(attachmentCacheEntry);
                     edocAttachmentSet.add(edocAttachment);
                 } else {
+                    LOGGER.info("Save attachment fail with document id " + docId + " document code " + document.getDocCode());
+                    currentSession.getTransaction().rollback();
                     return null;
                 }
             }
@@ -300,7 +303,6 @@ public class EdocDocumentService {
             return null;
         } finally {
             if (currentSession != null) {
-                currentSession.flush();
                 currentSession.close();
             }
         }
@@ -329,8 +331,7 @@ public class EdocDocumentService {
 
     public List<EdocDocument> selectForDailyCounter(Date date) {
 
-        List<EdocDocument> documents = documentDaoImpl.selectForDailyCounter(date);
-        return documents;
+        return documentDaoImpl.selectForDailyCounter(date);
     }
 
     public boolean checkExistDocument(String edXmlDocumentId) {

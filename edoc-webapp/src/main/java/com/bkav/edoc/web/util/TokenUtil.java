@@ -64,7 +64,7 @@ public class TokenUtil {
         } catch (Exception e) {
             log.error("Error when gen key for organization register");
         }
-        return null;
+        return "nodata";
     }
 
     public static void main(String[] args) {

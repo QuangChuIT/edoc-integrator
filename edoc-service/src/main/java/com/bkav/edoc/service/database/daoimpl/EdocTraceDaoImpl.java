@@ -21,7 +21,7 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         try{
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:responseForOrganId and et.enable=:enable order by et.timeStamp DESC");
-            Query<EdocTrace> query = currentSession.createQuery(sql.toString());
+            Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
             query.setParameter("responseForOrganId", responseForOrganId);
             query.setParameter("enable", true);
             return query.list();

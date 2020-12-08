@@ -41,8 +41,7 @@ public class EdocAttachmentService {
      * @return
      */
     public List<EdocAttachment> getEdocAttachmentsByDocId(long docId) {
-        List<EdocAttachment> attachments = attachmentDaoImpl.getAttachmentsByDocumentId(docId);
-        return attachments;
+        return attachmentDaoImpl.getAttachmentsByDocumentId(docId);
     }
 
     public EdocAttachment getAttachmentById(Long attachmentId) {

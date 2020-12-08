@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -144,32 +145,25 @@ public class UserRestController {
      */
     @RequestMapping(method = RequestMethod.POST,
             value = "/public/-/user/import")
-    public ResponseEntity<?> importUserFromExcel(@RequestParam("importExcel") MultipartFile file) {
+    public ResponseEntity<?> importUserFromExcel(@RequestParam("importUserFromExcel") MultipartFile file) {
         LOGGER.info("API import user from excel invoke !!!!!!!!!!!!!!!!!!!!!!!!!");
-        List<String> errors = new ArrayList<>();
         long numOfUser = 0;
         try {
             if (validateUtil.checkExtensionFile(file)) {
                 if (validateUtil.checkHeaderExcelFileForUser(file)) {
                     List<User> users = ExcelUtil.importUserFromExcel(file);
-                    LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
+                    LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!");
                     numOfUser = ExcelUtil.PushUsersToSSO(users);
-                    String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
-                    errors.add(readFileSuccess);
                     return new ResponseEntity<>(numOfUser, HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(numOfUser, HttpStatus.NOT_ACCEPTABLE);
                 }
             } else {
-                String invalidFormat = messageSourceUtil.getMessage("edoc.message.user.file.format.error", null);
-                LOGGER.error(invalidFormat);
-                errors.add(invalidFormat);
+                LOGGER.error("File invalid !!!!!!");
                 return new ResponseEntity<>(numOfUser, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            String uploadExcelError = messageSourceUtil.getMessage("edoc.message.file.upload.error", null);
-            LOGGER.error(uploadExcelError + e.getMessage());
-            errors.add(uploadExcelError);
+            LOGGER.error("Error import user from file cause " + Arrays.toString(e.getStackTrace()));
             return new ResponseEntity<>(numOfUser, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -185,7 +179,6 @@ public class UserRestController {
                 return HttpStatus.OK;
             } else {
                 return HttpStatus.INTERNAL_SERVER_ERROR;
-
             }
         }
     }

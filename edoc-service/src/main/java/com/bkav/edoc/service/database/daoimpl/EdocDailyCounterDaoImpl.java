@@ -2,10 +2,17 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDailyCounterDao;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
+import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.util.HibernateUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 
@@ -28,24 +35,49 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
 
     @Override
     public List<EdocDailyCounter> getOverStat(String organDomain) {
-        Session session = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain = :organDomain");
-        Query<EdocDailyCounter> query = session.createQuery(sql.toString());
-        query.setParameter("organDomain", organDomain);
-        return query.getResultList();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        List<EdocDailyCounter> edocDailyCounters = null;
+        try {
+            session.beginTransaction();
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain =:organDomain");
+            Query<EdocDailyCounter> query = session.createQuery(sql.toString());
+            query.setParameter("organDomain", organDomain);
+            edocDailyCounters = query.getResultList();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error query daily counter cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+        return edocDailyCounters;
     }
 
     @Override
     public List<EdocDailyCounter> getOverStat(String organDomain, Date fromDate, Date toDate) {
-        Session session = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain = :organDomain and DATE(dateTime) >= DATE(:fromDate) and DATE(dateTime) <= DATE(:toDate)");
-        Query<EdocDailyCounter> query = session.createQuery(sql.toString());
-        query.setParameter("organDomain", organDomain);
-        query.setParameter("fromDate", fromDate);
-        query.setParameter("toDate", toDate);
-        return query.getResultList();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        List<EdocDailyCounter> edocDailyCounters = null;
+        try {
+            session.beginTransaction();
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT dc from EdocDailyCounter dc where dc.organDomain =:organDomain and DATE(dateTime) >= DATE(:fromDate) and DATE(dateTime) <= DATE(:toDate)");
+            Query<EdocDailyCounter> query = session.createQuery(sql.toString());
+            query.setParameter("organDomain", organDomain);
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+            edocDailyCounters = query.getResultList();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error("Error query daily counter cause " + e.getMessage());
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+
+        return edocDailyCounters;
     }
 
     @Override

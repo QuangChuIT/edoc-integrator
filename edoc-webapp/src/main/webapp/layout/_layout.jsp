@@ -423,6 +423,23 @@
     </div>
 </div>
 
+<div class="modal fade" id="formImportFromExcel" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header user-detail">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="box" method="post" action="" enctype="multipart/form-data">
+                    <input name="uploadFiles" type="file">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script id="displayNamePermissionTemplate" type="text/x-jquery-tmpl">
     <div class="col-md-4 col-sm-6 col-xs-12">
         <span class="permission-role">${displayName}</span>
@@ -1116,6 +1133,10 @@
             </div>
         </div>
     </form>
+</script>
+
+<script id="organNameReport" type="text/x-jquery-tmpl">
+    <span class='organ-name'> + ${organName} + </span>
 </script>
 
 <!-- AJAX response must be wrapped in the modal's root class. -->

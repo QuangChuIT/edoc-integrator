@@ -29,7 +29,6 @@ public class EdocDailyCounterService {
     public List<EPublicStat> getStatsDetail(String organDomain, Date fromDate, Date toDate) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
         List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByFilterDomain(organDomain);
-        edocDailyCounterDao.openCurrentSession();
         for (OrganizationCacheEntry contact : contacts) {
             List<EdocDailyCounter> counters = new ArrayList<>();
             String organId = contact.getDomain();
@@ -50,7 +49,6 @@ public class EdocDailyCounterService {
             ePublicStat.setTotal(total);
             ePublicStats.add(ePublicStat);
         }
-        edocDailyCounterDao.closeCurrentSession();
         return ePublicStats;
     }
 

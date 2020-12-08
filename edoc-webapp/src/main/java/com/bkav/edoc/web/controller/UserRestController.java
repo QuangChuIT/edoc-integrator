@@ -137,7 +137,7 @@ public class UserRestController {
      */
     @RequestMapping(method = RequestMethod.POST,
             value = "/public/-/user/import")
-    public ResponseEntity<?> importUserFromExcel(@RequestParam("importExcel") MultipartFile file) {
+    public HttpStatus importUserFromExcel(@RequestParam("importUserFromExcel") MultipartFile file) {
         LOGGER.info("API import user from excel invoke !!!!!!!!!!!!!!!!!!!!!!!!!");
         List<String> errors = new ArrayList<>();
         long numOfUser = 0;
@@ -149,21 +149,21 @@ public class UserRestController {
                     numOfUser = ExcelUtil.PushUsersToSSO(users);
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                     errors.add(readFileSuccess);
-                    return new ResponseEntity<>(numOfUser, HttpStatus.OK);
+                    return HttpStatus.OK;
                 } else {
-                    return new ResponseEntity<>(numOfUser, HttpStatus.NOT_ACCEPTABLE);
+                    return HttpStatus.NOT_ACCEPTABLE;
                 }
             } else {
                 String invalidFormat = messageSourceUtil.getMessage("edoc.message.user.file.format.error", null);
                 LOGGER.error(invalidFormat);
                 errors.add(invalidFormat);
-                return new ResponseEntity<>(numOfUser, HttpStatus.BAD_REQUEST);
+                return HttpStatus.BAD_REQUEST;
             }
         } catch (Exception e) {
             String uploadExcelError = messageSourceUtil.getMessage("edoc.message.file.upload.error", null);
             LOGGER.error(uploadExcelError + e.getMessage());
             errors.add(uploadExcelError);
-            return new ResponseEntity<>(numOfUser, HttpStatus.INTERNAL_SERVER_ERROR);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }
 
@@ -230,9 +230,9 @@ public class UserRestController {
         }
     }
 
-    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
+    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.GET)
     public HttpStatus ExportUserToExcel() throws IOException {
-        boolean result;
+        boolean result = true;
         List<User> users = UserServiceUtil.getUser();
         result = ExcelUtil.exportUserToExcel(users);
         if(result)

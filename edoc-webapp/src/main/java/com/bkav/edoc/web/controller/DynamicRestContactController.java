@@ -129,11 +129,11 @@ public class DynamicRestContactController {
         long count = 0;
         try {
             if (validateUtil.checkExtensionFile(file)) {
-                if(true) {
+                if(validateUtil.checkHeaderExcelFileForOrgan(file)) {
                     List<EdocDynamicContact> organs = ExcelUtil.importOrganFromExcel(file);
                     for (EdocDynamicContact organ: organs) {
-                            EdocDynamicContactServiceUtil.createContact(organ);
-                            count++;
+                        EdocDynamicContactServiceUtil.createContact(organ);
+                        count++;
                     }
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                     errors.add(readFileSuccess);
@@ -155,9 +155,9 @@ public class DynamicRestContactController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/public/-/organ/export")
+    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
     public HttpStatus exportOrganToExcel() throws IOException {
-        boolean result;
+        boolean result = true;
         List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
         result = ExcelUtil.exportOrganToExcel(organs);
         if (result)

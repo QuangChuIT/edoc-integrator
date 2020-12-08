@@ -278,7 +278,7 @@ $(document).on("change", "#importOrganFromExcel", function (e) {
 $(document).on('click', '#exportOrganToExcel', function (e) {
     e.preventDefault();
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "/public/-/organ/export",
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,

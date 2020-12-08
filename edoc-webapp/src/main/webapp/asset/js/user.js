@@ -41,19 +41,19 @@ let userManage = {
                         "edit": {name: user_message.manage_edit_user, icon: "edit", disabled: function(key, opt) {
                             let id = opt.$trigger[0].id;
                             if (id == '164655867')
-                                    return !this.data('editDisabled');
+                                return !this.data('editDisabled');
                             }},
                         "permission": {name: user_message.manage_permission_user, icon: "fa-shield", disabled: function(key, opt) {
-                                let id = opt.$trigger[0].id;
-                                if (id == '164655867')
-                                    return !this.data('permissionDisabled');
-                            }},
+                            let id = opt.$trigger[0].id;
+                            if (id == '164655867')
+                                return !this.data('permissionDisabled');
+                        }},
                         "sep1": "---------",
                         "delete": {name: user_message.manage_remove_user, icon: "delete", disabled: function(key, opt) {
-                                let id = opt.$trigger[0].id;
-                                if (id == '164655867')
-                                    return !this.data('daleteDisabled');
-                            }}
+                            let id = opt.$trigger[0].id;
+                            if (id == '164655867')
+                                return !this.data('daleteDisabled');
+                        }}
                     }
                 });
             },
@@ -284,6 +284,17 @@ $(document).ready(function () {
     $(document).on('click', 'input[type="checkbox"]', function() {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
+
+    // Click to show modal for upload file
+    // Developing...
+    // $("#importUserFromExcel").on('click', function(e) {
+    //     e.preventDefault();
+    //     $('#formImportFromExcel').modal({
+    //         backdrop: 'static',
+    //         keyboard: false
+    //     })
+    // })
+
 });
 
 // Call ajax to import users from excel file
@@ -300,7 +311,7 @@ $(document).on("change", "#importUserFromExcel", function (e) {
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
-        success: function (data, response) {
+        success: function (response) {
             if (response === "OK")
                 $.notify(user_message.user_import_from_excel_success, "success");
             else if (response === "BAD_REQUEST")
@@ -320,7 +331,7 @@ $(document).on("change", "#importUserFromExcel", function (e) {
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "/public/-/user/export",
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,

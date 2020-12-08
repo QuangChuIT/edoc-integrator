@@ -21,13 +21,12 @@
         <div class="table-responsive">
             <form class="form-horizontal" id="formImportUser" method="POST" enctype="multipart/form-data">
                 <div class="row user-import" id="user-import-excel">
-                    <a class="btn btn-primary import-excel-button">
+                    <button class="btn btn-primary import-excel-button">
                         <i class="fa fa-arrow-circle-up fa-fw"></i>
                         <spring:message code="edoc.import.report"/>
                         <input type="file" name="importUserFromExcel" id="importUserFromExcel" class="form-control">
-                    </a>
-                    <button class="btn btn-primary btn-report-group dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false" id="exportUserToExcel">
+                    </button>
+                    <button class="btn btn-primary btn-report-group" id="exportUserToExcel">
                         <i class="fa fa-arrow-circle-down fa-fw"></i>
                         <spring:message code="edoc.export.report"/>
                     </button>
@@ -45,13 +44,12 @@
         <div class="table-responsive">
             <form class="form-horizontal" id="formImportOrgan" method="POST" enctype="multipart/form-data">
                 <div class="row user-import" id="organ-import-excel">
-                    <a class="btn btn-primary import-excel-button">
+                    <button class="btn btn-primary import-excel-button">
                         <i class="fa fa-arrow-circle-up fa-fw"></i>
                         <spring:message code="edoc.import.report"/>
                         <input type="file" name="importOrganFromExcel" id="importOrganFromExcel" class="form-control">
-                    </a>
-                    <button class="btn btn-primary btn-report-group dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false" id="exportOrganToExcel">
+                    </button>
+                    <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
                         <i class="fa fa-arrow-circle-down fa-fw"></i>
                         <spring:message code="edoc.export.report"/>
                     </button>

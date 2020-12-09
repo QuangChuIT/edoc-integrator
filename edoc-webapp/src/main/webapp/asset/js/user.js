@@ -98,6 +98,7 @@ let userManage = {
         });
     },
     deleteUser: function (userId) {
+        let instance = this;
         if (userId !== null && userId !== "") {
             $.ajax({
                 url: "/public/-/user/delete/" + userId,
@@ -114,10 +115,11 @@ let userManage = {
                     }
                 }
             })
-            $('#user-menu').click();
+            instance.renderUserDatatable();
         }
     },
     createUser: function () {
+        let instance = this;
         //get displayName
         let addDisplayName = $("#addDisplayName").val();
         //get userName
@@ -149,7 +151,7 @@ let userManage = {
                     if (response.code === 200) {
                         $.notify(user_message.user_add_new_success, "success");
                         $('#formAddUser').modal('toggle');
-                        $("#user-menu").click();
+                        instance.renderUserDatatable();
                         $('#edoc-add-user').empty();
                     } else {
                         $.notify(user_message.user_add_new_fail, "error");
@@ -162,6 +164,7 @@ let userManage = {
         }
     },
     editUser: function (userId) {
+        let instance = this;
         //get displayName
         let editDisplayName = $("#editDisplayName").val();
         //get organization
@@ -197,7 +200,7 @@ let userManage = {
             })
             $("#formEditUser").modal("toggle");
             $('#edoc-edit-user').empty();
-            $("#user-menu").click();
+            instance.renderUserDatatable();
         }
     },
     createUserRole: function(userId) {
@@ -267,9 +270,6 @@ $(document).ready(function () {
             keyboard: false
         });
     });
-
-    // Show form edit user
-    $("#")
 
     $("#addOrganDomain").select2({
         tags: true,

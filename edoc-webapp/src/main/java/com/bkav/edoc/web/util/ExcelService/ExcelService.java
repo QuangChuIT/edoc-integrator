@@ -5,12 +5,14 @@ import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -26,6 +28,8 @@ public class ExcelService {
 
     public List<User> readExcelFileForUser (MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+
 
         InputStream inputStream = file.getInputStream();
 
@@ -53,6 +57,12 @@ public class ExcelService {
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
+                if (currentCell.getStringCellValue().equals("")) {
+                    String nullData = "Null data at row " + rowNum;
+                    errors.add(nullData);
+                    LOGGER.error(nullData);
+                }
+
                 switch (cellIndex) {
                     case 1:
                         user.setUsername(currentCell.getStringCellValue());
@@ -90,6 +100,7 @@ public class ExcelService {
 
             users.add(user);
             count++;
+            rowNum++;
         }
         workbook.close();
         return users;

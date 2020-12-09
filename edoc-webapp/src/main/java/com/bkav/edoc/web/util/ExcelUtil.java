@@ -12,13 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class ExcelUtil {
-
-    private final MessageSourceUtil messageSourceUtil;
     private final static ExcelService excelService = new ExcelService();
-
-    public ExcelUtil(MessageSourceUtil messageSourceUtil) {
-        this.messageSourceUtil = messageSourceUtil;
-    }
 
     public static List<User> importUserFromExcel(MultipartFile file) throws IOException {
         return excelService.readExcelFileForUser(file);

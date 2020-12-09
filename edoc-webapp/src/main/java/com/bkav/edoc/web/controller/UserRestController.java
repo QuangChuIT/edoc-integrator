@@ -146,9 +146,9 @@ public class UserRestController {
                 if(validateUtil.checkHeaderExcelFileForUser(file)) {
                     List<User> users = ExcelUtil.importUserFromExcel(file);
                     LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
-                    numOfUser = ExcelUtil.PushUsersToSSO(users);
+                    //numOfUser = ExcelUtil.PushUsersToSSO(users);
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
-                    errors.add(readFileSuccess);
+                    LOGGER.info(readFileSuccess);
                     return HttpStatus.OK;
                 } else {
                     return HttpStatus.NOT_ACCEPTABLE;

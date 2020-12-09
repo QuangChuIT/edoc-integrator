@@ -14,15 +14,7 @@ import java.util.Arrays;
 public class EdocDocumentDetailService {
 
     private final EdocDocumentDetailDaoImpl documentDetailDaoImpl = new EdocDocumentDetailDaoImpl();
-    private final Gson gson = new Gson();
 
-    /**
-     * Add document detail
-     *
-     * @param messageHeader
-     * @param document
-     * @return
-     */
     public EdocDocumentDetail addDocumentDetail(MessageHeader messageHeader, EdocDocument document) {
         Session currentSession = documentDetailDaoImpl.openCurrentSession();
         try {
@@ -31,7 +23,7 @@ public class EdocDocumentDetailService {
             // get info of document detail
             EdocDocumentDetail documentDetail = MapperUtil.modelToDocumentDetail(messageHeader);
             documentDetail.setDocument(document);
-            documentDetailDaoImpl.persist(documentDetail);
+            currentSession.persist(documentDetail);
             currentSession.getTransaction().commit();
             return documentDetail;
         } catch (Exception e) {
@@ -41,7 +33,7 @@ public class EdocDocumentDetailService {
             }
             return null;
         } finally {
-            documentDetailDaoImpl.closeCurrentSession();
+            documentDetailDaoImpl.closeCurrentSession(currentSession);
         }
     }
 

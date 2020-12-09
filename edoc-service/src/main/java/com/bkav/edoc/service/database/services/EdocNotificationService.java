@@ -3,67 +3,25 @@ package com.bkav.edoc.service.database.services;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
-import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
-import com.bkav.edoc.service.xml.base.header.Organization;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
-
-    /**
-     * Add notifications
-     *
-     * @param toOrgans
-     * @param duaDate
-     * @param document
-     * @return
-     */
-    public Set<EdocNotification> addNotifications(List<Organization> toOrgans, Date duaDate, EdocDocument document) {
-        Session currentSession = notificationDaoImpl.openCurrentSession();
-        Set<EdocNotification> notifications = new HashSet<>();
-        try {
-            currentSession.beginTransaction();
-            // Insert Notification
-            for (Organization to : toOrgans) {
-                EdocNotification notification = new EdocNotification();
-                Date currentDate = new Date();
-                notification.setDateCreate(currentDate);
-                notification.setModifiedDate(currentDate);
-                notification.setSendNumber(0);
-                notification.setDueDate(duaDate);
-                notification.setReceiverId(to.getOrganId());
-                notification.setDocument(document);
-                notification.setTaken(false);
-                notificationDaoImpl.persist(notification);
-                LOGGER.info("Save edoc notification success for document " + document.getDocumentId()
-                        + " and code " + document.getDocCode());
-                notifications.add(notification);
-            }
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error save notification for document id " +
-                    document.getDocumentId() + " doc code " + document.getDocCode() + " cause " + Arrays.toString(e.getStackTrace()));
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-        } finally {
-            notificationDaoImpl.closeCurrentSession();
-        }
-        return notifications;
-    }
 
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
         try {
             currentSession.beginTransaction();
-            notificationDaoImpl.persist(edocNotification);
+            currentSession.persist(edocNotification);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -71,7 +29,7 @@ public class EdocNotificationService {
                 currentSession.getTransaction().rollback();
             }
         } finally {
-            notificationDaoImpl.closeCurrentSession();
+            notificationDaoImpl.closeCurrentSession(currentSession);
         }
     }
 
@@ -82,8 +40,7 @@ public class EdocNotificationService {
      * @return
      */
     public List<Long> getDocumentIdsByOrganId(String organId) {
-        List<Long> notificationIds = notificationDaoImpl.getDocumentIdsByOrganId(organId);
-        return notificationIds;
+        return notificationDaoImpl.getDocumentIdsByOrganId(organId);
     }
 
     /**
@@ -94,57 +51,45 @@ public class EdocNotificationService {
      * @return
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
-        notificationDaoImpl.openCurrentSession();
 
-        boolean checkAllow = notificationDaoImpl.checkAllowWithDocument(documentId, organId);
-
-        notificationDaoImpl.closeCurrentSession();
-        return checkAllow;
+        return notificationDaoImpl.checkAllowWithDocument(documentId, organId);
     }
 
     public List<EdocNotification> findAll() {
-        notificationDaoImpl.openCurrentSession();
-        List<EdocNotification> result = notificationDaoImpl.findAll();
-        notificationDaoImpl.closeCurrentSession();
-        return result;
+        return notificationDaoImpl.findAll();
     }
 
     public void removePendingDocumentId(String domain, long documentId) {
-        Session currentSession = notificationDaoImpl.openCurrentSession();
         try {
-            currentSession.beginTransaction();
             //notificationDaoImpl.setNotificationTaken(documentId, domain);
-            EdocNotification edocNotification = notificationDaoImpl.getByOrganAndDocumentId(documentId, domain);
-            edocNotification.setTaken(true);
-            edocNotification.setModifiedDate(new Date());
-            notificationDaoImpl.saveOrUpdate(edocNotification);
-            String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
-            DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
-            if (documentCacheUpdate != null) {
-                List<NotificationCacheEntry> notificationCacheEntries = documentCacheUpdate.getNotifications();
-                if (notificationCacheEntries.size() > 0) {
-                    //check has old notification
-                    notificationCacheEntries.removeIf(entry -> entry.getNotificationId().equals(edocNotification.getNotificationId()));
+            List<EdocNotification> edocNotifications = notificationDaoImpl.getByOrganAndDocumentId(documentId, domain);
+            if (edocNotifications.size() > 0) {
+                for (EdocNotification edocNotification : edocNotifications) {
+                    edocNotification.setTaken(true);
+                    edocNotification.setModifiedDate(new Date());
+                    notificationDaoImpl.saveOrUpdate(edocNotification);
+                    String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
+                    DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
+                    if (documentCacheUpdate != null) {
+                        List<NotificationCacheEntry> notificationCacheEntries = documentCacheUpdate.getNotifications();
+                        if (notificationCacheEntries.size() > 0) {
+                            //check has old notification
+                            notificationCacheEntries.removeIf(entry -> entry.getNotificationId().equals(edocNotification.getNotificationId()));
+                        }
+                        NotificationCacheEntry notificationCacheEntry = MapperUtil.modelToNotificationCache(edocNotification);
+                        notificationCacheEntries.add(notificationCacheEntry);
+                        documentCacheUpdate.setNotifications(notificationCacheEntries);
+                        MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
+                    }
                 }
-                NotificationCacheEntry notificationCacheEntry = MapperUtil.modelToNotificationCache(edocNotification);
-                notificationCacheEntries.add(notificationCacheEntry);
-                documentCacheUpdate.setNotifications(notificationCacheEntries);
-                MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
-            }
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            currentSession.getTransaction().rollback();
-        } finally {
-            notificationDaoImpl.closeCurrentSession();
-        }
-    }
 
-    public EdocNotification getByOrganAndDocumentId(long documentId, String organId) {
-        notificationDaoImpl.openCurrentSession();
-        EdocNotification notification = notificationDaoImpl.getByOrganAndDocumentId(documentId, organId);
-        notificationDaoImpl.closeCurrentSession();
-        return notification;
+            } else {
+                LOGGER.error("M.RemovePending. Not found edoc_notification to remove pending by document " + documentId + " receiver id " + domain);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error remove document pending for organ domain " + domain
+                    + " and document " + documentId + " cause " + Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public static void main(String[] args) {

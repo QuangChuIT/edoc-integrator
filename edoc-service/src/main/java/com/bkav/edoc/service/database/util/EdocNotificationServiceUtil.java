@@ -16,8 +16,4 @@ public class EdocNotificationServiceUtil {
     public static void addNotification(EdocNotification edocNotification) {
         NOTIFICATION_SERVICE.addNotification(edocNotification);
     }
-
-    public static Set<EdocNotification> addNotifications(List<Organization> toOrgans, Date dueDate, EdocDocument edocDocument) {
-        return NOTIFICATION_SERVICE.addNotifications(toOrgans, dueDate, edocDocument);
-    }
 }

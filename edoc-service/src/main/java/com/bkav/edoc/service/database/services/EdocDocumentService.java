@@ -17,26 +17,25 @@ import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.resource.QueryString;
+import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.util.CommonUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
-import com.bkav.edoc.service.xml.base.header.Organization;
-import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
+import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import java.io.InputStream;
 import java.util.*;
 
 public class EdocDocumentService {
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
-    private final EdocDocumentDetailService documentDetailService = new EdocDocumentDetailService();
-    private final EdocTraceHeaderListService traceHeaderListService = new EdocTraceHeaderListService();
-    private final EdocAttachmentService attachmentService = new EdocAttachmentService();
-    private final EdocNotificationService notificationService = new EdocNotificationService();
     private final Mapper mapper = new Mapper();
     private final Checker checker = new Checker();
+
+    private final AttachmentGlobalUtil attUtil = new AttachmentGlobalUtil();
 
     public EdocDocumentService() {
 
@@ -51,10 +50,7 @@ public class EdocDocumentService {
     }
 
     public List<EdocDocument> findAll() {
-        documentDaoImpl.openCurrentSession();
-        List<EdocDocument> result = documentDaoImpl.findAll();
-        documentDaoImpl.closeCurrentSession();
-        return result;
+        return documentDaoImpl.findAll();
     }
 
     public int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
@@ -126,10 +122,11 @@ public class EdocDocumentService {
             if (documents.size() > 0) {
                 for (EdocDocument document : documents) {
                     DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
-                    entries.add(documentCacheEntry);
+                    if (documentCacheEntry != null) {
+                        entries.add(documentCacheEntry);
+                    }
                 }
             }
-            documentDaoImpl.closeCurrentSession();
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -141,105 +138,173 @@ public class EdocDocumentService {
     }
 
     public EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
-                                    StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) throws Exception {
-        // output document id
-        if (outDocumentId == null) {
-            outDocumentId = new StringBuilder();
-        }
-        // add eDoc document
-        EdocDocument edocDocument = addEdocDocument(messageHeader);
-        if (edocDocument == null) {
-            errors.add(new Error("M.SaveDocError",
-                    "Error save document to database with document code " +
-                            messageHeader.getCode().getCodeNumber() + "/" + messageHeader.getCode().getCodeNotation()));
-            return null;
-        }
-        long docId = edocDocument.getDocumentId();
-        outDocumentId.append(docId);
-
-        // Add document to cache (using by get document)
-        saveGetDocumentCache(docId, edocDocument.getFromOrganDomain(),
-                edocDocument.getSentDate());
-
-        // Insert document detail
-        EdocDocumentDetail documentDetail = documentDetailService.addDocumentDetail(messageHeader, edocDocument);
-        if (documentDetail == null) {
-            errors.add(new Error("M.SaveDocError", "Error save document detail for document id " + docId));
-            deleteDocument(docId);
-            return null;
-        }
-        edocDocument.setDocumentDetail(documentDetail);
-        // get business info
-        String businessInfo = CommonUtil.getBusinessInfo(traces);
-
-        // Insert Trace Header List
-        EdocTraceHeaderList traceHeaderList = traceHeaderListService.addTraceHeaderList(traces, businessInfo, edocDocument);
-        if (traceHeaderList == null) {
-            errors.add(new Error("M.SaveDocError", "Error save trace header list for document id " + docId));
-            deleteDocument(docId);
-            return null;
-        }
-        edocDocument.setTraceHeaderList(traceHeaderList);
-        // Insert vao bang Attachment
-        Set<EdocAttachment> edocAttachments = attachmentService.addAttachments(edocDocument, attachments, edocAttachmentCacheEntries);
-        int attachmentSizeInput = attachments.size();
-        int attachmentSizeSave = edocAttachments.size();
-        if (attachmentSizeInput != attachmentSizeSave) {
-            errors.add(new Error("M.SaveDocError", "Error save attachments for document with id" + docId));
-            deleteDocument(docId);
-            return null;
-        }
-        edocDocument.setAttachments(edocAttachments);
-
-        List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
-        boolean sendVPCP = toesVPCP.size() > 0;
-        List<Organization> toOrganizations = messageHeader.getToes();
-        Date dueDate = messageHeader.getDueDate();
-        List<Organization> organToPending;
-        if (sendVPCP) {
-            toOrganizations.removeAll(toesVPCP);
-        }
-        organToPending = toOrganizations;
-        // add notifications
-        Set<EdocNotification> notifications = notificationService.addNotifications(organToPending, dueDate, edocDocument);
-        if (notifications.size() == 0) {
-            deleteDocument(docId);
-            LOGGER.error("Error when set document notification to database with document " + docId);
-            errors.add(new Error("M.SaveDocError", "Error save notifications for document with id" + docId));
-            return null;
-        }
-        // save pending document to cache
-        savePendingDocumentCache(organToPending, docId);
-        edocDocument.setNotifications(notifications);
-        saveAllowGetDocumentCache(organToPending, docId);
-        return edocDocument;
-    }
-
-    /**
-     * Add eDoc document, save to database
-     *
-     * @param messageHeader
-     * @return
-     * @throws Exception
-     */
-    public EdocDocument addEdocDocument(MessageHeader messageHeader) throws Exception {
+                                    StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
         Session currentSession = documentDaoImpl.openCurrentSession();
         try {
+            // output document id
+            if (outDocumentId == null) {
+                outDocumentId = new StringBuilder();
+            }
+
             currentSession.beginTransaction();
-            // get info of eDoc document
+            // prepare get document info from message header
             EdocDocument document = MapperUtil.modelToEdocDocument(messageHeader);
-            documentDaoImpl.persist(document);
+            currentSession.persist(document);
+
+            long docId = document.getDocumentId();
+
+            LOGGER.info("Save document successfully return DocumentId " + docId);
+            outDocumentId.append(docId);
+
+            // Add document to cache (using by get document)
+            saveGetDocumentCache(docId, document.getFromOrganDomain(),
+                    document.getSentDate());
+
+            // get info of document detail
+            EdocDocumentDetail documentDetail = MapperUtil.modelToDocumentDetail(messageHeader);
+            documentDetail.setDocument(document);
+            currentSession.persist(documentDetail);
+            LOGGER.info("Save document detail successfully with document id " + docId);
+            document.setDocumentDetail(documentDetail);
+
+            // get business info
+            String businessInfo = CommonUtil.getBusinessInfo(traces);
+
+            EdocTraceHeaderList edocTraceHeaderList = new EdocTraceHeaderList();
+            if (traces.getTraceHeaders().size() > 0) {
+                edocTraceHeaderList.setBusinessDocReason(traces.getBusiness().getBusinessDocReason());
+                int businessDocType = (int) traces.getBusiness().getBusinessDocType();
+                EdocTraceHeaderList.BusinessDocType type = EdocTraceHeaderList.BusinessDocType.values()[businessDocType];
+                edocTraceHeaderList.setBusinessDocType(type);
+                edocTraceHeaderList.setPaper(traces.getBusiness().getPaper());
+                edocTraceHeaderList.setBusinessInfo(businessInfo);
+                // get staff info
+                if (traces.getBusiness().getStaffInfo() != null) {
+                    StaffInfo staffInfo = traces.getBusiness().getStaffInfo();
+                    edocTraceHeaderList.setEmail(staffInfo.getEmail());
+                    edocTraceHeaderList.setDepartment(staffInfo.getDepartment());
+                    edocTraceHeaderList.setMobile(staffInfo.getMobile());
+                    edocTraceHeaderList.setStaff(staffInfo.getStaff());
+                }
+
+                // save trace header list to database
+                edocTraceHeaderList.setDocument(document);
+                currentSession.persist(edocTraceHeaderList);
+                LOGGER.info("Save trace header list successfully with document id " + docId);
+
+                // get list trace header
+                Set<EdocTraceHeader> edocTraceHeaders = new HashSet<>();
+                for (TraceHeader trace : traces.getTraceHeaders()) {
+                    EdocTraceHeader traceHeader = new EdocTraceHeader();
+                    traceHeader.setOrganDomain(trace.getOrganId());
+                    traceHeader.setTimeStamp(trace.getTimestamp());
+                    traceHeader.setTraceHeaderList(edocTraceHeaderList);
+                    currentSession.persist(traceHeader);
+                    LOGGER.info("Save trace header successfully with document id " + docId);
+                    edocTraceHeaders.add(traceHeader);
+                }
+                edocTraceHeaderList.setTraceHeaders(edocTraceHeaders);
+            }
+
+            // Insert vao bang Attachment
+            String rootPath = attUtil.getAttachmentPath();
+            Calendar cal = Calendar.getInstance();
+            String SEPARATOR = EdXmlConstant.SEPARATOR;
+            Set<EdocAttachment> edocAttachmentSet = new HashSet<>();
+            String domain = document.getFromOrganDomain();
+            for (int i = 0; i < attachments.size(); i++) {
+                Attachment attachment = attachments.get(i);
+                String dataPath = domain + SEPARATOR +
+                        cal.get(Calendar.YEAR) + SEPARATOR +
+                        (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
+                        cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
+                        docId + "_" + (i + 1);
+
+                String specPath = rootPath +
+                        (rootPath.endsWith(SEPARATOR) ? "" : SEPARATOR) +
+                        dataPath;
+                long size;
+                InputStream is = attachment.getInputStream();
+                size = attUtil.saveToFile(specPath, is);
+                is.close();
+                if (size > 0) {
+                    String name = attachment.getName();
+                    String type = attachment.getContentType();
+                    String organDomain = document.getFromOrganDomain();
+                    String toOrganDomain = document.getToOrganDomain();
+                    EdocAttachment edocAttachment = new EdocAttachment();
+                    edocAttachment.setOrganDomain(organDomain);
+                    edocAttachment.setName(name);
+                    edocAttachment.setType(type);
+                    edocAttachment.setToOrganDomain(toOrganDomain);
+                    edocAttachment.setCreateDate(new Date());
+                    edocAttachment.setFullPath(dataPath);
+                    edocAttachment.setSize(String.valueOf(size));
+                    edocAttachment.setDocument(document);
+                    currentSession.persist(edocAttachment);
+                    LOGGER.info("Save attachment successfully with document id " + docId);
+                    AttachmentCacheEntry attachmentCacheEntry = MapperUtil.modelToAttachmentCache(edocAttachment);
+                    attachmentCacheEntry.setDocumentId(docId);
+                    edocAttachmentCacheEntries.add(attachmentCacheEntry);
+                    edocAttachmentSet.add(edocAttachment);
+                } else {
+                    LOGGER.info("Save attachment fail with document id " + docId + " document code " + document.getDocCode());
+                    currentSession.getTransaction().rollback();
+                    return null;
+                }
+            }
+            document.setAttachments(edocAttachmentSet);
+
+            List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
+            List<Organization> toOrganizations = messageHeader.getToes();
+            List<Organization> organToPending = new ArrayList<>();
+            if (toesVPCP.size() > 0) {
+                for (Organization organization : toOrganizations) {
+                    if (!toesVPCP.contains(organization)) {
+                        organToPending.add(organization);
+                    }
+                }
+            } else {
+                organToPending = toOrganizations;
+            }
+            Date dueDate = messageHeader.getDueDate();
+
+            Set<EdocNotification> notifications = new HashSet<>();
+            // Insert Notification
+            for (Organization to : organToPending) {
+                EdocNotification notification = new EdocNotification();
+                Date currentDate = new Date();
+                notification.setDateCreate(currentDate);
+                notification.setModifiedDate(currentDate);
+                notification.setSendNumber(0);
+                notification.setDueDate(dueDate);
+                notification.setReceiverId(to.getOrganId());
+                notification.setDocument(document);
+                notification.setTaken(false);
+                currentSession.persist(notification);
+                LOGGER.info("Save edoc notification successfully for document " + docId
+                        + " and code " + document.getDocCode());
+                notifications.add(notification);
+            }
+            // save pending document to cache
+            savePendingDocumentCache(organToPending, docId);
+            document.setNotifications(notifications);
+            saveAllowGetDocumentCache(organToPending, docId);
             currentSession.getTransaction().commit();
             return document;
         } catch (Exception e) {
-            LOGGER.error("Error when save document for organ domain "
-                    + messageHeader.getFrom().getOrganId() + " cause " + Arrays.toString(e.getStackTrace()));
+            LOGGER.error("Error add document to database cause " + Arrays.toString(new String[]{Arrays.toString(e.getStackTrace())}));
+            Error error = new Error("M.SaveDocError", "Save document error cause "
+                    + Arrays.toString(e.getStackTrace()) + " with document code " + messageHeader.getCode().getCodeNumber());
+            errors.add(error);
             if (currentSession != null) {
                 currentSession.getTransaction().rollback();
             }
             return null;
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            if (currentSession != null) {
+                currentSession.close();
+            }
         }
     }
 
@@ -257,22 +322,16 @@ public class EdocDocumentService {
      */
     public boolean checkExistDocument(String subject, String codeNumber, String codeNotation,
                                       String promulgationDateStr, String fromOrganDomain, List<Organization> tos, List<String> attachmentNames) {
-        documentDaoImpl.openCurrentSession();
 
         Date promulgationDate = XmlGregorianCalendarUtil.convertToDate(promulgationDateStr, "dd/MM/yyyy");
         String toOrganDomain = CommonUtil.getToOrganDomain(tos);
 
-        boolean check = documentDaoImpl.checkExistDocument(subject, codeNumber, codeNotation, promulgationDate, fromOrganDomain, toOrganDomain, attachmentNames);
-
-        documentDaoImpl.closeCurrentSession();
-        return check;
+        return documentDaoImpl.checkExistDocument(subject, codeNumber, codeNotation, promulgationDate, fromOrganDomain, toOrganDomain, attachmentNames);
     }
 
     public List<EdocDocument> selectForDailyCounter(Date date) {
-        documentDaoImpl.openCurrentSession();
-        List<EdocDocument> documents = documentDaoImpl.selectForDailyCounter(date);
-        documentDaoImpl.closeCurrentSession();
-        return documents;
+
+        return documentDaoImpl.selectForDailyCounter(date);
     }
 
     public boolean checkExistDocument(String edXmlDocumentId) {
@@ -288,22 +347,10 @@ public class EdocDocumentService {
     }
 
     public void updateDocument(EdocDocument edocDocument) {
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            session.beginTransaction();
-            documentDaoImpl.saveOrUpdate(edocDocument);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error when update document with id " + edocDocument.getDocumentId() + " cause " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            documentDaoImpl.closeCurrentSession();
-        }
+        documentDaoImpl.saveOrUpdate(edocDocument);
     }
 
     /**
-     * save document to cache for get document
-     *
      * @param documentId
      * @param fromOrganDomain
      * @param sentDate
@@ -391,38 +438,14 @@ public class EdocDocumentService {
     }
 
     public List<DocumentCacheEntry> getDocuments(String organDomain, int start, int size) {
-        documentDaoImpl.openCurrentSession();
         List<DocumentCacheEntry> documentCacheEntries = new ArrayList<>();
         List<EdocDocument> documents = documentDaoImpl.getDocuments(organDomain, start, size);
         if (documents.size() > 0) {
             documentCacheEntries = ExecutorServiceUtil.getDocumentCacheEntries(documents);
         }
-        documentDaoImpl.closeCurrentSession();
         return documentCacheEntries;
     }
 
-    public List<DocumentCacheEntry> findByOrganIdAndMode(String organDomain, String mode, int start, int size) {
-        List<DocumentCacheEntry> documentCacheEntries;
-        String prefix = organDomain + "_" + mode;
-        String cacheKey = RedisKey.getKey(prefix, RedisKey.GET_LIST_DOCUMENT_KEY);
-        RedisUtil.getInstance().delete(cacheKey);
-        documentCacheEntries = (List<DocumentCacheEntry>) RedisUtil.getInstance().get(cacheKey, Object.class);
-        if (documentCacheEntries == null || documentCacheEntries.size() == 0) {
-            documentCacheEntries = new ArrayList<>();
-            documentDaoImpl.openCurrentSession();
-            List<EdocDocument> documents = documentDaoImpl.findByOranDomain(organDomain, mode, start, size);
-            if (documents.size() > 0) {
-                /*for (EdocDocument document : documents) {
-                    DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
-                    documentCacheEntries.add(documentCacheEntry);
-                }*/
-                documentCacheEntries = ExecutorServiceUtil.getDocumentCacheEntries(documents);
-                RedisUtil.getInstance().set(cacheKey, documentCacheEntries);
-            }
-            documentDaoImpl.closeCurrentSession();
-        }
-        return documentCacheEntries;
-    }
 
     public DocumentCacheEntry getDocById(long documentId) {
         DocumentCacheEntry documentCacheEntry;
@@ -431,31 +454,39 @@ public class EdocDocumentService {
         documentCacheEntry = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
         if (documentCacheEntry == null) {
             LOGGER.info("Found document with id " + documentId + " in cache !!!!!!");
-            documentDaoImpl.openCurrentSession();
             EdocDocument edocDocument = documentDaoImpl.findById(documentId);
             if (edocDocument != null) {
                 documentCacheEntry = MapperUtil.modelToDocumentCached(edocDocument);
                 MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheEntry);
             }
-            documentDaoImpl.closeCurrentSession();
         }
         return documentCacheEntry;
+    }
+
+    public DocumentCacheEntry getDocByCodeAndDomain(String docCode, String organDomain) {
+        EdocDocument edocDocument = documentDaoImpl.getDocumentByCodeDomain(docCode, organDomain);
+        if (edocDocument != null) {
+            return MapperUtil.modelToDocumentCached(edocDocument);
+        }
+        return null;
     }
 
     public MessageHeader getDocumentById(long docId) {
 
         EdocDocument document = this.getDocument(docId);
 
-        EdocDocumentDetail detail = document.getDocumentDetail();
-
-        return mapper.modelToMessageHeader(document, detail);
+        if (document != null) {
+            EdocDocumentDetail detail = document.getDocumentDetail();
+            return mapper.modelToMessageHeader(document, detail);
+        }
+        return null;
     }
 
     public EdocDocument addDocument(EdocDocument edocDocument) {
         Session currSession = documentDaoImpl.openCurrentSession();
         try {
             currSession.beginTransaction();
-            documentDaoImpl.persist(edocDocument);
+            currSession.persist(edocDocument);
             currSession.getTransaction().commit();
             return edocDocument;
         } catch (Exception e) {
@@ -465,18 +496,15 @@ public class EdocDocumentService {
             }
             return null;
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(currSession);
         }
     }
 
     public void updateDocument(long documentId) {
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            session.beginTransaction();
-            EdocDocument document = documentDaoImpl.findById(documentId);
+        EdocDocument document = documentDaoImpl.findById(documentId);
+        if (document != null) {
             document.setVisited(true);
             documentDaoImpl.update(document);
-            session.getTransaction().commit();
             // update to memcached
             String cacheKey = MemcachedKey.getKey(String.valueOf(document.getDocumentId()), MemcachedKey.DOCUMENT_KEY);
             DocumentCacheEntry documentCacheEntry = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
@@ -484,13 +512,8 @@ public class EdocDocumentService {
                 documentCacheEntry.setVisited(document.getVisited());
                 MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, documentCacheEntry);
             }
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (session != null) {
-                session.getTransaction().rollback();
-            }
-        } finally {
-            documentDaoImpl.closeCurrentSession();
+        } else {
+            LOGGER.warn("Update Document Not found document with id " + documentId);
         }
     }
 
@@ -500,7 +523,7 @@ public class EdocDocumentService {
             session.beginTransaction();
             EdocDocument document = documentDaoImpl.findById(documentId);
             document.setDraft(false);
-            documentDaoImpl.update(document);
+            session.update(document);
             session.getTransaction().commit();
             // update to memcached
             String cacheKey = MemcachedKey.getKey(String.valueOf(document.getDocumentId()), MemcachedKey.DOCUMENT_KEY);
@@ -515,7 +538,7 @@ public class EdocDocumentService {
                 session.getTransaction().rollback();
             }
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(session);
         }
     }
 
@@ -538,7 +561,7 @@ public class EdocDocumentService {
                 session.getTransaction().rollback();
             }
         } finally {
-            documentDaoImpl.closeCurrentSession();
+            documentDaoImpl.closeCurrentSession(session);
         }
     }
 

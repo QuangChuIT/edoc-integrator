@@ -1,12 +1,17 @@
 package com.bkav.edoc.service.database.util;
 
+import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDocumentDetail;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.services.EdocDocumentDetailService;
 import com.bkav.edoc.service.database.services.EdocDocumentService;
+import com.bkav.edoc.service.xml.base.attachment.Attachment;
+import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
+import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
+import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 
 import java.util.Date;
 import java.util.List;
@@ -14,10 +19,6 @@ import java.util.List;
 public class EdocDocumentServiceUtil {
     private final static EdocDocumentService DOCUMENT_SERVICE = new EdocDocumentService();
     private final static EdocDocumentDetailService EDOC_DOCUMENT_DETAIL_SERVICE = new EdocDocumentDetailService();
-
-    public static List<DocumentCacheEntry> getListDocumentByOrganDomain(String organDomain, String mode, int start, int length) {
-        return DOCUMENT_SERVICE.findByOrganIdAndMode(organDomain, mode, start, length);
-    }
 
     public static List<DocumentCacheEntry> getDocuments(String organId, int start, int size) {
         return DOCUMENT_SERVICE.getDocuments(organId, start, size);
@@ -37,6 +38,10 @@ public class EdocDocumentServiceUtil {
 
     public static DocumentCacheEntry getDocumentById(long documentId) {
         return DOCUMENT_SERVICE.getDocById(documentId);
+    }
+
+    public static DocumentCacheEntry getDocumentByCodeAndDomain(String docCode, String organDomain) {
+        return DOCUMENT_SERVICE.getDocByCodeAndDomain(docCode, organDomain);
     }
 
     public static EdocDocument getDocument(long documentId) {
@@ -68,11 +73,20 @@ public class EdocDocumentServiceUtil {
         DOCUMENT_SERVICE.updateDocument(documentId);
     }
 
+    public static void updateDocument(EdocDocument edocDocument) {
+        DOCUMENT_SERVICE.updateDocument(edocDocument);
+    }
+
     public static void deleteDraftDocument(long documentDraftId) {
         DOCUMENT_SERVICE.deleteDraftDocument(documentDraftId);
     }
 
     public static void updateDraftToPublishDocument(long documentId) {
         DOCUMENT_SERVICE.updateDraftToPublishDocument(documentId);
+    }
+
+    public static EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
+                                           StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
+        return DOCUMENT_SERVICE.addDocument(messageHeader, traces, attachments, outDocumentId, edocAttachmentCacheEntries, errors);
     }
 }

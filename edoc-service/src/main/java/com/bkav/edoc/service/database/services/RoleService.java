@@ -7,15 +7,10 @@ public class RoleService {
     private final RoleDaoImpl roleDao = new RoleDaoImpl();
 
     public void createRole (Role role) {
-        roleDao.openCurrentSession();
         roleDao.createRole(role);
-        roleDao.closeCurrentSession();
     }
 
     public boolean checkExistRoleByRoleName(String roleName) {
-        roleDao.openCurrentSession();
-        boolean result = roleDao.checkExistRoleByRoleName(roleName);
-        roleDao.closeCurrentSession();
-        return result;
+        return roleDao.checkExistRoleByRoleName(roleName);
     }
 }

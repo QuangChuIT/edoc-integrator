@@ -317,8 +317,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 }*/
             }
         } catch (Exception e) {
-            LOGGER.error("Error when confirm received " + e);
-            errorList.add(new Error("M.ConfirmReceived", "Error when process confirm received " + e.getMessage()));
+            LOGGER.error("Error confirm received " + e);
+            errorList.add(new Error("M.ConfirmReceived", "Error process confirm received " + Arrays.toString(e.getStackTrace())));
         }
 
         if (!errorList.isEmpty()) {
@@ -362,7 +362,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             // update trace
             if (!traceService.updateTrace(status)) {
 
-                errorList.add(new Error("M.updateTrace", "Error when process update trace"));
+                errorList.add(new Error("M.updateTrace",
+                        "Error process update trace cause not found document with trace or save error!"));
 
                 report = new Report(false, new ErrorList(errorList));
 
@@ -400,8 +401,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
             map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
         } catch (Exception e) {
-            LOGGER.error("Error when update traces cause " + Arrays.toString(e.getStackTrace()));
-            errorList.add(new Error("M.UpdateTraces", "Error when process get update " + Arrays.toString(e.getStackTrace())));
+            LOGGER.error("Error update traces cause " + Arrays.toString(e.getStackTrace()));
+            errorList.add(new Error("M.UpdateTraces", "Error process get update " + Arrays.toString(e.getStackTrace())));
 
             report = new Report(false, new ErrorList(errorList));
 
@@ -454,9 +455,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                 if (!acceptToDocument) {
                     errorList.add(new Error(
-                            "M.DOCUMENT",
-                            "Not allow with document !!!!"));
-                    errorList.add(new Error("Error", "Document does not exist !!!!"));
+                            "M.GetDocumentCheckAllow",
+                            "Not find document pending in cache, database docId " + documentId + " organId " + organId));
 
                     report = new Report(false, new ErrorList(errorList));
 
@@ -640,6 +640,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 boolean sendVPCP = toesVPCP.size() > 0;
                 // not send to vpcp -> save to cache
                 if (!sendVPCP) {
+                    LOGGER.info("Not send document to VPCP !!!!!!!!");
+                    LOGGER.info(messageHeader.getToes());
                     // save envelop file to cache
                     saveEnvelopeFileCache(envelop, strDocumentId.toString());
                 } else {
@@ -670,8 +672,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 map.put(StringPool.SEND_DOCUMENT_RESPONSE_ID_KEY, docIdResponseElm);
             } catch (Exception e) {
-                LOGGER.error("Error when send document " + Arrays.toString(e.getStackTrace()));
-                errorList.add(new Error("M.SendDocument", "Error when send document to esb " + e.getMessage()));
+                LOGGER.error("Error send document " + Arrays.toString(e.getStackTrace()));
+                errorList.add(new Error("M.SendDocument", "Error send document to esb error trace" + Arrays.toString(e.getStackTrace())));
 
                 report = new Report(false, new ErrorList(errorList));
 

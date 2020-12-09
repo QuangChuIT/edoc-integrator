@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -19,6 +21,7 @@ public class EdocDynamicContact implements Serializable {
     private String version;
     private String token;
     private boolean status;
+    @JsonIgnore
     private Set<User> users;
 
     public EdocDynamicContact() {

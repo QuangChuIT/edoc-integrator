@@ -7,45 +7,29 @@ public class CounterService {
     private final CounterDaoImpl counterDao = new CounterDaoImpl();
 
     public long increment() throws NoSuchCounterException {
-        counterDao.openCurrentSession();
-        long counter = counterDao.increment(_SYS_COUNTER_NAME, _SYS_COUNTER_INCREMENT);
-        counterDao.closeCurrentSession();
-        return counter;
+        return counterDao.increment(_SYS_COUNTER_NAME, _SYS_COUNTER_INCREMENT);
     }
 
     public long increment(String name) throws NoSuchCounterException {
-        counterDao.openCurrentSession();
-        long counter = counterDao.increment(name, _SYS_COUNTER_INCREMENT);
-        counterDao.closeCurrentSession();
-        return counter;
+        return counterDao.increment(name, _SYS_COUNTER_INCREMENT);
     }
 
     public long increment(String name, int size) throws NoSuchCounterException {
-        counterDao.openCurrentSession();
-        long counter = counterDao.increment(name, size);
-        counterDao.closeCurrentSession();
-        return counter;
+        return counterDao.increment(name, size);
     }
 
     public void rename(String oldName, String newName)
             throws NoSuchCounterException {
-        counterDao.openCurrentSession();
         counterDao.rename(oldName, newName);
-        counterDao.closeCurrentSession();
 
     }
 
     public void reset(String name) throws NoSuchCounterException {
-        counterDao.openCurrentSession();
         counterDao.reset(name, 0);
-        counterDao.closeCurrentSession();
-
     }
 
     public void reset(String name, int size) throws NoSuchCounterException {
-        counterDao.openCurrentSession();
         counterDao.reset(name, size);
-        counterDao.closeCurrentSession();
     }
 
     private static final String _SYS_COUNTER_NAME = "edoc.service.counter";

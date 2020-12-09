@@ -14,9 +14,7 @@ public class EdocPriorityService {
         String cacheKey = MemcachedKey.getKey(String.valueOf(priorityId), MemcachedKey.PRIORITY_KEY);
         EdocPriority priority = (EdocPriority) MemcachedUtil.getInstance().read(cacheKey);
         if (priority == null) {
-            EDOC_PRIORITY_DAO.openCurrentSession();
             EdocPriority edocPriority = EDOC_PRIORITY_DAO.findById(priorityId);
-            EDOC_PRIORITY_DAO.closeCurrentSession();
             if (edocPriority != null) {
                 priority = edocPriority;
                 MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, priority);
@@ -28,9 +26,6 @@ public class EdocPriorityService {
     }
 
     public List<EdocPriority> getAllPriorities() {
-        EDOC_PRIORITY_DAO.openCurrentSession();
-        List<EdocPriority> edocPriorities = EDOC_PRIORITY_DAO.findAll();
-        EDOC_PRIORITY_DAO.closeCurrentSession();
-        return edocPriorities;
+        return EDOC_PRIORITY_DAO.findAll();
     }
 }

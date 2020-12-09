@@ -73,9 +73,12 @@ public class Checker {
             List<String> stringList = Arrays.asList(organIdExcept.split("#"));
             for (Organization to : tos) {
                 String toDomain = to.getOrganId();
-                String organId = toDomain.substring(10, 13);
-                if (!stringList.contains(organId)) {
-                    toesVPCP.add(to);
+                String[] arr = toDomain.split("\\.");
+                if (arr.length > 0) {
+                    String organId = arr[arr.length - 1];
+                    if (!stringList.contains(organId)) {
+                        toesVPCP.add(to);
+                    }
                 }
             }
         } catch (Exception e) {

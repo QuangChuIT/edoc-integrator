@@ -13,4 +13,5 @@ public class RoleServiceUtil {
     public static boolean checkExistRoleByRoleName(String roleName) {
         return ROLE_SERVICE.checkExistRoleByRoleName(roleName);
     }
+
 }

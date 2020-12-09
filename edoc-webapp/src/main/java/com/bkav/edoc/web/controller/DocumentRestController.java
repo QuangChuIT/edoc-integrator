@@ -50,7 +50,7 @@ public class DocumentRestController {
                 return new ResponseEntity<>(document, HttpStatus.OK);
             }
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
@@ -66,7 +66,7 @@ public class DocumentRestController {
             Response response = new Response(200);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
         Response response = new Response(500);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -225,7 +225,8 @@ public class DocumentRestController {
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));
         } catch (Exception e) {
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
-            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500,
+                    errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -234,7 +235,7 @@ public class DocumentRestController {
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-        int draw = Integer.parseInt(request.getParameter("draw"));
+        /*int draw = Integer.parseInt(request.getParameter("draw"));
         String searchValue = request.getParameter("search[value]");
         String sortColumn = request.getParameter("order[0][column]");
         //Sorting Direction
@@ -242,8 +243,8 @@ public class DocumentRestController {
         System.out.println("draw " + draw);
         System.out.println("search value " + searchValue);
         System.out.println("sortColumn " + sortColumn);
-        System.out.println("sort direction " + sortDirection);
-        DatatableRequest<EdocDocument> datatableRequest = new DatatableRequest<>(request);
+        System.out.println("sort direction " + sortDirection);*/
+        DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
         int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
@@ -251,12 +252,14 @@ public class DocumentRestController {
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);
         if (!AppUtil.isObjectEmpty(entries)) {
-            dataTableResult.setRecordsTotal(totalCount);
+            if (!AppUtil.isObjectEmpty(entries)) {
+                dataTableResult.setRecordsTotal(totalCount);
 
-            if (datatableRequest.getPaginationRequest().isFilterByEmpty()) {
-                dataTableResult.setRecordsFiltered(totalCount);
-            } else {
-                dataTableResult.setRecordsFiltered(entries.size());
+                if (datatableRequest.getPaginationRequest().isFilterByEmpty()) {
+                    dataTableResult.setRecordsFiltered(totalCount);
+                } else {
+                    dataTableResult.setRecordsFiltered(entries.size());
+                }
             }
         }
         return new Gson().toJson(dataTableResult);
@@ -276,5 +279,6 @@ public class DocumentRestController {
         }
     }
 
-    private static final Logger logger = Logger.getLogger(DocumentRestController.class);
+    private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);
+
 }

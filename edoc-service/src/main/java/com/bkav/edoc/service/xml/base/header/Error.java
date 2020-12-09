@@ -22,7 +22,6 @@ public class Error {
      * @param description
      */
     public Error(String code, String description) {
-        super();
         this.code = code;
         this.description = description;
     }

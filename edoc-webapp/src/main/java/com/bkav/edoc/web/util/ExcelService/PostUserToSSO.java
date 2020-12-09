@@ -1,5 +1,6 @@
 package com.bkav.edoc.web.util.ExcelService;
 
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -26,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class PostUserToSSO {
@@ -63,9 +65,10 @@ public class PostUserToSSO {
                 HttpEntity httpEntity = response.getEntity();
                 if (httpEntity != null) {
                     result = EntityUtils.toString(httpEntity);
+                    LOGGER.info("Successfully post user to sso server " + result);
                 }
             } catch (Exception e) {
-                LOGGER.error(e);
+                LOGGER.error("Error post user to sso server cause " + Arrays.toString(e.getStackTrace()));
             } finally {
                 response.close();
             }
@@ -94,6 +97,7 @@ public class PostUserToSSO {
     }
 
     public static String createJson(User user) {
+        LOGGER.info("Convert user to json " + user);
         JSONObject json = new JSONObject();
         JSONObject name = new JSONObject();
         name.put("givenName", user.getUsername());
@@ -103,9 +107,23 @@ public class PostUserToSSO {
         organization.put("organization", user.getDynamicContact().getDomain());
         json.put("name",name);
         json.put("emails",email);
-        json.put("userName",user.getUsername());
-        json.put("password",user.getPassword());
+        json.put("userName",user.getUsername().trim());
+        json.put("password",user.getPassword().trim());
         json.put("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",organization);
         return json.toString();
+    }
+
+    public static void main(String[] args) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        User user = new User();
+        user.setDisplayName("Văn phòng");
+        user.setEmailAddress("vpubnd@lamdong.gov.vn");
+        user.setPassword("123@456aA");
+        user.setUsername("vpubnd");
+        EdocDynamicContact dynamicContact = new EdocDynamicContact();
+        dynamicContact.setDomain("000.00.01.H36");
+        user.setDynamicContact(dynamicContact);
+        String json = createJson(user);
+        String out = postUser("admin", "123abc@A", "https://iam.lamdong.gov.vn/scim2/Users", json);
+        System.out.println(out);
     }
 }

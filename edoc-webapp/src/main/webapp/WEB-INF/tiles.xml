@@ -47,4 +47,8 @@
     <definition name="publicReportDetail" extends="public.layout">
         <put-attribute name="body" value="/views/public_detail.jsp"/>
     </definition>
+
+    <definition name="publicTracePage" extends="public.layout">
+        <put-attribute name="body" value="/views/public_trace.jsp"/>
+    </definition>
 </tiles-definitions>

@@ -270,7 +270,7 @@ public class XmlUtil {
         // staff info
         OMElement staffInfoNode = getStaffInfoNode(business.getStaffInfo(), ns);
         businessNode.addChild(staffInfoNode);
-        LOGGER.error("Business " + business.toString());
+        LOGGER.info("Business " + business.toString());
         // replacement info list
         if (business.getBusinessDocType() == EdocTraceHeaderList.BusinessDocType.REPLACE.ordinal()) {
             OMElement replacementInfoListNode = getReplacementInfoListNode(business.getReplacementInfoList(), ns);
@@ -325,19 +325,21 @@ public class XmlUtil {
             businessDocumentInfoNode.addChild(documentReceiverNode);
 
             OMElement receiverListNode = factoryOM.createOMElement("ReceiverList", ns);
-            if (businessDocumentInfo.getReceiverList().getReceiver() != null && businessDocumentInfo.getReceiverList().getReceiver().size() > 0) {
-                for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
-                    OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
+            if (businessDocumentInfo.getReceiverList() != null) {
+                if (businessDocumentInfo.getReceiverList().getReceiver() != null && businessDocumentInfo.getReceiverList().getReceiver().size() > 0) {
+                    for (Receiver receiver : businessDocumentInfo.getReceiverList().getReceiver()) {
+                        OMElement receiverNode = factoryOM.createOMElement("Receiver", ns);
 
-                    OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
-                    receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
-                    receiverNode.addChild(receiverTypeNode);
+                        OMElement receiverTypeNode = factoryOM.createOMElement("ReceiverType", ns);
+                        receiverTypeNode.setText(String.valueOf(receiver.getReceiverType()));
+                        receiverNode.addChild(receiverTypeNode);
 
-                    OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
-                    organIdNode.setText(String.valueOf(receiver.getOrganId()));
-                    receiverNode.addChild(organIdNode);
+                        OMElement organIdNode = factoryOM.createOMElement("OrganId", ns);
+                        organIdNode.setText(String.valueOf(receiver.getOrganId()));
+                        receiverNode.addChild(organIdNode);
 
-                    receiverListNode.addChild(receiverNode);
+                        receiverListNode.addChild(receiverNode);
+                    }
                 }
             }
             businessDocumentInfoNode.addChild(receiverListNode);
@@ -743,6 +745,7 @@ public class XmlUtil {
                 ns);
 
         OMElement type = factoryOM.createOMElement("Type", ns);
+        LOGGER.info(currentHeader);
         String typeString = String.valueOf(currentHeader
                 .getDocumentType().getType());
         type.setText(typeString.isEmpty() ? StringPool.DEAUlt_INTEGER

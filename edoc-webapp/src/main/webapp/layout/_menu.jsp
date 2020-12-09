@@ -71,7 +71,7 @@
             </a>
         </li>
         <%
-            if(role == 0 || role == 1) {
+            if(role == 1233455 || role == 1342323) {
         %>
         <li>
             <a href="javascript:void(0)" data-mode="system" class="system-management-menu not-click">

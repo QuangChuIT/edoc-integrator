@@ -16,10 +16,7 @@ public class EdocDailyCounterService {
     private final EdocDynamicContactService edocDynamicContactService = new EdocDynamicContactService();
 
     public boolean checkExistCounter(Date date) {
-        edocDailyCounterDao.openCurrentSession();
-        boolean result = edocDailyCounterDao.checkExistCounter(date);
-        edocDailyCounterDao.closeCurrentSession();
-        return result;
+        return edocDailyCounterDao.checkExistCounter(date);
     }
 
     public void createDailyCounter(EdocDailyCounter dailyCounter) {
@@ -30,7 +27,7 @@ public class EdocDailyCounterService {
         List<EPublicStat> ePublicStats = new ArrayList<>();
         List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByFilterDomain(organDomain);
         for (OrganizationCacheEntry contact : contacts) {
-            List<EdocDailyCounter> counters = new ArrayList<>();
+            List<EdocDailyCounter> counters;
             String organId = contact.getDomain();
             if (fromDate == null || toDate == null) {
                 counters = edocDailyCounterDao.getOverStat(organId);
@@ -54,9 +51,7 @@ public class EdocDailyCounterService {
 
     public EPublic getStat(String organDomain) {
         EPublic ePublic = new EPublic();
-        edocDailyCounterDao.openCurrentSession();
         Long total = edocDailyCounterDao.getStat();
-        edocDailyCounterDao.closeCurrentSession();
         ePublic.setTotal(total);
         ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(organDomain));
         ePublic.setDateTime(DateUtils.format(new Date(), DateUtils.VN_DATETIME_FORMAT_NEW));

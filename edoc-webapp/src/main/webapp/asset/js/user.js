@@ -25,7 +25,7 @@ let userManage = {
                         let id = options.$trigger[0].id;
                         userId = id;
                         let m = "clicked: " + key + ' ' + id;
-                        switch(key) {
+                        switch (key) {
                             case "delete":
                                 instance.deleteUser(id);
                                 break;
@@ -53,7 +53,31 @@ let userManage = {
                             let id = opt.$trigger[0].id;
                             if (id == '164655867')
                                 return !this.data('daleteDisabled');
-                        }}
+                        }},
+                        "edit": {
+                            name: user_message.manage_edit_user, icon: "edit", disabled: function (key, opt) {
+                                let id = opt.$trigger[0].id;
+                                if (id == '164655867')
+                                    return !this.data('editDisabled');
+                            }
+                        },
+                        "permission": {
+                            name: user_message.manage_permission_user,
+                            icon: "fa-shield",
+                            disabled: function (key, opt) {
+                                let id = opt.$trigger[0].id;
+                                if (id == '164655867')
+                                    return !this.data('permissionDisabled');
+                            }
+                        },
+                        "sep1": "---------",
+                        "delete": {
+                            name: user_message.manage_remove_user, icon: "delete", disabled: function (key, opt) {
+                                let id = opt.$trigger[0].id;
+                                if (id == '164655867')
+                                    return !this.data('daleteDisabled');
+                            }
+                        }
                     }
                 });
             },
@@ -106,6 +130,7 @@ let userManage = {
                 statusCode: {
                     200: function (response) {
                         $.notify(user_message.user_delete_success, "success");
+                        instance.renderUserDatatable();
                     },
                     400: function (response) {
                         $.notify(user_message.user_delete_fail, "error");
@@ -113,9 +138,8 @@ let userManage = {
                     500: function (response) {
                         $.notify(user_message.user_delete_fail, "error");
                     }
-                }
-            })
-            instance.renderUserDatatable();
+                },
+            });
         }
     },
     createUser: function () {
@@ -203,7 +227,7 @@ let userManage = {
             instance.renderUserDatatable();
         }
     },
-    createUserRole: function(userId) {
+    createUserRole: function (userId) {
         let roleId;
         if ($("#adminRoleSelected").is(":checked")) {
             roleId = $("#adminRoleSelected").val();
@@ -220,14 +244,14 @@ let userManage = {
             url: "/public/-/create/role/",
             data: JSON.stringify(userRoleRequest),
             cache: false,
-            success: function(response) {
+            success: function (response) {
                 if (response.code === 201) {
                     $.notify(user_message.user_set_permission_success, "success");
                 } else if (response.code === 200) {
                     $.notify(user_message.user_set_permission_success, "success");
                 }
             },
-            error: function() {
+            error: function () {
                 $.notify(user_message.user_set_permission_fail, "error");
             }
         })
@@ -263,7 +287,7 @@ $(document).ready(function () {
     });
 
     // Show form add new user
-    $("#addUser").on('click', function(e) {
+    $("#addUser").on('click', function (e) {
         e.preventDefault();
         $('#formAddUser').modal({
             backdrop: 'static',
@@ -281,7 +305,7 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     })
-    $(document).on('click', 'input[type="checkbox"]', function() {
+    $(document).on('click', 'input[type="checkbox"]', function () {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
 
@@ -318,10 +342,18 @@ $(document).on("change", "#importUserFromExcel", function (e) {
             }
             else if (response === "BAD_REQUEST")
                 $.notify(user_message.user_import_invalid_format_file, "error");
-            // else if (response.code === 409)
+                // else if (response.code === 409)
             //     $.notify(user_message.user_import_from_excel_conflic, "error");
             else if (response === "NOT_ACCEPTABLE")
                 $.notify(user_message.user_import_from_excel_invalid_column, "error");
+            // let code = parseInt(response);
+            // if (code > 0) {
+            //     $.notify(user_message.user_import_from_excel_success, "success");
+            //     userManage.renderUserDatatable();
+            //     $("#importUserFromExcel").val('');
+            // } else {
+            //     $.notify(user_message.user_import_invalid_format_file, "error");
+            // }
         },
         error: (e) => {
             $.notify(user_message.user_import_from_excel_fail, "error");
@@ -347,7 +379,7 @@ $(document).on('click', '#exportUserToExcel', function (e) {
     })
 })
 
-$(".toggle-password").click(function() {
+$(".toggle-password").click(function () {
     $(this).toggleClass("fa-eye fa-eye-slash");
     let input = $($(this).attr("toggle"));
     if (input.attr("type") == "password") {
@@ -368,7 +400,7 @@ $(document).on("click", "#btn-addUser-cancel", function (event) {
 });
 
 // Button in Permission of user modal
-$(document).on("click", "#permission-confirm", function(e) {
+$(document).on("click", "#permission-confirm", function (e) {
     e.preventDefault();
     let userId = $(this).attr("data-id");
     userManage.createUserRole(userId);
@@ -488,6 +520,7 @@ function permissionClick(userId) {
         keyboard: false
     });
 }
+
 function editUserClick(userId) {
     $.get("/public/-/user/" + userId, function (data) {
         $('#edoc-edit-user').empty();

@@ -23,9 +23,6 @@ public class EdocTraceService {
     private final EdocTraceDaoImpl traceDaoImpl = new EdocTraceDaoImpl();
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "dd/MM/yyyy");
-
     public boolean updateTrace(MessageStatus status) {
         Session currentSession = traceDaoImpl.openCurrentSession();
         try {
@@ -60,7 +57,6 @@ public class EdocTraceService {
             String mobile = status.getStaffInfo().getMobile();
             String staff = status.getStaffInfo().getStaff();
             // search document by from organ domain and code
-            documentDaoImpl.setCurrentSession(currentSession);
             EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
@@ -92,7 +88,7 @@ public class EdocTraceService {
             edocTrace.setEnable(true);
             // insert trace to db
             currentSession.beginTransaction();
-            traceDaoImpl.persist(edocTrace);
+            currentSession.persist(edocTrace);
             String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
             DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
             if (documentCacheUpdate != null) {
@@ -112,7 +108,7 @@ public class EdocTraceService {
             }
             return false;
         } finally {
-            traceDaoImpl.closeCurrentSession();
+            traceDaoImpl.closeCurrentSession(currentSession);
         }
     }
 
@@ -134,11 +130,8 @@ public class EdocTraceService {
     }
 
     public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
-        traceDaoImpl.openCurrentSession();
 
         List<EdocTrace> traces = traceDaoImpl.getEdocTracesByOrganId(responseForOrganId);
-
-        traceDaoImpl.closeCurrentSession();
         return traces;
     }
 
@@ -148,23 +141,9 @@ public class EdocTraceService {
      * @param traces
      */
     public void disableEdocTrace(List<EdocTrace> traces) {
-        Session currentSession = traceDaoImpl.openCurrentSession();
-        try {
-            currentSession.beginTransaction();
-
-            for (EdocTrace trace : traces) {
-                trace.setEnable(false);
-                traceDaoImpl.disableEdocTrace(trace);
-            }
-
-            currentSession.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error(e);
-            if (currentSession != null) {
-                currentSession.getTransaction().rollback();
-            }
-        } finally {
-            traceDaoImpl.closeCurrentSession();
+        for (EdocTrace trace : traces) {
+            trace.setEnable(false);
+            traceDaoImpl.disableEdocTrace(trace);
         }
     }
 

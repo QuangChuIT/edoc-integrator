@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,6 +25,7 @@ public class EdocDocumentDetail implements Serializable {
     private String appendixes;
     private String responseFor;
     private SteeringType steeringType;
+    @JsonIgnore
     private EdocDocument document;
 
     public EdocDocumentDetail() {

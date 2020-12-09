@@ -173,12 +173,11 @@ public class Mapper {
     public Attachment attachmentModelToServiceEntity(EdocAttachment attachment) throws IOException {
 
         Attachment attachmentEntity = new Attachment();
-
         attachmentEntity.setName(attachment.getName());
 
-       /* String rootPath = _attGlobal.getAttachmentPath();
+            /* String rootPath = _attGlobal.getAttachmentPath();
 
-        StringBuilder filePath = new StringBuilder();*/
+            StringBuilder filePath = new StringBuilder();*/
 
         // Giai nen file dinh kem - Neu chua nen se tra ve duong dan hien
         // tai, neu da nen se giai nen va tra ve dia chi tuyet doi cua file

@@ -24,12 +24,13 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
 
     @Override
     public boolean checkExistCounter(Date date) {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT dc from EdocDailyCounter dc where dc.dateTime=:dateTime");
-        Query<EdocDailyCounter> query = session.createQuery(sql.toString());
+        Query<EdocDailyCounter> query = session.createQuery(sql.toString(), EdocDailyCounter.class);
         query.setParameter("dateTime", date);
         List<EdocDailyCounter> edocDailyCounters = query.getResultList();
+        closeCurrentSession(session);
         return edocDailyCounters.size() > 0;
     }
 
@@ -82,10 +83,11 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
 
     @Override
     public Long getStat() {
-        Session session = getCurrentSession();
+        Session session = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT sum(dc.sent + dc.received) from EdocDailyCounter dc");
-        Query<Long> query = session.createQuery(sql.toString());
+        Query<Long> query = session.createQuery(sql.toString(), Long.class);
+        closeCurrentSession(session);
         return query.uniqueResult();
     }
 

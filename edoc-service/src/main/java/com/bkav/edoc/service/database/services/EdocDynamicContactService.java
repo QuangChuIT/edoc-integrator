@@ -46,35 +46,24 @@ public class EdocDynamicContactService {
     }
 
     public List<EdocDynamicContact> getAllDynamicContact() {
-        dynamicContactDaoImpl.openCurrentSession();
-        List<EdocDynamicContact> contacts = dynamicContactDaoImpl.findAll();
-        dynamicContactDaoImpl.closeCurrentSession();
-        return contacts;
+        return dynamicContactDaoImpl.findAll();
     }
 
     public EdocDynamicContact findEdocDynamicContactById(long contactId) {
-        dynamicContactDaoImpl.openCurrentSession();
-        EdocDynamicContact contact = dynamicContactDaoImpl.findById(contactId);
-        dynamicContactDaoImpl.closeCurrentSession();
-        return contact;
+        return dynamicContactDaoImpl.findById(contactId);
     }
 
     public void updateContact(EdocDynamicContact edocDynamicContact) {
-        dynamicContactDaoImpl.openCurrentSession();
-
         dynamicContactDaoImpl.updateContact(edocDynamicContact);
 
-        dynamicContactDaoImpl.closeCurrentSession();
     }
 
     public OrganizationCacheEntry findById(long organId) {
         OrganizationCacheEntry organizationCacheEntry = null;
-        dynamicContactDaoImpl.openCurrentSession();
         EdocDynamicContact dynamicContact = dynamicContactDaoImpl.findById(organId);
         if (dynamicContact != null) {
             organizationCacheEntry = MapperUtil.modelToOrganCache(dynamicContact);
         }
-        dynamicContactDaoImpl.closeCurrentSession();
         return organizationCacheEntry;
     }
 
@@ -88,12 +77,10 @@ public class EdocDynamicContactService {
 
     public OrganizationCacheEntry findByDomain(String organDomain) {
         OrganizationCacheEntry organizationCacheEntry = null;
-        dynamicContactDaoImpl.openCurrentSession();
         EdocDynamicContact dynamicContact = dynamicContactDaoImpl.findByDomain(organDomain);
         if (dynamicContact != null) {
             organizationCacheEntry = MapperUtil.modelToOrganCache(dynamicContact);
         }
-        dynamicContactDaoImpl.closeCurrentSession();
         return organizationCacheEntry;
     }
 
@@ -106,8 +93,6 @@ public class EdocDynamicContactService {
         if (organizationCacheEntries == null) {
             organizationCacheEntries = new ArrayList<>();
 
-            dynamicContactDaoImpl.openCurrentSession();
-
             List<EdocDynamicContact> contacts = dynamicContactDaoImpl.findAll();
 
             for (EdocDynamicContact contact : contacts) {
@@ -116,18 +101,14 @@ public class EdocDynamicContactService {
             }
 
             MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
-
-            dynamicContactDaoImpl.closeCurrentSession();
         }
 
         return organizationCacheEntries;
     }
 
     public Long countOrgan(String domain) {
-        dynamicContactDaoImpl.openCurrentSession();
-        Long count = dynamicContactDaoImpl.countOrgan(domain);
-        dynamicContactDaoImpl.closeCurrentSession();
-        return count;
+
+        return dynamicContactDaoImpl.countOrgan(domain);
     }
 
     public List<OrganizationCacheEntry> getDynamicContactsByFilterDomain(String domain) {
@@ -137,7 +118,6 @@ public class EdocDynamicContactService {
 
         if (organizationCacheEntries == null) {
             organizationCacheEntries = new ArrayList<>();
-            dynamicContactDaoImpl.openCurrentSession();
             List<EdocDynamicContact> contacts = dynamicContactDaoImpl.getDynamicContactsByDomainFilter(domain);
 
             for (EdocDynamicContact contact : contacts) {
@@ -147,16 +127,13 @@ public class EdocDynamicContactService {
 
             MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
 
-            dynamicContactDaoImpl.closeCurrentSession();
         }
 
         return organizationCacheEntries;
     }
 
     public void createContact(EdocDynamicContact contact) {
-        dynamicContactDaoImpl.openCurrentSession();
         dynamicContactDaoImpl.createContact(contact);
-        dynamicContactDaoImpl.closeCurrentSession();
     }
 
     public boolean deleteOrgan(long organId) {

@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.taken=:taken");
-            Query query = currentSession.createQuery(sql.toString());
+            Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
             query.setParameter("receiverId", organId);
             query.setParameter("taken", false);
             return query.list();
@@ -49,32 +50,44 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
      * @return
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
-        Session currentSession = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
-        Query<Long> query = currentSession.createQuery(sql.toString());
-        query.setParameter("receiverId", organId);
-        query.setParameter("documentId", documentId);
-        List<Long> result = query.list();
-        return result != null && result.size() != 0;
+        Session currentSession = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.document.id FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
+            Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
+            query.setParameter("receiverId", organId);
+            query.setParameter("documentId", documentId);
+            List<Long> result = query.list();
+            return result != null && result.size() != 0;
+        } catch (Exception e) {
+            LOGGER.error("Error check allow document with document id " + documentId + " organId " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+            return false;
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
     }
 
-    public EdocNotification getByOrganAndDocumentId(long documentId, String organDomain) {
-        Session session = getCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
-        Query query = session.createQuery(sql.toString());
-        query.setParameter("receiverId", organDomain);
-        query.setParameter("documentId", documentId);
-        Object resultObj = query.getSingleResult();
-        if (resultObj != null) {
-            return (EdocNotification) resultObj;
+    public List<EdocNotification> getByOrganAndDocumentId(long documentId, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.document.id=:documentId");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("receiverId", organDomain);
+            query.setParameter("documentId", documentId);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error("Error get edoc notification by organ " + organDomain + " document id " + documentId + " cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
         }
-        return null;
     }
 
     public void setNotificationTaken(long documentId, String organId) throws SQLException {
-        Session currentSession = getCurrentSession();
+        Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE EdocNotification en SET en.taken=:taken where en.receiverId=:receiverId and en.document.id=:documentId");
         Query query = currentSession.createQuery(sql.toString());

@@ -2,17 +2,17 @@ package com.bkav.edoc.web.util.ExcelService;
 
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.entity.UserRole;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
+import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
-import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONArray;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -32,7 +32,8 @@ public class ExcelService {
     public List<User> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
         List<String> errors = new ArrayList<>();
-
+        int numUserSuccess = 0;
+        boolean flag = true;
 
         InputStream inputStream = file.getInputStream();
 
@@ -59,27 +60,48 @@ public class ExcelService {
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
-                if (currentCell.getStringCellValue().equals("")) {
-                    String nullData = "Null data at row " + rowNum;
-                    errors.add(nullData);
-                    LOGGER.error(nullData);
-                }
 
                 switch (cellIndex) {
                     case 1:
-                        user.setUsername(currentCell.getStringCellValue());
+                        String username = currentCell.getStringCellValue();
+                        if (username == "") {
+                            errors.add("Row " + rowNum + ": wrong username");
+                            flag = false;
+                        } else {
+                            user.setUsername(username);
+                        }
                         break;
 
                     case 2:
-                        user.setPassword(currentCell.getStringCellValue());
+                        String password = currentCell.getStringCellValue();
+                        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+                        if (password.equals("") || !password.matches(passwordRegex)) {
+                            errors.add("Row " + rowNum + ": wrong password");
+                            flag = false;
+                        } else {
+                            user.setPassword(password);
+                        }
                         break;
 
                     case 3:
-                        user.setEmailAddress(currentCell.getStringCellValue());
+                        String email = currentCell.getStringCellValue();
+                        String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
+                        if (email.equals("") || !email.matches(emailRegex)) {
+                            errors.add("Row " + rowNum + ": wrong email");
+                            flag = false;
+                        } else {
+                            user.setEmailAddress(email);
+                        }
                         break;
 
                     case 4:
-                        user.setDisplayName(currentCell.getStringCellValue());
+                        String displayName = currentCell.getStringCellValue();
+                        if (displayName.equals("")) {
+                            errors.add("Row " + rowNum + ": wrong display name");
+                            flag = false;
+                        } else {
+                            user.setDisplayName(currentCell.getStringCellValue());
+                        }
                         break;
 
                     case 5:
@@ -99,9 +121,6 @@ public class ExcelService {
                             user.setDynamicContact(organ);
                         }
                         break;
-
-                    default:
-                        break;
                 }
                 cellIndex++;
             }
@@ -110,8 +129,10 @@ public class ExcelService {
             user.setModifiedDate(currentDate);
             user.setLastLoginDate(currentDate);
             user.setStatus(true);
-
-            users.add(user);
+            if (flag == true) {
+                users.add(user);
+                numUserSuccess++;
+            }
             rowNum++;
         }
         workbook.close();
@@ -122,7 +143,7 @@ public class ExcelService {
         List<EdocDynamicContact> organs = new ArrayList<>();
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(1);
+        Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
         int rowNum = 0;
         while (rows.hasNext()) {
@@ -368,6 +389,12 @@ public class ExcelService {
                 // Set SSO field to true
                 user.setSso(true);
                 UserServiceUtil.createUser(user);
+                if (UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
+                    UserRole userRole = new UserRole();
+                    userRole.setUserId(user.getUserId());
+                    userRole.setRoleId(2);
+                    UserRoleServiceUtil.createUserRole(userRole);
+                }
             }
             count++;
         }

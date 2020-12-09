@@ -97,21 +97,16 @@ public class UserRestController {
             String message = "";
             int code = 200;
             if (editUserRequest != null) {
-                if (errors.size() == 0) {
-                    String organDomain = editUserRequest.getOrganDomain();
-                    EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
-                    User user = UserServiceUtil.findUserById(editUserRequest.getUserId());
-                    user.setDisplayName(editUserRequest.getDisplayName());
-                    user.setEmailAddress(editUserRequest.getEmailAddress());
-                    user.setDynamicContact(organization);
+                String organDomain = editUserRequest.getOrganDomain();
+                EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+                User user = UserServiceUtil.findUserById(editUserRequest.getUserId());
+                user.setDisplayName(editUserRequest.getDisplayName());
+                user.setEmailAddress(editUserRequest.getEmailAddress());
+                user.setDynamicContact(organization);
 
-                    UserCacheEntry userCacheEntry = MapperUtil.modelToUserCache(user);
-                    UserServiceUtil.updateUser(user);
-                    message = messageSourceUtil.getMessage("user.message.edit.success", null);
-                } else {
-                    code = 400;
-                    message = messageSourceUtil.getMessage("user.message.edit.fail", null);
-                }
+                UserCacheEntry userCacheEntry = MapperUtil.modelToUserCache(user);
+                UserServiceUtil.updateUser(user);
+                message = messageSourceUtil.getMessage("user.message.edit.success", null);
             }
             Response response = new Response(code, errors, message);
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));
@@ -131,7 +126,7 @@ public class UserRestController {
             long user_id = Long.parseLong(userId);
             UserCacheEntry user = UserServiceUtil.getUserById(user_id);
             if (user != null) {
-                return new ResponseEntity<>(user, HttpStatus.OK);
+                return   new ResponseEntity<>(user, HttpStatus.OK);
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -158,11 +153,6 @@ public class UserRestController {
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                     LOGGER.info(readFileSuccess);
                     return HttpStatus.OK;
-
-//                    LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!");
-//                    numOfUser = ExcelUtil.PushUsersToSSO(users);
-//                    return new ResponseEntity<>(numOfUser, HttpStatus.OK);
-
                 } else {
                     return HttpStatus.NOT_ACCEPTABLE;
                 }
@@ -177,14 +167,7 @@ public class UserRestController {
             LOGGER.error(uploadExcelError + e.getMessage());
             errors.add(uploadExcelError);
             return HttpStatus.INTERNAL_SERVER_ERROR;
-
-//            LOGGER.error("File invalid !!!!!!");
-//            return new ResponseEntity<>(numOfUser, HttpStatus.BAD_REQUEST);
         }
-//        catch (Exception e) {
-//            LOGGER.error("Error import user from file cause " + Arrays.toString(e.getStackTrace()));
-//            return new ResponseEntity<>(numOfUser, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
     }
 
 
@@ -251,7 +234,7 @@ public class UserRestController {
 
     @RequestMapping(value = "/public/-/user/export", method = RequestMethod.GET)
     public HttpStatus ExportUserToExcel() throws IOException {
-        boolean result = true;
+        boolean result;
         List<User> users = UserServiceUtil.getUser();
         result = ExcelUtil.exportUserToExcel(users);
         if (result)

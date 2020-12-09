@@ -172,19 +172,14 @@ public class ValidateUtil {
             Cell cell = cellIterator.next();
             if (colIndex == 0 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(1).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 1 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(2).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 2 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(3).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 3 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(4).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 4 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(5).getHeaderName())) {
                 colIndex++;
-                continue;
             } else if (colIndex == 5 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(6).getHeaderName())) {
                 colIndex++;
                 flag = true;

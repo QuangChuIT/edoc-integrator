@@ -311,13 +311,13 @@ $(document).ready(function () {
 
     // Click to show modal for upload file
     // Developing...
-    // $("#importUserFromExcel").on('click', function(e) {
-    //     e.preventDefault();
-    //     $('#formImportFromExcel').modal({
-    //         backdrop: 'static',
-    //         keyboard: false
-    //     })
-    // })
+    $("#importUserFromExcel").on('click', function(e) {
+        e.preventDefault();
+        $('#importExcelModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    })
 
 });
 

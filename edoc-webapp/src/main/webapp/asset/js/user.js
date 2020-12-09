@@ -312,8 +312,10 @@ $(document).on("change", "#importUserFromExcel", function (e) {
         contentType: false,
         cache: false,
         success: function (response) {
-            if (response === "OK")
+            if (response === "OK") {
                 $.notify(user_message.user_import_from_excel_success, "success");
+                $("#importUserFromExcel").val('');
+            }
             else if (response === "BAD_REQUEST")
                 $.notify(user_message.user_import_invalid_format_file, "error");
             // else if (response.code === 409)

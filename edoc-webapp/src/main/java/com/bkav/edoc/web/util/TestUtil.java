@@ -11,7 +11,6 @@ public class TestUtil {
         for (EdocDynamicContact edocDynamicContact : edocDynamicContactList) {
             String token = TokenUtil.getRandomNumber(edocDynamicContact.getDomain(), edocDynamicContact.getName());
             edocDynamicContact.setToken(token);
-            EdocDynamicContactServiceUtil.updateContact(edocDynamicContact);
         }
         System.out.println("done");
     }

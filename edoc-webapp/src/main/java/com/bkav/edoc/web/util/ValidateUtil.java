@@ -98,7 +98,7 @@ public class ValidateUtil {
             errors.add(messageSourceUtil.getMessage("organ.error.domain", null));
         }
 
-        if (contactRequest.getAddress().equals("")) {
+        /*if (contactRequest.getAddress().equals("")) {
             errors.add(messageSourceUtil.getMessage("organ.error.address", null));
         }
 
@@ -108,7 +108,7 @@ public class ValidateUtil {
 
         if (contactRequest.getEmail().equals("")) {
             errors.add(messageSourceUtil.getMessage("organ.error.email", null));
-        }
+        }*/
 
         return errors;
     }

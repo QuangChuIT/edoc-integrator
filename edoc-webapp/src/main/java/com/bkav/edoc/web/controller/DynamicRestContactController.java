@@ -2,11 +2,8 @@ package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
-import com.bkav.edoc.service.database.util.UserServiceUtil;
-import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.ContactRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.ExcelUtil;
@@ -22,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -74,11 +70,12 @@ public class DynamicRestContactController {
         if (organId != null) {
             long contactId = Long.parseLong(organId);
             EdocDynamicContact contact = EdocDynamicContactServiceUtil.findDynamicContactById(contactId);
+            OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
             String newToken = TokenUtil.getRandomNumber(contact.getDomain(), contact.getName());
             contact.setToken(newToken);
-            EdocDynamicContactServiceUtil.updateContact(contact);
-            OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
-            return new ResponseEntity<>(organizationCacheEntry, HttpStatus.OK);
+            EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, contact);
+            OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
+            return new ResponseEntity<>(cacheEntry, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
@@ -94,7 +91,7 @@ public class DynamicRestContactController {
                 errors = validateUtil.validateAddOrgan(contactRequest);
                 if (errors.size() == 0) {
                     EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(contactRequest.getId());
-
+                    OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(organ);
                     organ.setDomain(contactRequest.getDomain());
                     organ.setName(contactRequest.getName());
                     organ.setAddress(contactRequest.getAddress());
@@ -103,7 +100,7 @@ public class DynamicRestContactController {
                     if (!contactRequest.getTelephone().equals(""))
                         organ.setTelephone(contactRequest.getTelephone());
 
-                    EdocDynamicContactServiceUtil.updateContact(organ);
+                    EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, organ);
                     message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {
                     code = 400;
@@ -129,11 +126,11 @@ public class DynamicRestContactController {
         long count = 0;
         try {
             if (validateUtil.checkExtensionFile(file)) {
-                if(true) {
+                if (true) {
                     List<EdocDynamicContact> organs = ExcelUtil.importOrganFromExcel(file);
-                    for (EdocDynamicContact organ: organs) {
-                            EdocDynamicContactServiceUtil.createContact(organ);
-                            count++;
+                    for (EdocDynamicContact organ : organs) {
+                        EdocDynamicContactServiceUtil.createContact(organ);
+                        count++;
                     }
                     String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                     errors.add(readFileSuccess);

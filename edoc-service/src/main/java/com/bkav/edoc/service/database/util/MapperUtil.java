@@ -295,8 +295,14 @@ public class MapperUtil {
             userCacheEntry.setUserId(user.getUserId());
             userCacheEntry.setUsername(user.getUsername());
             userCacheEntry.setDisplayName(user.getDisplayName());
-            OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(user.getDynamicContact());
-            userCacheEntry.setOrganization(organizationCacheEntry);
+            EdocDynamicContact edocDynamicContact = user.getDynamicContact();
+            if (edocDynamicContact != null) {
+                OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(edocDynamicContact);
+                userCacheEntry.setOrganization(organizationCacheEntry);
+            } else {
+                userCacheEntry.setOrganization(new OrganizationCacheEntry());
+            }
+
             userCacheEntry.setOnSso(user.isSso());
         } catch (Exception e) {
             LOGGER.error("Error when convert user entry to cached entry cause " + e);

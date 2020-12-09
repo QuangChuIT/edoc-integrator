@@ -92,22 +92,20 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
     }
 
     @Override
-    public boolean deleteOrgan(long organId) {
+    public EdocDynamicContact deleteOrgan(long organId) {
         Session session = openCurrentSession();
-        boolean result;
+        EdocDynamicContact contact = null;
         try {
             session.beginTransaction();
             EdocDynamicContact organ = this.findById(organId);
             if (organ == null) {
                 LOGGER.error("Error delete organ not found document with id " + organId);
-                result = false;
             } else {
                 session.delete(organ);
                 session.getTransaction().commit();
-                result = true;
+                contact = organ;
             }
         } catch (Exception e) {
-            result = false;
             LOGGER.error("Error delete organ with id " + organId + " cause " + e.getMessage());
             session.getTransaction().rollback();
         } finally {
@@ -115,7 +113,7 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
                 session.close();
             }
         }
-        return result;
+        return contact;
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);

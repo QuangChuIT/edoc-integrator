@@ -98,21 +98,14 @@ public class UserRestController {
             String message = "";
             int code = 200;
             if (editUserRequest != null) {
-                if (errors.size() == 0) {
-                    String organDomain = editUserRequest.getOrganDomain();
-                    EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
-                    User user = UserServiceUtil.findUserById(editUserRequest.getUserId());
-                    user.setDisplayName(editUserRequest.getDisplayName());
-                    user.setEmailAddress(editUserRequest.getEmailAddress());
-                    user.setDynamicContact(organization);
-
-                    UserCacheEntry userCacheEntry = MapperUtil.modelToUserCache(user);
-                    UserServiceUtil.updateUser(user);
-                    message = messageSourceUtil.getMessage("user.message.edit.success", null);
-                } else {
-                    code = 400;
-                    message = messageSourceUtil.getMessage("user.message.edit.fail", null);
-                }
+                String organDomain = editUserRequest.getOrganDomain();
+                EdocDynamicContact organization = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+                User user = UserServiceUtil.findUserById(editUserRequest.getUserId());
+                user.setDisplayName(editUserRequest.getDisplayName());
+                user.setEmailAddress(editUserRequest.getEmailAddress());
+                user.setDynamicContact(organization);
+                UserServiceUtil.updateUser(user);
+                message = messageSourceUtil.getMessage("user.message.edit.success", null);
             }
             Response response = new Response(code, errors, message);
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));

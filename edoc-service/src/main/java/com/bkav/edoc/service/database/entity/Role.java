@@ -97,4 +97,5 @@ public class Role implements Serializable {
     public void setVersion(Date version) {
         this.version = version;
     }
+
 }

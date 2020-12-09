@@ -53,9 +53,27 @@ public class EdocDynamicContactService {
         return dynamicContactDaoImpl.findById(contactId);
     }
 
-    public void updateContact(EdocDynamicContact edocDynamicContact) {
+    public void updateContact(OrganizationCacheEntry cacheEntry, EdocDynamicContact edocDynamicContact) {
         dynamicContactDaoImpl.updateContact(edocDynamicContact);
+        List<OrganizationCacheEntry> organizationCacheEntries;
+        String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_KEY);
+        organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
 
+        if (organizationCacheEntries == null) {
+            organizationCacheEntries = new ArrayList<>();
+
+            List<EdocDynamicContact> contacts = dynamicContactDaoImpl.findAll();
+
+            for (EdocDynamicContact contact : contacts) {
+                OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
+                organizationCacheEntries.add(organizationCacheEntry);
+            }
+        } else {
+            organizationCacheEntries.remove(cacheEntry);
+            OrganizationCacheEntry newEntry = MapperUtil.modelToOrganCache(edocDynamicContact);
+            organizationCacheEntries.add(newEntry);
+        }
+        MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
     }
 
     public OrganizationCacheEntry findById(long organId) {
@@ -87,7 +105,6 @@ public class EdocDynamicContactService {
     public List<OrganizationCacheEntry> getAllContacts() {
         List<OrganizationCacheEntry> organizationCacheEntries;
         String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_KEY);
-        MemcachedUtil.getInstance().delete(cacheKey);
         organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
 
         if (organizationCacheEntries == null) {
@@ -137,6 +154,28 @@ public class EdocDynamicContactService {
     }
 
     public boolean deleteOrgan(long organId) {
-        return dynamicContactDaoImpl.deleteOrgan(organId);
+        EdocDynamicContact contactDel = dynamicContactDaoImpl.deleteOrgan(organId);
+        boolean result = false;
+        if (contactDel != null) {
+            List<OrganizationCacheEntry> organizationCacheEntries;
+            String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_KEY);
+            organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
+            OrganizationCacheEntry organizationCacheEntryDel = MapperUtil.modelToOrganCache(contactDel);
+            if (organizationCacheEntries == null) {
+                organizationCacheEntries = new ArrayList<>();
+
+                List<EdocDynamicContact> contacts = dynamicContactDaoImpl.findAll();
+
+                for (EdocDynamicContact contact : contacts) {
+                    OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
+                    organizationCacheEntries.add(organizationCacheEntry);
+                }
+            } else {
+                organizationCacheEntries.remove(organizationCacheEntryDel);
+            }
+            MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
+            result = true;
+        }
+        return result;
     }
 }

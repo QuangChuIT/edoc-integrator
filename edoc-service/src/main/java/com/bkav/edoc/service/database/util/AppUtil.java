@@ -97,7 +97,9 @@ public class AppUtil {
         String finalQuery = null;
         if (!AppUtil.isObjectEmpty(paginationCriteria)) {
             finalQuery = baseQuery
-                    .replaceAll("#WHERE_CLAUSE#", ((AppUtil.isObjectEmpty(paginationCriteria.getFilterByClause())) ? "" : " AND ") + paginationCriteria.getFilterByClause())
+                    .replaceAll("#WHERE_CLAUSE#",
+                            ((AppUtil.isObjectEmpty(paginationCriteria.getFilterByClause())) ? "" : " AND ")
+                                    + paginationCriteria.getFilterByClause())
                     .replaceAll("#ORDER_CLASUE#", paginationCriteria.getOrderByClause());
         }
         return (null == finalQuery) ? baseQuery : finalQuery;

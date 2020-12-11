@@ -11,6 +11,7 @@ import com.bkav.edoc.web.OAuth2Constants;
 import com.bkav.edoc.web.auth.CookieUtil;
 import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
+import com.bkav.edoc.web.util.CommonUtils;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
 import com.google.gson.Gson;
@@ -246,22 +247,12 @@ public class DocumentRestController {
         System.out.println("sort direction " + sortDirection);*/
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
         int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode);
         DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);
-        if (!AppUtil.isObjectEmpty(entries)) {
-            if (!AppUtil.isObjectEmpty(entries)) {
-                dataTableResult.setRecordsTotal(totalCount);
-
-                if (datatableRequest.getPaginationRequest().isFilterByEmpty()) {
-                    dataTableResult.setRecordsFiltered(totalCount);
-                } else {
-                    dataTableResult.setRecordsFiltered(entries.size());
-                }
-            }
-        }
+        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
         return new Gson().toJson(dataTableResult);
     }
 

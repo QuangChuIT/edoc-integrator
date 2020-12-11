@@ -2,14 +2,15 @@ package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.pagination.DataTableResult;
+import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.web.payload.ContactRequest;
 import com.bkav.edoc.web.payload.Response;
-import com.bkav.edoc.web.util.ExcelUtil;
-import com.bkav.edoc.web.util.MessageSourceUtil;
-import com.bkav.edoc.web.util.TokenUtil;
-import com.bkav.edoc.web.util.ValidateUtil;
+import com.bkav.edoc.web.util.*;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +38,17 @@ public class DynamicRestContactController {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
     )
     @ResponseBody
-    public ResponseEntity<?> getAllContact() {
-        try {
-            List<OrganizationCacheEntry> organs = EdocDynamicContactServiceUtil.getAllContacts();
-            if (organs != null) {
-                return new ResponseEntity<>(organs, HttpStatus.OK);
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public String getAllContact(HttpServletRequest request) {
+        DatatableRequest<OrganizationCacheEntry> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        int count = EdocDynamicContactServiceUtil.countContacts(pagination);
+        List<OrganizationCacheEntry> organs = EdocDynamicContactServiceUtil.getContacts(pagination);
+        DataTableResult<OrganizationCacheEntry> dataTableResult = new DataTableResult<>();
+        datatableRequest.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(organs);
+        dataTableResult.setRecordsTotal(count);
+        dataTableResult = new CommonUtils<OrganizationCacheEntry>().getDataTableResult(dataTableResult, organs, count, datatableRequest);
+        return new Gson().toJson(dataTableResult);
     }
 
     @RequestMapping(value = "/contact/-/document/contacts/{organId}", //

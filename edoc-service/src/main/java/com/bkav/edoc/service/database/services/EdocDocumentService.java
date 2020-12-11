@@ -90,6 +90,30 @@ public class EdocDocumentService {
         return result;
     }
 
+    public List<EdocDocument> getDocumentList() {
+        Session session = documentDaoImpl.openCurrentSession();
+        try {
+            session.beginTransaction();
+            Query<EdocDocument> query = session.createNativeQuery("{ call GetDocuments()}", EdocDocument.class);
+            List<EdocDocument> documents = query.getResultList();
+            System.out.println(documents.size());
+            session.getTransaction().commit();
+            return documents;
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            return new ArrayList<>();
+        } finally {
+            documentDaoImpl.closeCurrentSession(session);
+        }
+    }
+
+    public static void main(String[] args) {
+        List<EdocDocument> documents = new EdocDocumentService().getDocumentList();
+        for (EdocDocument document : documents) {
+            System.out.println(document.getDocumentDetail().getSignerFullName());
+        }
+    }
+
     public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
         List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
@@ -121,7 +145,7 @@ public class EdocDocumentService {
             List<EdocDocument> documents = query.getResultList();
             if (documents.size() > 0) {
                 for (EdocDocument document : documents) {
-                    DocumentCacheEntry documentCacheEntry = MapperUtil.modelToDocumentCached(document);
+                    DocumentCacheEntry documentCacheEntry = MapperUtil.documentToCached(document);
                     if (documentCacheEntry != null) {
                         entries.add(documentCacheEntry);
                     }

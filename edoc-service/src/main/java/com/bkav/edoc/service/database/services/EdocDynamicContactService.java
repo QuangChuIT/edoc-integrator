@@ -3,6 +3,7 @@ package com.bkav.edoc.service.database.services;
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
@@ -105,6 +106,7 @@ public class EdocDynamicContactService {
     public List<OrganizationCacheEntry> getAllContacts() {
         List<OrganizationCacheEntry> organizationCacheEntries;
         String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_KEY);
+        MemcachedUtil.getInstance().delete(cacheKey);
         organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
 
         if (organizationCacheEntries == null) {
@@ -121,6 +123,14 @@ public class EdocDynamicContactService {
         }
 
         return organizationCacheEntries;
+    }
+
+    public List<OrganizationCacheEntry> getContacts(PaginationCriteria paginationCriteria){
+        return new ArrayList<>();
+    }
+
+    public int countContacts(PaginationCriteria paginationCriteria){
+        return 0;
     }
 
     public Long countOrgan(String domain) {
@@ -159,6 +169,7 @@ public class EdocDynamicContactService {
         if (contactDel != null) {
             List<OrganizationCacheEntry> organizationCacheEntries;
             String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_KEY);
+            MemcachedUtil.getInstance().delete(cacheKey);
             organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
             OrganizationCacheEntry organizationCacheEntryDel = MapperUtil.modelToOrganCache(contactDel);
             if (organizationCacheEntries == null) {

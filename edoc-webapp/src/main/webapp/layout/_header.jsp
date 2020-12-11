@@ -46,7 +46,7 @@
                     String changePassUrl = PropsUtil.get("user.change.password.url");
                 %>
                 <li>
-                    <a class="user-info" href="<%= changePassUrl %>">
+                    <a class="change-password" href="<%= changePassUrl %>" target="_blank">
                         <i class="fa fa-key fa-fw"></i>
                         <spring:message code="user.change.password"/>
                     </a>

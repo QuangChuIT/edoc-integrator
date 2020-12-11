@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, Long> implements EdocDynamicContactDao {
@@ -39,23 +40,36 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
     @Override
     public List<EdocDynamicContact> getDynamicContactsByDomainFilter(String domain) {
         Session currentSession = openCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain");
-        Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
-        query.setParameter("domain", StringPool.PERCENT + domain + StringPool.PERCENT);
-        closeCurrentSession(currentSession);
-        return query.list();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain");
+            Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
+            query.setParameter("domain", StringPool.PERCENT + domain + StringPool.PERCENT);
+            return query.list();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(currentSession);
+        }
     }
 
     @Override
     public Long countOrgan(String organDomain) {
         Session currentSession = openCurrentSession();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain");
-        Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
-        query.setParameter("domain", StringPool.PERCENT + organDomain + StringPool.PERCENT);
-        closeCurrentSession(currentSession);
-        return query.uniqueResult();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain");
+            Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
+            query.setParameter("domain", StringPool.PERCENT + organDomain + StringPool.PERCENT);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return 0L;
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+
     }
 
     @Override

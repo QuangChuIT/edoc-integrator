@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.util;
 
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.services.EdocDynamicContactService;
 
 import java.util.List;
@@ -12,6 +13,14 @@ public class EdocDynamicContactServiceUtil {
 
     public static List<OrganizationCacheEntry> getAllContacts() {
         return DYNAMIC_CONTACT_SERVICE.getAllContacts();
+    }
+
+    public static int countContacts(PaginationCriteria paginationCriteria) {
+        return DYNAMIC_CONTACT_SERVICE.countContacts(paginationCriteria);
+    }
+
+    public static List<OrganizationCacheEntry> getContacts(PaginationCriteria paginationCriteria) {
+        return DYNAMIC_CONTACT_SERVICE.getContacts(paginationCriteria);
     }
 
     public static void createContact(EdocDynamicContact edocDynamicContact) {

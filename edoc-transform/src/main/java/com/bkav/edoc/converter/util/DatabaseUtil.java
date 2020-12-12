@@ -207,5 +207,26 @@ public class DatabaseUtil {
     }
 
 
+    public static List<EdocDocument> getDocumentByCounterDate(Connection connection, java.sql.Date _counterDate) {
+        List<EdocDocument> documents = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOCUMENT_BY_COUNTER_DATE);
+            preparedStatement.setDate(1, _counterDate);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                EdocDocument edocDocument = new EdocDocument();
+                edocDocument.setFromOrganDomain(resultSet.getString(1));
+                edocDocument.setToOrganDomain(resultSet.getString(2));
+                edocDocument.setSentDate(resultSet.getDate(3));
+                documents.add(edocDocument);
+            }
+            resultSet.close();
+            preparedStatement.close();
+        } catch (SQLException throwable) {
+            LOGGER.error(throwable);
+        }
+        return documents;
+    }
+
     private static final Logger LOGGER = Logger.getLogger(DatabaseUtil.class);
 }

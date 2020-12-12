@@ -97,7 +97,10 @@ let app_message = {
     "edoc_after_second_content": "giữa {0} đơn vị",
     "edoc_after_last_content": "(Tự động cập nhật lúc {0})",
     "edoc_report_filter": "Hiển thị kết quả thống kê trong khoảng: ",
-    "edoc_report_default_filter": "Hiển thị kết quả thống đến: "
+    "edoc_report_default_filter": "Hiển thị kết quả thống đến: ",
+    "edoc_delete_document_success" : "Kết thúc văn bản thành công !",
+    "edoc_delete_document_false" : "Kết thúc văn bản thất bại !",
+    "edoc_delete_document_error" : "Đã xảy ra lỗi trong quá trình kết thúc văn bản !",
 };
 
 let user_message = {

@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao<T, Id> {
@@ -63,7 +64,7 @@ public abstract class RootDaoImpl<T, Id extends Serializable> implements RootDao
         try {
             return session.get(clazz, id);
         } catch (Exception e) {
-            LOGGER.error("Error find by id " + id);
+            LOGGER.error("Error find by id " + id + " cause " + Arrays.toString(e.getStackTrace()));
             return null;
         } finally {
             closeCurrentSession(session);

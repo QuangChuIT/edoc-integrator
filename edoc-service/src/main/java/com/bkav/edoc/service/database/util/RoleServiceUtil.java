@@ -6,7 +6,7 @@ import com.bkav.edoc.service.database.services.RoleService;
 public class RoleServiceUtil {
     private static final RoleService ROLE_SERVICE = new RoleService();
 
-    public static void createRole (Role role) {
+    public static void createRole(Role role) {
         ROLE_SERVICE.createRole(role);
     }
 
@@ -14,4 +14,7 @@ public class RoleServiceUtil {
         return ROLE_SERVICE.checkExistRoleByRoleName(roleName);
     }
 
+    public static Role getRole(long roleId) {
+        return ROLE_SERVICE.getRoleById(roleId);
+    }
 }

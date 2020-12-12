@@ -43,7 +43,6 @@ let edocDocument = {
                     selector: 'tbody tr td',
                     callback: function (key, options) {
                         let id = options.$trigger[0].parentElement.id;
-                        let m = "clicked: " + key + ' ' + id;
                         instance.deleteDocument(id);
                     },
                     items: {
@@ -165,13 +164,14 @@ let edocDocument = {
                 type: "DELETE",
                 statusCode: {
                     200: function (response) {
-                        $.notify("Delete document success", "success");
+                        $("#" + documentId).remove();
+                        $.notify(app_message.edoc_delete_document_success, "success");
                     },
                     400: function (response) {
-                        $.notify("Delete document error", "success");
+                        $.notify(app_message.edoc_delete_document_false, "error");
                     },
                     500: function (response) {
-                        $.notify("Delete document error", "success");
+                        $.notify(app_message.edoc_delete_document_error, "error");
                     }
                 }
             })
@@ -379,7 +379,12 @@ $(document).ready(function () {
             });
             data.toOrganName = toOrganNames.join(", ");
             data.code = data.codeNumber + "/" + data.codeNotation;
-            $("#" + documentId).removeClass("not-visited");
+            let documentEle = $("#" + documentId);
+            if(documentEle.hasClass("not-visited")){
+                documentEle.removeClass("not-visited");
+                documentEle.find(".edoc-subject").find("#statusViewDoc").remove();
+                documentEle.find(".edoc-subject").prepend("<i class=\"fa fa-envelope-open-o fa-fw\" id=\"statusViewDoc\"></i>")
+            }
             $('#edoc-detail').empty();
             console.log(data);
             $('#edocDetailTemplate').tmpl(data).appendTo('#edoc-detail');

@@ -130,7 +130,7 @@ let userManage = {
                 statusCode: {
                     200: function (response) {
                         $.notify(user_message.user_delete_success, "success");
-                        instance.renderUserDatatable();
+                        $("#" + userId).remove();
                     },
                     400: function (response) {
                         $.notify(user_message.user_delete_fail, "error");

@@ -4,7 +4,8 @@
 <%@ page import="com.bkav.edoc.service.kernel.util.Base64" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
@@ -39,6 +40,15 @@
                     <a class="user-info" href="javascript:void(0)" data-id="<%=user.getUserId()%>">
                         <i class="fa fa-user fa-fw"></i>
                         <spring:message code="user.profile"/>
+                    </a>
+                </li>
+                <%
+                    String changePassUrl = PropsUtil.get("user.change.password.url");
+                %>
+                <li>
+                    <a class="change-password" href="<%= changePassUrl %>" target="_blank">
+                        <i class="fa fa-key fa-fw"></i>
+                        <spring:message code="user.change.password"/>
                     </a>
                 </li>
                 <li>

@@ -101,8 +101,10 @@ let organManage = {
             }
         });
     },
+
     createOrgan: function() {
         let instance = this;
+
         let name = $("#name").val();
         let domain = $("#domain").val();
         let address = $("#address").val();
@@ -127,7 +129,7 @@ let organManage = {
                 url: "/public/-/organ/create",
                 data: JSON.stringify(contactRequest),
                 cache: false,
-                success: function (response){
+                success: function (response) {
                     if (response.code === 200) {
                         $.notify(organ_message.organ_add_new_success, "success");
                         $('#formAddOrgan').modal('toggle');
@@ -168,7 +170,7 @@ let organManage = {
             url: "/contact/-/update/contact",
             data: JSON.stringify(contactRequest),
             cache: false,
-            success: function (response){
+            success: function (response) {
                 if (response.code === 200) {
                     $.notify(organ_message.organ_edit_success, "success");
                 } else {
@@ -192,6 +194,7 @@ let organManage = {
                 statusCode: {
                     200: function (response) {
                         $.notify(organ_message.organ_delete_success, "success");
+                        $("#" + organId).remove();
                     },
                     400: function (response) {
                         $.notify(organ_message.organ_delete_fail, "error");
@@ -218,7 +221,7 @@ $(document).ready(function () {
         });
     });
 
-    $("#addOrgan").on('click', function(e) {
+    $("#addOrgan").on('click', function (e) {
         e.preventDefault();
         $("#formAddOrgan").modal({
             backdrop: 'static',
@@ -310,13 +313,13 @@ $(document).on("click", "#btn-addOrgan-cancel", function (event) {
 });
 
 // Button in Edit organ form
-$(document).on('click', '#btn-edit-organ-confirm', function(e) {
+$(document).on('click', '#btn-edit-organ-confirm', function (e) {
     e.preventDefault();
     let organId = $(this).attr("data-id");
 
     organManage.editOrgan(organId);
 })
-$(document).on('click', '#btn-edit-organ-cancel', function(e) {
+$(document).on('click', '#btn-edit-organ-cancel', function (e) {
     e.preventDefault();
     $("#formEditOrgan").toggle();
 })

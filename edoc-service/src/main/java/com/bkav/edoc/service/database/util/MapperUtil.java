@@ -39,6 +39,99 @@ public class MapperUtil {
         return new DocumentCacheEntry();
     }
 
+    public static DocumentCacheEntry documentToCached(EdocDocument document) {
+        try {
+            DocumentCacheEntry documentCacheEntry = new DocumentCacheEntry();
+            documentCacheEntry.setDocumentId(document.getDocumentId());
+            documentCacheEntry.setEdXMLDocId(document.getEdXMLDocId());
+            documentCacheEntry.setCreateDate(document.getCreateDate());
+            documentCacheEntry.setModifiedDate(document.getModifiedDate());
+            documentCacheEntry.setSubject(document.getSubject());
+            documentCacheEntry.setPromulgationDate(document.getPromulgationDate());
+            documentCacheEntry.setPromulgationPlace(document.getPromulgationPlace());
+            documentCacheEntry.setDocumentType(document.getDocumentType());
+            documentCacheEntry.setDocumentTypeName(document.getDocumentTypeName());
+            documentCacheEntry.setSendExt(document.getSendExt());
+            documentCacheEntry.setVisited(document.getVisited());
+            String codeNation = document.getCodeNotation();
+            if (codeNation.contains("#")) {
+                codeNation = codeNation.substring(0, codeNation.indexOf("#"));
+            }
+            documentCacheEntry.setShortenSubject(StringUtil.shorten(document.getSubject(), 90));
+            documentCacheEntry.setCodeNotation(codeNation);
+            documentCacheEntry.setCodeNumber(document.getCodeNumber());
+            if (document.getDocCode() == null) {
+                String docCode = document.getCodeNumber() + "/" + document.getCodeNotation();
+                documentCacheEntry.setDocCode(docCode);
+            } else {
+                documentCacheEntry.setDocCode(document.getDocCode());
+            }
+            documentCacheEntry.setSentDate(document.getSentDate());
+            String fromOrganDomain = document.getFromOrganDomain();
+            OrganizationCacheEntry fromOrganCache = EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(fromOrganDomain);
+            documentCacheEntry.setFromOrgan(fromOrganCache);
+            String toOrgan = document.getToOrganDomain();
+            String[] toOrgans = toOrgan.split("#");
+            List<OrganizationCacheEntry> toContacts = new ArrayList<>();
+            for (String toDomain : toOrgans) {
+                OrganizationCacheEntry toOrganCache = EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(toDomain);
+                toContacts.add(toOrganCache);
+            }
+            EdocPriority priority = EDOC_PRIORITY_SERVICE.findById(document.getPriority());
+            documentCacheEntry.setPriority(priority);
+            documentCacheEntry.setToOrgan(toContacts);
+            documentCacheEntry.setDraft(document.getDraft());
+            documentCacheEntry.setVisible(document.getVisible());
+            DocumentDetailCacheEntry documentDetailCacheEntry = new DocumentDetailCacheEntry();
+            if (document.getDocumentDetail() != null) {
+                documentDetailCacheEntry = MapperUtil.modelToDocumentDetailCached(document.getDocumentDetail());
+            }
+            documentCacheEntry.setDocumentDetail(documentDetailCacheEntry);
+            /*Set<EdocAttachment> attachments = document.getAttachments();
+            List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
+            if (attachments.size() > 0) {
+                for (EdocAttachment attachment : attachments) {
+                    AttachmentCacheEntry attachmentCacheEntry = MapperUtil.modelToAttachmentCache(attachment);
+                    attachmentCacheEntry.setDocumentId(document.getDocumentId());
+                    attachmentCacheEntries.add(attachmentCacheEntry);
+                }
+            }
+            documentCacheEntry.setAttachments(attachmentCacheEntries);
+            List<TraceCacheEntry> traces = new ArrayList<>();
+            Set<EdocTrace> edocTraces = document.getTraces();
+            if (edocTraces.size() > 0) {
+                for (EdocTrace edocTrace : edocTraces) {
+                    TraceCacheEntry traceCacheEntry = MapperUtil.modelToTraceCache(edocTrace);
+                    traceCacheEntry.setDocumentId(document.getDocumentId());
+                    traces.add(traceCacheEntry);
+                }
+            }
+            traces.sort(Comparator.comparing(TraceCacheEntry::getTimeStamp));
+            documentCacheEntry.setTraces(traces);
+            TraceHeaderListCacheEntry traceHeaderListCacheEntry = MapperUtil.modelToTraceHeaderListCache(document.getTraceHeaderList());
+            traceHeaderListCacheEntry.setDocumentId(document.getDocumentId());
+            documentCacheEntry.setTraceHeaderList(traceHeaderListCacheEntry);
+
+            List<NotificationCacheEntry> notificationCacheEntries = new ArrayList<>();
+
+            Set<EdocNotification> notifications = document.getNotifications();
+
+            if (notifications.size() > 0) {
+                for (EdocNotification notification : notifications) {
+                    NotificationCacheEntry notificationCacheEntry = MapperUtil.modelToNotificationCache(notification);
+                    notificationCacheEntry.setDocumentId(document.getDocumentId());
+                    notificationCacheEntries.add(notificationCacheEntry);
+                }
+            }
+            documentCacheEntry.setNotifications(notificationCacheEntries);*/
+            return documentCacheEntry;
+        } catch (Exception e) {
+            LOGGER.error("Error convert document model to cache entry with document id "
+                    + document.getDocumentId() + " clause " + Arrays.toString(e.getStackTrace()));
+            return null;
+        }
+    }
+
     public static DocumentCacheEntry modelToDocumentCached(EdocDocument document) {
         try {
             DocumentCacheEntry documentCacheEntry = new DocumentCacheEntry();
@@ -295,8 +388,14 @@ public class MapperUtil {
             userCacheEntry.setUserId(user.getUserId());
             userCacheEntry.setUsername(user.getUsername());
             userCacheEntry.setDisplayName(user.getDisplayName());
-            OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(user.getDynamicContact());
-            userCacheEntry.setOrganization(organizationCacheEntry);
+            EdocDynamicContact edocDynamicContact = user.getDynamicContact();
+            if (edocDynamicContact != null) {
+                OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(edocDynamicContact);
+                userCacheEntry.setOrganization(organizationCacheEntry);
+            } else {
+                userCacheEntry.setOrganization(new OrganizationCacheEntry());
+            }
+
             userCacheEntry.setOnSso(user.isSso());
         } catch (Exception e) {
             LOGGER.error("Error when convert user entry to cached entry cause " + e);

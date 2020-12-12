@@ -6,6 +6,8 @@
 <%@ page import="com.bkav.edoc.service.database.util.UserRoleServiceUtil" %>
 <%@ page import="com.bkav.edoc.service.database.entity.User" %>
 <%@ page import="com.bkav.edoc.service.database.entity.UserRole" %>
+<%@ page import="com.bkav.edoc.service.database.entity.Role" %>
+<%@ page import="com.bkav.edoc.service.database.util.RoleServiceUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -14,7 +16,12 @@
     String userLog = new String(Base64.decode(userCookie), StandardCharsets.UTF_8);
     User user = new Gson().fromJson(userLog, User.class);
     UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
-    long role = userRole.getRoleId();
+    String roleKey = "USER";
+    if(userRole != null){
+        long roleId= userRole.getRoleId();
+        Role role = RoleServiceUtil.getRole(roleId);
+        roleKey = role.getRoleKey();
+    }
 %>
 <div class="edoc-action">
     <button class="btn btn-lg btn-create-edoc">
@@ -71,7 +78,7 @@
             </a>
         </li>
         <%
-            if(role == 0 || role == 1) {
+            if(roleKey.equals("ADMIN") || roleKey.equals("SUPER ADMIN")) {
         %>
         <li>
             <a href="javascript:void(0)" data-mode="system" class="system-management-menu not-click">

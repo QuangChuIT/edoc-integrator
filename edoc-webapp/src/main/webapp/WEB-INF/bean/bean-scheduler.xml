@@ -92,4 +92,34 @@
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
+
+    <!--Declare scheduler for Get status from VPCP-->
+    <bean name="getOrganJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetOrganizationJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="getOrganizationBean" value-ref="getOrganizationBean"/>
+            </map>
+        </property>
+    </bean>
+
+
+    <bean id="getOrganizationTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="getOrganJobDetail"/>
+        <property name="cronExpression" value="0 */15 * ? * *"/>
+        <!--<property name="cronExpression" value="0 0 2 ? * *"/>-->
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="getOrganizationTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
 </beans>

@@ -380,20 +380,24 @@ public class ExcelService {
          Convert user object to json
          Then, push json to sso */
         for (User user : users) {
+
             String json = PostUserToSSO.createJson(user);
             String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
 
             // If push to sso successfully
             // Then, insert user object to database
             if (!out.equals("")) {
-                // Set SSO field to true
-                user.setSso(true);
-                UserServiceUtil.createUser(user);
-                if (UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
-                    UserRole userRole = new UserRole();
-                    userRole.setUserId(user.getUserId());
-                    userRole.setRoleId(2);
-                    UserRoleServiceUtil.createUserRole(userRole);
+                User checkExist = UserServiceUtil.finUserByUsername(user.getUsername());
+                if (checkExist == null) {
+                    // Set SSO field to true
+                    user.setSso(true);
+                    UserServiceUtil.createUser(user);
+                    if (!UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
+                        UserRole userRole = new UserRole();
+                        userRole.setUserId(user.getUserId());
+                        userRole.setRoleId(4234343);
+                        UserRoleServiceUtil.createUserRole(userRole);
+                    }
                 }
             }
             count++;

@@ -23,14 +23,20 @@ public class RoleDaoImpl extends RootDaoImpl<Role, Long> implements RoleDao {
     @Override
     public boolean checkExistRoleByRoleName(String roleName) {
         Session session = openCurrentSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Long> query = builder.createQuery(Long.class);
-        Root<Role> root = query.from(Role.class);
-        query.select(builder.count(root.get("roleName")));
-        query.where(builder.equal(root.get("roleName"), roleName));
-        Long result = session.createQuery(query).getSingleResult();
-        closeCurrentSession(session);
-        return result > 0L;
+        try{
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Long> query = builder.createQuery(Long.class);
+            Root<Role> root = query.from(Role.class);
+            query.select(builder.count(root.get("roleName")));
+            query.where(builder.equal(root.get("roleName"), roleName));
+            Long result = session.createQuery(query).getSingleResult();
+            return result > 0L;
+        } catch (Exception e){
+            LOGGER.error(e);
+            return false;
+        } finally {
+            closeCurrentSession(session);
+        }
     }
 
     private final static Logger LOGGER = Logger.getLogger(RoleDaoImpl.class);

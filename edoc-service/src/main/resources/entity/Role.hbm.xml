@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.Role" table="role">
+        <id name="roleId" type="java.lang.Long">
+            <column name="role_id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="roleKey" type="string" column="role_key"/>
+        <property name="roleName" type="string" column="role_name"/>
+        <property name="description" type="string" column="description"/>
+        <property name="active" type="boolean" column="active"/>
+        <property name="createByUserId" type="long" column="create_by_user_id"/>
+        <property name="createDate" type="timestamp" column="create_date"/>
+        <property name="lastModifyByUserId" type="long" column="last_modify_by_user_id"/>
+        <property name="lastModifyOnDate" type="timestamp" column="last_modify_on_date"/>
+        <property name="version" type="timestamp" column="version"/>
+    </class>
+</hibernate-mapping>

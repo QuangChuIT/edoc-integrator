@@ -10,7 +10,8 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.List" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+    <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -21,7 +22,8 @@
     request.setAttribute("priorityList", priorityList);
     List<EdocDocumentType> typeList = EdocTypeServiceUtil.getTypes();
     request.setAttribute("typeList", typeList);
-    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getAllContacts();
+    String organToQuery = PropsUtil.get("edoc.root.organDomain");
+    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByFilterDomain(organToQuery);
     String organLogin = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
     String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
     String userLogin = new String(Base64.decode(organCookie), StandardCharsets.UTF_8);
@@ -803,9 +805,9 @@
         <a href="javascript:void(0)" title="${subject}" data-id="${documentId}"
             class="edoc-subject {{if visited==false}}${app_message.edoc_new_document}{{/if}}">
             {{if visited}}
-                <i class="fa fa-envelope-open-o fa-fw"></i>
+                <i class="fa fa-envelope-open-o fa-fw" id="statusViewDoc"></i>
             {{else}}
-                <i class="fa fa-envelope-o fa-fw"></i>
+                <i class="fa fa-envelope-o fa-fw" id="statusViewDoc"></i>
             {{/if}}
             <span>${shortenSubject.trim()}</span>
         </a>

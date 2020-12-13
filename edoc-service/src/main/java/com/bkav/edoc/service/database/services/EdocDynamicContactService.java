@@ -8,9 +8,15 @@ import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EdocDynamicContactService {
     private static final EdocDynamicContactDaoImpl dynamicContactDaoImpl = new EdocDynamicContactDaoImpl();
@@ -125,11 +131,48 @@ public class EdocDynamicContactService {
         return organizationCacheEntries;
     }
 
-    public List<OrganizationCacheEntry> getContacts(PaginationCriteria paginationCriteria){
-        return new ArrayList<>();
+    public Map<String, Object> getContacts(PaginationCriteria paginationCriteria) {
+        int totalRecords = 0;
+        List<OrganizationCacheEntry> contacts = new ArrayList<>();
+        Session session = dynamicContactDaoImpl.openCurrentSession();
+        Map<String, Object> map = null;
+        try {
+            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetOrganizations", EdocDynamicContact.class);
+            storedProcedureQuery.registerStoredProcedureParameter("orderBy", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("keyword", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("pageIdx", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("pageSize", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
+            storedProcedureQuery.setParameter("orderBy", paginationCriteria.getOrderBy());
+            storedProcedureQuery.setParameter("keyword", paginationCriteria.getSearch());
+            storedProcedureQuery.setParameter("pageIdx", paginationCriteria.getPageNumber());
+            storedProcedureQuery.setParameter("pageSize", paginationCriteria.getPageSize());
+            totalRecords = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
+
+            List list = storedProcedureQuery.getResultList();
+
+            if (list != null && list.size() > 0) {
+                for (Object object : list) {
+                    EdocDynamicContact contact = (EdocDynamicContact) object;
+                    OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
+                    contacts.add(cacheEntry);
+                }
+                map = new HashMap<>();
+                map.put("contacts", contacts);
+                map.put("totalContacts", totalRecords);
+                return map;
+            }
+            return null;
+        } catch (Exception e) {
+            LOGGER.error("Error get contacts cause " + e.getMessage());
+            return map;
+        } finally {
+            dynamicContactDaoImpl.closeCurrentSession(session);
+        }
+
     }
 
-    public int countContacts(PaginationCriteria paginationCriteria){
+    public int countContacts(PaginationCriteria paginationCriteria) {
         return 0;
     }
 
@@ -189,4 +232,6 @@ public class EdocDynamicContactService {
         }
         return result;
     }
+
+    private final static Logger LOGGER = Logger.getLogger(EdocDynamicContactService.class);
 }

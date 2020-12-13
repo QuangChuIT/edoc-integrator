@@ -6,6 +6,7 @@ import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.services.EdocDynamicContactService;
 
 import java.util.List;
+import java.util.Map;
 
 public class EdocDynamicContactServiceUtil {
 
@@ -19,7 +20,7 @@ public class EdocDynamicContactServiceUtil {
         return DYNAMIC_CONTACT_SERVICE.countContacts(paginationCriteria);
     }
 
-    public static List<OrganizationCacheEntry> getContacts(PaginationCriteria paginationCriteria) {
+    public static Map<String, Object> getContacts(PaginationCriteria paginationCriteria) {
         return DYNAMIC_CONTACT_SERVICE.getContacts(paginationCriteria);
     }
 

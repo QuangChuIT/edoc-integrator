@@ -301,15 +301,15 @@ public class DatatableRequest<T> {
         SortBy sortBy = null;
         if (!AppUtil.isObjectEmpty(this.getOrder())) {
             sortBy = new SortBy();
-            sortBy.addSort(this.getOrder().getData(), SortOrder.fromValue(this.getOrder().getSortDir()));
+            sortBy.addSort(this.getOrder().getName(), SortOrder.fromValue(this.getOrder().getSortDir()));
         }
-
+        pagination.setSearch(this.getSearch());
         FilterBy filterBy = new FilterBy();
         filterBy.setGlobalSearch(this.isGlobalSearch());
         for (DatatableColumnSpecs colSpec : this.getColumns()) {
             if (colSpec.isSearchable()) {
                 if (!AppUtil.isObjectEmpty(this.getSearch()) || !AppUtil.isObjectEmpty(colSpec.getSearch())) {
-                    filterBy.addFilter(colSpec.getData(), (this.isGlobalSearch()) ? this.getSearch() : colSpec.getSearch());
+                    filterBy.addFilter(colSpec.getName(), (this.isGlobalSearch()) ? this.getSearch() : colSpec.getSearch());
                 }
             }
         }

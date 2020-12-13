@@ -126,8 +126,10 @@ public class DatatableColumnSpecs {
         this.setSearch(request.getParameter("columns[" + i + "][search][value]"));
         this.setSearchable(Boolean.parseBoolean(request.getParameter("columns[" + i + "][searchable]")));
         int sortableCol = Integer.parseInt(request.getParameter("order[0][column]"));
-        this.setData(columns.get(i));
-        this.setName(columns.get(i));
+        this.setData(request.getParameter("columns[" + i + "][data]"));
+        this.setName(request.getParameter("columns[" + i + "][name]"));
+        /*this.setData(columns.get(i));
+        this.setName(columns.get(i));*/
         String sortDir = request.getParameter("order[0][dir]");
 
         if (i == sortableCol) {

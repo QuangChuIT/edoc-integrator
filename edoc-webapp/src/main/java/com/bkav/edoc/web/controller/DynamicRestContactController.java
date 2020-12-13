@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class DynamicRestContactController {
@@ -34,17 +35,20 @@ public class DynamicRestContactController {
         this.validateUtil = validateUtil;
     }
 
-    @RequestMapping(value = "/contact/-/document/contacts", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
-    )
+    @RequestMapping(value = "/contact/-/document/contacts", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getAllContact(HttpServletRequest request) {
         DatatableRequest<OrganizationCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        int count = EdocDynamicContactServiceUtil.countContacts(pagination);
-        List<OrganizationCacheEntry> organs = EdocDynamicContactServiceUtil.getContacts(pagination);
+        Map<String, Object> map = EdocDynamicContactServiceUtil.getContacts(pagination);
         DataTableResult<OrganizationCacheEntry> dataTableResult = new DataTableResult<>();
-        datatableRequest.setDraw(datatableRequest.getDraw());
+        int count = 0;
+        List<OrganizationCacheEntry> organs = new ArrayList<>();
+        if (map != null) {
+            count = (int) map.get("totalContacts");
+            organs = (List<OrganizationCacheEntry>) map.get("contacts");
+        }
+        dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(organs);
         dataTableResult.setRecordsTotal(count);
         dataTableResult = new CommonUtils<OrganizationCacheEntry>().getDataTableResult(dataTableResult, organs, count, datatableRequest);

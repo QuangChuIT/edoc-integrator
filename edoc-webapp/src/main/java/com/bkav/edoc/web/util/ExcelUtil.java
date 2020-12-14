@@ -12,13 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class ExcelUtil {
-
-    private final MessageSourceUtil messageSourceUtil;
     private final static ExcelService excelService = new ExcelService();
-
-    public ExcelUtil(MessageSourceUtil messageSourceUtil) {
-        this.messageSourceUtil = messageSourceUtil;
-    }
 
     public static List<User> importUserFromExcel(MultipartFile file) throws IOException {
         return excelService.readExcelFileForUser(file);
@@ -27,6 +21,8 @@ public class ExcelUtil {
     public static List<EdocDynamicContact> importOrganFromExcel(MultipartFile file) throws IOException {
         return excelService.readExcelFileForOrganization(file);
     }
+
+    // Optimizing code...
 
     public static boolean exportUserToExcel(List<User> users) throws IOException {
         return excelService.ExportUserToExcel(users);

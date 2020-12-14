@@ -131,7 +131,7 @@ let user_message = {
     "user_import_from_excel_fail": "Nhập dữ liệu người dùng thất bại",
     "user_import_from_excel_conflic": "Dữ liệu bị trùng",
     "user_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
-    "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công",
+    "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công, file được lưu tại thư mục Downloads",
     "user_export_to_excel_fail": "Xuất dữ liệu người dùng thất bại!",
     "user_add_new_success": "Tạo người dùng mới thành công",
     "user_add_new_fail": "Tạo người dùng mới thất bại",
@@ -172,7 +172,7 @@ let organ_message = {
     "organ_import_from_excel_fail": "Nhập dữ liệu đơn vị thất bại",
     "organ_import_from_excel_conflic": "Dữ liệu bị trùng",
     "organ_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
-    "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công",
+    "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công, file được lưu tại thư mục Downloads",
     "organ_export_to_excel_fail": "Xuất dữ liệu đơn vị thất bại!",
     "organ_delete_success": "Xóa đơn vị thành công",
     "organ_delete_fail": "Xóa đơn vị thất bại",
@@ -183,3 +183,8 @@ let organ_message = {
     "organ_btn_confirm": "Cập nhật",
     "organ_btn_cancel": "Hủy"
 };
+
+let role_message = {
+    "role_administrator": "Administrator",
+    "role_super_administrator": "Super Administrator"
+}

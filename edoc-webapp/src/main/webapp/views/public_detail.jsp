@@ -20,10 +20,10 @@
                         <span class="label label-success pull-right">
                             <spring:message code="edoc.report.total"/>
                             <span id="totalReport">
-
                             </span>
                         </span>
-                    </small></h3>
+                    </small>
+                </h3>
             </div>
         </div>
     </div>
@@ -70,7 +70,7 @@
         </div>
         <div class="row">
             <div class="table-responsive">
-                <table class="table table-striped table-hover custom-datatable" id="edocReportTable">
+                <table class="table table-striped table-bordered table-hover custom-datatable" id="edocReportTable">
                 </table>
             </div>
         </div>

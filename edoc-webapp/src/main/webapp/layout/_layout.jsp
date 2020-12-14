@@ -61,6 +61,9 @@
     <link href="<c:url value="/asset/css/font-awesome.min.css"/>" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
     <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
+
+    <!-- Css modal import Excel -->
+    <link href="<c:url value="/asset/css/dragdropModalTheme/script.css"/>" rel="stylesheet"/>
 <body>
 <tiles:insertAttribute name="header"/>
 <div class="side-bar" id="layoutSideBar">
@@ -153,6 +156,32 @@
         </div>
     </div>
     <!-- /.modal-content -->
+</div>
+
+<div class="modal fade" id="importExcelModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="fileuploader fileuploader-theme-dragdrop">
+                <input type="hidden" name="fileuploader-list-files" value="[]"/>
+                <input type="file" name="files[]" multiple="multiple" id="inputFileUpload"/>
+                <div class="fileuploader-input">
+                    <div class="fileuploader-input-inner">
+                        <div class="fileuploader-icon-main"></div>
+                        <h3 class="fileuploader-input-caption">
+                            <span><spring:message code="modal.import.excel.dragdrop"></span>
+                        </h3>
+                        <p><spring:message code="modal.import.excel.or"></p>
+                        <button type="button" class="fileuploader-input-button">
+                            <span><spring:message code="modal.import.excel.choose"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="fileuploader-items">
+                <ul class="fileuploader-items-list"></ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="formAddUser" role="dialog">
@@ -420,6 +449,23 @@
                 </span>
             </div>
             <div class="modal-body organ-detail" id="edoc-edit-organ">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formImportFromExcel" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header user-detail">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="box" method="post" action="" enctype="multipart/form-data">
+                    <input name="uploadFiles" type="file">
+                </form>
             </div>
         </div>
     </div>
@@ -1118,6 +1164,10 @@
             </div>
         </div>
     </form>
+</script>
+
+<script id="organNameReport" type="text/x-jquery-tmpl">
+    <span class='organ-name'> + ${organName} + </span>
 </script>
 
 <!-- AJAX response must be wrapped in the modal's root class. -->

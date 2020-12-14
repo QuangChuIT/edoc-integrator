@@ -38,7 +38,7 @@ let edocReport = {
         instance.appSetting.dataTable = $('#edocReportTable').DataTable({
             ajax: {
                 url: url,
-                dataSrc: ""
+                dataSrc: "",
             },
             responsive: true,
             pageLength: 20,
@@ -46,15 +46,13 @@ let edocReport = {
             lengthChange: false,
             autoWidth: true,
             bDestroy: true,
+            process: true,
             paging: true,
             info: false,
             columns: [
                 {
                     "title": app_message.edoc_organ_name,
-                    "data": null,
-                    "render": function (data) {
-                        return "<span class='organ-name'>" + data.organName + "</span>";
-                    }
+                    "data": "organName",
                 },
                 {
                     "title": app_message.edoc_organ_sent,
@@ -70,7 +68,7 @@ let edocReport = {
                 }
             ],
             language: app_message.language,
-            "order": [[3, "desc"]]
+            "order": [[3, "desc"]],
         });
         if (fromDate !== "" && toDate !== "") {
             $("#filterLabel").html(app_message.edoc_report_filter + "<span class='time-filter'>" + fromDate + " - " + toDate + "</span>");

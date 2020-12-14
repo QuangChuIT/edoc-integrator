@@ -8,6 +8,7 @@ import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +28,12 @@ public class EdocConvert {
 
         log.info("---------------------- Get Document ----------------------------");
 
-        Connection connection = DBConnectionUtil.initPortalDBConnection();
+        Connection connection = DBConnectionUtil.initConvertDBConnection();
         int totalDoc = DatabaseUtil.getTotalDocument(connection);
 
+        String checkDate = "2020-09-25";
 
-        List<EdocDocument> documents = DatabaseUtil.getFromDatabase(connection);
+        List<EdocDocument> documents = DatabaseUtil.getFromDatabase(connection, checkDate);
 
         log.info("---------------------- Get Document Success with size " + documents.size() + " ----------------------------");
         for (EdocDocument document : documents) {

@@ -136,7 +136,6 @@ $(document).on("click", ".delete-attachment", function (event) {
                     window.attachmentManager.setItems(attachmentsStore);
                     console.log(window.attachmentManager.getItems());
                     window.attachmentManager.deleteItem(attachmentId);
-                    console.log("after delete");
                     console.log(window.attachmentManager.getItems());
                     window.localEdocStorage.saveAttachments(window.attachmentManager.getItems());
                     let attToView = {"attachments": window.attachmentManager.getItems()};

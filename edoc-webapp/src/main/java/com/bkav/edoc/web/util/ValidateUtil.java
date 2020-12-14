@@ -152,4 +152,49 @@ public class ValidateUtil {
         }
         return flag;
     }
+
+    public boolean checkHeaderExcelFileForOrgan (MultipartFile file) throws IOException {
+        boolean flag = false;
+
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //Iterate through each row from first sheet
+        Iterator<Row> rowIterator = sheet.iterator();
+
+        Row row = rowIterator.next();
+
+        //For each row iterate through each columns
+        Iterator<Cell> cellIterator = row.cellIterator();
+
+        int colIndex = 0;
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            if (colIndex == 0 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(1).getHeaderName())) {
+                colIndex++;
+            } else if (colIndex == 1 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(2).getHeaderName())) {
+                colIndex++;
+            } else if (colIndex == 2 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(3).getHeaderName())) {
+                colIndex++;
+            } else if (colIndex == 3 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(4).getHeaderName())) {
+                colIndex++;
+            } else if (colIndex == 4 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(5).getHeaderName())) {
+                colIndex++;
+            } else if (colIndex == 5 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(6).getHeaderName())) {
+                colIndex++;
+                flag = true;
+            } else if (colIndex == 6 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(7).getHeaderName())) {
+                colIndex++;
+                flag = true;
+            } else if (colIndex == 7 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(8).getHeaderName())) {
+                colIndex++;
+                flag = true;
+            } else if (colIndex == 8 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(9).getHeaderName())) {
+                flag = true;
+            }
+        }
+
+        return flag;
+    }
 }

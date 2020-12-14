@@ -84,7 +84,6 @@ let organManage = {
                     "name": "email",
                     "title": organ_message.table_header_email,
                     "data": "email",
-
                 },
                 {
                     "name": "status",
@@ -117,7 +116,10 @@ let organManage = {
             }
         });
     },
-    createOrgan: function () {
+
+    createOrgan: function() {
+        let instance = this;
+
         let name = $("#name").val();
         let domain = $("#domain").val();
         let address = $("#address").val();
@@ -146,7 +148,7 @@ let organManage = {
                     if (response.code === 200) {
                         $.notify(organ_message.organ_add_new_success, "success");
                         $('#formAddOrgan').modal('toggle');
-                        $("#organ-menu").click();
+                        instance.renderOrganDatatable();
                         $('#edoc-add-organ').empty();
                     } else {
                         $.notify(organ_message.organ_add_new_fail, "error");
@@ -158,7 +160,9 @@ let organManage = {
             });
         }
     },
-    editOrgan: function (id) {
+    editOrgan: function(id) {
+        let instance = this;
+
         let name = $("#editName").val();
         let domain = $("#editDomain").val();
         let address = $("#editAddress").val();
@@ -194,9 +198,10 @@ let organManage = {
         });
         $('#edoc-edit-organ').empty();
         $('#formEditOrgan').modal('toggle');
-        $("#organ-menu").click();
+        instance.renderOrganDatatable();
     },
     deleteOrgan: function (organId) {
+        let instance = this;
         if (organId !== null && organId !== "") {
             $.ajax({
                 url: "/public/-/organ/delete/" + organId,
@@ -214,7 +219,7 @@ let organManage = {
                     }
                 }
             })
-            $('#organ-menu').click();
+            instance.renderOrganDatatable();
         }
     }
 }
@@ -295,7 +300,7 @@ $(document).on("change", "#importOrganFromExcel", function (e) {
 $(document).on('click', '#exportOrganToExcel', function (e) {
     e.preventDefault();
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "/public/-/organ/export",
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,

@@ -9,6 +9,7 @@ import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,6 +31,9 @@ public class ExcelService {
 
     public List<User> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        int numUserSuccess = 0;
+        boolean flag = true;
 
         InputStream inputStream = file.getInputStream();
 
@@ -56,21 +60,48 @@ public class ExcelService {
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
+
                 switch (cellIndex) {
                     case 1:
-                        user.setUsername(currentCell.getStringCellValue());
+                        String username = currentCell.getStringCellValue();
+                        if (username.equals("")) {
+                            errors.add("Row " + rowNum + ": wrong username");
+                            flag = false;
+                        } else {
+                            user.setUsername(username);
+                        }
                         break;
 
                     case 2:
-                        user.setPassword(currentCell.getStringCellValue());
+                        String password = currentCell.getStringCellValue();
+                        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+                        if (password.equals("") || !password.matches(passwordRegex)) {
+                            errors.add("Row " + rowNum + ": wrong password");
+                            flag = false;
+                        } else {
+                            user.setPassword(password);
+                        }
                         break;
 
                     case 3:
-                        user.setEmailAddress(currentCell.getStringCellValue());
+                        String email = currentCell.getStringCellValue();
+                        String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
+                        if (email.equals("") || !email.matches(emailRegex)) {
+                            errors.add("Row " + rowNum + ": wrong email");
+                            flag = false;
+                        } else {
+                            user.setEmailAddress(email);
+                        }
                         break;
 
                     case 4:
-                        user.setDisplayName(currentCell.getStringCellValue());
+                        String displayName = currentCell.getStringCellValue();
+                        if (displayName.equals("")) {
+                            errors.add("Row " + rowNum + ": wrong display name");
+                            flag = false;
+                        } else {
+                            user.setDisplayName(currentCell.getStringCellValue());
+                        }
                         break;
 
                     case 5:
@@ -90,9 +121,6 @@ public class ExcelService {
                             user.setDynamicContact(organ);
                         }
                         break;
-
-                    default:
-                        break;
                 }
                 cellIndex++;
             }
@@ -101,8 +129,11 @@ public class ExcelService {
             user.setModifiedDate(currentDate);
             user.setLastLoginDate(currentDate);
             user.setStatus(true);
-
-            users.add(user);
+            if (flag == true) {
+                users.add(user);
+                numUserSuccess++;
+            }
+            rowNum++;
         }
         workbook.close();
         return users;
@@ -112,7 +143,7 @@ public class ExcelService {
         List<EdocDynamicContact> organs = new ArrayList<>();
         InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(1);
+        Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
         int rowNum = 0;
         while (rows.hasNext()) {
@@ -164,6 +195,11 @@ public class ExcelService {
         return organs;
     }
 
+    //
+    // Fixing & Optimizing code.
+    // Processing...
+    //
+
     public boolean ExportUserToExcel(List<User> users) throws IOException {
         Workbook workbook = new XSSFWorkbook();
 
@@ -179,7 +215,7 @@ public class ExcelService {
         Row header = sheet.createRow(0);
 
         CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.BROWN.getIndex());
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         XSSFFont font = ((XSSFWorkbook) workbook).createFont();
@@ -229,10 +265,12 @@ public class ExcelService {
             cell.setCellStyle(style);
             numRow++;
         }
-        File currDir = new File("C:\\Users\\Public\\Desktop\\Danh_sach_tai_khoan.xlsx");
+        String userHomeDir = System.getProperty("user.home");
+        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_tai_khoan.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);
+        LOGGER.info("Export Excel file with path: " + path);
         workbook.write(outputStream);
         workbook.close();
         return true;
@@ -251,15 +289,13 @@ public class ExcelService {
         sheet.setColumnWidth(6, 4000);
         sheet.setColumnWidth(7, 4000);
         sheet.setColumnWidth(8, 4000);
-        sheet.setColumnWidth(9, 4000);
-        sheet.setColumnWidth(10, 4000);
 
         sheet.setDefaultRowHeight((short) 450);
 
         Row header = sheet.createRow(0);
 
         CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.BROWN.getIndex());
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         XSSFFont font = ((XSSFWorkbook) workbook).createFont();
@@ -271,7 +307,7 @@ public class ExcelService {
         Cell headerCell;
 
         // Write header row to excel file for organization
-        for (int i = 0, j = 1; i < 11; i++, j++) {
+        for (int i = 0, j = 1; i < 9; i++, j++) {
             headerCell = header.createCell(i);
             headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(j).getHeaderName());
             headerCell.setCellStyle(headerStyle);
@@ -320,19 +356,13 @@ public class ExcelService {
             cell.setCellValue(organ.getWebsite());
             cell.setCellStyle(style);
 
-            cell = row.createCell(9);
-            cell.setCellValue(organ.getType());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(10);
-            cell.setCellValue(organ.getVersion());
-            cell.setCellStyle(style);
-            numRow++;
         }
-        File currDir = new File("C:\\Users\\Public\\Desktop\\Danh_sach_to_chuc.xlsx");
+        String userHomeDir = System.getProperty("user.home");
+        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_to_chuc.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);
+        LOGGER.info("Export Excel file with path: " + path);
         workbook.write(outputStream);
         workbook.close();
         return true;
@@ -374,5 +404,7 @@ public class ExcelService {
         }
         return count;
     }
+
+    private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.util.ExcelUtil.class);
 
 }

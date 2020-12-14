@@ -1,7 +1,6 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.entity.UserRole;
-import com.bkav.edoc.service.database.services.UserRoleService;
 import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRoleRequest;

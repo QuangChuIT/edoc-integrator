@@ -102,7 +102,7 @@ public class DBConnectionUtil {
 	}
 
 	public static void main(String[] args) {
-		Connection connection = initPortalDBConnection();
+		Connection connection = initConvertDBConnection();
 		if(connection != null){
 			System.out.println("success !!!");
 		}

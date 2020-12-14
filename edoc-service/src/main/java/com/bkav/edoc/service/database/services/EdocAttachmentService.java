@@ -21,7 +21,7 @@ public class EdocAttachmentService {
         Session currentSession = attachmentDaoImpl.openCurrentSession();
         try {
             currentSession.beginTransaction();
-            currentSession.persist(edocAttachment);
+            currentSession.save(edocAttachment);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);

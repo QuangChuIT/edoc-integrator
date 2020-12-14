@@ -20,7 +20,8 @@ import java.util.List;
 public class PublicStatRestController {
 
     @GetMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+    public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
+                                           @RequestParam(value = "toDate", required = false) String toDate) {
         String organDomainCode = PropsUtil.get("edoc.root.organDomain");
         if (fromDate == null || toDate == null) {
             return EdocDailyCounterServiceUtil.getStatsDetail(organDomainCode, null, null);

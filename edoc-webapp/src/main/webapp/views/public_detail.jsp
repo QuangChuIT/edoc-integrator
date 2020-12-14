@@ -50,17 +50,17 @@
                         <spring:message code="edoc.report.button"/>
                     </button>
                 </li>
-                 <li class="dropdown">
-                     <button class="btn btn-primary btn-report-group dropdown-toggle" data-toggle="dropdown"
-                             aria-haspopup="true" aria-expanded="false" id="exportReport">
-                         <i class="fa fa-arrow-circle-down fa-fw"></i>
-                         <spring:message code="edoc.export.report"/>
-                     </button>
-                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                         <li><a class="dropdown-item" id="exportReportPDF" href="javascript:void(0)">PDF</a></li>
-                         <li><a class="dropdown-item" id="exportReportExcel" href="javascript:void(0)">Excel</a></li>
-                     </ul>
-                 </li>
+                <li class="dropdown">
+                    <button class="btn btn-primary btn-report-group dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" id="exportReport">
+                        <i class="fa fa-arrow-circle-down fa-fw"></i>
+                        <spring:message code="edoc.export.report"/>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" id="exportReportPDF" href="javascript:void(0)">PDF</a></li>
+                        <li><a class="dropdown-item" id="exportReportExcel" href="javascript:void(0)">Excel</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
         <div class="row message-filter">

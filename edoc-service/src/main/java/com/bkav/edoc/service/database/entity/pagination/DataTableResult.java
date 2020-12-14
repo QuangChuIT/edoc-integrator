@@ -1,6 +1,5 @@
 package com.bkav.edoc.service.database.entity.pagination;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

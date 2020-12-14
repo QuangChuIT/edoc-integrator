@@ -10,13 +10,24 @@ let organManage = {
         dataTable: null,
         mode: "system"
     },
+    init: function () {
+        let instance = this;
+
+        if (typeof jQuery === 'undefined') {
+            edocDocument.log("Can not load jQuery environment");
+            return;
+        }
+        instance.renderOrganDatatable();
+    },
     renderOrganDatatable: function () {
         let instance = this;
-        instance.dataTable = $('#dataTables-organ').DataTable({
+        instance.organSetting.dataTable = $('#dataTables-organ').DataTable({
+            serverSide: true,
+            processing: true,
+            pageLength: 25,
             ajax: {
                 url: "/contact/-/document/contacts",
-                dataSrc: "",
-                type: "GET"
+                type: "POST"
             },
             drawCallback: function () {
                 $(this).contextMenu({
@@ -48,14 +59,16 @@ let organManage = {
             },
             rowId: "id",
             responsive: true,
-            pageLength: 25,
-            autoWidth: true,
+            autoWidth: false,
+            ordering: true,
             bDestroy: true,
-            processing: true,
+            searching: true,
+            lengthChange: false,
             paging: true,
             info: false,
             columns: [
                 {
+                    "name": "name",
                     "title": organ_message.table_header_name,
                     "data": null,
                     "render": function (data) {
@@ -63,15 +76,17 @@ let organManage = {
                     }
                 },
                 {
+                    "name": "domain",
                     "title": organ_message.table_header_domain,
                     "data": "domain",
                 },
                 {
+                    "name": "email",
                     "title": organ_message.table_header_email,
                     "data": "email",
-
                 },
                 {
+                    "name": "status",
                     "title": organ_message.organ_status,
                     "data": null,
                     "render": function (data) {
@@ -84,7 +99,7 @@ let organManage = {
                 }
             ],
             language: app_message.language,
-            "order": [[0, "asc"]]
+            order: [[0, "asc"]]
         });
     },
     reGenerateToken: function (organId) {

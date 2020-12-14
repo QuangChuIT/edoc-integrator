@@ -64,6 +64,8 @@ let userManage = {
             responsive: true,
             pageLength: 25,
             autoWidth: true,
+            ordering: true,
+            searching: true,
             bDestroy: true,
             processing: true,
             paging: true,

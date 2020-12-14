@@ -69,6 +69,7 @@ let edocDocument = {
             info: false,
             columns: [
                 {
+                    "name": "ed.subject",
                     "title": app_message.edoc_table_header_subject,
                     "data": null,
                     "render": function (data) {
@@ -76,10 +77,12 @@ let edocDocument = {
                     }
                 },
                 {
+                    "name" : "ed.from_organ_domain",
                     "title": app_message.edoc_table_header_fromOrgan,
                     "data": "fromOrgan.name"
                 },
                 {
+                    "name" : "ed.doc_code",
                     "title": app_message.table_header_code,
                     "data": null,
                     "render": function (data) {
@@ -87,6 +90,7 @@ let edocDocument = {
                     }
                 },
                 {
+                    "name" : "ed.document_type_name",
                     "title": app_message.table_header_documentCate,
                     "data": null,
                     "render": function (data) {
@@ -94,6 +98,7 @@ let edocDocument = {
                     }
                 },
                 {
+                    "name" : "ed.create_date",
                     "title": app_message.table_header_createDate,
                     "data": null,
                     "render": function (data) {
@@ -427,23 +432,46 @@ $(document).ready(function () {
         $('#dueDate').datetimepicker("show");
     });
 
+    let pageLength = 0;
+
     $("#search-edoc").change(function () {
+        let keyword = $('#search-edoc').val();
+
         if (edocDocument.appSetting.mode === "draft") {
             $('#dataTablesDraftDoc').DataTable().search(
-                $('#search-edoc').val(),
+                keyword,
             ).draw();
         } else if (edocDocument.appSetting.mode === "userManage") {
             $(".edoc-table-user").show();
             $("#dataTables-user").DataTable().search(
-                $("#search-edoc").val(),
+                keyword,
             ).draw();
         } else if (edocDocument.appSetting.mode === "organManage") {
-            $('#dataTables-organ').DataTable().search(
-                $('#search-edoc').val(),
+            if (keyword.length === 0) {
+                organManage.organSetting.dataTable.page.len(pageLength);
+                pageLength = 0;
+            }
+            else if (pageLength === 0) {
+                pageLength = organManage.organSetting.dataTable.page.len();
+                organManage.organSetting.dataTable.page.len(1000);
+            }
+            organManage.organSetting.dataTable.search(
+                keyword,
             ).draw();
-        } else {
-            $('#dataTables-edoc').DataTable().search(
+            /*$('#dataTables-organ').DataTable().search(
                 $('#search-edoc').val(),
+            ).draw();*/
+        } else {
+            if (keyword.length === 0) {
+                edocDocument.appSetting.dataTable.page.len(pageLength);
+                pageLength = 0;
+            }
+            else if (pageLength === 0) {
+                pageLength = edocDocument.appSetting.dataTable.page.len();
+                edocDocument.appSetting.dataTable.page.len(1000);
+            }
+            $('#dataTables-edoc').DataTable().search(
+                keyword,
             ).draw();
         }
     });

@@ -27,7 +27,10 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.*;
 
 public class EdocDocumentService {
@@ -76,10 +79,10 @@ public class EdocDocumentService {
                     queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_DRAFT_TMP, paginationCriteria);
                     break;
             }
-            Query<Long> query = session.createQuery(queryDocument, Long.class);
+            Query query = session.createNativeQuery(queryDocument);
             query.setParameter("organDomain", organId);
-            Long count = query.uniqueResult();
-            result = Math.toIntExact(count);
+            BigInteger count = (BigInteger) query.getSingleResult();
+            result = count.intValue();
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -93,14 +96,25 @@ public class EdocDocumentService {
     public List<EdocDocument> getDocumentList() {
         Session session = documentDaoImpl.openCurrentSession();
         try {
-            session.beginTransaction();
-            Query<EdocDocument> query = session.createNativeQuery("{ call GetDocuments()}", EdocDocument.class);
-            List<EdocDocument> documents = query.getResultList();
+            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetDocumentsInbox", EdocDocument.class);
+            storedProcedureQuery.registerStoredProcedureParameter("mode", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("orderBy", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("offset", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("size", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
+            storedProcedureQuery.setParameter("mode", "inbox");
+            storedProcedureQuery.setParameter("organId", "000.00.20.H36");
+            storedProcedureQuery.setParameter("orderBy", "subject desc");
+            storedProcedureQuery.setParameter("offset", 1);
+            storedProcedureQuery.setParameter("size", 10);
+            List<EdocDocument> documents = storedProcedureQuery.getResultList();
             System.out.println(documents.size());
-            session.getTransaction().commit();
+            int count = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
+            System.out.println(count);
             return documents;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            e.printStackTrace();
             return new ArrayList<>();
         } finally {
             documentDaoImpl.closeCurrentSession(session);
@@ -136,7 +150,7 @@ public class EdocDocumentService {
                     queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_DRAFT_TMP, paginationCriteria);
                     break;
             }
-            Query<EdocDocument> query = session.createQuery(queryDocument, EdocDocument.class);
+            Query<EdocDocument> query = session.createNativeQuery(queryDocument, EdocDocument.class);
             query.setParameter("organDomain", organId);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();

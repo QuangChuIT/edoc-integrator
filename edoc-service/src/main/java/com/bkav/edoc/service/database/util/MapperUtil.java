@@ -315,7 +315,7 @@ public class MapperUtil {
             organizationCacheEntry.setEmail(contact.getEmail());
             organizationCacheEntry.setId(contact.getId());
             organizationCacheEntry.setInCharge(contact.getInCharge());
-            organizationCacheEntry.setName(contact.getName());
+            organizationCacheEntry.setName(contact.getName().trim());
             organizationCacheEntry.setTelephone(contact.getTelephone());
             organizationCacheEntry.setToken(contact.getToken());
             organizationCacheEntry.setParent(contact.getParent());

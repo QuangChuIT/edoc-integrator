@@ -26,6 +26,10 @@ public class PaginationCriteria {
      */
     private FilterBy filterBy;
 
+    /**
+     * the search keyword
+     */
+    private String search;
 
     /**
      * Gets the page number.
@@ -127,6 +131,24 @@ public class PaginationCriteria {
     }
 
     /**
+     * Get the search
+     *
+     * @return string
+     */
+    public String getSearch() {
+        return search;
+    }
+
+    /**
+     * Sets search
+     *
+     * @param search the search value
+     */
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
+    /**
      * Checks if is sort by empty.
      *
      * @return true, if is sort by empty
@@ -195,6 +217,30 @@ public class PaginationCriteria {
                 if (null == stringBuilder) {
                     stringBuilder = new StringBuilder();
                     stringBuilder.append(ORDER_BY).append(pair.getKey()).append(SPACE).append(pair.getValue());
+                } else {
+                    stringBuilder.append(COMMA).append(pair.getKey()).append(SPACE).append(pair.getValue());
+                }
+            }
+        }
+
+        return (null == stringBuilder) ? BLANK : stringBuilder.toString();
+    }
+
+    /**
+     * Gets the order by clause.
+     *
+     * @return the order by clause
+     */
+    public String getOrderBy() {
+
+        StringBuilder stringBuilder = null;
+
+        if (!isSortByEmpty()) {
+
+            for (Map.Entry<String, SortOrder> pair : sortBy.getSortBys().entrySet()) {
+                if (null == stringBuilder) {
+                    stringBuilder = new StringBuilder();
+                    stringBuilder.append(pair.getKey()).append(SPACE).append(pair.getValue());
                 } else {
                     stringBuilder.append(COMMA).append(pair.getKey()).append(SPACE).append(pair.getValue());
                 }

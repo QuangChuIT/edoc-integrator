@@ -64,7 +64,7 @@ public class ExcelService {
                 switch (cellIndex) {
                     case 1:
                         String username = currentCell.getStringCellValue();
-                        if (username == "") {
+                        if (username.equals("")) {
                             errors.add("Row " + rowNum + ": wrong username");
                             flag = false;
                         } else {

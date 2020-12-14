@@ -1,9 +1,13 @@
 package com.bkav.edoc.web.controller;
 
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
+import com.bkav.edoc.service.database.entity.pagination.DataTableResult;
+import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
@@ -12,9 +16,11 @@ import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.EditUserRequest;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.payload.UserRequest;
+import com.bkav.edoc.web.util.CommonUtils;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,10 +28,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserRestController {
@@ -40,10 +48,24 @@ public class UserRestController {
 
 
     @RequestMapping(value = "/public/-/users",
-            method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public ResponseEntity<?> getAllUser() {
+    public ResponseEntity<?> getAllUser(HttpServletRequest request) {
+//        DatatableRequest<UserCacheEntry> datatableRequest = new DatatableRequest<>(request);
+//        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+//        Map<String, Object> map = UserServiceUtil.getAllUsers(pagination);
+//        DataTableResult<OrganizationCacheEntry> dataTableResult = new DataTableResult<>();
+//        int count = 0;
+//        List<OrganizationCacheEntry> organs = new ArrayList<>();
+//        if (map != null) {
+//            count = (int) map.get("totalContacts");
+//            organs = (List<OrganizationCacheEntry>) map.get("contacts");
+//        }
+//        dataTableResult.setDraw(datatableRequest.getDraw());
+//        dataTableResult.setListOfDataObjects(organs);
+//        dataTableResult.setRecordsTotal(count);
+//        dataTableResult = new CommonUtils<OrganizationCacheEntry>().getDataTableResult(dataTableResult, organs, count, datatableRequest);
+//        return new Gson().toJson(dataTableResult);
         try {
             List<UserCacheEntry> users = UserServiceUtil.getAllUsers();
             if (users != null) {

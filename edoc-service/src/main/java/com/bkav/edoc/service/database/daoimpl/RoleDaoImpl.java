@@ -2,8 +2,10 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.RoleDao;
 import com.bkav.edoc.service.database.entity.Role;
+import com.bkav.edoc.service.database.entity.User;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -38,6 +40,27 @@ public class RoleDaoImpl extends RootDaoImpl<Role, Long> implements RoleDao {
             closeCurrentSession(session);
         }
     }
+
+    public Role getRoleByRoleName(String roleName) {
+        Session currentSession = openCurrentSession();
+        try {
+            CriteriaBuilder builder = currentSession.getCriteriaBuilder();
+            CriteriaQuery<Role> query = builder.createQuery(Role.class);
+            Root<Role> root = query.from(Role.class);
+            query.select(root);
+            query.where(builder.equal(root.get("roleName"), roleName));
+            Query<Role> q = currentSession.createQuery(query);
+            return q.uniqueResult();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
+    }
+
 
     private final static Logger LOGGER = Logger.getLogger(RoleDaoImpl.class);
 }

@@ -17,4 +17,8 @@ public class RoleServiceUtil {
     public static Role getRole(long roleId) {
         return ROLE_SERVICE.getRoleById(roleId);
     }
+
+    public static Role getRoleByRoleName(String roleKey) {
+        return ROLE_SERVICE.getRoleByRoleName(roleKey);
+    }
 }

@@ -183,3 +183,8 @@ let organ_message = {
     "organ_btn_confirm": "Cập nhật",
     "organ_btn_cancel": "Hủy"
 };
+
+let role_message = {
+    "role_administrator": "Administrator",
+    "role_super_administrator": "Super Administrator"
+}

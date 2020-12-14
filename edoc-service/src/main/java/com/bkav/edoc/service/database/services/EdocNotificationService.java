@@ -21,7 +21,7 @@ public class EdocNotificationService {
         Session currentSession = notificationDaoImpl.openCurrentSession();
         try {
             currentSession.beginTransaction();
-            currentSession.persist(edocNotification);
+            currentSession.save(edocNotification);
             currentSession.getTransaction().commit();
         } catch (Exception e) {
             LOGGER.error(e);

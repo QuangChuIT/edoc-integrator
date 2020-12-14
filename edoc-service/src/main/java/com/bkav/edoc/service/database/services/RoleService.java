@@ -17,4 +17,8 @@ public class RoleService {
     public Role getRoleById(long roleId) {
         return roleDao.findById(roleId);
     }
+
+    public Role getRoleByRoleName(String roleName) {
+        return roleDao.getRoleByRoleName(roleName);
+    }
 }

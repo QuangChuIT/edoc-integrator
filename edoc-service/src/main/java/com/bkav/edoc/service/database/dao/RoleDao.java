@@ -6,4 +6,6 @@ public interface RoleDao {
     void createRole(Role role);
 
     boolean checkExistRoleByRoleName(String roleName);
+
+    Role getRoleByRoleName(String roleName);
 }

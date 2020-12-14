@@ -41,7 +41,7 @@ public class EdocDocumentDetailService {
         Session session = documentDetailDaoImpl.openCurrentSession();
         try {
             session.beginTransaction();
-            documentDetailDaoImpl.persist(edocDocumentDetail);
+            session.save(edocDocumentDetail);
             session.getTransaction().commit();
             return edocDocumentDetail;
         } catch (Exception e) {

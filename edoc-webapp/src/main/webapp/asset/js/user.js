@@ -1,3 +1,4 @@
+let AdministratorId, SuperAdministratorId;
 let userManage = {
     userSetting: {
         host: "/public/-/user/",
@@ -40,41 +41,19 @@ let userManage = {
                     items: {
                         "edit": {name: user_message.manage_edit_user, icon: "edit", disabled: function(key, opt) {
                             let id = opt.$trigger[0].id;
-                            if (id == '164655867')
+                            if (id == AdministratorId || id == SuperAdministratorId)
                                 return !this.data('editDisabled');
                             }},
                         "permission": {name: user_message.manage_permission_user, icon: "fa-shield", disabled: function(key, opt) {
                             let id = opt.$trigger[0].id;
-                            if (id == '164655867')
+                            if (id == AdministratorId || id == SuperAdministratorId)
                                 return !this.data('permissionDisabled');
                         }},
-                        "sep1": "---------",
-                        "delete": {name: user_message.manage_remove_user, icon: "delete", disabled: function(key, opt) {
-                            let id = opt.$trigger[0].id;
-                            if (id == '164655867')
-                                return !this.data('daleteDisabled');
-                        }},
-                        "edit": {
-                            name: user_message.manage_edit_user, icon: "edit", disabled: function (key, opt) {
-                                let id = opt.$trigger[0].id;
-                                if (id == '164655867')
-                                    return !this.data('editDisabled');
-                            }
-                        },
-                        "permission": {
-                            name: user_message.manage_permission_user,
-                            icon: "fa-shield",
-                            disabled: function (key, opt) {
-                                let id = opt.$trigger[0].id;
-                                if (id == '164655867')
-                                    return !this.data('permissionDisabled');
-                            }
-                        },
                         "sep1": "---------",
                         "delete": {
                             name: user_message.manage_remove_user, icon: "delete", disabled: function (key, opt) {
                                 let id = opt.$trigger[0].id;
-                                if (id == '164655867')
+                                if (id == AdministratorId || id == SuperAdministratorId)
                                     return !this.data('daleteDisabled');
                             }
                         }
@@ -318,6 +297,13 @@ $(document).ready(function () {
             keyboard: false
         })
     })
+
+    $.get("/public/-/role/" + role_message.role_administrator, function (data) {
+        AdministratorId = data.roleId;
+    });
+    $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
+        SuperAdministratorId = data.roleId;
+    });
 
 });
 

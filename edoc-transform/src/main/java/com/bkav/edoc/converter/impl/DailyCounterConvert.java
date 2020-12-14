@@ -25,6 +25,7 @@ public class DailyCounterConvert {
             while (rs.next()) {
                 Map<String, EdocDailyCounter> dailyCounterMap = new HashMap<>();
                 _counterDate = rs.getDate(1);
+                LOGGER.info("Starting counter document in data: " + _counterDate);
                 List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate);
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
@@ -36,6 +37,7 @@ public class DailyCounterConvert {
                     }
                 }
                 submitDatabase(dailyCounterMap);
+                LOGGER.info("Counter document in date " + _counterDate + " successfully!!");
             }
         } catch (SQLException throwable) {
             LOGGER.error(throwable);

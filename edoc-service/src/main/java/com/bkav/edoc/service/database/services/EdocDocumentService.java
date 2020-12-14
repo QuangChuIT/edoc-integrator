@@ -510,7 +510,7 @@ public class EdocDocumentService {
         Session currSession = documentDaoImpl.openCurrentSession();
         try {
             currSession.beginTransaction();
-            currSession.persist(edocDocument);
+            currSession.save(edocDocument);
             currSession.getTransaction().commit();
             return edocDocument;
         } catch (Exception e) {

@@ -23,11 +23,13 @@ public class DatabaseUtil {
         return total;
     }
 
-    public static List<EdocDocument> getFromDatabase(Connection connection) throws SQLException {
+    public static List<EdocDocument> getFromDatabase(Connection connection, String checkDate) throws SQLException {
         List<EdocDocument> documents = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(StringQuery.GET_DOCUMENT);
+            PreparedStatement statement = connection.prepareStatement(StringQuery.GET_DOCUMENT);
+            statement.setDate(1, java.sql.Date.valueOf(checkDate));
+//            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 EdocDocument edocDocument = new EdocDocument();

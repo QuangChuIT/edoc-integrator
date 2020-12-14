@@ -6,9 +6,9 @@ import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -54,6 +54,19 @@ public class RoleController {
         }
         LOGGER.error(messageSourceUtil.getMessage("user.create.role.fail", null));
         return HttpStatus.OK;
+    }
+
+    @RequestMapping(value = "/public/-/role/{roleName}", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<?> getRoleIdByRoleKey(@PathVariable("roleName") String roleName) {
+        try {
+            Role role = RoleServiceUtil.getRoleByRoleName(roleName);
+            return new ResponseEntity<>(role, HttpStatus.OK);
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.RoleController.class);

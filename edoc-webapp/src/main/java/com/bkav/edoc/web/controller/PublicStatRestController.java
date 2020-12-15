@@ -35,7 +35,7 @@ public class PublicStatRestController {
 
     @GetMapping(value = "/public/-/document/stat", produces = {MediaType.APPLICATION_JSON_VALUE})
     public EPublic getStat() {
-        String organDomainCode = PropsUtil.get("edoc.root.organDomain");
+        String organDomainCode = PropsUtil.get("edoc.except.organId");
         return EdocDailyCounterServiceUtil.getStat(organDomainCode);
     }
 

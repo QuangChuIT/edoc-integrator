@@ -4,6 +4,7 @@ import com.bkav.edoc.service.database.entity.EdocDailyCounter;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
+import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +24,16 @@ public class StatDocumentBean {
                 List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
-                    countSent(fromOrgan, dailyCounterMap);
+                    if (checkOrganToStat(fromOrgan)) {
+                        countSent(fromOrgan, dailyCounterMap);
+                    }
+
                     String toOrgans = document.getToOrganDomain();
                     String[] toOrgansList = toOrgans.split("#");
                     for (String toOrgan : toOrgansList) {
-                        countReceived(toOrgan, dailyCounterMap);
+                        if (checkOrganToStat(toOrgan)) {
+                            countReceived(toOrgan, dailyCounterMap);
+                        }
                     }
                 }
                 submitDatabase(dailyCounterMap);
@@ -69,6 +75,24 @@ public class StatDocumentBean {
             dailyCounter.setOrganDomain(organDomain);
         }
         dailyCounterMap.put(organDomain, dailyCounter);
+    }
+
+    private boolean checkOrganToStat(String organId) {
+        boolean result = false;
+        try {
+            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
+            String[] arr = organId.split("\\.");
+            if (arr.length > 0) {
+                String organCode = arr[arr.length - 1];
+                if (stringList.contains(organCode)) {
+                    result = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error check organ to stat cause " + e);
+        }
+        return result;
     }
 
     private void submitDatabase(Map<String, EdocDailyCounter> dailyCounterMap) {

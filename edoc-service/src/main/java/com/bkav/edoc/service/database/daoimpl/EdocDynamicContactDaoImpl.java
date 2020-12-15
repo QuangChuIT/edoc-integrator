@@ -8,7 +8,6 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, Long> implements EdocDynamicContactDao {
@@ -43,7 +42,8 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain1 or edc.domain like :domain2 or edc.domain like :domain3 or edc.domain like :domain4");
+            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain1 or edc.domain " +
+                    "like :domain2 or edc.domain like :domain3 or edc.domain like :domain4");
             String[] arr = domain.split("#");
             Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
             query.setParameter("domain1", StringPool.PERCENT + arr[0] + StringPool.PERCENT);

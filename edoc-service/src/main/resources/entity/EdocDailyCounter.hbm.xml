@@ -9,6 +9,7 @@
             <generator class="identity"/>
         </id>
         <property name="organDomain" type="string" column="organDomain"/>
+        <property name="organName" type="string" column="organName"/>
         <property name="dateTime" type="timestamp" column="dateTime"/>
         <property name="sent" column="sent" type="int"/>
         <property name="received" column="received" type="int"/>

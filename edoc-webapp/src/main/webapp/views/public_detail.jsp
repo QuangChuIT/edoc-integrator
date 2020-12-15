@@ -64,7 +64,7 @@
             </ul>
         </div>
         <div class="row message-filter">
-            <div class="col-md-12 col-xs-12 col-sm-12" x>
+            <div class="col-md-12 col-xs-12 col-sm-12">
                 <p id="filterLabel"></p>
             </div>
         </div>

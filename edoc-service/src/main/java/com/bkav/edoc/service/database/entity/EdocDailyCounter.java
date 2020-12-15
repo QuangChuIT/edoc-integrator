@@ -6,6 +6,7 @@ import java.util.Date;
 public class EdocDailyCounter implements Serializable {
     private Long dailyCounterId;
     private String organDomain;
+    private String organName;
     private Date dateTime;
     private int sent;
     private int received;
@@ -51,5 +52,13 @@ public class EdocDailyCounter implements Serializable {
 
     public void setReceived(int received) {
         this.received = received;
+    }
+
+    public String getOrganName() {
+        return organName;
+    }
+
+    public void setOrganName(String organName) {
+        this.organName = organName;
     }
 }

@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, Long> implements EdocDynamicContactDao {
@@ -42,9 +43,13 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain");
+            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain1 or edc.domain like :domain2 or edc.domain like :domain3 or edc.domain like :domain4");
+            String[] arr = domain.split("#");
             Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
-            query.setParameter("domain", StringPool.PERCENT + domain + StringPool.PERCENT);
+            query.setParameter("domain1", StringPool.PERCENT + arr[0] + StringPool.PERCENT);
+            query.setParameter("domain2", StringPool.PERCENT + arr[1] + StringPool.PERCENT);
+            query.setParameter("domain3", StringPool.PERCENT + arr[2] + StringPool.PERCENT);
+            query.setParameter("domain4", StringPool.PERCENT + arr[3] + StringPool.PERCENT);
             return query.list();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -128,6 +133,28 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
             }
         }
         return contact;
+    }
+
+    @Override
+    public String getNameByOrganId(String organId) {
+        Session currentSession = openCurrentSession();
+        String result = "";
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT name FROM EdocDynamicContact edc where edc.domain=:organId");
+            Query<String> query = currentSession.createQuery(sql.toString(), String.class);
+            query.setParameter("organId", organId);
+            if (query.uniqueResult() != null) {
+                result = query.uniqueResult();
+            } else {
+                LOGGER.warn("Get name from edoc_dynamic contact null with " + organId);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+        return result;
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);

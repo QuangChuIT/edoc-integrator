@@ -25,6 +25,10 @@ public class EdocDynamicContactService {
         return dynamicContactDaoImpl.findByDomain(domain);
     }
 
+    public String getNameByOrganId(String organId) {
+        return dynamicContactDaoImpl.getNameByOrganId(organId);
+    }
+
     public OrganizationCacheEntry getOrganizationCache(String domain) {
         String cacheKey = MemcachedKey.getKey(domain, MemcachedKey.DYNAMICCONTACT_KEY);
 
@@ -172,9 +176,6 @@ public class EdocDynamicContactService {
 
     }
 
-    public int countContacts(PaginationCriteria paginationCriteria) {
-        return 0;
-    }
 
     public Long countOrgan(String domain) {
 

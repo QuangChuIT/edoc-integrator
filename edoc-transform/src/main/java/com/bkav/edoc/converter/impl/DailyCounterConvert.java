@@ -6,11 +6,15 @@ import com.bkav.edoc.converter.util.StringQuery;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DailyCounterConvert {
     private static final Logger LOGGER = Logger.getLogger(DailyCounterConvert.class);
@@ -29,11 +33,22 @@ public class DailyCounterConvert {
                 List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate);
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
-                    countSent(fromOrgan, dailyCounterMap);
+                    if (checkCurrentOrgan(fromOrgan)) {
+                        String organName = EdocDynamicContactServiceUtil.getNameByOrganId(fromOrgan);
+                        if (!organName.equals("")) {
+                            countSent(fromOrgan, dailyCounterMap, organName);
+                        }
+                    }
+
                     String toOrgans = document.getToOrganDomain();
                     String[] toOrgansList = toOrgans.split("#");
                     for (String toOrgan : toOrgansList) {
-                        countReceived(toOrgan, dailyCounterMap);
+                        if (checkCurrentOrgan(toOrgan)) {
+                            String organName = EdocDynamicContactServiceUtil.getNameByOrganId(toOrgan);
+                            if (!organName.equals("")) {
+                                countReceived(toOrgan, dailyCounterMap, organName);
+                            }
+                        }
                     }
                 }
                 submitDatabase(dailyCounterMap);
@@ -44,6 +59,24 @@ public class DailyCounterConvert {
         }
     }
 
+    public boolean checkCurrentOrgan(String organDomain) {
+        boolean result = false;
+        try {
+            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
+            String[] arr = organDomain.split("\\.");
+            if (arr.length > 0) {
+                String organId = arr[arr.length - 1];
+                if (stringList.contains(organId)) {
+                    result = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error when check send document to VPCP " + e);
+        }
+        return result;
+    }
+
     private void submitDatabase(Map<String, EdocDailyCounter> dailyCounterMap) {
         for (Map.Entry<String, EdocDailyCounter> entry : dailyCounterMap.entrySet()) {
             EdocDailyCounter dailyCounter = entry.getValue();
@@ -51,7 +84,7 @@ public class DailyCounterConvert {
         }
     }
 
-    private void countSent(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap) {
+    private void countSent(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap, String organName) {
         EdocDailyCounter dailyCounter;
         if (dailyCounterMap.containsKey(organDomain)) {
             dailyCounter = dailyCounterMap.get(organDomain);
@@ -62,13 +95,14 @@ public class DailyCounterConvert {
             dailyCounter = new EdocDailyCounter();
             dailyCounter.setSent(1);
             dailyCounter.setDateTime(_counterDate);
+            dailyCounter.setOrganName(organName);
             dailyCounter.setReceived(0);
             dailyCounter.setOrganDomain(organDomain);
         }
         dailyCounterMap.put(organDomain, dailyCounter);
     }
 
-    private void countReceived(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap) {
+    private void countReceived(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap, String organName) {
         EdocDailyCounter dailyCounter;
         if (dailyCounterMap.containsKey(organDomain)) {
             dailyCounter = dailyCounterMap.get(organDomain);
@@ -78,6 +112,7 @@ public class DailyCounterConvert {
         } else {
             dailyCounter = new EdocDailyCounter();
             dailyCounter.setSent(0);
+            dailyCounter.setOrganName(organName);
             dailyCounter.setDateTime(_counterDate);
             dailyCounter.setReceived(1);
             dailyCounter.setOrganDomain(organDomain);

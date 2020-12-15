@@ -2,10 +2,8 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDailyCounterDao;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
-import com.bkav.edoc.service.database.util.HibernateUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.Date;

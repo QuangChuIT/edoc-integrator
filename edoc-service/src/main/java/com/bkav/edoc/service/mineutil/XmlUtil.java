@@ -91,6 +91,7 @@ public class XmlUtil {
     private Document getDocument(SOAPEnvelope envelope, DocumentBuilderFactory factory) {
         try {
             String str = envelope.toString();
+            LOGGER.info(str);
             InputStream is = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(is);

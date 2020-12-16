@@ -21,10 +21,10 @@
         <div class="table-responsive">
             <form class="form-horizontal" id="formImportUser" method="POST" enctype="multipart/form-data">
                 <div class="row user-import" id="user-import-excel">
-                    <button class="btn btn-primary import-excel-button" id="importUserFromExcel">
+                    <button class="btn btn-primary import-excel-button">
                         <i class="fa fa-arrow-circle-up fa-fw"></i>
                         <spring:message code="edoc.import.report"/>
-<%--                        <input type="file" name="importUserFromExcel" id="importUserFromExcel" class="form-control">--%>
+                        <input type="file" name="importUserFromExcel" id="importUserFromExcel" class="form-control">
                     </button>
                     <button class="btn btn-primary btn-report-group" id="exportUserToExcel">
                         <i class="fa fa-arrow-circle-down fa-fw"></i>

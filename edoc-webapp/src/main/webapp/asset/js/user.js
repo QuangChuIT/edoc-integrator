@@ -300,13 +300,13 @@ $(document).ready(function () {
 
     // Click to show modal for upload file
     // Developing...
-    $("#importUserFromExcel").on('click', function (e) {
-        e.preventDefault();
-        $('#importExcelModal').modal({
-            backdrop: 'static',
-            keyboard: false
-        })
-    })
+    // $("#importUserFromExcel").on('click', function (e) {
+    //     e.preventDefault();
+    //     $('#importExcelModal').modal({
+    //         backdrop: 'static',
+    //         keyboard: false
+    //     })
+    // })
 
     $.get("/public/-/role/" + role_message.role_administrator, function (data) {
         AdministratorId = data.roleId;

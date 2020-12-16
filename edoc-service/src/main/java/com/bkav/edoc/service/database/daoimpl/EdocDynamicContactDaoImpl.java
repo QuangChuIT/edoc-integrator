@@ -64,9 +64,14 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain");
+            sql.append("SELECT count(*) FROM EdocDynamicContact edc where edc.domain like :domain1 or edc.domain" +
+                    " like :domain2 or edc.domain like :domain3 or edc.domain like :domain4");
             Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
-            query.setParameter("domain", StringPool.PERCENT + organDomain + StringPool.PERCENT);
+            String[] arr = organDomain.split("#");
+            query.setParameter("domain1", StringPool.PERCENT + arr[0] + StringPool.PERCENT);
+            query.setParameter("domain2", StringPool.PERCENT + arr[1] + StringPool.PERCENT);
+            query.setParameter("domain3", StringPool.PERCENT + arr[2] + StringPool.PERCENT);
+            query.setParameter("domain4", StringPool.PERCENT + arr[3] + StringPool.PERCENT);
             return query.uniqueResult();
         } catch (Exception e) {
             LOGGER.error(e);

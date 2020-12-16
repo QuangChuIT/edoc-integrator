@@ -185,6 +185,7 @@ public class EdocDynamicContactService {
     public List<OrganizationCacheEntry> getDynamicContactsByFilterDomain(String domain) {
         List<OrganizationCacheEntry> organizationCacheEntries;
         String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_BY_KEY);
+        MemcachedUtil.getInstance().delete(cacheKey);
         organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
 
         if (organizationCacheEntries == null) {

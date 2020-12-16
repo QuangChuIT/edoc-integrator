@@ -6,11 +6,14 @@ import com.bkav.edoc.converter.util.StringQuery;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DailyCounterConvert {
     private static final Logger LOGGER = Logger.getLogger(DailyCounterConvert.class);
@@ -29,11 +32,16 @@ public class DailyCounterConvert {
                 List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate);
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
-                    countSent(fromOrgan, dailyCounterMap);
+                    if (checkCurrentOrgan(fromOrgan)) {
+                        countSent(fromOrgan, dailyCounterMap);
+                    }
+
                     String toOrgans = document.getToOrganDomain();
                     String[] toOrgansList = toOrgans.split("#");
                     for (String toOrgan : toOrgansList) {
-                        countReceived(toOrgan, dailyCounterMap);
+                        if (checkCurrentOrgan(toOrgan)) {
+                            countReceived(toOrgan, dailyCounterMap);
+                        }
                     }
                 }
                 submitDatabase(dailyCounterMap);
@@ -42,6 +50,24 @@ public class DailyCounterConvert {
         } catch (SQLException throwable) {
             LOGGER.error(throwable);
         }
+    }
+
+    public boolean checkCurrentOrgan(String organDomain) {
+        boolean result = false;
+        try {
+            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
+            String[] arr = organDomain.split("\\.");
+            if (arr.length > 0) {
+                String organId = arr[arr.length - 1];
+                if (stringList.contains(organId)) {
+                    result = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error when check send document to VPCP " + e);
+        }
+        return result;
     }
 
     private void submitDatabase(Map<String, EdocDailyCounter> dailyCounterMap) {

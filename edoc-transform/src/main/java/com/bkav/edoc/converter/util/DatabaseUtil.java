@@ -27,7 +27,7 @@ public class DatabaseUtil {
         List<EdocDocument> documents = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement(StringQuery.GET_DOCUMENT);
-            statement.setDate(1, java.sql.Date.valueOf(checkDate));
+            /*statement.setDate(1, java.sql.Date.valueOf(checkDate));*/
 //            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery();
 
@@ -42,10 +42,18 @@ public class DatabaseUtil {
                 }
                 edocDocument.setCreateDate(createDate);
                 edocDocument.setSentDate(sentDate);
+
                 edocDocument.setModifiedDate(resultSet.getDate(4));
                 edocDocument.setSubject(resultSet.getString(5));
-                edocDocument.setCodeNumber(resultSet.getString(6));
-                edocDocument.setCodeNotation(resultSet.getString(7));
+                String codeNumber = resultSet.getString(6);
+                String codeNotation = resultSet.getString(7);
+                edocDocument.setCodeNumber(codeNumber);
+                edocDocument.setCodeNotation(codeNotation);
+                if (codeNotation.contains("#")) {
+                    codeNotation = codeNotation.substring(0, codeNotation.indexOf("#"));
+                }
+                String docCode = codeNumber + "/" + codeNotation;
+                edocDocument.setDocCode(docCode);
                 edocDocument.setPromulgationPlace(resultSet.getString(8));
                 edocDocument.setPromulgationDate(resultSet.getDate(9));
                 edocDocument.setDocumentTypeDetail(resultSet.getInt(10));
@@ -55,6 +63,7 @@ public class DatabaseUtil {
                 edocDocument.setDraft(resultSet.getBoolean(13));
                 edocDocument.setToOrganDomain(resultSet.getString(15));
                 edocDocument.setFromOrganDomain(resultSet.getString(16));
+                edocDocument.setVisited(false);
                 edocDocument.setVisible(resultSet.getBoolean(17));
                 documents.add(edocDocument);
             }

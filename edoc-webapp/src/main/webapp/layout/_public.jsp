@@ -13,138 +13,143 @@
     <%--<link rel="shortcut icon" href="<c:url value="/images/favicon.ico"/>" type="image/x-icon">
     <link rel="icon" href="<c:url value="/images/favicon.ico"/>" type="image/x-icon">--%>
     <title><tiles:getAsString name="title"/></title>
-    <!-- Bootstrap Core CSS -->
     <link href="<c:url value="/asset/css/bootstrap.min.css"/>" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
     <!-- DataTables CSS -->
     <link href="<c:url value="/asset/css/dataTables/jquery.dataTables.min.css"/>" rel="stylesheet">
     <link href="<c:url value="/asset/css/dataTables/dataTables.bootstrap.min.css"/>" rel="stylesheet">
     <!-- DataTables Responsive CSS -->
     <link href="<c:url value="/asset/css/dataTables/responsive.dataTables.min.css"/>" rel="stylesheet">
     <link href="<c:url value="/asset/css/dataTables/responsive.bootstrap.min.css"/>" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Custom Fonts -->
     <link href="<c:url value="/asset/css/font-awesome.min.css"/>" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
+    <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
     <!-- Custom CSS -->
     <link href="<c:url value="/asset/css/report.css"/>" rel="stylesheet">
+    <link href="<c:url value="/asset/css/startmin.css"/>" rel="stylesheet">
 </head>
 <body>
-    <div id="wrapper">
-        <tiles:insertAttribute name="body"/>
+<div id="wrapper">
+    <tiles:insertAttribute name="body"/>
+</div>
+<script id="edocPublicStatTmpl" type="text/x-jquery-tmpl">
+    <div>
+        <a href="<c:url value="/public/stat/detail"/>">
+            <div id="publicContent">
+                <p class="before">${String.format(app_message.edoc_before_content, getCurrentMonth() + 1)}</p>
+                <p id="all" class="main">${addCommas(total + 0)}</p>
+                <p class="after">${app_message.edoc_after_first_content}</p>
+                <p class="after">${String.format(app_message.edoc_after_second_content,totalOrgan)}</p>
+                <p class="sub">${String.format(app_message.edoc_after_last_content,dateTime)}</p>
+            </div>
+        </a>
     </div>
-    <script id="edocPublicStatTmpl" type="text/x-jquery-tmpl">
-        <div>
-            <a href="<c:url value="/public/stat/detail"/>">
-                <div id="publicContent">
-                    <p class="before">${String.format(app_message.edoc_before_content, getCurrentMonth() + 1)}</p>
-                    <p id="all" class="main">${addCommas(total + 0)}</p>
-                    <p class="after">${app_message.edoc_after_first_content}</p>
-                    <p class="after">${String.format(app_message.edoc_after_second_content,totalOrgan)}</p>
-                    <p class="sub">${String.format(app_message.edoc_after_last_content,dateTime)}</p>
-                </div>
-            </a>
+</script>
+<script id="edocPublicTraceTmpl" type="text/x-jquery-tmpl">
+    <form class="form-horizontal" action="javascript:void(0)">
+        <div class="form-group">
+            <div class="col-md-1 col-sm-6 col-xs-12">
+                <label class="control-label " for="subjectInfo">${app_message.edoc_table_header_subject}</label>
+            </div>
+            <div class="col-md-11 col-sm-6 col-xs-12">
+                <textarea class="form-control" readonly rows="2" id="subjectInfo">${subject}</textarea>
+            </div>
         </div>
-    </script>
-
-    <script id="edocPublicTraceTmpl" type="text/x-jquery-tmpl">
-        <form class="form-horizontal" action="javascript:void(0)">
-            <div class="form-group">
-                <div class="col-md-1 col-sm-6 col-xs-12">
-                    <label class="control-label " for="subjectInfo">${app_message.edoc_table_header_subject}</label>
-                </div>
-                <div class="col-md-11 col-sm-6 col-xs-12">
-                    <textarea class="form-control" readonly rows="2" id="subjectInfo">${subject}</textarea>
-                </div>
+        <div class="form-group">
+            <div class="col-md-1 col-sm-6 col-xs-12">
+                <label class="control-label " for="toOrganInfo">
+                    ${app_message.edoc_organ_process}
+                </label>
             </div>
-            <div class="form-group">
-                <div class="col-md-1 col-sm-6 col-xs-12">
-                    <label class="control-label " for="toOrganInfo">
-                        ${app_message.edoc_organ_process}
-                    </label>
-                </div>
-                <div class="col-md-11 col-sm-6 col-xs-12">
-                    <textarea class="form-control" readonly rows="3" id="toOrganInfo">${toOrganName}</textarea>
-                </div>
+            <div class="col-md-11 col-sm-6 col-xs-12">
+                <textarea class="form-control" readonly rows="3" id="toOrganInfo">${toOrganName}</textarea>
             </div>
-            <div class="form-group trace-area">
-                <div class="col-md-12 col-xs-12 col-sm-12">
-                    <span class="field-title">
-                        ${app_message.edoc_trace}
-                    </span>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12 traces">
-                        {{if traces.length > 0}}
-                            {{each traces}}
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="staff-comment col-md-8 col-sm-6 col-xs-12" id="trace_${traceId}">
-                                                <div class="staff-handler>
+        </div>
+        <div class="form-group trace-area">
+            <div class="col-md-12 col-xs-12 col-sm-12">
+                <span class="field-title">
+                    ${app_message.edoc_trace}
+                </span>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 traces">
+                    {{if traces.length > 0}}
+                        {{each traces}}
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="staff-comment col-md-8 col-sm-6 col-xs-12" id="trace_${traceId}">
+                                            <div class="staff-handler>
 
-                                                    <span><i class="fa fa-info-circle fa-fw"></i>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>
-                                                </div>
-                                                <div class="staff-comment">
-                                                    <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
-                                                </div>
-                                    </div>
-                                        <div class="col-md-2 col-sm-6 col-xs-12 text-center">
-                                            ${getStatusOfTrace(statusCode)}
-                                        </div>
-                                        <div class="col-md-1 col-sm-6 col-xs-12 text-center">
-                                            <span>${convertToDate(timeStamp).formatTime()}</span>
-                                        </div>
-                                        <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
-                                            <span>${convertToDate(timeStamp).formatDate()}</span>
-                                        </div>
-                                    </div>
-
+                                                <span><i class="fa fa-info-circle fa-fw"></i>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>
+                                            </div>
+                                            <div class="staff-comment">
+                                                <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
+                                            </div>
                                 </div>
-                            {{/each}}
-                        {{else}}
-                            {{each notifications}}
-                                <div class="form-group">
-                                    <div class="col-md-8 col-sm-6 col-xs-12">
-                                        <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
-                                    </div>
                                     <div class="col-md-2 col-sm-6 col-xs-12 text-center">
-                                        {{if taken == false}}
-                                            ${app_message.edoc_not_received_message}
-                                        {{else}}
-                                            ${app_message.edoc_received_message}
-                                        {{/if}}
+                                        ${getStatusOfTrace(statusCode)}
                                     </div>
                                     <div class="col-md-1 col-sm-6 col-xs-12 text-center">
-                                        <span>${convertToDate(modifiedDate).formatTime()}</span>
+                                        <span>${convertToDate(timeStamp).formatTime()}</span>
                                     </div>
                                     <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
-                                        <span>${convertToDate(modifiedDate).formatDate()}</span>
+                                        <span>${convertToDate(timeStamp).formatDate()}</span>
                                     </div>
                                 </div>
-                            {{/each}}
-                        {{/if}}
-                    </div>
+
+                            </div>
+                        {{/each}}
+                    {{else}}
+                        {{each notifications}}
+                            <div class="form-group">
+                                <div class="col-md-8 col-sm-6 col-xs-12">
+                                    <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
+                                </div>
+                                <div class="col-md-2 col-sm-6 col-xs-12 text-center">
+                                    {{if taken == false}}
+                                        ${app_message.edoc_not_received_message}
+                                    {{else}}
+                                        ${app_message.edoc_received_message}
+                                    {{/if}}
+                                </div>
+                                <div class="col-md-1 col-sm-6 col-xs-12 text-center">
+                                    <span>${convertToDate(modifiedDate).formatTime()}</span>
+                                </div>
+                                <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
+                                    <span>${convertToDate(modifiedDate).formatDate()}</span>
+                                </div>
+                            </div>
+                        {{/each}}
+                    {{/if}}
                 </div>
             </div>
-        </form>
-    </script>
-    <!-- jQuery -->
-    <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
-    <script src="<c:url value="/asset/js/message.js"/>"></script>
-    <script src="<c:url value="/asset/js/notify.min.js"/>"></script>
-    <%--datetimepicker--%>
-    <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
-    <!-- Bootstrap Core JavaScript -->
-    <script src="<c:url value="/asset/js/bootstrap.min.js"/>"></script>
-    <!-- Custom Theme JavaScript -->
-    <script src="<c:url value="/asset/js/report.js" />"></script>
-    <script src="<c:url value="/asset/js/trace.js" />"></script>
-    <script src="<c:url value="/asset/js/datetime.js" />"></script>
-    <%--JQuery template--%>
-    <script src="<c:url value="/asset/js/jquery.tmpl.min.js"/>"></script>
-    <!-- DataTables JavaScript -->
-    <script src="<c:url value="/asset/js/dataTables/jquery.dataTables.min.js"/>"></script>
-    <script src="<c:url value="/asset/js/dataTables/dataTables.bootstrap.min.js"/>"></script>
-    <script src="<c:url value="/asset/js/dataTables/dataTables.responsive.min.js"/>"></script>
-    <script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>
+        </div>
+    </form>
+</script>
+<%--Jquery--%>
+<script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
+<script src="<c:url value="/asset/js/message.js"/>"></script>
+<script src="<c:url value="/asset/js/jquery.cookie.js"/>"></script>
+<script src="<c:url value="/asset/js/notify.min.js"/>"></script>
+<script src="<c:url value="/asset/js/jquery.formatter.js"/>"></script>
+<script src="<c:url value="/asset/js/select2.min.js"/>"></script>
+<%--datetimepicker--%>
+<script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="<c:url value="/asset/js/bootstrap.min.js"/>"></script>
+<%--JQuery template--%>
+<script src="<c:url value="/asset/js/jquery.tmpl.min.js"/>"></script>
+<script src="<c:url value="/asset/js/datetime.js" />"></script>
+<!-- DataTables JavaScript -->
+<script src="<c:url value="/asset/js/dataTables/jquery.dataTables.min.js"/>"></script>
+<script src="<c:url value="/asset/js/dataTables/dataTables.bootstrap.min.js"/>"></script>
+<script src="<c:url value="/asset/js/dataTables/dataTables.responsive.min.js"/>"></script>
+<script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>
+<!-- Custom Theme JavaScript -->
+<script src="<c:url value="/asset/js/report.js" />"></script>
+<script src="<c:url value="/asset/js/datetime.js" />"></script>
 </body>
 </html>

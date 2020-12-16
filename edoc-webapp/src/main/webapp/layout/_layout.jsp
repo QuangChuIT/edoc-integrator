@@ -62,6 +62,7 @@
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
     <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
 </head>
+
 <body>
 <tiles:insertAttribute name="header"/>
 <div class="side-bar" id="layoutSideBar">
@@ -166,11 +167,11 @@
                     <div class="fileuploader-input-inner">
                         <div class="fileuploader-icon-main"></div>
                         <h3 class="fileuploader-input-caption">
-                            <span><spring:message code="modal.import.excel.dragdrop"></span>
+                            <span><spring:message code="modal.import.excel.dragdrop"/></span>
                         </h3>
-                        <p><spring:message code="modal.import.excel.or"></p>
+                        <p><spring:message code="modal.import.excel.or"/></p>
                         <button type="button" class="fileuploader-input-button">
-                            <span><spring:message code="modal.import.excel.choose"></span>
+                            <span><spring:message code="modal.import.excel.choose"/></span>
                         </button>
                     </div>
                 </div>

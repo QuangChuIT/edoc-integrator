@@ -73,16 +73,17 @@ let edocDocument = {
                     "title": app_message.edoc_table_header_subject,
                     "data": null,
                     "render": function (data) {
+                        console.log(data);
                         return $('#edocSubjectTemplate').tmpl(data).html();
                     }
                 },
                 {
-                    "name" : "ed.from_organ_domain",
+                    "name": "ed.from_organ_domain",
                     "title": app_message.edoc_table_header_fromOrgan,
                     "data": "fromOrgan.name"
                 },
                 {
-                    "name" : "ed.doc_code",
+                    "name": "ed.doc_code",
                     "title": app_message.table_header_code,
                     "data": null,
                     "render": function (data) {
@@ -90,7 +91,7 @@ let edocDocument = {
                     }
                 },
                 {
-                    "name" : "ed.document_type_name",
+                    "name": "ed.document_type_name",
                     "title": app_message.table_header_documentCate,
                     "data": null,
                     "render": function (data) {
@@ -98,7 +99,7 @@ let edocDocument = {
                     }
                 },
                 {
-                    "name" : "ed.create_date",
+                    "name": "ed.create_date",
                     "title": app_message.table_header_createDate,
                     "data": null,
                     "render": function (data) {
@@ -385,7 +386,7 @@ $(document).ready(function () {
             data.toOrganName = toOrganNames.join(", ");
             data.code = data.codeNumber + "/" + data.codeNotation;
             let documentEle = $("#" + documentId);
-            if(documentEle.hasClass("not-visited")){
+            if (documentEle.hasClass("not-visited")) {
                 documentEle.removeClass("not-visited");
                 documentEle.find(".edoc-subject").find("#statusViewDoc").remove();
                 documentEle.find(".edoc-subject").prepend("<i class=\"fa fa-envelope-open-o fa-fw\" id=\"statusViewDoc\"></i>")
@@ -450,8 +451,7 @@ $(document).ready(function () {
             if (keyword.length === 0) {
                 organManage.organSetting.dataTable.page.len(pageLength);
                 pageLength = 0;
-            }
-            else if (pageLength === 0) {
+            } else if (pageLength === 0) {
                 pageLength = organManage.organSetting.dataTable.page.len();
                 organManage.organSetting.dataTable.page.len(1000);
             }
@@ -465,8 +465,7 @@ $(document).ready(function () {
             if (keyword.length === 0) {
                 edocDocument.appSetting.dataTable.page.len(pageLength);
                 pageLength = 0;
-            }
-            else if (pageLength === 0) {
+            } else if (pageLength === 0) {
                 pageLength = edocDocument.appSetting.dataTable.page.len();
                 edocDocument.appSetting.dataTable.page.len(1000);
             }

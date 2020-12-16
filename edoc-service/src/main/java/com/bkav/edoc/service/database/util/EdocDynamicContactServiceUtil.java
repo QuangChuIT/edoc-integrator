@@ -16,8 +16,8 @@ public class EdocDynamicContactServiceUtil {
         return DYNAMIC_CONTACT_SERVICE.getAllContacts();
     }
 
-    public static int countContacts(PaginationCriteria paginationCriteria) {
-        return DYNAMIC_CONTACT_SERVICE.countContacts(paginationCriteria);
+    public static String getNameByOrganId(String organId) {
+        return DYNAMIC_CONTACT_SERVICE.getNameByOrganId(organId);
     }
 
     public static Map<String, Object> getContacts(PaginationCriteria paginationCriteria) {

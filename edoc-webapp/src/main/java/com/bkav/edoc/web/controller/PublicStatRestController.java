@@ -19,9 +19,11 @@ import java.util.List;
 @RestController
 public class PublicStatRestController {
 
-    @GetMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
-        String organDomainCode = PropsUtil.get("edoc.root.organDomain");
+
+    @RequestMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
+                                           @RequestParam(value = "toDate", required = false) String toDate) {
+        String organDomainCode = PropsUtil.get("edoc.except.organId");
         if (fromDate == null || toDate == null) {
             return EdocDailyCounterServiceUtil.getStatsDetail(organDomainCode, null, null);
         } else {
@@ -33,7 +35,7 @@ public class PublicStatRestController {
 
     @GetMapping(value = "/public/-/document/stat", produces = {MediaType.APPLICATION_JSON_VALUE})
     public EPublic getStat() {
-        String organDomainCode = PropsUtil.get("edoc.root.organDomain");
+        String organDomainCode = PropsUtil.get("edoc.except.organId");
         return EdocDailyCounterServiceUtil.getStat(organDomainCode);
     }
 

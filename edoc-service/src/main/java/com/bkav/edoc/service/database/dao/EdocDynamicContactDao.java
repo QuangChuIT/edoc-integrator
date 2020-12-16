@@ -20,4 +20,5 @@ public interface EdocDynamicContactDao {
 
     EdocDynamicContact deleteOrgan(long organId);
 
+    String getNameByOrganId(String organId);
 }

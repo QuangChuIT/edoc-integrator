@@ -349,7 +349,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             status = extractMime.getStatus(envelop);
 
             SignatureEdoc signature = extractMime.getSignature(envelop);
-
+            LOGGER.info(signature);
             report = checker.checkSignature(signature);
 
             if (!report.isIsSuccess()) {

@@ -1,4 +1,3 @@
-let AdministratorId, SuperAdministratorId;
 let userManage = {
     userSetting: {
         host: "/public/-/user/",
@@ -39,22 +38,31 @@ let userManage = {
                         }
                     },
                     items: {
-                        "edit": {name: user_message.manage_edit_user, icon: "edit", disabled: function(key, opt) {
-                            let id = opt.$trigger[0].id;
-                            if (id == AdministratorId || id == SuperAdministratorId)
-                                return !this.data('editDisabled');
-                            }},
-                        "permission": {name: user_message.manage_permission_user, icon: "fa-shield", disabled: function(key, opt) {
-                            let id = opt.$trigger[0].id;
-                            if (id == AdministratorId || id == SuperAdministratorId)
-                                return !this.data('permissionDisabled');
-                        }},
+                        "edit": {
+                            name: user_message.manage_edit_user, icon: "edit", disabled: function (key, opt) {
+                                let id = opt.$trigger[0].id;
+                                return true;
+                               /* if (id == AdministratorId || id == SuperAdministratorId)
+                                    return !this.data('editDisabled');*/
+                            }
+                        },
+                        "permission": {
+                            name: user_message.manage_permission_user,
+                            icon: "fa-shield",
+                            disabled: function (key, opt) {
+                                let id = opt.$trigger[0].id;
+                                return true;
+                                /*if (id == AdministratorId || id == SuperAdministratorId)
+                                    return !this.data('permissionDisabled');*/
+                            }
+                        },
                         "sep1": "---------",
                         "delete": {
                             name: user_message.manage_remove_user, icon: "delete", disabled: function (key, opt) {
                                 let id = opt.$trigger[0].id;
-                                if (id == AdministratorId || id == SuperAdministratorId)
-                                    return !this.data('daleteDisabled');
+                                return true;
+                                /*if (id == AdministratorId || id == SuperAdministratorId)
+                                    return !this.data('deleteDisabled');*/
                             }
                         }
                     }
@@ -292,7 +300,7 @@ $(document).ready(function () {
 
     // Click to show modal for upload file
     // Developing...
-    $("#importUserFromExcel").on('click', function(e) {
+    $("#importUserFromExcel").on('click', function (e) {
         e.preventDefault();
         $('#importExcelModal').modal({
             backdrop: 'static',
@@ -306,7 +314,6 @@ $(document).ready(function () {
     // $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
     //     SuperAdministratorId = data.roleId;
     // });
-
 });
 
 // Call ajax to import users from excel file
@@ -327,8 +334,7 @@ $(document).on("change", "#importUserFromExcel", function (e) {
             if (response === "OK") {
                 $.notify(user_message.user_import_from_excel_success, "success");
                 $("#importUserFromExcel").val('');
-            }
-            else if (response === "BAD_REQUEST")
+            } else if (response === "BAD_REQUEST")
                 $.notify(user_message.user_import_invalid_format_file, "error");
                 // else if (response.code === 409)
             //     $.notify(user_message.user_import_from_excel_conflic, "error");

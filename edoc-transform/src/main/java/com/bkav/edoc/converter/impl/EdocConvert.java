@@ -29,15 +29,15 @@ public class EdocConvert {
         log.info("---------------------- Get Document ----------------------------");
 
         Connection connection = DBConnectionUtil.initConvertDBConnection();
-        int totalDoc = DatabaseUtil.getTotalDocument(connection);
 
         String checkDate = "2020-09-25";
 
         List<EdocDocument> documents = DatabaseUtil.getFromDatabase(connection, checkDate);
-
+        int count = 0;
         log.info("---------------------- Get Document Success with size " + documents.size() + " ----------------------------");
         for (EdocDocument document : documents) {
             try {
+                LOGGER.info("Convert success number document " + count);
                 long oldDocumentId = document.getDocumentId();
 
                 EdocDocumentDetail documentDetail = DatabaseUtil.getEdocDocumentDetailByDocId(oldDocumentId, connection);
@@ -79,6 +79,7 @@ public class EdocConvert {
                         traceHeader.setTraceHeaderList(traceHeaderList);
                         edocTraceHeaderListService.createTraceHeader(traceHeader);
                     }
+                    count ++;
                 } else {
                     LOGGER.warn("Not convert document with old document id " + oldDocumentId + " cause another value reference null");
                 }

@@ -148,7 +148,7 @@ public class UserRestController {
             long user_id = Long.parseLong(userId);
             UserCacheEntry user = UserServiceUtil.getUserById(user_id);
             if (user != null) {
-                return   new ResponseEntity<>(user, HttpStatus.OK);
+                return new ResponseEntity<>(user, HttpStatus.OK);
             }
         } catch (Exception e) {
             LOGGER.error(e);

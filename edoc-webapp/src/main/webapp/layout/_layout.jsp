@@ -10,8 +10,8 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.List" %>
-    <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
-    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -61,9 +61,7 @@
     <link href="<c:url value="/asset/css/font-awesome.min.css"/>" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
     <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
-
-    <!-- Css modal import Excel -->
-    <link href="<c:url value="/asset/css/dragdropModalTheme/script.css"/>" rel="stylesheet"/>
+</head>
 <body>
 <tiles:insertAttribute name="header"/>
 <div class="side-bar" id="layoutSideBar">

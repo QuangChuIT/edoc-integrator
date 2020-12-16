@@ -303,9 +303,9 @@ $(document).ready(function () {
     $.get("/public/-/role/" + role_message.role_administrator, function (data) {
         AdministratorId = data.roleId;
     });
-    $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
-        SuperAdministratorId = data.roleId;
-    });
+    // $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
+    //     SuperAdministratorId = data.roleId;
+    // });
 
 });
 

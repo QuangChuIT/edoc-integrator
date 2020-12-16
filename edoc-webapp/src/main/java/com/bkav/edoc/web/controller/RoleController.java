@@ -57,7 +57,7 @@ public class RoleController {
     }
 
     @RequestMapping(value = "/public/-/role/{roleName}", method = RequestMethod.GET,
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
     public ResponseEntity<?> getRoleIdByRoleKey(@PathVariable("roleName") String roleName) {
         try {

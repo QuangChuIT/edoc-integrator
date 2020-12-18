@@ -10,11 +10,12 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 
 public class ExcelUtil {
     private final static ExcelService excelService = new ExcelService();
 
-    public static List<User> importUserFromExcel(MultipartFile file) throws IOException {
+    public static Map<String, Object> importUserFromExcel(MultipartFile file) throws IOException {
         return excelService.readExcelFileForUser(file);
     }
 
@@ -32,7 +33,7 @@ public class ExcelUtil {
         return excelService.ExportOrganToExcel(organs);
     }
 
-    public static long PushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        return excelService.PushExcelDataToSSO(users);
+    public static long pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        return excelService.pushExcelDataToSSO(users);
     }
 }

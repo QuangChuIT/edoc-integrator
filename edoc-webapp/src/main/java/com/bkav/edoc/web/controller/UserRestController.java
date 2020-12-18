@@ -1,22 +1,14 @@
 package com.bkav.edoc.web.controller;
 
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
-import com.bkav.edoc.service.database.entity.pagination.DataTableResult;
-import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
-import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
-import com.bkav.edoc.web.payload.AddUserRequest;
-import com.bkav.edoc.web.payload.EditUserRequest;
-import com.bkav.edoc.web.payload.Response;
-import com.bkav.edoc.web.payload.UserRequest;
-import com.bkav.edoc.web.util.CommonUtils;
+import com.bkav.edoc.web.payload.*;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
@@ -160,36 +152,41 @@ public class UserRestController {
      * Excel File Upload
      */
     @RequestMapping(method = RequestMethod.POST,
-            value = "/public/-/user/import")
-    public HttpStatus importUserFromExcel(@RequestParam("importUserFromExcel") MultipartFile file) {
-        List<String> errors = new ArrayList<>();
+            value = "/public/-/user/import", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String importUserFromExcel(@RequestParam("fileToUpload") MultipartFile file) {
         LOGGER.info("API import user from excel invoke !!!!!!!!!!!!!!!!!!!!!!!!!");
-        long numOfUser = 0;
+        Response response = null;
         try {
             if (validateUtil.checkExtensionFile(file)) {
                 if (validateUtil.checkHeaderExcelFileForUser(file)) {
-                    List<User> users = ExcelUtil.importUserFromExcel(file);
-
-                    LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
-                    //numOfUser = ExcelUtil.PushUsersToSSO(users);
-                    String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
-                    LOGGER.info(readFileSuccess);
-                    return HttpStatus.OK;
+                    Map<String, Object> map = ExcelUtil.importUserFromExcel(file);
+                    List<ImportExcelError> importExcelErrors = (List<ImportExcelError>) map.get("errors");
+                    if (importExcelErrors.size() > 0) {
+                        List<String> errors = messageSourceUtil.convertToMessage(importExcelErrors);
+                        response = new Response(400, errors, messageSourceUtil.getMessage("data.invalid", null));
+                    } else {
+                        List<User> users = (List<User>) map.get("users");
+                        LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
+                        long numOfUser = ExcelUtil.pushUsersToSSO(users);
+                        String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
+                        response = new Response(200, new ArrayList<>(), readFileSuccess);
+                    }
                 } else {
-                    return HttpStatus.NOT_ACCEPTABLE;
+                    response = new Response(400, new ArrayList<>(), messageSourceUtil.getMessage("user.error.header", null));
                 }
             } else {
                 String invalidFormat = messageSourceUtil.getMessage("edoc.message.user.file.format.error", null);
-                LOGGER.error(invalidFormat);
-                errors.add(invalidFormat);
-                return HttpStatus.BAD_REQUEST;
+                response = new Response(400, new ArrayList<>(), invalidFormat);
             }
         } catch (Exception e) {
             String uploadExcelError = messageSourceUtil.getMessage("edoc.message.file.upload.error", null);
-            LOGGER.error(uploadExcelError + e.getMessage());
-            errors.add(uploadExcelError);
-            return HttpStatus.INTERNAL_SERVER_ERROR;
+            List<String> error = new ArrayList<>();
+            error.add(e.getMessage());
+            LOGGER.error("Error import user from excel file cause " + e.getMessage());
+            response = new Response(500, error, uploadExcelError);
         }
+        return new Gson().toJson(response);
     }
 
 
@@ -238,7 +235,7 @@ public class UserRestController {
 
 //                    UserServiceUtil.createUser(newUser);
                     users.add(newUser);
-                    long numUserSuccess = ExcelUtil.PushUsersToSSO(users);
+                    long numUserSuccess = ExcelUtil.pushUsersToSSO(users);
                     message = messageSourceUtil.getMessage("user.message.create.success", null);
                 } else {
                     code = 400;

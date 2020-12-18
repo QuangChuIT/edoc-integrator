@@ -73,7 +73,7 @@ public class PostUserToSSO {
                 response.close();
             }
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Error post user to sso server cause ", e);
         } finally {
             httpclient.close();
         }

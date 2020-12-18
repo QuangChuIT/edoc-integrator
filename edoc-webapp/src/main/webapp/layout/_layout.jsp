@@ -22,7 +22,7 @@
     request.setAttribute("priorityList", priorityList);
     List<EdocDocumentType> typeList = EdocTypeServiceUtil.getTypes();
     request.setAttribute("typeList", typeList);
-    String organToQuery = PropsUtil.get("edoc.root.organDomain");
+    String organToQuery = PropsUtil.get("edoc.except.organId");
     List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByFilterDomain(organToQuery);
     String organLogin = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
     String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
@@ -61,6 +61,7 @@
     <link href="<c:url value="/asset/css/font-awesome.min.css"/>" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
     <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/asset/css/sweetalert2.min.css"/>" rel="stylesheet"/>
 </head>
 
 <body>
@@ -1733,6 +1734,7 @@
 <script src="<c:url value="/asset/js/notify.min.js"/>"></script>
 <script src="<c:url value="/asset/js/jquery.formatter.js"/>"></script>
 <script src="<c:url value="/asset/js/select2.min.js"/>"></script>
+<script src="<c:url value="/asset/js/sweetalert2.min.js"/>"></script>
 <%--datetimepicker--%>
 <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
 <!-- Bootstrap Core JavaScript -->

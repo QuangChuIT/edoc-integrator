@@ -4,10 +4,10 @@ import com.bkav.edoc.service.database.entity.Role;
 import com.bkav.edoc.service.database.util.RoleServiceUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -56,17 +56,17 @@ public class RoleController {
         return HttpStatus.OK;
     }
 
-    @RequestMapping(value = "/public/-/role/{roleName}", method = RequestMethod.GET,
+    @RequestMapping(value = "/public/-/role/{roleKey}", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
-    public ResponseEntity<?> getRoleIdByRoleKey(@PathVariable("roleName") String roleName) {
+    public String getRoleIdByRoleKey(@PathVariable("roleKey") String roleName) {
         try {
             Role role = RoleServiceUtil.getRoleByRoleName(roleName);
-            return new ResponseEntity<>(role.getRoleId(), HttpStatus.OK);
+            return new Gson().toJson(role);
         } catch (Exception e) {
             LOGGER.error(e);
+            return "";
         }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.RoleController.class);

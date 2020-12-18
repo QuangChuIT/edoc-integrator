@@ -27,7 +27,10 @@ let organManage = {
             pageLength: 25,
             ajax: {
                 url: "/contact/-/document/contacts",
-                type: "POST"
+                type: "POST",
+                success: function(data) {
+                    console.log(data)
+                }
             },
             drawCallback: function () {
                 $(this).contextMenu({

@@ -2,17 +2,21 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
+import java.util.*;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -92,10 +96,29 @@ public class EdocNotificationService {
         }
     }
 
+    public String getDocumentNotTakenByOrganId() {
+        Map<String, Object> map = new HashMap<>();
+        Session session = notificationDaoImpl.openCurrentSession();
+        try {
+            List<String> organsId = notificationDaoImpl.getReceiverIdNotTaken();
+            map.put("receiverId", organsId);
+            System.out.println(new Gson().toJson(map));
+            System.out.println(map.size());
+            return new Gson().toJson(map);
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new Gson().toJson(map);
+        } finally {
+            notificationDaoImpl.closeCurrentSession(session);
+        }
+    }
+
     public static void main(String[] args) {
         EdocNotificationService edocNotificationService = new EdocNotificationService();
-        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
+//        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
+        edocNotificationService.getDocumentNotTakenByOrganId();
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
+
 }

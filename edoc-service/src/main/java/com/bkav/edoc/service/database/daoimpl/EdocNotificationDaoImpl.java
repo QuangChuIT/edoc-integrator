@@ -97,5 +97,21 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         query.executeUpdate();
     }
 
+    public List<String> getReceiverIdNotTaken() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.receiverId FROM EdocNotification en where en.taken=:taken group by en.receiverId");
+            Query<String> query = session.createQuery(sql.toString(), String.class);
+            query.setParameter("taken", false);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationDaoImpl.class);
 }

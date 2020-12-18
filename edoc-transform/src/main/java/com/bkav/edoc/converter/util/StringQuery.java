@@ -15,6 +15,13 @@ public class StringQuery {
     public static final String COUNT_DOCUMENTS = "Select count(*) from edoc_document";
     public static final String GET_DYNAMIC_CONTACT = "Select Id, Name, InCharge, Domain, Email, Address, Telephone, Fax, Website, Type, Version from edoc_dynamiccontact";
     public static final String GET_USER = "Select userId, screenName, emailAddress, CONCAT(firstName,' ', middleName,' ', lastName), password_, status, createDate, modifiedDate, lastLoginDate, lastLoginIP from user_";
-    public static final String GET_DATE_COUNTER = "Select distinct Date(sent_date) from edoc_document";
-    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from edoc_document where Date(sent_date) = ? group by doc_code";
+
+    public static final String GET_DATE_COUNTER = "Select distinct Date(sentDate) from edoc_document where year(sentDate)= 2020";
+
+    /*public static final String GET_DATE_COUNTER = "Select distinct Date(sent_date) from edoc_document where year(sent_date) = 2020";*/
+
+    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select fromOrganDomain, toOrganDomain, sentDate from edoc_document where Date(sentDate) = ?";
+
+    /*public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from " +
+            "edoc_document where Date(sent_date) = ? group by doc_code";*/
 }

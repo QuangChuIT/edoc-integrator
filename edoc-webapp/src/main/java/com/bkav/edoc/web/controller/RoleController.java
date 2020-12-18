@@ -62,7 +62,7 @@ public class RoleController {
     public ResponseEntity<?> getRoleIdByRoleKey(@PathVariable("roleName") String roleName) {
         try {
             Role role = RoleServiceUtil.getRoleByRoleName(roleName);
-            return new ResponseEntity<>(role, HttpStatus.OK);
+            return new ResponseEntity<>(role.getRoleId(), HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error(e);
         }

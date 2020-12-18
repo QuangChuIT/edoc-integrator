@@ -36,16 +36,15 @@ let edocReport = {
             url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
         }
         instance.appSetting.dataTable = $('#edocReportTable').DataTable({
-            serverSide: true,
-            processing: true,
-            pageLength: 25,
             ajax: {
                 url: url,
-                type: "POST"
+                type: "POST",
+                dataSrc: ""
             },
+            pageLength: 25,
             responsive: true,
             autoWidth: false,
-            ordering: false,
+            ordering: true,
             bDestroy: true,
             searching: false,
             lengthChange: false,

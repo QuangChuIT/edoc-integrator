@@ -52,8 +52,14 @@ public class EdocDailyCounterService {
                 }
 
                 storedProcedureQuery.setParameter("organId", organId);
-                int sent = (Integer) storedProcedureQuery.getOutputParameterValue("totalSent");
-                int received = (Integer) storedProcedureQuery.getOutputParameterValue("totalReceived");
+                int sent = 0;
+                int received = 0;
+                if(storedProcedureQuery.getOutputParameterValue("totalSent") != null){
+                    sent = (Integer) storedProcedureQuery.getOutputParameterValue("totalSent");
+                }
+                if( storedProcedureQuery.getOutputParameterValue("totalReceived") != null){
+                    received = (Integer) storedProcedureQuery.getOutputParameterValue("totalReceived");
+                }
                 EPublicStat ePublicStat = new EPublicStat();
                 ePublicStat.setLastUpdate(new Date());
                 ePublicStat.setOrganDomain(organDomain);

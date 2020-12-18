@@ -254,7 +254,7 @@ public class UserRestController {
         }
     }
 
-    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.GET)
+    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
     public HttpStatus ExportUserToExcel() throws IOException {
         boolean result;
         List<User> users = UserServiceUtil.getUser();

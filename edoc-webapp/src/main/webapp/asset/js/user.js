@@ -1,3 +1,4 @@
+let AdministratorId;
 let userManage = {
     userSetting: {
         host: "/public/-/user/",
@@ -309,11 +310,15 @@ $(document).ready(function () {
     // })
 
     $.get("/public/-/role/" + role_message.role_administrator, function (data) {
-        AdministratorId = data.roleId;
+        AdministratorId = data;
+        console.log(data)
     });
     // $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
     //     SuperAdministratorId = data.roleId;
     // });
+    $("#email-template-menu").on('click', function (e){
+        e.preventDefault();
+    })
 });
 
 // Call ajax to import users from excel file
@@ -359,13 +364,15 @@ $(document).on("change", "#importUserFromExcel", function (e) {
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "/public/-/user/export",
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
         success: function (response) {
-            $.notify(user_message.user_export_to_excel_success, "success");
+            if (response === "OK") {
+                $.notify(user_message.user_export_to_excel_success, "success");
+            }
         },
         error: (e) => {
             $.notify(user_message.user_export_to_excel_fail, "error");

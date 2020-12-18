@@ -102,7 +102,7 @@
             }
         %>
         <li>
-            <a href="javascript:void(0)" cla                                                                    ss="email-template-menu" data-mode="draft" id="email-template-menu">
+            <a href="javascript:void(0)" class="email-template-menu" data-mode="draft" id="email-template-menu">
                 <i class="fa fa-envelope fa-fw"></i>
                 <span class="menu-title"><spring:message code="menu.email.template.manage"/></span>
             </a>

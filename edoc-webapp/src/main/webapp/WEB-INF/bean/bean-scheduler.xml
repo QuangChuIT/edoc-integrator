@@ -122,4 +122,13 @@
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
+
+    <bean name="sendEmailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendEmailJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="sendEmailBean" value-ref="sendEmailBean"/>
+            </map>
+        </property>
+    </bean>
 </beans>

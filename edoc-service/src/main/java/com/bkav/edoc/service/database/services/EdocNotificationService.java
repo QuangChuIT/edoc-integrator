@@ -105,25 +105,6 @@ public class EdocNotificationService {
         List<EmailRequest> emailRequests = new ArrayList<>();
         Session session = notificationDaoImpl.openCurrentSession();
         try {
-//            List<String> organIds = notificationDaoImpl.getReceiverIdNotTaken();
-//            for (String organId: organIds) {
-//                map = new HashMap<>();
-//                List<EdocDocument> documents = notificationDaoImpl.getDocumentByReceiverId(organId);
-//                List<String> documentDetails = new ArrayList<>();
-//                for (EdocDocument document: documents) {
-//                    documentMap = new HashMap<>();
-//                    documentMap.put("Subject", document.getSubject());
-//                    documentMap.put("FromOrgan", document.getPromulgationPlace());
-//                    documentMap.put("SentDate", String.valueOf(document.getSentDate()));
-//                    documentDetails.add(new Gson().toJson(documentMap));
-//                }
-//                map.put("ReceiverId", organId);
-//                map.put("NumberOfDocNotTaken", documentDetails.size());
-//                map.put("documents", documentDetails);
-//                json.add(new Gson().toJson(map));
-//            }
-//            System.out.println(json);
-//            System.out.println(json.size());
             List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken();
             for (String receiverId: receiverIds) {
                 EmailRequest emailRequest = new EmailRequest();

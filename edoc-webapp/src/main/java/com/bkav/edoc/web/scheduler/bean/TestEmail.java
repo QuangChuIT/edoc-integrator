@@ -1,6 +1,4 @@
-package com.bkav.edoc.web.scheduler.bean;
-
-import com.bkav.edoc.web.scheduler.bean.EmailSenderBean;
+package com.bkav.edoc.web.scheduler.bean;;
 
 public class TestEmail {
     public static void main(String[] args) {

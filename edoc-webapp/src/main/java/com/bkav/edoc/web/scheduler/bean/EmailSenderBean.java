@@ -40,9 +40,11 @@ public class EmailSenderBean {
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
                 String receiverEmail = contact.getEmail();
                 emailObject.setReceiverName(contact.getName());
-                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "noreply@bmail.com", "fbt87716@zwoho.com", emailObject);
+                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "no-reply@bmail.com", "fbt87716@zwoho.com", emailObject);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " successfully!!!");
+
+                // test run 2 times
                 test++;
                 if (test == 2)
                     break;

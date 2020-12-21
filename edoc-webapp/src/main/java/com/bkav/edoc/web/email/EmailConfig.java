@@ -17,7 +17,7 @@ public class EmailConfig {
 
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("noreply@bmail.com");
+        mailSender.setUsername("no-reply@bmail.com");
         //mailSender.setPassword("gmail password");
 
         Properties javaMailProperties = new Properties();

@@ -248,8 +248,14 @@ let userManage = {
         $('#formPermission').modal('toggle');
     }
 }
+$(document).on("ready", function () {
+    $("#editOrganDomain").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
+    });
+});
 $(document).ready(function () {
-
     // Show detail of user-login info
     $(".user-info").on('click', function () {
         let userId = $(this).attr("data-id");
@@ -290,11 +296,6 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     });
-    $("#editOrganDomain").select2({
-        tags: true,
-        maximumSelectionLength: 1,
-        width: "auto"
-    })
     $(document).on('click', 'input[type="checkbox"]', function () {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });

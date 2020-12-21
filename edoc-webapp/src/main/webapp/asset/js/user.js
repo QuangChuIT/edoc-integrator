@@ -595,3 +595,12 @@ function editUserClick(userId) {
         keyboard: false
     });
 }
+
+function progressHandler(event) {
+    var percent = (event.loaded / event.total) * 100;
+    _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+}
+
+function completeHandler(event) {
+    _("status").innerHTML = event.target.responseText;
+}

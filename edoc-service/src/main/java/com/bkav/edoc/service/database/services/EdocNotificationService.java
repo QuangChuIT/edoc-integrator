@@ -4,9 +4,11 @@ import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
+import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
+import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
@@ -97,17 +99,34 @@ public class EdocNotificationService {
     }
 
     public String getDocumentNotTakenByOrganId() {
-        Map<String, Object> map = new HashMap<>();
         Session session = notificationDaoImpl.openCurrentSession();
+        Map<String, Object> map = null;
+        Map<String, Object> documentMap = null;
+        List<String> json = new ArrayList<>();
         try {
-            List<String> organsId = notificationDaoImpl.getReceiverIdNotTaken();
-            map.put("receiverId", organsId);
-            System.out.println(new Gson().toJson(map));
-            System.out.println(map.size());
-            return new Gson().toJson(map);
+            List<String> organIds = notificationDaoImpl.getReceiverIdNotTaken();
+            for (String organId: organIds) {
+                map = new HashMap<>();
+                List<EdocDocument> documents = notificationDaoImpl.getDocumentByReceiverId(organId);
+                List<String> documentDetails = new ArrayList<>();
+                for (EdocDocument document: documents) {
+                    documentMap = new HashMap<>();
+                    documentMap.put("Subject", document.getSubject());
+                    documentMap.put("FromOrgan", document.getPromulgationPlace());
+                    documentMap.put("SentDate", String.valueOf(document.getSentDate()));
+                    documentDetails.add(new Gson().toJson(documentMap));
+                }
+                map.put("ReceiverId", organId);
+                map.put("NumberOfDocNotTaken", documentDetails.size());
+                map.put("documents", documentDetails);
+                json.add(new Gson().toJson(map));
+            }
+            System.out.println(json);
+            System.out.println(json.size());
+            return new Gson().toJson(json);
         } catch (Exception e) {
             LOGGER.error(e);
-            return new Gson().toJson(map);
+            return new Gson().toJson(json);
         } finally {
             notificationDaoImpl.closeCurrentSession(session);
         }

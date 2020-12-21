@@ -95,18 +95,17 @@
                     <a href="javascript:void(0)" data-mode="organManage" id="organ-menu"><spring:message
                             code="menu.system.management.organ"/></a>
                 </li>
+                <li>
+                    <a href="javascript:void(0)" data-mode="draft" id="email-template-menu">
+                        </i><spring:message code="menu.email.template.manage"/>
+                    </a>
+                </li>
             </ul>
             <!-- /.nav-second-level -->
         </li>
         <%
             }
         %>
-        <li>
-            <a href="javascript:void(0)" class="email-template-menu" data-mode="draft" id="email-template-menu">
-                <i class="fa fa-envelope fa-fw"></i>
-                <span class="menu-title"><spring:message code="menu.email.template.manage"/></span>
-            </a>
-        </li>
     </ul>
 </nav>
 <nav id="reportTabC" class="navbar-default sidebar fade in tab-container">

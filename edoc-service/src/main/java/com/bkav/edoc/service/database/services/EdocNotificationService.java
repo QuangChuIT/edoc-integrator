@@ -3,10 +3,12 @@ package com.bkav.edoc.service.database.services;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
+import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
+import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
@@ -22,6 +24,7 @@ import java.util.*;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
+    private final EdocDynamicContactDaoImpl edocDynamicContactDao = new EdocDynamicContactDaoImpl();
 
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
@@ -98,35 +101,43 @@ public class EdocNotificationService {
         }
     }
 
-    public String getDocumentNotTakenByOrganId() {
+    public List<EmailRequest> getEmailRequestScheduleSend() {
+        List<EmailRequest> emailRequests = new ArrayList<>();
         Session session = notificationDaoImpl.openCurrentSession();
-        Map<String, Object> map = null;
-        Map<String, Object> documentMap = null;
-        List<String> json = new ArrayList<>();
         try {
-            List<String> organIds = notificationDaoImpl.getReceiverIdNotTaken();
-            for (String organId: organIds) {
-                map = new HashMap<>();
-                List<EdocDocument> documents = notificationDaoImpl.getDocumentByReceiverId(organId);
-                List<String> documentDetails = new ArrayList<>();
-                for (EdocDocument document: documents) {
-                    documentMap = new HashMap<>();
-                    documentMap.put("Subject", document.getSubject());
-                    documentMap.put("FromOrgan", document.getPromulgationPlace());
-                    documentMap.put("SentDate", String.valueOf(document.getSentDate()));
-                    documentDetails.add(new Gson().toJson(documentMap));
-                }
-                map.put("ReceiverId", organId);
-                map.put("NumberOfDocNotTaken", documentDetails.size());
-                map.put("documents", documentDetails);
-                json.add(new Gson().toJson(map));
+//            List<String> organIds = notificationDaoImpl.getReceiverIdNotTaken();
+//            for (String organId: organIds) {
+//                map = new HashMap<>();
+//                List<EdocDocument> documents = notificationDaoImpl.getDocumentByReceiverId(organId);
+//                List<String> documentDetails = new ArrayList<>();
+//                for (EdocDocument document: documents) {
+//                    documentMap = new HashMap<>();
+//                    documentMap.put("Subject", document.getSubject());
+//                    documentMap.put("FromOrgan", document.getPromulgationPlace());
+//                    documentMap.put("SentDate", String.valueOf(document.getSentDate()));
+//                    documentDetails.add(new Gson().toJson(documentMap));
+//                }
+//                map.put("ReceiverId", organId);
+//                map.put("NumberOfDocNotTaken", documentDetails.size());
+//                map.put("documents", documentDetails);
+//                json.add(new Gson().toJson(map));
+//            }
+//            System.out.println(json);
+//            System.out.println(json.size());
+            List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken();
+            for (String receiverId: receiverIds) {
+                EmailRequest emailRequest = new EmailRequest();
+                emailRequest.setReceiverId(receiverId);
+                List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(receiverId);
+                emailRequest.setNumberOfDocument(documents.size());
+                emailRequest.setEdocDocument(documents);
+                emailRequests.add(emailRequest);
             }
-            System.out.println(json);
-            System.out.println(json.size());
-            return new Gson().toJson(json);
+            System.out.println(emailRequests.size());
+            return emailRequests;
         } catch (Exception e) {
             LOGGER.error(e);
-            return new Gson().toJson(json);
+            return emailRequests;
         } finally {
             notificationDaoImpl.closeCurrentSession(session);
         }
@@ -135,7 +146,7 @@ public class EdocNotificationService {
     public static void main(String[] args) {
         EdocNotificationService edocNotificationService = new EdocNotificationService();
 //        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
-        edocNotificationService.getDocumentNotTakenByOrganId();
+        edocNotificationService.getEmailRequestScheduleSend();
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);

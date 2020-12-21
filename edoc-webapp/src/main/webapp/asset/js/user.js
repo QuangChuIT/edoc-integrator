@@ -319,7 +319,7 @@ $(document).ready(function () {
     // });
     $("#email-template-menu").on('click', function (e) {
         e.preventDefault();
-    })
+    });
 });
 
 // Call ajax to import users from excel file
@@ -356,6 +356,9 @@ $(document).on("click", ".import-excel-button", function (e) {
                 processData: false, //prevent jQuery from automatically transforming the data into a query string
                 contentType: false,
                 cache: false,
+                beforeSend: function ( xhr ) {
+                    $("#overlay").show();
+                },
                 success: function (response) {
                     let successOptions = {
                         autoHideDelay: 200000,
@@ -384,43 +387,12 @@ $(document).on("click", ".import-excel-button", function (e) {
                 },
                 error: (e) => {
                     $.notify(user_message.user_import_from_excel_fail, "error");
-                }
-            })
+                },
+            }).done(function () {
+                $("#overlay").hide();
+            });
         }
     });
-    /*let form = $('#formImportUser')[0];
-    let data = new FormData(form);
-    $.ajax({
-        type: "POST",
-        enctype: 'multipart/form-data',
-        url: "/public/-/user/import",
-        data: data,
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
-        contentType: false,
-        cache: false,
-        success: function (response) {
-            if (response === "OK") {
-                $.notify(user_message.user_import_from_excel_success, "success");
-                $("#importUserFromExcel").val('');
-            } else if (response === "BAD_REQUEST")
-                $.notify(user_message.user_import_invalid_format_file, "error");
-                // else if (response.code === 409)
-            //     $.notify(user_message.user_import_from_excel_conflic, "error");
-            else if (response === "NOT_ACCEPTABLE")
-                $.notify(user_message.user_import_from_excel_invalid_column, "error");
-            // let code = parseInt(response);
-            // if (code > 0) {
-            //     $.notify(user_message.user_import_from_excel_success, "success");
-            //     userManage.renderUserDatatable();
-            //     $("#importUserFromExcel").val('');
-            // } else {
-            //     $.notify(user_message.user_import_invalid_format_file, "error");
-            // }
-        },
-        error: (e) => {
-            $.notify(user_message.user_import_from_excel_fail, "error");
-        }
-    });*/
 });
 
 // Call ajax to export users to Excel file

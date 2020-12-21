@@ -204,6 +204,7 @@ public class UserRestController {
         }
     }
 
+
     @RequestMapping(value = "/public/-/user/create", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Response> createUser(@RequestBody AddUserRequest addUserRequest) {
         List<String> errors = new ArrayList<>();

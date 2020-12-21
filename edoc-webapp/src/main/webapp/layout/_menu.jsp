@@ -96,8 +96,8 @@
                             code="menu.system.management.organ"/></a>
                 </li>
                 <li>
-                    <a href="javascript:void(0)" data-mode="draft" id="email-template-menu">
-                        </i><spring:message code="menu.email.template.manage"/>
+                    <a href="javascript:void(0)" class="email-template-menu" data-mode="draft" id="email-template-menu">
+                        <span class="menu-title"><spring:message code="menu.email.template.manage"/></span>
                     </a>
                 </li>
             </ul>
@@ -106,6 +106,10 @@
         <%
             }
         %>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0747edb589aa928168ab0d7b02b16e0a1695405e
     </ul>
 </nav>
 <nav id="reportTabC" class="navbar-default sidebar fade in tab-container">

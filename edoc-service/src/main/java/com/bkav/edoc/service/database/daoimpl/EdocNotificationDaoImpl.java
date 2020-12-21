@@ -103,7 +103,6 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken GROUP BY en.receiverId");
-
             Query<String> query = session.createQuery(sql.toString(), String.class);
             query.setParameter("taken", false);
             return query.getResultList();
@@ -115,15 +114,14 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         }
     }
 
-    public List<EdocDocument> getDocumentByReceiverId (String receiverId) {
+    public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT en.document FROM EdocNotification en WHERE taken=:taken AND en.receiverId=:receiverId");
+            sql.append("SELECT en.document FROM EdocNotification en WHERE en.receiverId=:receiverId and en.taken=:taken");
             Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
-            query.setParameter("taken", false);
             query.setParameter("receiverId", receiverId);
-            query.setMaxResults(3);
+            query.setParameter("taken", false);
             return query.getResultList();
         } catch (Exception e) {
             LOGGER.error(e);

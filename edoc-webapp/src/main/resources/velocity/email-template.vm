@@ -1,8 +1,35 @@
 <html>
 <body>
-    <h3>Hello ${user.userName}, welcome to the Velocity Email Template!</h3>
-    <div>
-        Your email address is <a href="mailto:${user.emailAddress}">${user.emailAddress}</a>.
-    </div>
+##<div>
+##    Kính gửi đơn vị ${emailRequest.receiverName},
+##</div>
+##<br>
+##<div>
+##    Hiện tại, đơn vị đang có ${emailRequest.numberOfDocument} văn bản chưa được nhận về, chi tiết các văn bản như sau:
+##</div>
+##<br>
+##<table>
+##    <thead>
+##    <tr>
+##        <th>Trích yếu</th>
+##        <th>Đơn vị gửi</th>
+##        <th>Ngày phát hành</th>
+##        <th>Ngày đồng bộ lên trục</th>
+##    </tr>
+##    </thead>
+##    #set($columns = ["subject", "toOrganDomain", "promulgationDate", "sentDate"])
+##    #foreach($document in $emailRequest.edocDocument)
+##    #end
+##    <tbody>
+##    <tr>
+##        #foreach($column in $columns)
+##            <td>$document.get($column)</td>
+##        #end
+##    </tr>
+##    </tbody>
+##</table>
+<div>
+    Test send email!!!!!!!!!!!!!
+</div>
 </body>
 </html>

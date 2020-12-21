@@ -1,7 +1,6 @@
 package com.bkav.edoc.service.database.util;
 
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import jdk.nashorn.internal.parser.Token;
 
 import java.sql.*;
 

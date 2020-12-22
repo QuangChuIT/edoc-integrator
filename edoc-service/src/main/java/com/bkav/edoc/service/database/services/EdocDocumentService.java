@@ -190,8 +190,9 @@ public class EdocDocumentService {
             currentSession.persist(document);
 
             long docId = document.getDocumentId();
+            String docCode = document.getDocCode();
 
-            LOGGER.info("Save document successfully return DocumentId " + docId);
+            LOGGER.info("Save document successfully return DocumentId " + docId + " docCode " + docCode);
             outDocumentId.append(docId);
 
             // Add document to cache (using by get document)

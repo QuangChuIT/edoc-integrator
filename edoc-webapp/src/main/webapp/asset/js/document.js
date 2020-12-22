@@ -73,7 +73,6 @@ let edocDocument = {
                     "title": app_message.edoc_table_header_subject,
                     "data": null,
                     "render": function (data) {
-                        console.log(data);
                         return $('#edocSubjectTemplate').tmpl(data).html();
                     }
                 },

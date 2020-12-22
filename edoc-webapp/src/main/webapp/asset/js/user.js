@@ -41,9 +41,9 @@ let userManage = {
                         "edit": {
                             name: user_message.manage_edit_user, icon: "edit", disabled: function (key, opt) {
                                 let id = opt.$trigger[0].id;
-                                return true;
-                               /* if (id == AdministratorId || id == SuperAdministratorId)
-                                    return !this.data('editDisabled');*/
+                                return false;
+                                /* if (id == AdministratorId || id == SuperAdministratorId)
+                                     return !this.data('editDisabled');*/
                             }
                         },
                         "permission": {
@@ -51,7 +51,7 @@ let userManage = {
                             icon: "fa-shield",
                             disabled: function (key, opt) {
                                 let id = opt.$trigger[0].id;
-                                return true;
+                                return false;
                                 /*if (id == AdministratorId || id == SuperAdministratorId)
                                     return !this.data('permissionDisabled');*/
                             }
@@ -60,7 +60,8 @@ let userManage = {
                         "delete": {
                             name: user_message.manage_remove_user, icon: "delete", disabled: function (key, opt) {
                                 let id = opt.$trigger[0].id;
-                                return true;
+                                return false;
+
                                 /*if (id == AdministratorId || id == SuperAdministratorId)
                                     return !this.data('deleteDisabled');*/
                             }
@@ -247,8 +248,14 @@ let userManage = {
         $('#formPermission').modal('toggle');
     }
 }
+$(document).on("ready", function () {
+    $("#editOrganDomain").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
+    });
+});
 $(document).ready(function () {
-
     // Show detail of user-login info
     $(".user-info").on('click', function () {
         let userId = $(this).attr("data-id");
@@ -289,62 +296,102 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     });
-    $("#editOrganDomain").select2({
-        tags: true,
-        maximumSelectionLength: 1,
-        width: "auto"
-    })
     $(document).on('click', 'input[type="checkbox"]', function () {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
 
     // Click to show modal for upload file
     // Developing...
-    $("#importUserFromExcel").on('click', function (e) {
-        e.preventDefault();
-        $('#importExcelModal').modal({
-            backdrop: 'static',
-            keyboard: false
-        })
-    });
+    // $("#importUserFromExcel").on('click', function (e) {
+    //     e.preventDefault();
+    //     $('#importExcelModal').modal({
+    //         backdrop: 'static',
+    //         keyboard: false
+    //     })
+    // })
 
+   /* $.get("/public/-/role/" + role_message.role_administrator, function (data){
+        console.log(data);
+        AdministratorId = data;
+        console.log(data)
+    });*/
+    // $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
+    //     SuperAdministratorId = data.roleId;
+    // });
+    $("#email-template-menu").on('click', function (e) {
+        e.preventDefault();
+    });
 });
 
 // Call ajax to import users from excel file
-$(document).on("change", "#importUserFromExcel", function (e) {
+$(document).on("click", ".import-excel-button", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
-    let form = $('#formImportUser')[0];
-    let data = new FormData(form);
-    $.ajax({
-        type: "POST",
-        enctype: 'multipart/form-data',
-        url: "/public/-/user/import",
-        data: data,
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
-        contentType: false,
-        cache: false,
-        success: function (response) {
-            if (response === "OK") {
-                $.notify(user_message.user_import_from_excel_success, "success");
-                $("#importUserFromExcel").val('');
-            } else if (response === "BAD_REQUEST")
-                $.notify(user_message.user_import_invalid_format_file, "error");
-                // else if (response.code === 409)
-            //     $.notify(user_message.user_import_from_excel_conflic, "error");
-            else if (response === "NOT_ACCEPTABLE")
-                $.notify(user_message.user_import_from_excel_invalid_column, "error");
-            // let code = parseInt(response);
-            // if (code > 0) {
-            //     $.notify(user_message.user_import_from_excel_success, "success");
-            //     userManage.renderUserDatatable();
-            //     $("#importUserFromExcel").val('');
-            // } else {
-            //     $.notify(user_message.user_import_invalid_format_file, "error");
-            // }
+    Swal.fire({
+        title: 'Chọn file tải lên',
+        input: 'file',
+        showCancelButton: true,
+        confirmButtonText: 'Tải lên',
+        cancelButtonText: 'Hủy bỏ',
+        onBeforeOpen: () => {
+            $(".swal2-file").change(function () {
+                var reader = new FileReader();
+                reader.readAsDataURL(this.files[0]);
+            });
         },
-        error: (e) => {
-            $.notify(user_message.user_import_from_excel_fail, "error");
+        inputAttributes: {
+            'accept': "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            'aria-label': 'Upload your profile picture'
+
+        }
+    }).then((file) => {
+        if (file.value) {
+            let formData = new FormData();
+            let file = $('.swal2-file')[0].files[0];
+            formData.append("fileToUpload", file);
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/public/-/user/import",
+                data: formData,
+                processData: false, //prevent jQuery from automatically transforming the data into a query string
+                contentType: false,
+                cache: false,
+                beforeSend: function ( xhr ) {
+                    $("#overlay").show();
+                },
+                success: function (response) {
+                    let successOptions = {
+                        autoHideDelay: 200000,
+                        showAnimation: "fadeIn",
+                        autoHide: false,
+                        clickToHide: true,
+                        hideAnimation: "fadeOut",
+                        hideDuration: 700,
+                        arrowShow: false
+                    };
+                    if (response.code === 400) {
+                        successOptions.className = "error";
+                        if (response.errors.length > 0) {
+                            response.errors.forEach(function (obj) {
+                                $.notify(obj, successOptions);
+                            });
+                        }
+                        $.notify(response.message, successOptions);
+                    } else if (response.code === 200) {
+                        successOptions.className = "success";
+                        $.notify(response.message, successOptions);
+                    } else {
+                        successOptions.className = "error";
+                        $.notify(response.message, "error", successOptions);
+                    }
+                },
+                error: (e) => {
+                    $.notify(user_message.user_import_from_excel_fail, "error");
+                },
+            }).done(function () {
+                $("#overlay").hide();
+            });
         }
     });
 });
@@ -353,13 +400,15 @@ $(document).on("change", "#importUserFromExcel", function (e) {
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "/public/-/user/export",
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
         success: function (response) {
-            $.notify(user_message.user_export_to_excel_success, "success");
+            if (response === "OK") {
+                $.notify(user_message.user_export_to_excel_success, "success");
+            }
         },
         error: (e) => {
             $.notify(user_message.user_export_to_excel_fail, "error");

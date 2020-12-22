@@ -20,8 +20,11 @@ public class StatDocumentBean {
             //yesterday.add(Calendar.DATE, -1);
             //yesterday.add(Calendar.HOUR, 7);
             _counterDate = yesterday.getTime();
+            LOGGER.info("Counter date prepare stat " + _counterDate);
             if (!EdocDailyCounterServiceUtil.checkExistCounter(_counterDate)) {
+                LOGGER.info("Prepare stat document with counter date " + _counterDate);
                 List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
+                LOGGER.info("List document to stat " + documents.size());
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
                     if (checkOrganToStat(fromOrgan)) {
@@ -99,6 +102,7 @@ public class StatDocumentBean {
         for (Map.Entry<String, EdocDailyCounter> entry : dailyCounterMap.entrySet()) {
             EdocDailyCounter dailyCounter = entry.getValue();
             EdocDailyCounterServiceUtil.createDailyCounter(dailyCounter);
+            LOGGER.info("Submit database success for organ domain " + dailyCounter.getOrganDomain());
         }
     }
 

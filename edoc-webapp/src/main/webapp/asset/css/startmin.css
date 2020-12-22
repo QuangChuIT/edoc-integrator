@@ -265,9 +265,11 @@ table.dataTable thead .sorting:after {
     background: #ffffff !important;
     cursor: pointer;
 }
-.custom-datatable tbody tr td:focus{
+
+.custom-datatable tbody tr td:focus {
     outline: none !important;
 }
+
 .custom-datatable th:first-child {
     padding-left: 15px;
 }
@@ -412,7 +414,6 @@ ul.nav a.active {
     border-radius: 0 !important;
     padding: 5px 7px !important;
     color: #000000 !important;
-    width: 359px !important;
 }
 
 .organ-detail .control-label {
@@ -428,7 +429,6 @@ ul.nav a.active {
     cursor: default !important;
     background: #ffffff !important;
     padding: 5px 7px !important;
-    width: 359px !important;
     color: #000000 !important;
 }
 
@@ -471,7 +471,6 @@ ul.nav a.active {
     background: #ffffff !important;
     cursor: auto;
     padding: 5px 7px !important;
-    width: 359px !important;
     border-radius: 0 !important;
     color: #000000 !important;
 }
@@ -480,7 +479,6 @@ ul.nav a.active {
     background: #ffffff !important;
     cursor: auto !important;
     border-radius: 0 !important;
-    width: 359px;
     padding: 5px 7px !important;
     color: #000000 !important;
 }
@@ -516,14 +514,12 @@ ul.nav a.active {
 }
 
 .user-detail .select2 {
-    width: 359px !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     color: #000000 !important;
 }
 
 #editOrganDomain {
-    width: 359px !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     color: #000000 !important;
@@ -661,12 +657,7 @@ ul.nav a.active {
     padding: 10px 0;
 }
 
-.adduser-button {
-    margin: 0 5px;
-    border-radius: 0 !important;
-}
-
-.addorgan-button {
+.user-import .btn {
     margin: 0 5px;
     border-radius: 0 !important;
 }
@@ -692,11 +683,11 @@ ul.nav a.active {
 }
 
 #user-import-excel {
-    display:none;
+    display: none;
 }
 
 #organ-import-excel {
-    display:none;
+    display: none;
 }
 
 .permission-role {
@@ -1861,10 +1852,12 @@ a:focus {
     background-color: #fff;
     margin: 0;
 }
+
 .fileuploader {
     max-width: 420px;
     margin: 15px;
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input {
     display: block;
     padding: 60px 0;
@@ -1880,6 +1873,7 @@ a:focus {
     margin: 0 auto;
     margin-bottom: 26px;
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input h3 {
     margin: 0;
     margin-bottom: 8px;
@@ -1893,6 +1887,7 @@ a:focus {
     white-space: normal;
     box-shadow: none;
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input p {
     margin: 0;
     padding: 0;
@@ -1905,15 +1900,57 @@ a:focus {
     -webkit-transition: 500ms cubic-bezier(0.17, 0.67, 0, 1.01);
     transition: 500ms cubic-bezier(0.17, 0.67, 0, 1.01);
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input.fileuploader-dragging .fileuploader-input-inner > * {
     transform: translateY(18px);
     opacity: 0;
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input.fileuploader-dragging .fileuploader-icon-main {
     transform: translateY(30px) scale(1.2);
     opacity: 0.6;
 }
+
 .fileuploader-theme-dragdrop .fileuploader-input.fileuploader-dragging .fileuploader-input-caption {
     transform: translateY(30px);
     opacity: 0.6;
+}
+
+.swal2-popup {
+    font-size: unset !important;
+}
+
+#overlay {
+    position: fixed;
+    height: 40px;
+    z-index: 10000000000;
+    bottom: 40px;
+    left: 20px;
+    display: none;
+}
+
+.cv-spinner {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px #ddd solid;
+    border-top: 4px #2e93e6 solid;
+    border-radius: 50%;
+    animation: sp-anime 0.8s infinite linear;
+}
+
+@keyframes sp-anime {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.is-hide {
+    display: none;
 }

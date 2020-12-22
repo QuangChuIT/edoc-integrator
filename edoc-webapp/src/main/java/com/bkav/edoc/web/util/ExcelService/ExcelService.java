@@ -1,12 +1,11 @@
 package com.bkav.edoc.web.util.ExcelService;
 
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.Role;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
-import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
-import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
-import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
-import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.service.database.util.*;
+import com.bkav.edoc.web.payload.ImportExcelError;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
 import org.apache.log4j.Logger;
@@ -22,19 +21,14 @@ import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ExcelService {
 
-    public List<User> readExcelFileForUser(MultipartFile file) throws IOException {
+    public Map<String, Object> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
-        List<String> errors = new ArrayList<>();
-        int numUserSuccess = 0;
+        List<ImportExcelError> errors = new ArrayList<>();
         boolean flag = true;
-
         InputStream inputStream = file.getInputStream();
 
         // Create workbook, sheet of excel
@@ -60,12 +54,13 @@ public class ExcelService {
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
-
+                ImportExcelError importExcelError = null;
                 switch (cellIndex) {
                     case 1:
                         String username = currentCell.getStringCellValue();
                         if (username.equals("")) {
-                            errors.add("Row " + rowNum + ": wrong username");
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.username");
+                            errors.add(importExcelError);
                             flag = false;
                         } else {
                             user.setUsername(username);
@@ -75,29 +70,45 @@ public class ExcelService {
                     case 2:
                         String password = currentCell.getStringCellValue();
                         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
-                        if (password.equals("") || !password.matches(passwordRegex)) {
-                            errors.add("Row " + rowNum + ": wrong password");
+                        if (password.equals("")) {
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.password.empty");
+                            errors.add(importExcelError);
                             flag = false;
                         } else {
-                            user.setPassword(password);
+                            if (!password.matches(passwordRegex)) {
+                                importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.password.invalid");
+                                errors.add(importExcelError);
+                                flag = false;
+                            } else {
+                                user.setPassword(password);
+                            }
                         }
                         break;
 
                     case 3:
                         String email = currentCell.getStringCellValue();
                         String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
-                        if (email.equals("") || !email.matches(emailRegex)) {
-                            errors.add("Row " + rowNum + ": wrong email");
+                        if (email.equals("")) {
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.email.empty");
+                            errors.add(importExcelError);
                             flag = false;
                         } else {
                             user.setEmailAddress(email);
+                            /*if (!email.matches(emailRegex)) {
+                                importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.email.invalid");
+                                errors.add(importExcelError);
+                                flag = false;
+                            } else {
+                                user.setEmailAddress(email);
+                            }*/
                         }
                         break;
 
                     case 4:
                         String displayName = currentCell.getStringCellValue();
                         if (displayName.equals("")) {
-                            errors.add("Row " + rowNum + ": wrong display name");
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.fullname");
+                            errors.add(importExcelError);
                             flag = false;
                         } else {
                             user.setDisplayName(currentCell.getStringCellValue());
@@ -106,19 +117,25 @@ public class ExcelService {
 
                     case 5:
                         String organ_id = currentCell.getStringCellValue().trim();
-                        EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(organ_id);
-                        if (organ == null) {
-                            // create organ
-                            EdocDynamicContact contact = new EdocDynamicContact();
-                            contact.setDomain(organ_id);
-                            contact.setName(user.getDisplayName());
-                            contact.setEmail(user.getEmailAddress());
-                            String token = TokenUtil.getRandomNumber(organ_id, user.getDisplayName());
-                            contact.setToken(token);
-                            EdocDynamicContactServiceUtil.createContact(contact);
-                            user.setDynamicContact(contact);
+                        if (organ_id.equals("")) {
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.organId");
+                            errors.add(importExcelError);
+                            flag = false;
                         } else {
-                            user.setDynamicContact(organ);
+                            EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(organ_id);
+                            if (organ == null) {
+                                // create organ
+                                EdocDynamicContact contact = new EdocDynamicContact();
+                                contact.setDomain(organ_id);
+                                contact.setName(user.getDisplayName());
+                                contact.setEmail(user.getEmailAddress());
+                                String token = TokenUtil.getRandomNumber(organ_id, user.getDisplayName());
+                                contact.setToken(token);
+                                EdocDynamicContactServiceUtil.createContact(contact);
+                                user.setDynamicContact(contact);
+                            } else {
+                                user.setDynamicContact(organ);
+                            }
                         }
                         break;
                 }
@@ -129,14 +146,16 @@ public class ExcelService {
             user.setModifiedDate(currentDate);
             user.setLastLoginDate(currentDate);
             user.setStatus(true);
-            if (flag == true) {
+            if (flag) {
                 users.add(user);
-                numUserSuccess++;
             }
             rowNum++;
         }
         workbook.close();
-        return users;
+        Map<String, Object> map = new HashMap<>();
+        map.put("errors", errors);
+        map.put("users", users);
+        return map;
     }
 
     public List<EdocDynamicContact> readExcelFileForOrganization(MultipartFile file) throws IOException {
@@ -368,36 +387,39 @@ public class ExcelService {
         return true;
     }
 
-    public long PushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
         String is_password = PropsUtil.get(ConfigParams.IS_PASSWORD);
         String is_post_url = PropsUtil.get(ConfigParams.IS_POST_URL);
 
         // Count number of user push to sso successfully
         long count = 0;
-
-        /* Push each user to SSO:
-         Convert user object to json
-         Then, push json to sso */
+        /* Push each user to SSO:*/
         for (User user : users) {
-
-            String json = PostUserToSSO.createJson(user);
-            String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
-
-            // If push to sso successfully
-            // Then, insert user object to database
-            if (!out.equals("")) {
-                User checkExist = UserServiceUtil.finUserByUsername(user.getUsername());
-                if (checkExist == null) {
+            User checkExist = UserServiceUtil.finUserByUsername(user.getUsername());
+            if (checkExist == null) {
+                //Convert user object to json
+                //Then, push json to sso
+                String json = PostUserToSSO.createJson(user);
+                String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
+                if (!out.equals("")) {
                     // Set SSO field to true
                     user.setSso(true);
                     UserServiceUtil.createUser(user);
                     if (!UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
                         UserRole userRole = new UserRole();
+                        Role role = RoleServiceUtil.getRoleByRoleName("USER");
                         userRole.setUserId(user.getUserId());
-                        userRole.setRoleId(4234343);
+                        userRole.setRoleId(role.getRoleId());
                         UserRoleServiceUtil.createUserRole(userRole);
                     }
+                }
+            } else {
+                LOGGER.info("Duplicate user with username " + user.getUsername());
+                if (!checkExist.isSso()) {
+                    String json = PostUserToSSO.createJson(checkExist);
+                    String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
+                    LOGGER.info(out);
                 }
             }
             count++;

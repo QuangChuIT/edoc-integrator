@@ -128,7 +128,7 @@ let user_message = {
     "manage_edit_user": "Chỉnh sửa",
     "user_import_from_excel_success": "Nhập dữ liệu người dùng từ Excel thành công",
     "user_import_invalid_format_file": "Sai định dạng file",
-    "user_import_from_excel_fail": "Nhập dữ liệu người dùng thất bại",
+    "user_import_from_excel_fail": "Tải lên dữ liệu người dùng thất bại !",
     "user_import_from_excel_conflic": "Dữ liệu bị trùng",
     "user_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
     "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công, file được lưu tại thư mục Downloads",

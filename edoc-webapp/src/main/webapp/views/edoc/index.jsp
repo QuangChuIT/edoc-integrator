@@ -19,46 +19,45 @@
     </div>
     <div class="edoc-table-user">
         <div class="table-responsive">
-            <form class="form-horizontal" id="formImportUser" method="POST" enctype="multipart/form-data">
-                <div class="row user-import" id="user-import-excel">
-                    <button class="btn btn-primary import-excel-button" id="importUserFromExcel">
-                        <i class="fa fa-arrow-circle-up fa-fw"></i>
-                        <spring:message code="edoc.import.report"/>
-<%--                        <input type="file" name="importUserFromExcel" id="importUserFromExcel" class="form-control">--%>
-                    </button>
-                    <button class="btn btn-primary btn-report-group" id="exportUserToExcel">
-                        <i class="fa fa-arrow-circle-down fa-fw"></i>
-                        <spring:message code="edoc.export.report"/>
-                    </button>
-                    <button class="btn btn-success adduser-button" id="addUser">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <spring:message code="edoc.button.add.user"/>
-                    </button>
-                </div>
-            </form>
+            <div class="row user-import" id="user-import-excel">
+                <button class="btn btn-primary import-excel-button">
+                    <i class="fa fa-arrow-circle-up fa-fw"></i>
+                    <spring:message code="edoc.import.report"/>
+                </button>
+                <button class="btn btn-primary btn-report-group" id="exportUserToExcel">
+                    <i class="fa fa-arrow-circle-down fa-fw"></i>
+                    <spring:message code="edoc.export.report"/>
+                </button>
+                <button class="btn btn-success adduser-button" id="addUser">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <spring:message code="edoc.button.add.user"/>
+                </button>
+                <button class="btn btn-info sync-sso-button" id="syncUserSSO">
+                    <i class="fa fa-rocket fa-fw"></i>
+                    <spring:message code="edoc.button.sync.user"/>
+                </button>
+            </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-user">
             </table>
         </div>
     </div>
     <div class="edoc-table-organ">
         <div class="table-responsive">
-            <form class="form-horizontal" id="formImportOrgan" method="POST" enctype="multipart/form-data">
-                <div class="row user-import" id="organ-import-excel">
-                    <button class="btn btn-primary import-excel-button">
-                        <i class="fa fa-arrow-circle-up fa-fw"></i>
-                        <spring:message code="edoc.import.report"/>
-                        <input type="file" name="importOrganFromExcel" id="importOrganFromExcel" class="form-control">
-                    </button>
-                    <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
-                        <i class="fa fa-arrow-circle-down fa-fw"></i>
-                        <spring:message code="edoc.export.report"/>
-                    </button>
-                    <button class="btn btn-success addorgan-button" id="addOrgan">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        <spring:message code="edoc.button.add.organ"/>
-                    </button>
-                </div>
-            </form>
+            <div class="row user-import" id="organ-import-excel">
+                <button class="btn btn-primary import-excel-button">
+                    <i class="fa fa-arrow-circle-up fa-fw"></i>
+                    <spring:message code="edoc.import.report"/>
+                    <input type="file" name="importOrganFromExcel" id="importOrganFromExcel" class="form-control">
+                </button>
+                <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
+                    <i class="fa fa-arrow-circle-down fa-fw"></i>
+                    <spring:message code="edoc.export.report"/>
+                </button>
+                <button class="btn btn-success addorgan-button" id="addOrgan">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <spring:message code="edoc.button.add.organ"/>
+                </button>
+            </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-organ">
             </table>
         </div>

@@ -13,6 +13,7 @@ public class EdocNotification implements Serializable {
     private Date dateCreate;
     private Date modifiedDate;
     private Date dueDate;
+    private boolean taken;
     @JsonIgnore
     private EdocDocument document;
 
@@ -27,7 +28,6 @@ public class EdocNotification implements Serializable {
         this.taken = taken;
     }
 
-    private Boolean taken;
 
     public Long getNotificationId() {
         return notificationId;

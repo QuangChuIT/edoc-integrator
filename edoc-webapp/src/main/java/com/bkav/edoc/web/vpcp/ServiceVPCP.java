@@ -168,7 +168,8 @@ public class ServiceVPCP {
                                 StringBuilder documentEsbId = new StringBuilder();
                                 List<Error> errors = new ArrayList<>();
                                 List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-                                EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader, traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
+                                EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader,
+                                        traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
                                 if (document != null) {
                                     LOGGER.info("Save document from vpcp successfully from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
                                     document.setDocumentExtId(item.getId());

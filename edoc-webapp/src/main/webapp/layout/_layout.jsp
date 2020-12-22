@@ -10,8 +10,8 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.List" %>
-    <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
-    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -61,9 +61,9 @@
     <link href="<c:url value="/asset/css/font-awesome.min.css"/>" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="<c:url value="/asset/css/jquery.datetimepicker.min.css"/>">
     <link href="<c:url value="/asset/css/select2.min.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/asset/css/sweetalert2.min.css"/>" rel="stylesheet"/>
+</head>
 
-    <!-- Css modal import Excel -->
-    <%--<link href="<c:url value="/asset/css/dragdropModalTheme/script.css"/>" rel="stylesheet"/>--%>
 <body>
 <tiles:insertAttribute name="header"/>
 <div class="side-bar" id="layoutSideBar">
@@ -1084,7 +1084,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <textarea class="form-control" readonly rows="2" id="userName">${name}</textarea>
+                    <textarea class="form-control" readonly rows="2" id="userName"> {{if name}}${name}{{else}}${app_message.no_data}{{/if}}</textarea>
                 </div>
             </div>
             <div class="form-group">
@@ -1094,7 +1094,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="inCharge" value="${inCharge}">
+                    <input type="text" class="form-control" readonly id="inCharge" value="{{if inCharge}}${inCharge}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
             <div class="form-group">
@@ -1104,7 +1104,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="domain" value="${domain}">
+                    <input type="text" class="form-control" readonly id="domain" value="{{if domain}}${domain}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
             <div class="form-group">
@@ -1114,7 +1114,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="telephone" value="${telephone}">
+                    <input type="text" class="form-control" readonly id="telephone" value="{{if telephone}}${telephone}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
             <div class="form-group">
@@ -1124,7 +1124,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="email" value="${email}">
+                    <input type="text" class="form-control" readonly id="email" value="{{if email}}${email}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
             <div class="form-group">
@@ -1134,7 +1134,7 @@
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="address" value="${address}">
+                    <input type="text" class="form-control" readonly id="address" value="{{if address}}${address}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
             <div class="form-group">
@@ -1147,7 +1147,7 @@
                     <a href="javascript:void(0)" class="organ-view-token">
                         <i class="fa fa-unlock-alt" aria-hidden="true"></i>
                     </a>
-                    <input type="password" class="form-control input-token" readonly id="token" password-shown="false" value="${token}">
+                    <input type="password" class="form-control input-token" readonly id="token" password-shown="false" value="{{if token}}${token}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
              <div class="form-group">
@@ -1482,14 +1482,14 @@
                 <select class="form-control to-organ" id="toOrgan">
                     <option value="" selected>${toOrgan[0].name}</option>
                     <%
-    for (OrganizationCacheEntry organization : organizationCacheEntries) {
-%>
-                    <option value="<%=organization.getDomain()%>">
-                        <%=organization.getName()%>
-                    </option>
-                    <%
-    }
-%>
+                        for (OrganizationCacheEntry organization : organizationCacheEntries) {
+                    %>
+                                        <option value="<%=organization.getDomain()%>">
+                                            <%=organization.getName()%>
+                                        </option>
+                                        <%
+                        }
+                    %>
                 </select>
             </div>
         </div>
@@ -1726,7 +1726,12 @@
     </form>
 
 </script>
-
+<div id="overlay">
+    <div class="cv-spinner">
+        <span class="loading-spinner"></span>
+        <span>&nbsp;Đang xử lý</span>
+    </div>
+</div>
 <%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
@@ -1734,6 +1739,7 @@
 <script src="<c:url value="/asset/js/notify.min.js"/>"></script>
 <script src="<c:url value="/asset/js/jquery.formatter.js"/>"></script>
 <script src="<c:url value="/asset/js/select2.min.js"/>"></script>
+<script src="<c:url value="/asset/js/sweetalert2.min.js"/>"></script>
 <%--datetimepicker--%>
 <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
 <!-- Bootstrap Core JavaScript -->

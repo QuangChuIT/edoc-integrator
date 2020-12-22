@@ -68,7 +68,7 @@ public class EmailSenderBean {
 
                 StringWriter stringWriter = new StringWriter();
 
-                velocityEngine.mergeTemplate("velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
+                velocityEngine.mergeTemplate("resources/velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
 
                 message.setSubject(subject);
                 message.setText(stringWriter.toString(), true);

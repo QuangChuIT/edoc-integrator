@@ -3,7 +3,6 @@ package com.bkav.edoc.web.scheduler;
 import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.scheduler.bean.EmailSenderBean;
-import com.bkav.edoc.web.scheduler.bean.SendEmailBean;
 import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.quartz.JobExecutionContext;
@@ -34,5 +33,5 @@ public class SendEmailJob extends QuartzJobBean {
         }
     }
 
-    private static final Logger LOGGER = Logger.getLogger(SendEmailBean.class);
+    private static final Logger LOGGER = Logger.getLogger(SendEmailJob.class);
 }

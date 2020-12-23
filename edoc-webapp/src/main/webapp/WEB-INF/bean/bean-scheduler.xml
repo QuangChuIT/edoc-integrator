@@ -123,7 +123,8 @@
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
 
-
+    <!--Declare scheduler for send email warning document not taken by adapter-->
+    <!--Declare scheduler for public stat-->
     <bean name="sendEmailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendEmailJob"/>
         <property name="jobDataMap">
@@ -131,5 +132,24 @@
                 <entry key="sendEmailBean" value-ref="sendEmailBean"/>
             </map>
         </property>
+    </bean>
+
+    <bean id="sendEmailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="sendEmailJobDetail"/>
+        <property name="cronExpression" value="0 */2 * ? * *"/>
+        <!--<property name="cronExpression" value="0 0 1 ? * *"/>-->
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="sendEmailTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
     </bean>
 </beans>

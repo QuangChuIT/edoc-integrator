@@ -4,6 +4,7 @@ import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
+import com.bkav.edoc.web.email.EmailConfig;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -20,19 +21,9 @@ import java.util.List;
 
 @Component("sendEmailBean")
 public class EmailSenderBean {
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    private VelocityEngine velocityEngine;
 
     public void runScheduleSendEmail() {
         try {
-//            Calendar yesterday = Calendar.getInstance();
-//            //yesterday.add(Calendar.DATE, -1);
-//            //yesterday.add(Calendar.HOUR, 7);
-//            _counterDate = yesterday.getTime();
-//            LOGGER.info("Email prepare send at " + _counterDate);
             List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend();
             int test = 0;
             for (EmailRequest emailObject: emailSendObject) {
@@ -40,7 +31,7 @@ public class EmailSenderBean {
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
                 String receiverEmail = contact.getEmail();
                 emailObject.setReceiverName(contact.getName());
-                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "JvMailSender@gmail.com", "kqa74479@zwoho.com", emailObject);
+                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "jvmailsender@gmail.com", "fwl61922@eoopy.com", emailObject);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " successfully!!!");
 
@@ -54,8 +45,9 @@ public class EmailSenderBean {
         }
     }
 
-    public void sendEmailUsingVelocityTemplate(final String subject, final String message,
+    private void sendEmailUsingVelocityTemplate(final String subject, final String message,
                                                final String fromEmailAddress, final String toEmailAddress, EmailRequest emailRequest) {
+        EmailConfig emailConfig = new EmailConfig();
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
@@ -67,7 +59,7 @@ public class EmailSenderBean {
 
                 StringWriter stringWriter = new StringWriter();
 
-                velocityEngine.mergeTemplate("velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
+                emailConfig.velocityEngine().mergeTemplate("velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
 
                 message.setSubject(subject);
                 message.setText(stringWriter.toString(), true);
@@ -75,7 +67,7 @@ public class EmailSenderBean {
         };
 
         try {
-            mailSender.send(preparator);
+            emailConfig.mailSender().send(preparator);
         } catch (Exception e) {
             e.printStackTrace();
         }

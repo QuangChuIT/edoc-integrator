@@ -25,7 +25,7 @@ public class SendEmailJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         LOGGER.info("Start send email at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
-        boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.sendmail"), false);
+        boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.sendmail"), true);
         if(runScheduler){
             LOGGER.info("Run scheduler send email !!!!!!!!!");
             sendEmailBean.runScheduleSendEmail();

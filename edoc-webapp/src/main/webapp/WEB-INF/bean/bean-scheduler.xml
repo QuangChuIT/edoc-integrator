@@ -123,6 +123,7 @@
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
 
+
     <bean name="sendEmailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendEmailJob"/>
         <property name="jobDataMap">

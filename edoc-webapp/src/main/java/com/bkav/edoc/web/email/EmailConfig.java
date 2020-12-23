@@ -17,8 +17,8 @@ public class EmailConfig {
         mailSender.setPassword("123abc@A");
 
         Properties javaMailProperties = new Properties();
-        javaMailProperties.put("mail.smtp.auth", true);
-        javaMailProperties.put("mail.smtp.starttls.enable", true);
+        javaMailProperties.put("mail.smtp.auth", "true");
+        javaMailProperties.put("mail.smtp.starttls.enable", "true");
         javaMailProperties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
         //javaMailProperties.put("mail.smtp.socketFactory.fallback", true);
         javaMailProperties.put("mail.transport.protocol", "smtp");

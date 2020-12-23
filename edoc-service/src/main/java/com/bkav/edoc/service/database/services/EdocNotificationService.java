@@ -110,11 +110,11 @@ public class EdocNotificationService {
                 EmailRequest emailRequest = new EmailRequest();
                 emailRequest.setReceiverId(receiverId);
                 List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(receiverId);
-                //emailRequest.setNumberOfDocument(documents.size());
+                emailRequest.setNumberOfDocument(documents.size());
                 emailRequest.setEdocDocument(documents);
                 emailRequests.add(emailRequest);
             }
-            //System.out.println(emailRequests.size());
+            System.out.println(emailRequests.size());
             return emailRequests;
         } catch (Exception e) {
             LOGGER.error(e);

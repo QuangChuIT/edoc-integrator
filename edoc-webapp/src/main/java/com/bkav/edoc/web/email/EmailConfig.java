@@ -4,11 +4,11 @@ import java.util.Properties;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class EmailConfig {
 
     @Bean
@@ -17,8 +17,8 @@ public class EmailConfig {
 
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("no-reply@bmail.com");
-        //mailSender.setPassword("gmail password");
+        mailSender.setUsername("JvMailSender@gmail.com");
+        mailSender.setPassword("qxtjcwezxhbgtphx");
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.auth", true);

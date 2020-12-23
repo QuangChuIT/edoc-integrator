@@ -18,7 +18,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.StringWriter;
 import java.util.List;
 
-@Component ("sendEmailBean")
+@Component("sendEmailBean")
 public class EmailSenderBean {
     @Autowired
     private JavaMailSender mailSender;
@@ -40,7 +40,7 @@ public class EmailSenderBean {
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
                 String receiverEmail = contact.getEmail();
                 emailObject.setReceiverName(contact.getName());
-                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "no-reply@bmail.com", "fbt87716@zwoho.com", emailObject);
+                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về", null, "JvMailSender@gmail.com", "kqa74479@zwoho.com", emailObject);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " successfully!!!");
 
@@ -54,9 +54,8 @@ public class EmailSenderBean {
         }
     }
 
-    private void sendEmailUsingVelocityTemplate(final String subject, final String message,
+    public void sendEmailUsingVelocityTemplate(final String subject, final String message,
                                                final String fromEmailAddress, final String toEmailAddress, EmailRequest emailRequest) {
-
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
@@ -68,7 +67,7 @@ public class EmailSenderBean {
 
                 StringWriter stringWriter = new StringWriter();
 
-                velocityEngine.mergeTemplate("resources/velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
+                velocityEngine.mergeTemplate("velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
 
                 message.setSubject(subject);
                 message.setText(stringWriter.toString(), true);

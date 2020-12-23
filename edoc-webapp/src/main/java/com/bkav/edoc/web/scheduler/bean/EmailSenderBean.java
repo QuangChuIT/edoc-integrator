@@ -20,11 +20,14 @@ import java.util.List;
 
 @Component ("sendEmailBean")
 public class EmailSenderBean {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private VelocityEngine velocityEngine;
+    private final VelocityEngine velocityEngine;
+
+    public EmailSenderBean(JavaMailSender mailSender, VelocityEngine velocityEngine) {
+        this.mailSender = mailSender;
+        this.velocityEngine = velocityEngine;
+    }
 
     public void runScheduleSendEmail() {
         try {

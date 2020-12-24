@@ -1,6 +1,7 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocNotificationDao;
+import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -101,8 +102,25 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT en.receiverId FROM EdocNotification en where en.taken=:taken group by en.receiverId");
+            sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken GROUP BY en.receiverId");
             Query<String> query = session.createQuery(sql.toString(), String.class);
+            query.setParameter("taken", false);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
+    public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.document FROM EdocNotification en WHERE en.receiverId=:receiverId and en.taken=:taken");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("receiverId", receiverId);
             query.setParameter("taken", false);
             return query.getResultList();
         } catch (Exception e) {

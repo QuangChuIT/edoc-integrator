@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class EmailConfig {
 
     @Bean
@@ -17,8 +18,8 @@ public class EmailConfig {
 
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("noreplay@gmail.com");
-        mailSender.setPassword("gmail password");
+        mailSender.setUsername("no-reply@bmail.com");
+        //mailSender.setPassword("gmail password");
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.auth", true);

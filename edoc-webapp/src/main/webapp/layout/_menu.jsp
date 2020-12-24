@@ -106,7 +106,6 @@
         <%
             }
         %>
-
     </ul>
 </nav>
 <nav id="reportTabC" class="navbar-default sidebar fade in tab-container">

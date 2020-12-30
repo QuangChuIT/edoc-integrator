@@ -210,19 +210,33 @@ public class EdocDocumentService {
 
             EdocTraceHeaderList edocTraceHeaderList = new EdocTraceHeaderList();
             if (traces.getTraceHeaders().size() > 0) {
-                edocTraceHeaderList.setBusinessDocReason(traces.getBusiness().getBusinessDocReason());
-                int businessDocType = (int) traces.getBusiness().getBusinessDocType();
-                EdocTraceHeaderList.BusinessDocType type = EdocTraceHeaderList.BusinessDocType.values()[businessDocType];
-                edocTraceHeaderList.setBusinessDocType(type);
-                edocTraceHeaderList.setPaper(traces.getBusiness().getPaper());
+                // fix loi tu vpcp gui thieu the business
+                if (traces.getBusiness() == null) {
+                    edocTraceHeaderList.setBusinessDocReason("New document");
+                    int businessDocType = 0;
+                    EdocTraceHeaderList.BusinessDocType type = EdocTraceHeaderList.BusinessDocType.values()[businessDocType];
+                    edocTraceHeaderList.setBusinessDocType(type);
+                    edocTraceHeaderList.setPaper(0);
+                } else {
+                    edocTraceHeaderList.setBusinessDocReason(traces.getBusiness().getBusinessDocReason());
+                    int businessDocType = (int) traces.getBusiness().getBusinessDocType();
+                    EdocTraceHeaderList.BusinessDocType type = EdocTraceHeaderList.BusinessDocType.values()[businessDocType];
+                    edocTraceHeaderList.setBusinessDocType(type);
+                    edocTraceHeaderList.setPaper(traces.getBusiness().getPaper());
+                }
                 edocTraceHeaderList.setBusinessInfo(businessInfo);
                 // get staff info
-                if (traces.getBusiness().getStaffInfo() != null) {
+                if (traces.getBusiness() != null && traces.getBusiness().getStaffInfo() != null) {
                     StaffInfo staffInfo = traces.getBusiness().getStaffInfo();
                     edocTraceHeaderList.setEmail(staffInfo.getEmail());
                     edocTraceHeaderList.setDepartment(staffInfo.getDepartment());
                     edocTraceHeaderList.setMobile(staffInfo.getMobile());
                     edocTraceHeaderList.setStaff(staffInfo.getStaff());
+                } else {
+                    edocTraceHeaderList.setEmail("");
+                    edocTraceHeaderList.setDepartment("");
+                    edocTraceHeaderList.setMobile("");
+                    edocTraceHeaderList.setStaff("");
                 }
 
                 // save trace header list to database

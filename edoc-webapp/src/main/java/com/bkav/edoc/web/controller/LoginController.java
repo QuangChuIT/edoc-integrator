@@ -74,10 +74,12 @@ public class LoginController {
         String session_state = CookieUtil.getValue(request, OAuth2Constants.SESSION_STATE);
 
         String idToken = CookieUtil.getValue(request, OAuth2Constants.SSO_ID_TOKEN);
+        String redirectUri = "";
+        if (session != null) {
+            redirectUri = (String) session.getAttribute(OAuth2Constants.CALL_BACK_URL);
+        }
 
-        String redirectUri = (String) session.getAttribute(OAuth2Constants.CALL_BACK_URL);
-
-        if (redirectUri == null) {
+        if (redirectUri.equals("")) {
             redirectUri = PropsUtil.get("callBackUrl");
         }
 
@@ -98,7 +100,9 @@ public class LoginController {
             CookieUtil.clear(response, OAuth2Constants.TOKEN_SSO, host_);
 
             // clear session
-            session.invalidate();
+            if (session != null) {
+                session.invalidate();
+            }
             response.sendRedirect(logoutUrl.toString());
         }
     }

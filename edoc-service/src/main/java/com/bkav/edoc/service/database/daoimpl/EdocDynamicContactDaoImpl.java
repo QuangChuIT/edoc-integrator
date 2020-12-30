@@ -42,14 +42,14 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain like :domain1 or edc.domain " +
-                    "like :domain2 or edc.domain like :domain3 or edc.domain like :domain4");
             String[] arr = domain.split("#");
+            sql.append("SELECT edc FROM EdocDynamicContact edc");
+            String filterQuery = getFilterDomain(domain);
+            sql.append(" where ").append(filterQuery);
             Query<EdocDynamicContact> query = currentSession.createQuery(sql.toString(), EdocDynamicContact.class);
-            query.setParameter("domain1", StringPool.PERCENT + arr[0] + StringPool.PERCENT);
-            query.setParameter("domain2", StringPool.PERCENT + arr[1] + StringPool.PERCENT);
-            query.setParameter("domain3", StringPool.PERCENT + arr[2] + StringPool.PERCENT);
-            query.setParameter("domain4", StringPool.PERCENT + arr[3] + StringPool.PERCENT);
+            for (int i = 0; i < arr.length; i++) {
+                query.setParameter("domain" + i, StringPool.PERCENT + arr[i] + StringPool.PERCENT);
+            }
             return query.list();
         } catch (Exception e) {
             LOGGER.error(e);
@@ -57,6 +57,24 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         } finally {
             closeCurrentSession(currentSession);
         }
+    }
+
+    private String getFilterDomain(String domain) {
+        String[] arr = domain.split("#");
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < arr.length; i++) {
+            String value = "domain" + i;
+            builder.append("edc.domain like :").append(value);
+            if (i != arr.length - 1) {
+                builder.append(" or ");
+            }
+        }
+        return builder.toString();
+    }
+
+    public static void main(String[] args) {
+        String domain = "H36#I36#J36#A36I01#I02#I03#I04#I05#J02#J06#J07#J08#J09#J15#J16#J17#E01#D01#G5#G12#G15#G14#G13#K36#G20#H15#G16#H07";
+        System.out.println(new EdocDynamicContactDaoImpl().getDynamicContactsByDomainFilter(domain).size());
     }
 
     @Override

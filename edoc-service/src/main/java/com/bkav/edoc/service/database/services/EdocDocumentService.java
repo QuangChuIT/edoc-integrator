@@ -190,8 +190,9 @@ public class EdocDocumentService {
             currentSession.persist(document);
 
             long docId = document.getDocumentId();
+            String docCode = document.getDocCode();
 
-            LOGGER.info("Save document successfully return DocumentId " + docId);
+            LOGGER.info("Save document successfully return DocumentId " + docId + " docCode " + docCode);
             outDocumentId.append(docId);
 
             // Add document to cache (using by get document)
@@ -345,6 +346,7 @@ public class EdocDocumentService {
             currentSession.getTransaction().commit();
             return document;
         } catch (Exception e) {
+            LOGGER.error("Error add document to database because " + e);
             LOGGER.error("Error add document to database cause " + Arrays.toString(new String[]{Arrays.toString(e.getStackTrace())}));
             Error error = new Error("M.SaveDocError", "Save document error cause "
                     + Arrays.toString(e.getStackTrace()) + " with document code " + messageHeader.getCode().getCodeNumber());

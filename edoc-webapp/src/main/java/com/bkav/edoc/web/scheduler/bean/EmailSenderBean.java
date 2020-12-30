@@ -40,7 +40,7 @@ public class EmailSenderBean {
         try {
             List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend();
             Map<String, Object> mail = null;
-            int test = 0;
+//            int test = 0;
             for (EmailRequest emailObject: emailSendObject) {
                 mail = new HashMap<>();
                 LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId());
@@ -53,14 +53,14 @@ public class EmailSenderBean {
                 FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream);
                 byte[] bytes = outputStream.toByteArray();
                 sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null, "jvmailsender@gmail.com",
-                        "jvmailsender@gmail.com", mail, bytes);
+                        receiverEmail, mail, bytes);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " successfully!!!");
 
                 // test run 2 times
-                test++;
-                if (test == 2)
-                    break;
+//                test++;
+//                if (test == 2)
+//                    break;
             }
         } catch (Exception e) {
             LOGGER.error("Error to send email because "  + e);

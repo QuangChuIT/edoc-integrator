@@ -15,6 +15,7 @@ public class DateUtils {
     public static final String DATE_FORMAT_NEW = "yyyy-MM-dd";
     public static final String VN_DATETIME_FORMAT_NEW = "dd/MM/yyyy HH:mm:ss";
     public static final String VN_DATETIME_FORMAT_D = "dd-MM-yyyy HH:mm:ss";
+    public static final String VN_DATE_FORMAT = "dd-MM-yyyy";
     public DateUtils() {
     }
 

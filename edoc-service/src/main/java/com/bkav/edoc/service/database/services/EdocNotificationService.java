@@ -114,7 +114,7 @@ public class EdocNotificationService {
                 emailRequest.setEdocDocument(documents);
                 emailRequests.add(emailRequest);
             }
-            System.out.println(emailRequests.size());
+            LOGGER.info("Has " + receiverIds.size() + " organ need to send warning email!!");
             return emailRequests;
         } catch (Exception e) {
             LOGGER.error(e);

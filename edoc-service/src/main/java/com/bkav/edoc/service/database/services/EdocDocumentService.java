@@ -332,6 +332,7 @@ public class EdocDocumentService {
             currentSession.getTransaction().commit();
             return document;
         } catch (Exception e) {
+            LOGGER.error("Error add document to database because " + e);
             LOGGER.error("Error add document to database cause " + Arrays.toString(new String[]{Arrays.toString(e.getStackTrace())}));
             Error error = new Error("M.SaveDocError", "Save document error cause "
                     + Arrays.toString(e.getStackTrace()) + " with document code " + messageHeader.getCode().getCodeNumber());

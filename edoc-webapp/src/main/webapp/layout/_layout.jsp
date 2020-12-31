@@ -738,7 +738,7 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="rostaff-commentw" id="trace_${traceId}" style="display:none">
+                                <div class="staff-comment" id="trace_${traceId}" style="display:none">
                                     <div class="col-md-7 col-sm-6 col-xs-12">
                                         <div class="staff-handler>
                                             <span>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>

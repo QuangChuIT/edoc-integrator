@@ -6,6 +6,7 @@ import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.web.email.EmailConfig;
 import com.bkav.edoc.web.util.FilePDFUtil;
 
 import com.bkav.edoc.web.util.PropsUtil;
@@ -67,13 +68,19 @@ public class EmailSenderBean {
                 mail.put("TotalDocument", emailObject.getNumberOfDocument());
                 mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
                 mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
+
+                // write document to pdf
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
                 byte[] bytes = outputStream.toByteArray();
+
+                // create email pdf content object
                 EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
                 emailPDFRequest.setOrganName(contact.getName());
                 emailPDFRequest.setBytes(bytes);
                 pdfRequests.add(emailPDFRequest);
+
+                // send mail to each organ
                 sendEmailToOrgans("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
                         PropsUtil.get("mail.to.address"),
                         receiverEmail, mail, bytes);
@@ -82,20 +89,23 @@ public class EmailSenderBean {
 
                 // test run 2 times
 //                test++;
-//                if (test == 5)
+//                if (test == 3)
 //                    break;
             }
             LOGGER.info("Start send email to admin!!!!!");
             mailAdmin.put("TotalDocuments", num_documents);
+
+            // send mail to admin mail
             sendEmailToAdmin("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
                     PropsUtil.get("mail.to.address"),
-                    PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
+                    "jvmailsender@gmail.com", mailAdmin, pdfRequests);
             LOGGER.info("Send email to admin ended!!!");
         } catch (Exception e) {
             LOGGER.error("Error to send email because "  + e);
         }
     }
 
+    // merge content to template for each organ
     private void sendEmailToOrgans(final String subject, final String message,
                                                 final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final byte[] bytes) {
         //EmailConfig emailConfig = new EmailConfig();
@@ -129,6 +139,7 @@ public class EmailSenderBean {
         }
     }
 
+    // merge content to template for admin
     private void sendEmailToAdmin(final String subject, final String message,
                                    final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final List<EmailPDFRequest> pdfRequests) {
         //EmailConfig emailConfig = new EmailConfig();
@@ -164,12 +175,13 @@ public class EmailSenderBean {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println("Start...");
-        EmailSenderBean emailSenderBean = new EmailSenderBean();
-        emailSenderBean.runScheduleSendEmail();
-        System.out.println("End!!!!");
-    }
+    // main test
+//    public static void main(String[] args) {
+//        System.out.println("Start...");
+//        EmailSenderBean emailSenderBean = new EmailSenderBean();
+//        emailSenderBean.runScheduleSendEmail();
+//        System.out.println("End!!!!");
+//    }
 
     private final static Logger LOGGER = Logger.getLogger(EmailSenderBean.class);
 }

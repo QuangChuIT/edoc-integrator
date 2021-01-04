@@ -102,9 +102,9 @@
                                     <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
                                         <h1 style="text-align: center; margin: 0 0 15px;">Hệ thống Trục liên thông văn bản tỉnh Lâm Đồng</h1>
                                         <h2 style="text-align: center; margin: 0 0 25px; color: red; font-weight: bold;">Thông báo</h2>
-                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;">Kính gửi đơn vị <strong>${mailRequest.receiverName}</strong>,</p>
+                                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;">Kính gửi <strong>${mailRequest.receiverName}</strong>,</p>
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;">
-                                            Từ ngày <u>${mailRequest.yesterday}</u> đến ngày  <u>${mailRequest.currentDate}</u>, đơn vị đang có tổng <strong>${mailRequest.TotalDocument}</strong> văn bản chưa được nhận về: Yêu cầu đơn vị truy cập web trục liên thông để kiểm tra tình trạng và đưa ra phương án xử lý. Chi tiết các văn bản được ghi trong tệp đính kèm dưới đây. Mời đơn vị kiểm tra lại.
+                                            Từ ngày <u>${mailRequest.yesterday}</u> đến ngày  <u>${mailRequest.currentDate}</u>, đang có tổng <strong>${mailRequest.TotalOrgan}</strong> đơn vị và có tổng <strong>${mailRequest.TotalDocuments}</strong> văn bản chưa được nhận về: mời quản trị hệ thống truy cập web trục liên thông để kiểm tra. Chi tiết các văn bản theo từng đơn vị được ghi trong các tệp đính kèm dưới đây.
                                         </p>
 
                                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;">Xin chân thành cám ơn!</p>

@@ -1,12 +1,14 @@
 package com.bkav.edoc.web.scheduler.bean;
 
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EmailPDFRequest;
 import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.FilePDFUtil;
 
+import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.io.IOUtils;
@@ -22,10 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component("sendEmailBean")
 public class EmailSenderBean {
@@ -36,39 +35,71 @@ public class EmailSenderBean {
     @Autowired
     private VelocityEngine velocityEngine;
 
+
     public void runScheduleSendEmail() {
         try {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);
+            Date yesterday = cal.getTime();
             List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend();
+
             Map<String, Object> mail = null;
-//            int test = 0;
+            Map<String, Object> mailAdmin = new HashMap<>();
+            List<EmailPDFRequest> pdfRequests = new ArrayList<>();
+
+            // put to mail admin object
+            mailAdmin.put("receiverName", PropsUtil.get("admin.mail.name"));
+            mailAdmin.put("TotalOrgan", emailSendObject.size());
+            mailAdmin.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+            mailAdmin.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
+
+            long num_documents = 0;
+            int test = 0;
             for (EmailRequest emailObject: emailSendObject) {
                 mail = new HashMap<>();
+                num_documents += emailObject.getNumberOfDocument();
                 LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId());
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
                 String receiverEmail = contact.getEmail();
+
+                // put to mail organ
                 mail.put("receiverName", contact.getName());
                 mail.put("TotalDocument", emailObject.getNumberOfDocument());
-                mail.put("Date", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+                mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+                mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream);
+                FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
                 byte[] bytes = outputStream.toByteArray();
-                sendEmailUsingVelocityTemplate("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null, "jvmailsender@gmail.com",
+                EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
+                emailPDFRequest.setOrganName(contact.getName());
+                emailPDFRequest.setBytes(bytes);
+                pdfRequests.add(emailPDFRequest);
+                sendEmailToOrgans("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
+                        PropsUtil.get("mail.to.address"),
                         receiverEmail, mail, bytes);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
-                LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " successfully!!!");
+                LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended!!!");
 
                 // test run 2 times
-//                test++;
-//                if (test == 2)
-//                    break;
+                test++;
+                if (test == 5)
+                    break;
             }
+            LOGGER.info("Start send email to admin!!!!!");
+            mailAdmin.put("TotalDocuments", num_documents);
+            sendEmailToAdmin("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
+                    PropsUtil.get("mail.to.address"),
+                    PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
+            LOGGER.info("Send email to admin ended!!!");
         } catch (Exception e) {
             LOGGER.error("Error to send email because "  + e);
         }
     }
 
-    private void sendEmailUsingVelocityTemplate(final String subject, final String message,
+    private void sendEmailToOrgans(final String subject, final String message,
                                                 final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final byte[] bytes) {
+        //EmailConfig emailConfig = new EmailConfig();
+
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, CharEncoding.UTF_8);
@@ -85,6 +116,41 @@ public class EmailSenderBean {
                 StringWriter stringWriter = new StringWriter();
 
                 velocityEngine.mergeTemplate("velocity/email-template.vm", "UTF-8", velocityContext, stringWriter);
+
+                message.setSubject(subject);
+                message.setText(stringWriter.toString(), true);
+            }
+        };
+
+        try {
+            mailSender.send(preparator);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendEmailToAdmin(final String subject, final String message,
+                                   final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final List<EmailPDFRequest> pdfRequests) {
+        //EmailConfig emailConfig = new EmailConfig();
+
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+            public void prepare(MimeMessage mimeMessage) throws Exception {
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, CharEncoding.UTF_8);
+                message.setTo(toEmailAddress);
+                message.setFrom(new InternetAddress(fromEmailAddress));
+                for (EmailPDFRequest pdfRequest: pdfRequests) {
+                    InputStream is = new ByteArrayInputStream(pdfRequest.getBytes());
+                    message.addAttachment("Báo_cáo_văn_bản_chưa_nhận_về_" + pdfRequest.getOrganName() +
+                            "_" + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT) + ".pdf", new ByteArrayResource(IOUtils.toByteArray(is)));
+                }
+
+                VelocityContext velocityContext = new VelocityContext();
+                velocityContext.put("mailRequest", mailRequest);
+                LOGGER.info(velocityContext.get("mailRequest"));
+
+                StringWriter stringWriter = new StringWriter();
+
+                velocityEngine.mergeTemplate("velocity/admin-email-template.vm", "UTF-8", velocityContext, stringWriter);
 
                 message.setSubject(subject);
                 message.setText(stringWriter.toString(), true);

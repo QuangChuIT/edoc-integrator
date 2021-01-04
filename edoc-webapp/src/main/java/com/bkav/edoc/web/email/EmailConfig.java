@@ -2,6 +2,7 @@ package com.bkav.edoc.web.email;
 
 import java.util.Properties;
 
+import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,17 +16,15 @@ public class EmailConfig {
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-        mailSender.setUsername("jvmailsender@gmail.com");
-        mailSender.setPassword("123abc@A");
+        mailSender.setHost(PropsUtil.get("mail.host"));
+        mailSender.setPort(Integer.parseInt(PropsUtil.get("mail.port"))); // 587 465
+        mailSender.setUsername(PropsUtil.get("mail.username"));
+        mailSender.setPassword(PropsUtil.get("mail.password"));
 
         Properties javaMailProperties = new Properties();
         javaMailProperties.put("mail.smtp.auth", "true");
-        javaMailProperties.put("mail.smtp.starttls.enable", "true");
-        javaMailProperties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        //javaMailProperties.put("mail.smtp.socketFactory.fallback", true);
-        javaMailProperties.put("mail.transport.protocol", "smtp");
+        //javaMailProperties.put(PropsUtil.get("mail.starttls"), "true");
+        javaMailProperties.put("mail.smtp.ssl.trust", PropsUtil.get("mail.host"));
 
         mailSender.setJavaMailProperties(javaMailProperties);
 

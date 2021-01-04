@@ -12,7 +12,7 @@ import java.util.List;
 public class FilePDFUtil {
     private static final WriteDocumentsToPDF WRITE_DOCUMENTS_TO_PDF = new WriteDocumentsToPDF();
 
-    public static void WriteDocumentsToPDF (List<EdocDocument> documents, OutputStream outputStream) throws IOException, DocumentException, FontFormatException {
-        WRITE_DOCUMENTS_TO_PDF.WriteDocumentsToPDF(documents, outputStream);
+    public static void WriteDocumentsToPDF(List<EdocDocument> documents, OutputStream outputStream, String name) throws IOException, DocumentException, FontFormatException {
+        WRITE_DOCUMENTS_TO_PDF.WriteDocumentsToPDF(documents, outputStream, name);
     }
 }

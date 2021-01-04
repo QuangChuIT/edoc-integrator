@@ -2,24 +2,18 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.EdocDocument;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
-import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
-import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
-import com.google.gson.Gson;
+import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import javax.persistence.ParameterMode;
-import javax.persistence.StoredProcedureQuery;
 import java.util.*;
 
 public class EdocNotificationService {
@@ -104,17 +98,21 @@ public class EdocNotificationService {
     public List<EmailRequest> getEmailRequestScheduleSend() {
         List<EmailRequest> emailRequests = new ArrayList<>();
         Session session = notificationDaoImpl.openCurrentSession();
+        int count_organ = 0;
         try {
             List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken();
             for (String receiverId: receiverIds) {
-                EmailRequest emailRequest = new EmailRequest();
-                emailRequest.setReceiverId(receiverId);
-                List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(receiverId);
-                emailRequest.setNumberOfDocument(documents.size());
-                emailRequest.setEdocDocument(documents);
-                emailRequests.add(emailRequest);
+                if (checkOrganToSendEmail(receiverId)) {
+                    EmailRequest emailRequest = new EmailRequest();
+                    emailRequest.setReceiverId(receiverId);
+                    List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(receiverId);
+                    emailRequest.setNumberOfDocument(documents.size());
+                    emailRequest.setEdocDocument(documents);
+                    emailRequests.add(emailRequest);
+                    count_organ++;
+                }
             }
-            LOGGER.info("Has " + receiverIds.size() + " organ need to send warning email!!");
+            LOGGER.info("Has " + count_organ + " organ need to send warning email!!");
             return emailRequests;
         } catch (Exception e) {
             LOGGER.error(e);
@@ -122,6 +120,24 @@ public class EdocNotificationService {
         } finally {
             notificationDaoImpl.closeCurrentSession(session);
         }
+    }
+
+    private boolean checkOrganToSendEmail(String organId) {
+        boolean result = false;
+        try {
+            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
+            String[] arr = organId.split("\\.");
+            if (arr.length > 0) {
+                String organCode = arr[arr.length - 1];
+                if (stringList.contains(organCode)) {
+                    result = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error check organ to stat cause " + e);
+        }
+        return result;
     }
 
     public static void main(String[] args) {

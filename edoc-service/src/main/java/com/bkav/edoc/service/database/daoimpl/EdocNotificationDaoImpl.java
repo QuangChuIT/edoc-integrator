@@ -105,7 +105,6 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken GROUP BY en.receiverId");
             Query<String> query = session.createQuery(sql.toString(), String.class);
             query.setParameter("taken", false);
-            //query.setMaxResults(1);
             return query.getResultList();
         } catch (Exception e) {
             LOGGER.error(e);

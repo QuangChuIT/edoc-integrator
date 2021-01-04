@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class WriteDocumentsToPDF {
     private static String fontFileName = "/fonts/vuArial.ttf";
 
-    public void WriteDocumentsToPDF(List<EdocDocument> documents, OutputStream outputStream) throws DocumentException, IOException {
+    public void WriteDocumentsToPDF(List<EdocDocument> documents, OutputStream outputStream, String organName) throws DocumentException, IOException {
         Document document = new Document();
         int stt = 1;
         PdfWriter.getInstance(document, outputStream);
@@ -28,14 +28,14 @@ public class WriteDocumentsToPDF {
         Font font = new Font(bf,16);
         document.open();
         Paragraph preface = new Paragraph();
-        preface.add(new Paragraph("Danh sách các văn bản chưa được nhận về của đơn vị tới ngày " +
+        preface.add(new Paragraph("Danh sách các văn bản chưa được nhận về của đơn vị " + organName + " tới ngày " +
                 DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), font));
         addEmptyLine(preface, 3);
         document.add(preface);
 
-        PdfPTable table = new PdfPTable(5);
+        PdfPTable table = new PdfPTable(6);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{0.5f, 3.75f, 1.5f, 1.25f, 1.25f});
+        table.setWidths(new float[]{0.5f, 3.5f, 1.5f, 1.25f, 1.25f, 1.25f});
         addTableHeader(table, path);
         for (EdocDocument doc: documents) {
             addRows(table, doc, stt, path);
@@ -49,7 +49,7 @@ public class WriteDocumentsToPDF {
         BaseFont bf = BaseFont.createFont(String.valueOf(path), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font font = new Font(bf,12);
 
-        Stream.of("STT", "Trích yếu", "Đơn vị gửi", "Ngày phát hành", "Ngày đồng bộ lên trục")
+        Stream.of("STT", "Trích yếu", "Đơn vị gửi", "Ký hiệu", "Ngày phát hành", "Ngày đồng bộ lên trục")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -64,7 +64,7 @@ public class WriteDocumentsToPDF {
         String fromOrgan = EdocDynamicContactServiceUtil.getNameByOrganId(document.getFromOrganDomain());
         BaseFont bf = BaseFont.createFont(String.valueOf(path), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font font = new Font(bf,12);
-        Stream.of(String.valueOf(stt), document.getSubject(), fromOrgan,
+        Stream.of(String.valueOf(stt), document.getSubject(), fromOrgan, document.getDocCode(),
                 DateUtils.format(document.getPromulgationDate(), DateUtils.VN_DATE_FORMAT),
                 DateUtils.format(document.getSentDate(), DateUtils.VN_DATE_FORMAT))
                 .forEach(cellTable -> {

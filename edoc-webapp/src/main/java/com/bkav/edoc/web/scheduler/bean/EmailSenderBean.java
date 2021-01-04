@@ -8,6 +8,7 @@ import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.FilePDFUtil;
 
+import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.log4j.Logger;
@@ -28,6 +29,9 @@ import java.util.*;
 
 @Component("sendEmailBean")
 public class EmailSenderBean {
+
+    @Autowired
+    private MessageSourceUtil messageSourceUtil;
 
     @Autowired
     private JavaMailSender mailSender;

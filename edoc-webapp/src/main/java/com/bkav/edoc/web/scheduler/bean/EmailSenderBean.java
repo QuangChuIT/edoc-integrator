@@ -81,9 +81,9 @@ public class EmailSenderBean {
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended!!!");
 
                 // test run 2 times
-                test++;
-                if (test == 5)
-                    break;
+//                test++;
+//                if (test == 5)
+//                    break;
             }
             LOGGER.info("Start send email to admin!!!!!");
             mailAdmin.put("TotalDocuments", num_documents);

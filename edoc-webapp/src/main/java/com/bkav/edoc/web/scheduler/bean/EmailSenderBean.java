@@ -82,14 +82,14 @@ public class EmailSenderBean {
                 // send mail to each organ
                 sendEmailToOrgans("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
                         PropsUtil.get("mail.to.address"),
-                        "jvmailsender@gmail.com", mail, bytes);
+                        receiverEmail, mail, bytes);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended!!!");
 
                 // test run 2 times
-                test++;
-                if (test == 3)
-                    break;
+//                test++;
+//                if (test == 3)
+//                    break;
             }
             LOGGER.info("Start send email to admin!!!!!");
             mailAdmin.put("TotalDocuments", num_documents);

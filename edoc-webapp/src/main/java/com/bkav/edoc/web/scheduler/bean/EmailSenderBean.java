@@ -24,7 +24,10 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.*;
 
 @Component("sendEmailBean")
@@ -39,7 +42,6 @@ public class EmailSenderBean {
     @Autowired
     private VelocityEngine velocityEngine;
 
-
     public void runScheduleSendEmail() {
         try {
             Calendar cal = Calendar.getInstance();
@@ -50,16 +52,19 @@ public class EmailSenderBean {
             Map<String, Object> mail = null;
             Map<String, Object> mailAdmin = new HashMap<>();
             List<EmailPDFRequest> pdfRequests = new ArrayList<>();
-
+            String adminReceivedName = messageSourceUtil.getMessage("edoc.admin.name", null);
             // put to mail admin object
-            mailAdmin.put("receiverName", PropsUtil.get("admin.mail.name"));
+            mailAdmin.put("receiverName", adminReceivedName);
             mailAdmin.put("TotalOrgan", emailSendObject.size());
             mailAdmin.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
             mailAdmin.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
 
             long num_documents = 0;
             int test = 0;
-            for (EmailRequest emailObject: emailSendObject) {
+            String edocTitleMailSender = messageSourceUtil.getMessage("edoc.send.mail.title",
+                    new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT),
+                            DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
+            for (EmailRequest emailObject : emailSendObject) {
                 mail = new HashMap<>();
                 num_documents += emailObject.getNumberOfDocument();
                 LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId());
@@ -84,43 +89,43 @@ public class EmailSenderBean {
                 pdfRequests.add(emailPDFRequest);
 
                 // send mail to each organ
-                sendEmailToOrgans("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
+                sendEmailToOrgans(edocTitleMailSender, null,
                         PropsUtil.get("mail.to.address"),
-                        receiverEmail, mail, bytes);
+                        "jvmailsender@gmail.com", mail, bytes);
                 LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
                 LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended!!!");
 
                 // test run 2 times
-//                test++;
-//                if (test == 3)
-//                    break;
+                test++;
+                if (test == 2)
+                    break;
             }
             LOGGER.info("Start send email to admin!!!!!");
             mailAdmin.put("TotalDocuments", num_documents);
-
             // send mail to admin mail
-            sendEmailToAdmin("Thống kê văn bản chưa được nhận về tới ngày " + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT), null,
+            sendEmailToAdmin(edocTitleMailSender, null,
                     PropsUtil.get("mail.to.address"),
                     PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
             LOGGER.info("Send email to admin ended!!!");
         } catch (Exception e) {
-            LOGGER.error("Error to send email because "  + e);
+            LOGGER.error("Error to send email because " + e);
         }
     }
 
     // merge content to template for each organ
     private void sendEmailToOrgans(final String subject, final String message,
-                                                final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final byte[] bytes) {
+                                   final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final byte[] bytes) {
         //EmailConfig emailConfig = new EmailConfig();
+        String attachmentName = messageSourceUtil.getMessage("edoc.attachment.name.send.mail",
+                new Object[]{mailRequest.get("receiverName"), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
 
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+        MimeMessagePreparator preparatory = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, CharEncoding.UTF_8);
                 InputStream is = new ByteArrayInputStream(bytes);
                 message.setTo(toEmailAddress);
                 message.setFrom(new InternetAddress(fromEmailAddress));
-                message.addAttachment("Báo_cáo_văn_bản_chưa_nhận_về_" + mailRequest.get("receiverName") +
-                        "_" + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT) + ".pdf", new ByteArrayResource(IOUtils.toByteArray(is)));
+                message.addAttachment(attachmentName, new ByteArrayResource(IOUtils.toByteArray(is)));
 
                 VelocityContext velocityContext = new VelocityContext();
                 velocityContext.put("mailRequest", mailRequest);
@@ -136,7 +141,7 @@ public class EmailSenderBean {
         };
 
         try {
-            mailSender.send(preparator);
+            mailSender.send(preparatory);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -144,18 +149,19 @@ public class EmailSenderBean {
 
     // merge content to template for admin
     private void sendEmailToAdmin(final String subject, final String message,
-                                   final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final List<EmailPDFRequest> pdfRequests) {
+                                  final String fromEmailAddress, final String toEmailAddress, final Map<String, Object> mailRequest, final List<EmailPDFRequest> pdfRequests) {
         //EmailConfig emailConfig = new EmailConfig();
 
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+        MimeMessagePreparator perpetrator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, CharEncoding.UTF_8);
                 message.setTo(toEmailAddress);
                 message.setFrom(new InternetAddress(fromEmailAddress));
-                for (EmailPDFRequest pdfRequest: pdfRequests) {
+                for (EmailPDFRequest pdfRequest : pdfRequests) {
                     InputStream is = new ByteArrayInputStream(pdfRequest.getBytes());
-                    message.addAttachment("Báo_cáo_văn_bản_chưa_nhận_về_" + pdfRequest.getOrganName() +
-                            "_" + DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT) + ".pdf", new ByteArrayResource(IOUtils.toByteArray(is)));
+                    String attachmentName = messageSourceUtil.getMessage("edoc.attachment.name.send.mail",
+                            new Object[]{mailRequest.get("receiverName"), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
+                    message.addAttachment(attachmentName, new ByteArrayResource(IOUtils.toByteArray(is)));
                 }
 
                 VelocityContext velocityContext = new VelocityContext();
@@ -172,7 +178,7 @@ public class EmailSenderBean {
         };
 
         try {
-            mailSender.send(preparator);
+            mailSender.send(perpetrator);
         } catch (Exception e) {
             e.printStackTrace();
         }

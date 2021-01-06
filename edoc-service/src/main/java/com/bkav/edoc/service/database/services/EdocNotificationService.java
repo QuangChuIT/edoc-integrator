@@ -95,12 +95,12 @@ public class EdocNotificationService {
         }
     }
 
-    public List<EmailRequest> getEmailRequestScheduleSend() {
+    public List<EmailRequest> getEmailRequestScheduleSend(Date fromDate, Date toDate) {
         List<EmailRequest> emailRequests = new ArrayList<>();
         Session session = notificationDaoImpl.openCurrentSession();
         int count_organ = 0;
         try {
-            List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken();
+            List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken(fromDate, toDate);
             for (String receiverId: receiverIds) {
                 if (checkOrganToSendEmail(receiverId)) {
                     EmailRequest emailRequest = new EmailRequest();
@@ -112,7 +112,7 @@ public class EdocNotificationService {
                     count_organ++;
                 }
             }
-            LOGGER.info("Has " + count_organ + " organ need to send warning email!!");
+            LOGGER.info("Total " + count_organ + " organ need to send warning email!!");
             return emailRequests;
         } catch (Exception e) {
             LOGGER.error(e);
@@ -142,8 +142,8 @@ public class EdocNotificationService {
 
     public static void main(String[] args) {
         EdocNotificationService edocNotificationService = new EdocNotificationService();
-//        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
-        edocNotificationService.getEmailRequestScheduleSend();
+        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
+        /*edocNotificationService.getEmailRequestScheduleSend();*/
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);

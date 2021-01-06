@@ -10,6 +10,7 @@ import org.hibernate.query.Query;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long> implements EdocNotificationDao {
@@ -98,11 +99,13 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         query.executeUpdate();
     }
 
-    public List<String> getReceiverIdNotTaken() {
+    @Override
+    public List<String> getReceiverIdNotTaken(Date fromDate, Date toDate) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken GROUP BY en.receiverId");
+            sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken and " +
+                    "(DATE(en.modifiedDate) >= DATE(:fromDate) and DATE(en.modifiedDate) <= DATE(:toDate)) GROUP BY en.receiverId");
             Query<String> query = session.createQuery(sql.toString(), String.class);
             query.setParameter("taken", false);
             return query.getResultList();

@@ -7,7 +7,6 @@ import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.FilePDFUtil;
-
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import org.apache.commons.codec.CharEncoding;
@@ -44,10 +43,12 @@ public class EmailSenderBean {
 
     public void runScheduleSendEmail() {
         try {
+            int dateRange = Integer.parseInt(PropsUtil.get("edoc.date.range"));
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
+            cal.add(Calendar.DATE, -dateRange);
             Date yesterday = cal.getTime();
-            List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend();
+            Date now = new Date();
+            List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend(yesterday, now);
 
             Map<String, Object> mail = null;
             Map<String, Object> mailAdmin = new HashMap<>();
@@ -67,33 +68,38 @@ public class EmailSenderBean {
             for (EmailRequest emailObject : emailSendObject) {
                 mail = new HashMap<>();
                 num_documents += emailObject.getNumberOfDocument();
-                LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId());
+                LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId() + " !!!!!!!");
+
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
                 String receiverEmail = contact.getEmail();
 
-                // put to mail organ
-                mail.put("receiverName", contact.getName());
-                mail.put("TotalDocument", emailObject.getNumberOfDocument());
-                mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
-                mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
+                if (contact.getEmail() == null || contact.getEmail().equals("")) {
+                    LOGGER.info("Organ with domain " + contact.getDomain() + " have not email config !!!!!!");
+                } else {
+                    LOGGER.info("Total " + emailObject.getNumberOfDocument() + " documents not taken by organ " + contact.getDomain() + " !!!!!!!!");
+                    // put to mail organ
+                    mail.put("receiverName", contact.getName());
+                    mail.put("TotalDocument", emailObject.getNumberOfDocument());
+                    mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+                    mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
 
-                // write document to pdf
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
-                byte[] bytes = outputStream.toByteArray();
+                    // write document to pdf
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
+                    byte[] bytes = outputStream.toByteArray();
 
-                // create email pdf content object
-                EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
-                emailPDFRequest.setOrganName(contact.getName());
-                emailPDFRequest.setBytes(bytes);
-                pdfRequests.add(emailPDFRequest);
+                    // create email pdf content object
+                    EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
+                    emailPDFRequest.setOrganName(contact.getName());
+                    emailPDFRequest.setBytes(bytes);
+                    pdfRequests.add(emailPDFRequest);
 
-                // send mail to each organ
-                sendEmailToOrgans(edocTitleMailSender, null,
-                        PropsUtil.get("mail.to.address"),
-                        receiverEmail, mail, bytes);
-                LOGGER.info("Has " + emailObject.getNumberOfDocument() + " documents not taken");
-                LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended!!!");
+                    // send mail to each organ
+                    sendEmailToOrgans(edocTitleMailSender, null,
+                            PropsUtil.get("mail.to.address"),
+                            receiverEmail, mail, bytes);
+                    LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended !!!!!!");
+                }
 
                 // test run 2 times
                 /*test++;
@@ -160,7 +166,7 @@ public class EmailSenderBean {
                 for (EmailPDFRequest pdfRequest : pdfRequests) {
                     InputStream is = new ByteArrayInputStream(pdfRequest.getBytes());
                     String attachmentName = messageSourceUtil.getMessage("edoc.attachment.name.send.mail",
-                            new Object[]{mailRequest.get("receiverName"), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
+                            new Object[]{pdfRequest.getOrganName(), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
                     message.addAttachment(attachmentName, new ByteArrayResource(IOUtils.toByteArray(is)));
                 }
 

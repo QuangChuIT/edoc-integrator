@@ -4,6 +4,7 @@ import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.services.EdocNotificationService;
 
+import java.util.Date;
 import java.util.List;
 
 public class EdocNotificationServiceUtil {
@@ -14,7 +15,7 @@ public class EdocNotificationServiceUtil {
         NOTIFICATION_SERVICE.addNotification(edocNotification);
     }
 
-    public static List<EmailRequest> emailScheduleSend() {
-        return NOTIFICATION_SERVICE.getEmailRequestScheduleSend();
+    public static List<EmailRequest> emailScheduleSend(Date fromDate, Date toDate) {
+        return NOTIFICATION_SERVICE.getEmailRequestScheduleSend(fromDate, toDate);
     }
 }

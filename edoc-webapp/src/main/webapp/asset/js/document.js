@@ -390,8 +390,6 @@ $(document).ready(function () {
                 documentEle.find(".edoc-subject").find("#statusViewDoc").remove();
                 documentEle.find(".edoc-subject").prepend("<i class=\"fa fa-envelope-open-o fa-fw\" id=\"statusViewDoc\"></i>")
             }
-            let traces = data.traces;
-            let notifications = data.notifications;
             $('#edoc-detail').empty();
             console.log(data);
             $('#edocDetailTemplate').tmpl(data).appendTo('#edoc-detail');

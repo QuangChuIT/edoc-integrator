@@ -160,7 +160,7 @@ public class EmailSenderBean {
                 for (EmailPDFRequest pdfRequest : pdfRequests) {
                     InputStream is = new ByteArrayInputStream(pdfRequest.getBytes());
                     String attachmentName = messageSourceUtil.getMessage("edoc.attachment.name.send.mail",
-                            new Object[]{mailRequest.get("receiverName"), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
+                            new Object[]{pdfRequest.getOrganName(), DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
                     message.addAttachment(attachmentName, new ByteArrayResource(IOUtils.toByteArray(is)));
                 }
 

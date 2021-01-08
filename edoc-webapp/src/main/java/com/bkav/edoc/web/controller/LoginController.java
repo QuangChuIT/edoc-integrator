@@ -79,7 +79,7 @@ public class LoginController {
             redirectUri = (String) session.getAttribute(OAuth2Constants.CALL_BACK_URL);
         }
 
-        if (redirectUri.equals("")) {
+        if (redirectUri != null && redirectUri.equals("")) {
             redirectUri = PropsUtil.get("callBackUrl");
         }
 

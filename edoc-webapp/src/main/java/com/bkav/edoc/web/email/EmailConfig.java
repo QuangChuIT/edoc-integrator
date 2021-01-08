@@ -18,12 +18,12 @@ public class EmailConfig {
 
         mailSender.setHost(PropsUtil.get("mail.host"));
         mailSender.setPort(Integer.parseInt(PropsUtil.get("mail.port"))); // 587 465
-        mailSender.setUsername(PropsUtil.get("mail.username"));
-        mailSender.setPassword(PropsUtil.get("mail.password"));
+        /*mailSender.setUsername(PropsUtil.get("mail.username"));
+        mailSender.setPassword(PropsUtil.get("mail.password"));*/
 
         Properties javaMailProperties = new Properties();
-        javaMailProperties.put("mail.smtp.auth", "true");
-        //javaMailProperties.put(PropsUtil.get("mail.starttls"), "true");
+        /*javaMailProperties.put("mail.smtp.auth", "true");
+        javaMailProperties.put(PropsUtil.get("mail.starttls"), "true");*/
         javaMailProperties.put("mail.smtp.ssl.trust", PropsUtil.get("mail.host"));
 
         mailSender.setJavaMailProperties(javaMailProperties);

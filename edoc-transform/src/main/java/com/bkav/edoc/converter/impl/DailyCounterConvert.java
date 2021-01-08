@@ -23,7 +23,7 @@ public class DailyCounterConvert {
         try (Connection connection = DBConnectionUtil.initConvertDBConnection()) {
             Statement stm;
             stm = connection.createStatement();
-            ResultSet rs = stm.executeQuery(StringQuery.GET_DATE_COUNTER);
+            ResultSet rs = stm.executeQuery(StringQuery.GET_DATE);
 
             while (rs.next()) {
                 Map<String, EdocDailyCounter> dailyCounterMap = new HashMap<>();

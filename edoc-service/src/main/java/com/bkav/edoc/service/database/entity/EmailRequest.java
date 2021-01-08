@@ -43,4 +43,13 @@ public class EmailRequest implements Serializable {
     public void setEdocDocument(List<EdocDocument> edocDocument) {
         this.edocDocument = edocDocument;
     }
+
+    @Override
+    public String toString() {
+        return "EmailRequest{" +
+                "receiverId='" + receiverId + '\'' +
+                ", receiverName='" + receiverName + '\'' +
+                ", numberOfDocument=" + numberOfDocument +
+                '}';
+    }
 }

@@ -33,5 +33,10 @@ public class StatDocumentJob extends QuartzJobBean {
         }
     }
 
+//    public static void main(String[] args) {
+//        StatDocumentBean statDocumentBean = new StatDocumentBean();
+//        statDocumentBean.runSchedulerStatDocument();
+//    }
+
     private static final Logger LOGGER = Logger.getLogger(StatDocumentJob.class);
 }

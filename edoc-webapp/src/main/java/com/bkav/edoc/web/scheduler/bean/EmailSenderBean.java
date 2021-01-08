@@ -106,15 +106,15 @@ public class EmailSenderBean {
                 if (test == 2)
                     break;*/
             }
-            LOGGER.info("Start send email to admin!!!!!");
+            LOGGER.info("--------------------- Start send email to admin ------------------------");
             mailAdmin.put("TotalDocuments", num_documents);
             // send mail to admin mail
             sendEmailToAdmin(edocTitleMailSender, null,
                     PropsUtil.get("mail.to.address"),
                     PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
-            LOGGER.info("Send email to admin ended!!!");
+            LOGGER.info("------------------------------- Send email to admin ended -----------------------------");
         } catch (Exception e) {
-            LOGGER.error("Error to send email because " + e);
+            LOGGER.error("Error to send email cause " + e);
         }
     }
 

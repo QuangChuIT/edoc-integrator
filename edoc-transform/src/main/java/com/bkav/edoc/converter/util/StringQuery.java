@@ -18,9 +18,11 @@ public class StringQuery {
 
     public static final String GET_DATE_COUNTER = "Select distinct Date(sentDate) from edoc_document where year(sentDate)= 2020";
 
+    public static final String GET_DATE = "SELECT distinct Date(create_date) FROM edoc_document where Date(create_date) > \"2021-01-06\"";
+
     /*public static final String GET_DATE_COUNTER = "Select distinct Date(sent_date) from edoc_document where year(sent_date) = 2020";*/
 
-    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select fromOrganDomain, toOrganDomain, sentDate from edoc_document where Date(sentDate) = ?";
+    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from edoc_document where Date(sent_date) = ?";
 
     /*public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from " +
             "edoc_document where Date(sent_date) = ? group by doc_code";*/

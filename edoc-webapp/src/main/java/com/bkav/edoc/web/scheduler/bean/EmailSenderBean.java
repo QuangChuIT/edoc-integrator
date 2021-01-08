@@ -50,69 +50,74 @@ public class EmailSenderBean {
             Date now = new Date();
             List<EmailRequest> emailSendObject = EdocNotificationServiceUtil.emailScheduleSend(yesterday, now);
 
-            Map<String, Object> mail = null;
-            Map<String, Object> mailAdmin = new HashMap<>();
-            List<EmailPDFRequest> pdfRequests = new ArrayList<>();
-            String adminReceivedName = messageSourceUtil.getMessage("edoc.admin.name", null);
-            // put to mail admin object
-            mailAdmin.put("receiverName", adminReceivedName);
-            mailAdmin.put("TotalOrgan", emailSendObject.size());
-            mailAdmin.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
-            mailAdmin.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
+            if (emailSendObject.size() == 0) {
+                LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
+            } else {
+                Map<String, Object> mail = null;
+                Map<String, Object> mailAdmin = new HashMap<>();
+                List<EmailPDFRequest> pdfRequests = new ArrayList<>();
+                String adminReceivedName = messageSourceUtil.getMessage("edoc.admin.name", null);
+                // put to mail admin object
+                mailAdmin.put("receiverName", adminReceivedName);
+                mailAdmin.put("TotalOrgan", emailSendObject.size());
+                mailAdmin.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+                mailAdmin.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
 
-            long num_documents = 0;
-            int test = 0;
-            String edocTitleMailSender = messageSourceUtil.getMessage("edoc.send.mail.title",
-                    new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT),
-                            DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
-            for (EmailRequest emailObject : emailSendObject) {
-                mail = new HashMap<>();
-                num_documents += emailObject.getNumberOfDocument();
-                LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId() + " !!!!!!!");
+                long num_documents = 0;
+                int test = 0;
+                String edocTitleMailSender = messageSourceUtil.getMessage("edoc.send.mail.title",
+                        new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT),
+                                DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT)});
+                for (EmailRequest emailObject : emailSendObject) {
+                    mail = new HashMap<>();
+                    num_documents += emailObject.getNumberOfDocument();
+                    LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId() + " !!!!!!!");
 
-                EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
-                String receiverEmail = contact.getEmail();
+                    EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
+                    String receiverEmail = contact.getEmail();
 
-                if (contact.getEmail() == null || contact.getEmail().equals("")) {
-                    LOGGER.info("Organ with domain " + contact.getDomain() + " have not email config !!!!!!");
-                } else {
-                    LOGGER.info("Total " + emailObject.getNumberOfDocument() + " documents not taken by organ " + contact.getDomain() + " !!!!!!!!");
-                    // put to mail organ
-                    mail.put("receiverName", contact.getName());
-                    mail.put("TotalDocument", emailObject.getNumberOfDocument());
-                    mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
-                    mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
+                    if (contact.getEmail() == null || contact.getEmail().equals("")) {
+                        LOGGER.info("Organ with domain " + contact.getDomain() + " have not email config !!!!!!");
+                    } else {
+                        LOGGER.info("Total " + emailObject.getNumberOfDocument() + " documents not taken by organ " + contact.getDomain() + " !!!!!!!!");
+                        // put to mail organ
+                        mail.put("receiverName", contact.getName());
+                        mail.put("TotalDocument", emailObject.getNumberOfDocument());
+                        mail.put("currentDate", DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT));
+                        mail.put("yesterday", DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT));
 
-                    // write document to pdf
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
-                    byte[] bytes = outputStream.toByteArray();
+                        // write document to pdf
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                        FilePDFUtil.WriteDocumentsToPDF(emailObject.getEdocDocument(), outputStream, contact.getName());
+                        byte[] bytes = outputStream.toByteArray();
 
-                    // create email pdf content object
-                    EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
-                    emailPDFRequest.setOrganName(contact.getName());
-                    emailPDFRequest.setBytes(bytes);
-                    pdfRequests.add(emailPDFRequest);
+                        // create email pdf content object
+                        EmailPDFRequest emailPDFRequest = new EmailPDFRequest();
+                        emailPDFRequest.setOrganName(contact.getName());
+                        emailPDFRequest.setBytes(bytes);
+                        pdfRequests.add(emailPDFRequest);
 
-                    // send mail to each organ
-                    sendEmailToOrgans(edocTitleMailSender, null,
-                            PropsUtil.get("mail.to.address"),
-                            receiverEmail, mail, bytes);
-                    LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended !!!!!!");
+                        // send mail to each organ
+
+                        sendEmailToOrgans(edocTitleMailSender, null,
+                                PropsUtil.get("mail.to.address"),
+                                receiverEmail, mail, bytes);
+                        LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended !!!!!!");
+                    }
+
+                    // test run 2 times
+                    /*test++;
+                    if (test == 2)
+                        break;*/
                 }
-
-                // test run 2 times
-                /*test++;
-                if (test == 2)
-                    break;*/
+                LOGGER.info("Start send email to admin!!!!!");
+                mailAdmin.put("TotalDocuments", num_documents);
+                // send mail to admin mail
+                sendEmailToAdmin(edocTitleMailSender, null,
+                        PropsUtil.get("mail.to.address"),
+                        PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
+                LOGGER.info("Send email to admin ended!!!");
             }
-            LOGGER.info("Start send email to admin!!!!!");
-            mailAdmin.put("TotalDocuments", num_documents);
-            // send mail to admin mail
-            sendEmailToAdmin(edocTitleMailSender, null,
-                    PropsUtil.get("mail.to.address"),
-                    PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
-            LOGGER.info("Send email to admin ended!!!");
         } catch (Exception e) {
             LOGGER.error("Error to send email because " + e);
         }

@@ -108,6 +108,8 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
                     "(DATE(en.modifiedDate) >= DATE(:fromDate) and DATE(en.modifiedDate) <= DATE(:toDate)) GROUP BY en.receiverId");
             Query<String> query = session.createQuery(sql.toString(), String.class);
             query.setParameter("taken", false);
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
             return query.getResultList();
         } catch (Exception e) {
             LOGGER.error(e);

@@ -328,7 +328,7 @@ $(document).on("click", ".import-excel-button", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
     Swal.fire({
-        title: 'Chọn file tải lên',
+        title: 'Chọn tệp tải lên',
         input: 'file',
         showCancelButton: true,
         confirmButtonText: 'Tải lên',

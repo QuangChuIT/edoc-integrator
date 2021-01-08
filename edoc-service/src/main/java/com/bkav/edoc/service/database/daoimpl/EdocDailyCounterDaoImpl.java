@@ -87,7 +87,7 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
     }
 
     public void createDailyCounter(EdocDailyCounter dailyCounter) {
-        this.saveOrUpdate(dailyCounter);
+        this.persist(dailyCounter);
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDailyCounterDaoImpl.class);

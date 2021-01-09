@@ -101,7 +101,7 @@ public class EmailSenderBean {
 
                         sendEmailToOrgans(edocTitleMailSender, null,
                                 PropsUtil.get("mail.to.address"),
-                                receiverEmail, mail, bytes);
+                                "jvmailsender@gmail.com", mail, bytes);
                         LOGGER.info("Send email to organ with id " + emailObject.getReceiverId() + " ended !!!!!!");
                     }
 

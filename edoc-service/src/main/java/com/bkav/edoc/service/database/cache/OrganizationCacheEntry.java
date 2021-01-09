@@ -13,6 +13,7 @@ public class OrganizationCacheEntry implements Serializable {
     private String token;
     private boolean status;
     private Long parent;
+    private boolean isAgency;
 
     public Long getId() {
         return id;
@@ -92,5 +93,17 @@ public class OrganizationCacheEntry implements Serializable {
 
     public void setParent(Long parent) {
         this.parent = parent;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public boolean isAgency() {
+        return isAgency;
+    }
+
+    public void setAgency(boolean agency) {
+        isAgency = agency;
     }
 }

@@ -235,5 +235,9 @@ public class EdocDynamicContactService {
         return result;
     }
 
+    public List<String> getAllDomain() {
+        return dynamicContactDaoImpl.getAllDomain();
+    }
+
     private final static Logger LOGGER = Logger.getLogger(EdocDynamicContactService.class);
 }

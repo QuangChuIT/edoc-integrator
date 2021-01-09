@@ -239,5 +239,21 @@ public class DatabaseUtil {
         return documents;
     }
 
+//    public EdocDynamicContact getContactByDomain (Connection connection, String domain) {
+//        EdocDynamicContact contact = null;
+//
+//        try {
+//            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_CONTACT_BY_DOMAIN);
+//            preparedStatement.setString(1, domain);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//            while (resultSet.next()) {
+//                contact = new EdocDynamicContact();
+//            }
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        }
+//        return contact;
+//    }
+
     private static final Logger LOGGER = Logger.getLogger(DatabaseUtil.class);
 }

@@ -10,6 +10,8 @@ public interface EdocDynamicContactDao {
 
     List<EdocDynamicContact> getDynamicContactsByDomainFilter(String domain);
 
+    List<String> getAllDomain();
+
     Long countOrgan(String organDomain);
 
     boolean checkPermission(String organId, String token);

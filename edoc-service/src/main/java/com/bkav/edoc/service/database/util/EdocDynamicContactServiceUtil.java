@@ -59,4 +59,8 @@ public class EdocDynamicContactServiceUtil {
     public static boolean deleteContact(long organId) {
         return DYNAMIC_CONTACT_SERVICE.deleteOrgan(organId);
     }
+
+    public static List<String> getAllDomain() {
+        return DYNAMIC_CONTACT_SERVICE.getAllDomain();
+    }
 }

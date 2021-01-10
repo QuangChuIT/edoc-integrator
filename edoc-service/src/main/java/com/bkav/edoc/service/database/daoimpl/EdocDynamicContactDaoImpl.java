@@ -1,6 +1,7 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDynamicContactDao;
+import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.kernel.string.StringPool;
 import org.apache.log4j.Logger;
@@ -56,6 +57,22 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
             return new ArrayList<>();
         } finally {
             closeCurrentSession(currentSession);
+        }
+    }
+
+    @Override
+    public List<String> getAllDomain() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT edc.domain from EdocDynamicContact edc");
+            Query<String> query = session.createQuery(sql.toString(), String.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            closeCurrentSession(session);
         }
     }
 

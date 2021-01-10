@@ -17,7 +17,7 @@ public class StatDocumentBean {
         try {
             Calendar yesterday = Calendar.getInstance();
             Map<String, EdocDailyCounter> dailyCounterMap = new HashMap<>();
-            //yesterday.add(Calendar.DATE, -1);
+            yesterday.add(Calendar.DATE, -1);
             //yesterday.add(Calendar.HOUR, 7);
             _counterDate = yesterday.getTime();
             LOGGER.info("Counter date prepare stat " + _counterDate);

@@ -28,12 +28,12 @@ public class EdocDailyCounterService {
         edocDailyCounterDao.createDailyCounter(dailyCounter);
     }
 
-    public List<EPublicStat> getStatsDetail(String organDomain, Date fromDate, Date toDate) {
+    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
 
         Session session = edocDailyCounterDao.openCurrentSession();
         try {
-            List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByFilterDomain(organDomain);
+            List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
             for (OrganizationCacheEntry contact : contacts) {
                 String organId = contact.getDomain();
                 StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
@@ -62,7 +62,7 @@ public class EdocDailyCounterService {
                 }
                 EPublicStat ePublicStat = new EPublicStat();
                 ePublicStat.setLastUpdate(new Date());
-                ePublicStat.setOrganDomain(organDomain);
+                ePublicStat.setOrganDomain(organId);
                 ePublicStat.setOrganName(contact.getName());
                 ePublicStat.setSent(sent);
                 ePublicStat.setReceived(received);
@@ -78,11 +78,11 @@ public class EdocDailyCounterService {
         return ePublicStats;
     }
 
-    public EPublic getStat(String organDomain) {
+    public EPublic getStat() {
         EPublic ePublic = new EPublic();
         Long total = edocDailyCounterDao.getStat();
         ePublic.setTotal(total);
-        ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(organDomain));
+        ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(true));
         ePublic.setDateTime(DateUtils.format(new Date(), DateUtils.VN_DATETIME_FORMAT_NEW));
         return ePublic;
     }

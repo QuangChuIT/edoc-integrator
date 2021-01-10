@@ -1,13 +1,9 @@
 package com.bkav.edoc.converter.impl;
 
 import com.bkav.edoc.converter.entity.DynamicContactAgency;
-import com.bkav.edoc.converter.util.DBConnectionUtil;
-import com.bkav.edoc.converter.util.StringQuery;
 import com.bkav.edoc.converter.util.TokenUtil;
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
-import com.bkav.edoc.service.database.util.MapperUtil;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,10 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,34 +83,20 @@ public class DynamicContactCheckAgency {
         LOGGER.info("--------------Start check agency in database------------------");
 
         long count_new = 0;
-        int flag = 0;
-        try (Connection connection = DBConnectionUtil.initConvertDBConnection()) {
-            Statement stm;
-            stm = connection.createStatement();
-            ResultSet rs = stm.executeQuery(StringQuery.GET_ALL_DOMAIN_CONTACT);
 
-            for (DynamicContactAgency dynamicContactAgency: dynamicContactAgencies) {
+        try {
+            for (DynamicContactAgency dynamicContactAgency : dynamicContactAgencies) {
                 String agencyDomain = dynamicContactAgency.getAgencyDomain();
-
-                LOGGER.info(" Start check Agency domain is " + agencyDomain);
-
-                //List<String> contactDomains = EdocDynamicContactServiceUtil.getAllDomain();
-                while (rs.next() && flag == 0) {
-                    String contactDomain = rs.getString(1);
-                    if (agencyDomain.equals(contactDomain)) {
-                        EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(contactDomain);
-                        OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
-                        contact.setAgency(true);
-                        EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, contact);
-                        flag++;
-                    }
-                }
-                if (flag == 0) {
+                EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(agencyDomain);
+                if (edocDynamicContact != null) {
+                    edocDynamicContact.setAgency(true);
+                    EdocDynamicContactServiceUtil.updateContact(edocDynamicContact);
+                } else {
                     EdocDynamicContact contact = new EdocDynamicContact();
                     contact.setDomain(agencyDomain);
                     contact.setName(dynamicContactAgency.getAgencyName());
                     contact.setInCharge("Lâm Đồng");
-                    contact.setAddress("tỉnh Lâm Đồng");
+                    contact.setAddress("Tỉnh Lâm Đồng");
                     contact.setStatus(true);
                     String newToken = TokenUtil.getRandomNumber(agencyDomain, dynamicContactAgency.getAgencyName());
                     contact.setToken(newToken);
@@ -125,10 +104,8 @@ public class DynamicContactCheckAgency {
                     EdocDynamicContactServiceUtil.createContact(contact);
                     count_new++;
                 }
-                flag = 0;
             }
-
-        } catch (SQLException throwable) {
+        } catch (Exception throwable) {
             LOGGER.error(throwable);
         }
         LOGGER.info(count_new + " new agency has been created!!!!!");

@@ -22,8 +22,7 @@
     request.setAttribute("priorityList", priorityList);
     List<EdocDocumentType> typeList = EdocTypeServiceUtil.getTypes();
     request.setAttribute("typeList", typeList);
-    String organToQuery = PropsUtil.get("edoc.except.organId");
-    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByFilterDomain(organToQuery);
+    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByAgency(true);
     String organLogin = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
     String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
     String userLogin = new String(Base64.decode(organCookie), StandardCharsets.UTF_8);

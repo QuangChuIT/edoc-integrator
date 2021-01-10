@@ -19,11 +19,11 @@ public class EdocDailyCounterServiceUtil {
         EDOC_DAILY_COUNTER_SERVICE.createDailyCounter(dailyCounter);
     }
 
-    public static List<EPublicStat> getStatsDetail(String organDomain, Date fromDate, Date toDate) {
-        return EDOC_DAILY_COUNTER_SERVICE.getStatsDetail(organDomain, fromDate, toDate);
+    public static List<EPublicStat> getStatsDetail(Date fromDate, Date toDate) {
+        return EDOC_DAILY_COUNTER_SERVICE.getStatsDetail(fromDate, toDate);
     }
 
-    public static EPublic getStat(String organDomain) {
-        return EDOC_DAILY_COUNTER_SERVICE.getStat(organDomain);
+    public static EPublic getStat() {
+        return EDOC_DAILY_COUNTER_SERVICE.getStat();
     }
 }

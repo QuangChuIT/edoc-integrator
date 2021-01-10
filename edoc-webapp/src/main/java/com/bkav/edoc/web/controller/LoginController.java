@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 
 @Controller
@@ -120,7 +121,7 @@ public class LoginController {
             final OAuthClientRequest accessRequest = oAuthTokenRequestBuilder.setGrantType(GrantType.AUTHORIZATION_CODE)
                     .setClientId(PropsUtil.get("consumerKey"))
                     .setClientSecret(PropsUtil.get("consumerSecret"))
-                    .setRedirectURI((String) session.getAttribute(OAuth2Constants.CALL_BACK_URL))
+                    .setRedirectURI(PropsUtil.get("callBackUrl"))
                     .setCode(code)
                     .buildBodyMessage();
             try {
@@ -218,7 +219,7 @@ public class LoginController {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Error when get token from sso " + e);
+            LOGGER.error("Error when get token from sso " + Arrays.toString(e.getStackTrace()));
         }
 
         return token;

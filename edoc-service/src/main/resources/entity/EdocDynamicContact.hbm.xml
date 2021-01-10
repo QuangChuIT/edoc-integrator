@@ -21,7 +21,7 @@
         <property name="website" type="string" column="website"/>
         <property name="status" type="boolean" column="status"/>
         <property name="token" type="string" column="token"/>
-        <property name="isAgency" type="boolean" column="is_agency"/>
+        <property name="agency" type="boolean" column="agency"/>
         <set name="users" table="user_" cascade="all"
              inverse="true" lazy="true" fetch="select">
             <key>

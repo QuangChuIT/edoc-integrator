@@ -21,7 +21,7 @@ public class EdocDynamicContact implements Serializable {
     private String version;
     private String token;
     private boolean status;
-    private boolean isAgency;
+    private boolean agency;
     @JsonIgnore
     private Set<User> users;
 
@@ -152,11 +152,11 @@ public class EdocDynamicContact implements Serializable {
         this.users = users;
     }
 
-    public boolean isAgency() {
-        return isAgency;
+    public boolean getAgency() {
+        return agency;
     }
 
     public void setAgency(boolean agency) {
-        isAgency = agency;
+        this.agency = agency;
     }
 }

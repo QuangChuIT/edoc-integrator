@@ -300,16 +300,6 @@ $(document).ready(function () {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
 
-    // Click to show modal for upload file
-    // Developing...
-    // $("#importUserFromExcel").on('click', function (e) {
-    //     e.preventDefault();
-    //     $('#importExcelModal').modal({
-    //         backdrop: 'static',
-    //         keyboard: false
-    //     })
-    // })
-
    /* $.get("/public/-/role/" + role_message.role_administrator, function (data){
         console.log(data);
         AdministratorId = data;
@@ -343,7 +333,8 @@ $(document).on("click", ".import-excel-button", function (e) {
             'accept': "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             'aria-label': 'Upload your profile picture'
 
-        }
+        },
+        html: '<a href="/"><u>hoặc tải về tệp mẫu</u></a>'
     }).then((file) => {
         if (file.value) {
             let formData = new FormData();
@@ -419,7 +410,7 @@ $(document).on('click', '#exportUserToExcel', function (e) {
 $(".toggle-password").click(function () {
     $(this).toggleClass("fa-eye fa-eye-slash");
     let input = $($(this).attr("toggle"));
-    if (input.attr("type") == "password") {
+    if (input.attr("type") === "password") {
         input.attr("type", "text");
     } else {
         input.attr("type", "password");

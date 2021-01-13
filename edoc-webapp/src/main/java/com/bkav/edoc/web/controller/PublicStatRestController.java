@@ -23,20 +23,18 @@ public class PublicStatRestController {
     @RequestMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
                                            @RequestParam(value = "toDate", required = false) String toDate) {
-        String organDomainCode = PropsUtil.get("edoc.except.organId");
         if (fromDate == null || toDate == null) {
-            return EdocDailyCounterServiceUtil.getStatsDetail(organDomainCode, null, null);
+            return EdocDailyCounterServiceUtil.getStatsDetail(null, null);
         } else {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);
-            return EdocDailyCounterServiceUtil.getStatsDetail(organDomainCode, fromDateValue, toDateValue);
+            return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue);
         }
     }
 
     @GetMapping(value = "/public/-/document/stat", produces = {MediaType.APPLICATION_JSON_VALUE})
     public EPublic getStat() {
-        String organDomainCode = PropsUtil.get("edoc.except.organId");
-        return EdocDailyCounterServiceUtil.getStat(organDomainCode);
+        return EdocDailyCounterServiceUtil.getStat();
     }
 
     @RequestMapping(value = "/public/-/document/trace",

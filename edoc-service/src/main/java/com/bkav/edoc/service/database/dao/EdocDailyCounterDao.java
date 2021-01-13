@@ -14,4 +14,5 @@ public interface EdocDailyCounterDao {
     List<EdocDailyCounter> getOverStat(String organDomain, Date fromDate, Date toDate);
 
     Long getStat();
+
 }

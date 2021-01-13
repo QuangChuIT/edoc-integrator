@@ -64,6 +64,10 @@ public class EdocDynamicContactService {
         return dynamicContactDaoImpl.findById(contactId);
     }
 
+    public void updateContact(EdocDynamicContact edocDynamicContact) {
+        dynamicContactDaoImpl.updateContact(edocDynamicContact);
+    }
+
     public void updateContact(OrganizationCacheEntry cacheEntry, EdocDynamicContact edocDynamicContact) {
         dynamicContactDaoImpl.updateContact(edocDynamicContact);
         List<OrganizationCacheEntry> organizationCacheEntries;
@@ -177,12 +181,12 @@ public class EdocDynamicContactService {
     }
 
 
-    public Long countOrgan(String domain) {
+    public Long countOrgan(boolean agency) {
 
-        return dynamicContactDaoImpl.countOrgan(domain);
+        return dynamicContactDaoImpl.countOrgan(agency);
     }
 
-    public List<OrganizationCacheEntry> getDynamicContactsByFilterDomain(String domain) {
+    public List<OrganizationCacheEntry> getDynamicContactsByAgency(boolean agency) {
         List<OrganizationCacheEntry> organizationCacheEntries;
         String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_BY_KEY);
         MemcachedUtil.getInstance().delete(cacheKey);
@@ -190,7 +194,7 @@ public class EdocDynamicContactService {
 
         if (organizationCacheEntries == null) {
             organizationCacheEntries = new ArrayList<>();
-            List<EdocDynamicContact> contacts = dynamicContactDaoImpl.getDynamicContactsByDomainFilter(domain);
+            List<EdocDynamicContact> contacts = dynamicContactDaoImpl.getDynamicContactsByAgency(agency);
 
             for (EdocDynamicContact contact : contacts) {
                 OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);

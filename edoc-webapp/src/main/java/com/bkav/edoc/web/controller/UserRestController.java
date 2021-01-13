@@ -263,30 +263,5 @@ public class UserRestController {
             return HttpStatus.BAD_REQUEST;
     }
 
-    @RequestMapping(value = "/user/-/create/admin", method = RequestMethod.POST)
-    public HttpStatus CreateAdminUser() {
-        if (UserServiceUtil.checkExistUserByUserName(messageSourceUtil.getMessage("user.create.admin.username", null))) {
-            return HttpStatus.OK;
-        } else {
-            User user = new User();
-            user.setUsername(messageSourceUtil.getMessage("user.create.admin.username", null));
-            user.setPassword(messageSourceUtil.getMessage("user.create.admin.password", null));
-            user.setDisplayName(messageSourceUtil.getMessage("user.create.admin.displayname", null));
-            Date currentDate = new Date();
-            user.setCreateDate(currentDate);
-            user.setModifiedDate(currentDate);
-            user.setStatus(true);
-            user.setSso(true);
-
-            UserServiceUtil.createUser(user);
-
-            UserRole userRole = new UserRole();
-            userRole.setUserId(user.getUserId());
-            userRole.setRoleId(1);
-            UserRoleServiceUtil.createUserRole(userRole);
-            return HttpStatus.CREATED;
-        }
-    }
-
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);
 }

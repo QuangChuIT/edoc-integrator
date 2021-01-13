@@ -5,7 +5,9 @@ import com.bkav.edoc.converter.util.DatabaseUtil;
 import com.bkav.edoc.converter.util.StringQuery;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
 import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 
@@ -55,17 +57,12 @@ public class DailyCounterConvert {
     public boolean checkCurrentOrgan(String organDomain) {
         boolean result = false;
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
-            String[] arr = organDomain.split("\\.");
-            if (arr.length > 0) {
-                String organId = arr[arr.length - 1];
-                if (stringList.contains(organId)) {
-                    result = true;
-                }
+            EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+            if (edocDynamicContact != null) {
+                result = edocDynamicContact.getAgency();
             }
         } catch (Exception e) {
-            LOGGER.error("Error when check send document to VPCP " + e);
+            LOGGER.error("Error check organ to stat cause " + e);
         }
         return result;
     }

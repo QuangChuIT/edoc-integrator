@@ -5,8 +5,10 @@ import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
@@ -125,14 +127,9 @@ public class EdocNotificationService {
     private boolean checkOrganToSendEmail(String organId) {
         boolean result = false;
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
-            String[] arr = organId.split("\\.");
-            if (arr.length > 0) {
-                String organCode = arr[arr.length - 1];
-                if (stringList.contains(organCode)) {
-                    result = true;
-                }
+            EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(organId);
+            if (edocDynamicContact != null) {
+                result = edocDynamicContact.getAgency();
             }
         } catch (Exception e) {
             LOGGER.error("Error check organ to stat cause " + e);

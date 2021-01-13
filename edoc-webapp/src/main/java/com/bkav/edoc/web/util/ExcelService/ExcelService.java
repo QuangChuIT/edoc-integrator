@@ -131,6 +131,8 @@ public class ExcelService {
                                 contact.setEmail(user.getEmailAddress());
                                 String token = TokenUtil.getRandomNumber(organ_id, user.getDisplayName());
                                 contact.setToken(token);
+                                contact.setCreateDate(new Date());
+                                contact.setStatus(true);
                                 EdocDynamicContactServiceUtil.createContact(contact);
                                 user.setDynamicContact(contact);
                             } else {
@@ -218,7 +220,6 @@ public class ExcelService {
     // Fixing & Optimizing code.
     // Processing...
     //
-
     public boolean ExportUserToExcel(List<User> users) throws IOException {
         Workbook workbook = new XSSFWorkbook();
 
@@ -285,7 +286,7 @@ public class ExcelService {
             numRow++;
         }
         String userHomeDir = System.getProperty("user.home");
-        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_tai_khoan.xlsx");
+        File currDir = new File(userHomeDir + "/Downloads/Danh_sach_tai_khoan.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);
@@ -376,9 +377,11 @@ public class ExcelService {
             cell.setCellStyle(style);
 
         }
-        String userHomeDir = System.getProperty("user.home");
-        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_to_chuc.xlsx");
+        String userHomeDir = System.getProperty("user.dir");
+        File currDir = new File(userHomeDir + File.separator + "../Downloads/Danh_sach_to_chuc.xlsx");
+        LOGGER.info("Current path: " + currDir);
         String path = currDir.getAbsolutePath();
+        LOGGER.info("Absolute path: " + path);
 
         FileOutputStream outputStream = new FileOutputStream(path);
         LOGGER.info("Export Excel file with path: " + path);

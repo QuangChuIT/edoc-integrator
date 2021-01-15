@@ -2,10 +2,7 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDailyCounterDaoImpl;
-import com.bkav.edoc.service.database.entity.EPublic;
-import com.bkav.edoc.service.database.entity.EPublicStat;
-import com.bkav.edoc.service.database.entity.EdocDailyCounter;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -84,6 +81,30 @@ public class EdocDailyCounterService {
         ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(true));
         ePublic.setDateTime(DateUtils.format(new Date(), DateUtils.VN_DATETIME_FORMAT_NEW));
         return ePublic;
+    }
+
+    public String getSentReceivedDocByYear(String year) {
+        Session session = edocDailyCounterDao.openCurrentSession();
+        try {
+            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetSentReceivedDocument");
+            storedProcedureQuery.registerStoredProcedureParameter("year", String.class, ParameterMode.IN);
+            storedProcedureQuery.setParameter("year", year);
+            List list = storedProcedureQuery.getResultList();
+
+            return new Gson().toJson(list);
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            edocDailyCounterDao.closeCurrentSession(session);
+        }
+    }
+
+    public static void main(String[] args) {
+        EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
+        String rs = edocDailyCounterService.getSentReceivedDocByYear("2020");
+
+        System.out.println(rs);
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

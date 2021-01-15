@@ -115,7 +115,7 @@ function downloadAll(urls) {
         link.setAttribute('href', href);
         link.setAttribute('download', element.name);
         link.click();
-    });
+    });l
     document.body.removeChild(link);
 }
 

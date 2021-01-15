@@ -480,6 +480,7 @@ $(document).ready(function () {
         if (dataMode != null) {
             edocDocument.appSetting.mode = dataMode;
             $('.edoc-content > [class^=edoc-table]').hide();
+            $(".edoc-statistic").hide();
             if (dataMode === "draft") {
                 edocDocument.renderDaftTable();
                 $(".edoc-table-draft").show();

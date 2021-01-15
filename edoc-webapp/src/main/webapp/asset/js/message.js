@@ -58,6 +58,7 @@ let app_message = {
     "edoc_organ_total": "Tổng số",
     "edoc_message_error_report": "Nhập ngày bắt đầu và ngày kết thúc để thống kê!",
     "edoc_message_error_report_date": "Ngày bắt đầu không được lớn hơn ngày kết thúc !",
+    "edoc_message_error_export": "Lỗi xuất tệp excel",
     //Datatable setting
     "language": {
         "decimal": "",
@@ -187,4 +188,10 @@ let organ_message = {
 let role_message = {
     "role_administrator": "Administrator",
     "role_super_administrator": "Super Administrator"
+}
+
+let chart_message = {
+    "chart_sent_document": "Gửi",
+    "chart_received_document": "Nhận",
+    "chart_in_year": "Thống kê văn bản gửi - nhận trong năm "
 }

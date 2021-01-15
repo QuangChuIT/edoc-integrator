@@ -1730,6 +1730,7 @@
         <span>&nbsp;Đang xử lý</span>
     </div>
 </div>
+
 <%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
@@ -1738,6 +1739,11 @@
 <script src="<c:url value="/asset/js/jquery.formatter.js"/>"></script>
 <script src="<c:url value="/asset/js/select2.min.js"/>"></script>
 <script src="<c:url value="/asset/js/sweetalert2.min.js"/>"></script>
+
+<!-- Chart JS -->
+<script src="<c:url value="/asset/js/chartJS/Chart.min.js"/>"></script>
+<script src="<c:url value="/asset/js/chartJS/utils.js"/>"></script>
+
 <%--datetimepicker--%>
 <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
 <!-- Bootstrap Core JavaScript -->
@@ -1758,6 +1764,7 @@
 <script src="<c:url value="/asset/js/document.js"/>"></script>
 <script src="<c:url value="/asset/js/user.js"/>"></script>
 <script src="<c:url value="/asset/js/organization.js"/>"></script>
+<script src="<c:url value="/asset/js/drawChart.js"/>"></script>
 <!-- Page-Level Demo Scripts - Tables - Use for reference -->
 <script src="<c:url value="/asset/js/attachment.js"/>"></script>
 </body>

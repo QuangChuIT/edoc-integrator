@@ -79,7 +79,26 @@ let edocReport = {
             let currentDate = new Date().formatDate();
             $("#filterLabel").html(app_message.edoc_report_default_filter + "<span class='time-filter'>" + currentDate + "</span>");
         }
-
+    },
+    exportExcel: function(fromDate, toDate) {
+        let url = "/public/-/stat/export/excel";
+        if (fromDate !== "" && toDate !== "") {
+            url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
+        }
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(response) {
+                let link = document.createElement('a');
+                let href = url;
+                link.style.display = 'none';
+                link.setAttribute('href', href);
+                link.click();
+            },
+            error: (e) => {
+                $.notify(app_message.edoc_message_error_export, "error");
+            }
+        })
     }
 }
 $(document).ready(function () {
@@ -132,6 +151,19 @@ $(document).ready(function () {
             edocReport.renderReportTable(fromDate, toDate);
         }
     });
+
+    $("#exportReport").on("click", function(e) {
+        e.preventDefault();
+        let fromDate = $("#fromDate").val();
+        let toDate = $("#toDate").val();
+        if (fromDate !== "" || toDate !== "") {
+            let fromDateValue = new Date(fromDate);
+            let toDateValue = new Date(toDate);
+            if (fromDateValue > toDateValue)
+                $.notify(app_message.edoc_message_error_export, "error");
+        }
+        edocReport.exportExcel(fromDate, toDate);
+    })
 });
 
 String.format = function () {

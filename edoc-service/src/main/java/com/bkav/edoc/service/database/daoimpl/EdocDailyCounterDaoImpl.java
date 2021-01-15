@@ -86,8 +86,28 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
         }
     }
 
+    public List<Integer> getExistYearInDailycounter() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select distinct year(dc.dateTime) from EdocDailyCounter dc");
+            Query<Integer> query = session.createQuery(sql.toString(), Integer.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return null;
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
     public void createDailyCounter(EdocDailyCounter dailyCounter) {
         this.persist(dailyCounter);
+    }
+
+    public static void main(String[] args) {
+        EdocDailyCounterDaoImpl edocDailyCounterDao = new EdocDailyCounterDaoImpl();
+        System.out.println(edocDailyCounterDao.getExistYearInDailycounter());
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDailyCounterDaoImpl.class);

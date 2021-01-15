@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping">
+
+<hibernate-mapping>
+    <class name="com.bkav.edoc.service.database.entity.ExcelDailyCounterHeader" table="excel_dailycounter_header">
+        <id name="id" type="java.lang.Long">
+            <column name="Id"/>
+            <generator class="identity"/>
+        </id>
+        <property name="headerName" type="string" column="header_name"/>
+    </class>
+</hibernate-mapping>

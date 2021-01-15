@@ -1887,3 +1887,8 @@ a:focus {
 input[type=checkbox] {
     margin-left: 20px;
 }
+
+#chart-area {
+    width: 80%;
+    margin: 50px 0 0 70px
+}

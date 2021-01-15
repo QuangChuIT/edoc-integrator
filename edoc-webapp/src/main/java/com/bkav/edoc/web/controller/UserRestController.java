@@ -252,16 +252,16 @@ public class UserRestController {
         }
     }
 
-    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
-    public HttpStatus ExportUserToExcel() throws IOException {
-        boolean result;
-        List<User> users = UserServiceUtil.getUser();
-        result = ExcelUtil.exportUserToExcel(users);
-        if (result)
-            return HttpStatus.OK;
-        else
-            return HttpStatus.BAD_REQUEST;
-    }
+//    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
+//    public HttpStatus ExportUserToExcel() throws IOException {
+//        boolean result;
+//        List<User> users = UserServiceUtil.getUser();
+//        result = ExcelUtil.exportUserToExcel(users);
+//        if (result)
+//            return HttpStatus.OK;
+//        else
+//            return HttpStatus.BAD_REQUEST;
+//    }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);
 }

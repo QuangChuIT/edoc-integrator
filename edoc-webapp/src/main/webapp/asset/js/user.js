@@ -248,13 +248,7 @@ let userManage = {
         $('#formPermission').modal('toggle');
     }
 }
-$(document).on("ready", function () {
-    $("#editOrganDomain").select2({
-        tags: true,
-        maximumSelectionLength: 1,
-        width: "auto"
-    });
-});
+
 $(document).ready(function () {
     // Show detail of user-login info
     $(".user-info").on('click', function () {
@@ -292,6 +286,11 @@ $(document).ready(function () {
     });
 
     $("#addOrganDomain").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
+    });
+    $("#editOrganDomain").select2({
         tags: true,
         maximumSelectionLength: 1,
         width: "auto"

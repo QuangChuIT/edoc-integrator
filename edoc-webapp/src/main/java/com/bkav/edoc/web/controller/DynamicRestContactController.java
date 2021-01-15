@@ -161,16 +161,16 @@ public class DynamicRestContactController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
-    public HttpStatus exportOrganToExcel() throws IOException {
-        boolean result = true;
-        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
-        result = ExcelUtil.exportOrganToExcel(organs);
-        if (result)
-            return HttpStatus.OK;
-        else
-            return HttpStatus.BAD_REQUEST;
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
+//    public HttpStatus exportOrganToExcel() throws IOException {
+//        boolean result = true;
+//        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
+//        result = ExcelUtil.exportOrganToExcel(organs);
+//        if (result)
+//            return HttpStatus.OK;
+//        else
+//            return HttpStatus.BAD_REQUEST;
+//    }
 
     @DeleteMapping(value = "/public/-/organ/delete/{organId}")
     public HttpStatus deleteOrgan(@PathVariable("organId") Long organId) {

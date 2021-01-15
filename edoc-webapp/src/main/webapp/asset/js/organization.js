@@ -344,7 +344,7 @@ $(document).on('click', '#btn-edit-organ-confirm', function (e) {
 })
 $(document).on('click', '#btn-edit-organ-cancel', function (e) {
     e.preventDefault();
-    $("#formEditOrgan").toggle();
+    $("#formEditOrgan").modal('toggle');
 })
 
 function editOrganClick(organId) {

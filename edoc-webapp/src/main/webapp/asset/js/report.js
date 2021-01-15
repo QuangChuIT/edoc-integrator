@@ -80,7 +80,7 @@ let edocReport = {
             $("#filterLabel").html(app_message.edoc_report_default_filter + "<span class='time-filter'>" + currentDate + "</span>");
         }
     },
-    exportExcel: function(fromDate, toDate) {
+    exportExcel: function (fromDate, toDate) {
         let url = "/public/-/stat/export/excel";
         if (fromDate !== "" && toDate !== "") {
             url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
@@ -88,17 +88,23 @@ let edocReport = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function(response) {
+            beforeSend: function (xhr) {
+                $("#overlay-public").show();
+            },
+            success: function (response) {
                 let link = document.createElement('a');
                 let href = url;
                 link.style.display = 'none';
                 link.setAttribute('href', href);
                 link.click();
+                $.notify(app_message.edoc_export_success, "success");
             },
             error: (e) => {
                 $.notify(app_message.edoc_message_error_export, "error");
             }
-        })
+        }).done(function () {
+            $("#overlay-public").hide();
+        });
     }
 }
 $(document).ready(function () {
@@ -148,21 +154,21 @@ $(document).ready(function () {
         if (fromDateValue > toDateValue) {
             $.notify(app_message.edoc_message_error_report_date, "error");
         } else {
+            localStorage.removeItem("fromDateReport");
+            localStorage.removeItem("toDateReport");
+            localStorage.setItem("fromDateReport", fromDate);
+            localStorage.setItem("toDateReport", toDate);
             edocReport.renderReportTable(fromDate, toDate);
         }
+
     });
 
-    $("#exportReport").on("click", function(e) {
+    $("#exportReport").on("click", function (e) {
         e.preventDefault();
-        let fromDate = $("#fromDate").val();
-        let toDate = $("#toDate").val();
-        if (fromDate !== "" || toDate !== "") {
-            let fromDateValue = new Date(fromDate);
-            let toDateValue = new Date(toDate);
-            if (fromDateValue > toDateValue)
-                $.notify(app_message.edoc_message_error_export, "error");
-        }
+        let fromDate = localStorage.getItem("fromDateReport");
+        let toDate = localStorage.getItem("toDateReport");
         edocReport.exportExcel(fromDate, toDate);
+
     })
 });
 

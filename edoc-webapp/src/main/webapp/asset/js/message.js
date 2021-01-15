@@ -8,6 +8,8 @@ let app_message = {
     "table_header_modify_date": "ModifyDate",
     "table_header_document_id": "DocumentId",
     "table_header_document_create": "CreateDate",
+    "edoc_export_success" : "Xuất dữ liệu thành công !",
+    "edoc_report_time_error" : "Khoảng thời gian thống kê không được để trống ngày bắt đầu hoặc ngày kết thúc !",
     //config for form edoc detail
     "message_no_data": "Không có dữ liệu",
     "edoc_table_header_subject": "Trích yếu",

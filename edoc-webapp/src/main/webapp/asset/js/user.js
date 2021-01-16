@@ -389,16 +389,20 @@ $(document).on("click", ".import-excel-button", function (e) {
 // Call ajax to export users to Excel file
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
+    let url = "/public/-/user/export"
     $.ajax({
-        type: "POST",
-        url: "/public/-/user/export",
+        type: "GET",
+        url: url,
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
-        success: function (response) {
-            if (response === "OK") {
-                $.notify(user_message.user_export_to_excel_success, "success");
-            }
+        success: function () {
+            let link = document.createElement('a');
+            let href = url;
+            link.style.display = 'none';
+            link.setAttribute('href', href);
+            link.click();
+            $.notify(user_message.user_export_to_excel_success, "success");
         },
         error: (e) => {
             $.notify(user_message.user_export_to_excel_fail, "error");

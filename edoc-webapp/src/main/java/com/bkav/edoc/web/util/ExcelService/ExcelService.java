@@ -218,7 +218,8 @@ public class ExcelService {
     // Fixing & Optimizing code.
     // Processing...
     //
-/*    public boolean ExportUserToExcel(List<User> users) throws IOException {
+    public void ExportUserToExcel(HttpServletResponse response) throws IOException {
+        List<User> users = UserServiceUtil.getUser();
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Danh sách tài khoản");
@@ -283,18 +284,15 @@ public class ExcelService {
             cell.setCellStyle(style);
             numRow++;
         }
-        String userHomeDir = System.getProperty("user.home");
-        File currDir = new File(userHomeDir + "/Downloads/Danh_sach_tai_khoan.xlsx");
-        String path = currDir.getAbsolutePath();
 
-        FileOutputStream outputStream = new FileOutputStream(path);
-        LOGGER.info("Export Excel file with path: " + path);
+        ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
-        return true;
+        outputStream.close();
     }
 
-    public boolean ExportOrganToExcel(List<EdocDynamicContact> organs) throws IOException {
+    public void ExportOrganToExcel(HttpServletResponse response) throws IOException {
+        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Danh sách đơn vị");
@@ -375,20 +373,11 @@ public class ExcelService {
             cell.setCellStyle(style);
 
         }
-        String userHomeDir = System.getProperty("user.dir");
-        File currDir = new File(userHomeDir + File.separator + "../Downloads/Danh_sach_to_chuc.xlsx");
-        LOGGER.info("Current path: " + currDir);
-        String path = currDir.getAbsolutePath();
-        LOGGER.info("Absolute path: " + path);
-
-        FileOutputStream outputStream = new FileOutputStream(path);
-        LOGGER.info("Export Excel file with path: " + path);
+        ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
-        return true;
+        outputStream.close();
     }
-
- */
 
     public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);

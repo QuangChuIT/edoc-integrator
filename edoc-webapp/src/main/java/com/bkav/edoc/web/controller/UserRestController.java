@@ -8,6 +8,7 @@ import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.payload.*;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -252,16 +254,16 @@ public class UserRestController {
         }
     }
 
-//    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.POST)
-//    public HttpStatus ExportUserToExcel() throws IOException {
-//        boolean result;
-//        List<User> users = UserServiceUtil.getUser();
-//        result = ExcelUtil.exportUserToExcel(users);
-//        if (result)
-//            return HttpStatus.OK;
-//        else
-//            return HttpStatus.BAD_REQUEST;
-//    }
+    @RequestMapping(value = "/public/-/user/export", method = RequestMethod.GET)
+    public void ExportUserToExcel(HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+
+        String headerValue = "attachment; filename=Don_vi-" + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        ExcelUtil.exportUserToExcel(response);
+    }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);
 }

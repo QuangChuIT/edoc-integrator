@@ -26,13 +26,13 @@ public class ExcelUtil {
     }
 
     // Fixing...
-//    public static boolean exportUserToExcel(List<User> users) throws IOException {
-//        return excelService.ExportUserToExcel(users);
-//    }
-//
-//    public static boolean exportOrganToExcel(List<EdocDynamicContact> organs) throws IOException {
-//        return excelService.ExportOrganToExcel(organs);
-//    }
+    public static void exportUserToExcel(HttpServletResponse response) throws IOException {
+        excelService.ExportUserToExcel(response);
+    }
+
+    public static void exportOrganToExcel(HttpServletResponse response) throws IOException {
+        excelService.ExportOrganToExcel(response);
+    }
 
     public static long pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         return excelService.pushExcelDataToSSO(users);

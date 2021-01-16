@@ -278,48 +278,103 @@ $(document).on("click", ".organ-view-token", function (e) {
     }
 });
 
-$(document).on("change", "#importOrganFromExcel", function (e) {
+$(document).on("click", "#importOrganFromExcel", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
-    let form = $('#formImportOrgan')[0];
-    let data = new FormData(form);
-    $.ajax({
-        type: "POST",
-        enctype: 'multipart/form-data',
-        url: "/public/-/organ/import",
-        data: data,
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
-        contentType: false,
-        cache: false,
-        success: function (response) {
-            if (response === "OK")
-                $.notify(organ_message.organ_import_from_excel_success, "success");
-            else if (response === "BAD_REQUEST")
-                $.notify(organ_message.organ_import_invalid_format_file, "error");
-            else if (response === "NOT_ACCEPTABLE")
-                $.notify(organ_message.organ_import_from_excel_invalid_column, "error");
+    Swal.fire({
+        title: 'Chọn tệp tải lên',
+        input: 'file',
+        showCancelButton: true,
+        confirmButtonText: 'Tải lên',
+        cancelButtonText: 'Hủy bỏ',
+        onBeforeOpen: () => {
+            $(".swal2-file").change(function () {
+                var reader = new FileReader();
+                reader.readAsDataURL(this.files[0]);
+            });
         },
-        error: (e) => {
-            $.notify(organ_message.organ_import_from_excel_fail, "error");
+        inputAttributes: {
+            'accept': "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            'aria-label': 'Upload your profile picture'
+        },
+        html: '<a href="/public/-/organ/export/sample"><u>hoặc tải về tệp mẫu</u></a>'
+    }).then((file) => {
+        if (file.value) {
+            let formData = new FormData();
+            let file = $('.swal2-file')[0].files[0];
+            formData.append("fileOrganToUpload", file);
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/public/-/organ/import",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                willOpen: function () {
+                    $("#overlay").show();
+                },
+                success: function(response) {
+                    let successOptions = {
+                        autoHideDelay: 200000,
+                        showAnimation: "fadeIn",
+                        autoHide: false,
+                        clickToHide: true,
+                        hideAnimation: "fadeOut",
+                        hideDuration: 700,
+                        arrowShow: false
+                    };
+                    if (response.code === 400) {
+                        successOptions.className = "error";
+                        if (response.errors.length > 0) {
+                            response.errors.forEach(function (obj) {
+                                $.notify(obj, successOptions);
+                            });
+                        }
+                        $.notify(response.message, successOptions);
+                    } else if (response.code === 200) {
+                        successOptions.className = "success";
+                        $.notify(response.message, successOptions);
+                    } else {
+                        successOptions.className = "error";
+                        $.notify(response.message, "error", successOptions);
+                    }
+                },
+                error: (e) => {
+                    $.notify(organ_message.organ_import_from_excel_fail, "error");
+                },
+            }).done(function () {
+                $("#overlay").hide();
+            });
         }
     });
 });
 
 $(document).on('click', '#exportOrganToExcel', function (e) {
     e.preventDefault();
+    let url = "/public/-/organ/export"
     $.ajax({
         type: "GET",
-        url: "/public/-/organ/export",
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
+        url: url,
+        processData: false,
         contentType: false,
-        cache: false,
-        success: function (response) {
-            $.notify(organ_message.organ_export_to_excel_success, "success");
+        beforeSend: function () {
+            $("#overlay").show();
+        },
+        success: function () {
+            let link = document.createElement('a');
+            let href = url;
+            link.style.display = 'none';
+            link.setAttribute('href', href);
+            link.click();
         },
         error: (e) => {
             $.notify(organ_message.organ_export_to_excel_fail, "error");
         }
-    })
+    }).done(function () {
+        $("#overlay").hide();
+        $.notify(organ_message.organ_export_to_excel_success, "success");
+    });
 })
 
 $(document).on("contextmenu", "#dataTables-organ>tbody>tr", function (event) {

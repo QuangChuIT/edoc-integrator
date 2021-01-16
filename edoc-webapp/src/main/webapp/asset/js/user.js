@@ -313,7 +313,7 @@ $(document).ready(function () {
 });
 
 // Call ajax to import users from excel file
-$(document).on("click", ".import-excel-button", function (e) {
+$(document).on("click", "#importUserFromExcel", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
     Swal.fire({
@@ -333,12 +333,12 @@ $(document).on("click", ".import-excel-button", function (e) {
             'aria-label': 'Upload your profile picture'
 
         },
-        html: '<a href="/"><u>hoặc tải về tệp mẫu</u></a>'
+        html: '<a href="/public/-/user/export/sample"><u>hoặc tải về tệp mẫu</u></a>'
     }).then((file) => {
         if (file.value) {
             let formData = new FormData();
             let file = $('.swal2-file')[0].files[0];
-            formData.append("fileToUpload", file);
+            formData.append("fileUserToUpload", file);
             $.ajax({
                 type: "POST",
                 enctype: 'multipart/form-data',
@@ -347,7 +347,7 @@ $(document).on("click", ".import-excel-button", function (e) {
                 processData: false, //prevent jQuery from automatically transforming the data into a query string
                 contentType: false,
                 cache: false,
-                beforeSend: function ( xhr ) {
+                beforeSend: function () {
                     $("#overlay").show();
                 },
                 success: function (response) {
@@ -396,18 +396,23 @@ $(document).on('click', '#exportUserToExcel', function (e) {
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
+        beforeSend: function () {
+            $("#overlay").show();
+        },
         success: function () {
             let link = document.createElement('a');
             let href = url;
             link.style.display = 'none';
             link.setAttribute('href', href);
             link.click();
-            $.notify(user_message.user_export_to_excel_success, "success");
         },
         error: (e) => {
             $.notify(user_message.user_export_to_excel_fail, "error");
         }
-    })
+    }).done(function () {
+        $("#overlay").hide();
+        $.notify(user_message.user_export_to_excel_success, "success");
+    });
 })
 
 $(".toggle-password").click(function () {

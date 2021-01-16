@@ -23,6 +23,11 @@ import java.util.*;
 
 public class ExcelService {
 
+    private Workbook workbook;
+    private Sheet sheet;
+    private CellStyle headerStyle;
+    private XSSFFont font;
+
     public Map<String, Object> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
         List<ImportExcelError> errors = new ArrayList<>();
@@ -158,12 +163,16 @@ public class ExcelService {
         return map;
     }
 
-    public List<EdocDynamicContact> readExcelFileForOrganization(MultipartFile file) throws IOException {
+    public Map<String, Object> readExcelFileForOrganization(MultipartFile file) throws IOException {
         List<EdocDynamicContact> organs = new ArrayList<>();
+        List<ImportExcelError> errors = new ArrayList<>();
+        boolean flag = true;
         InputStream inputStream = file.getInputStream();
+
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
+
         int rowNum = 0;
         while (rows.hasNext()) {
             Row currentRow = rows.next();
@@ -181,15 +190,30 @@ public class ExcelService {
             while (cellsInRow.hasNext()) {
                 Cell currentCell = cellsInRow.next();
                 currentCell.setCellType(Cell.CELL_TYPE_STRING);
+                ImportExcelError importExcelError = null;
                 switch (cellIndex) {
                     case 1:
-                        organ.setName(currentCell.getStringCellValue());
+                        String name = currentCell.getStringCellValue();
+                        if (name.equals("")) {
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "organ.error.name");
+                            errors.add(importExcelError);
+                            flag = false;
+                        } else {
+                            organ.setName(name);
+                        }
                         break;
                     case 2:
                         organ.setInCharge(currentCell.getStringCellValue());
                         break;
                     case 3:
-                        organ.setDomain(currentCell.getStringCellValue());
+                        String domain = currentCell.getStringCellValue();
+                        if (domain.equals("")) {
+                            importExcelError = new ImportExcelError(cellIndex, rowNum, "organ.error.domain");
+                            errors.add(importExcelError);
+                            flag = false;
+                        } else {
+                            organ.setDomain(domain);
+                        }
                         break;
                     case 4:
                         organ.setEmail(currentCell.getStringCellValue());
@@ -200,57 +224,28 @@ public class ExcelService {
                     case 6:
                         organ.setTelephone(currentCell.getStringCellValue());
                         break;
-                    default:
-                        organ.setStatus(true);
-                        break;
                 }
                 cellIndex++;
             }
             String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
             organ.setToken(newToken);
-            organs.add(organ);
+            organ.setCreateDate(new Date());
+            organ.setAgency(true);
+            organ.setStatus(true);
+            if (flag)
+                organs.add(organ);
+            rowNum++;
         }
         workbook.close();
-        return organs;
+        Map<String, Object> map = new HashMap<>();
+        map.put("errors", errors);
+        map.put("organs", organs);
+        return map;
     }
 
-    //
-    // Fixing & Optimizing code.
-    // Processing...
-    //
     public void ExportUserToExcel(HttpServletResponse response) throws IOException {
         List<User> users = UserServiceUtil.getUser();
-        Workbook workbook = new XSSFWorkbook();
-
-        Sheet sheet = workbook.createSheet("Danh sách tài khoản");
-        sheet.setColumnWidth(0, 1500);
-        sheet.setColumnWidth(1, 4000);
-        sheet.setColumnWidth(2, 6000);
-        sheet.setColumnWidth(3, 5000);
-        sheet.setColumnWidth(4, 8000);
-        sheet.setColumnWidth(5, 5000);
-        sheet.setDefaultRowHeight((short) 500);
-
-        Row header = sheet.createRow(0);
-
-        CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
-        font.setFontName("Times New Roman");
-        font.setFontHeightInPoints((short) 14);
-        font.setBold(true);
-        headerStyle.setFont(font);
-
-        Cell headerCell;
-
-        // Write header row to excel file for user
-        for (int i = 0, j = 1; i < 6; i++, j++) {
-            headerCell = header.createCell(i);
-            headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(j).getHeaderName());
-            headerCell.setCellStyle(headerStyle);
-        }
+        createUserExcelHeader();
 
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
@@ -289,45 +284,21 @@ public class ExcelService {
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
+        LOGGER.info("Write users to Excel END!!!!!!!!!");
+    }
+
+    public void exportSampleUserExcelFile(HttpServletResponse response) throws IOException {
+        createUserExcelHeader();
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+        LOGGER.info("Write a sample file for user end!!!!");
     }
 
     public void ExportOrganToExcel(HttpServletResponse response) throws IOException {
         List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
-        Workbook workbook = new XSSFWorkbook();
-
-        Sheet sheet = workbook.createSheet("Danh sách đơn vị");
-        sheet.setColumnWidth(0, 1500);
-        sheet.setColumnWidth(1, 10000);
-        sheet.setColumnWidth(2, 4000);
-        sheet.setColumnWidth(3, 5000);
-        sheet.setColumnWidth(4, 5000);
-        sheet.setColumnWidth(5, 4000);
-        sheet.setColumnWidth(6, 4000);
-        sheet.setColumnWidth(7, 4000);
-        sheet.setColumnWidth(8, 4000);
-
-        sheet.setDefaultRowHeight((short) 450);
-
-        Row header = sheet.createRow(0);
-
-        CellStyle headerStyle = workbook.createCellStyle();
-        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
-        font.setFontName("Times New Roman");
-        font.setFontHeightInPoints((short) 14);
-        font.setBold(true);
-        headerStyle.setFont(font);
-
-        Cell headerCell;
-
-        // Write header row to excel file for organization
-        for (int i = 0, j = 1; i < 9; i++, j++) {
-            headerCell = header.createCell(i);
-            headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(j).getHeaderName());
-            headerCell.setCellStyle(headerStyle);
-        }
+        createOrganExcelHeader();
 
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
@@ -371,12 +342,22 @@ public class ExcelService {
             cell = row.createCell(8);
             cell.setCellValue(organ.getWebsite());
             cell.setCellStyle(style);
-
+            numRow++;
         }
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
+        LOGGER.info("Write organs to Excel END!!!!!!!!!");
+    }
+
+    public void ExportSampleOrganExcelFile (HttpServletResponse response) throws IOException {
+        createOrganExcelHeader();
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+        LOGGER.info("Write a sample file for organs to Excel END!!!!!!!!!");
     }
 
     public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
@@ -488,6 +469,74 @@ public class ExcelService {
         outputStream.close();
 
         LOGGER.info("Write data to Excel end!!!!!");
+    }
+
+    private void createOrganExcelHeader() {
+        workbook = new XSSFWorkbook();
+
+        sheet = workbook.createSheet("Danh sách đơn vị");
+        sheet.setColumnWidth(0, 1500);
+        sheet.setColumnWidth(1, 10000);
+        sheet.setColumnWidth(2, 4000);
+        sheet.setColumnWidth(3, 5000);
+        sheet.setColumnWidth(4, 5000);
+        sheet.setColumnWidth(5, 4000);
+        sheet.setColumnWidth(6, 4000);
+        sheet.setColumnWidth(7, 4000);
+        sheet.setColumnWidth(8, 4000);
+
+        sheet.setDefaultRowHeight((short) 450);
+
+        Row header = sheet.createRow(0);
+
+        createHeaderStyle();
+
+        Cell headerCell;
+
+        // Write header row to excel file for organization
+        for (int i = 0, j = 1; i < 9; i++, j++) {
+            headerCell = header.createCell(i);
+            headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(j).getHeaderName());
+            headerCell.setCellStyle(headerStyle);
+        }
+    }
+
+    private void createUserExcelHeader() {
+        workbook = new XSSFWorkbook();
+
+        sheet = workbook.createSheet("Danh sách tài khoản");
+        sheet.setColumnWidth(0, 1500);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 6000);
+        sheet.setColumnWidth(3, 5000);
+        sheet.setColumnWidth(4, 8000);
+        sheet.setColumnWidth(5, 5000);
+        sheet.setDefaultRowHeight((short) 500);
+
+        Row header = sheet.createRow(0);
+
+        createHeaderStyle();
+
+        Cell headerCell;
+
+        // Write header row to excel file for user
+        for (int i = 0, j = 1; i < 6; i++, j++) {
+            headerCell = header.createCell(i);
+            headerCell.setCellValue(ExcelHeaderServiceUtil.getUserHeaderById(j).getHeaderName());
+            headerCell.setCellStyle(headerStyle);
+        }
+    }
+
+    private void createHeaderStyle() {
+        headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        font = ((XSSFWorkbook) workbook).createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 14);
+        font.setBold(true);
+        headerStyle.setFont(font);
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.util.ExcelUtil.class);

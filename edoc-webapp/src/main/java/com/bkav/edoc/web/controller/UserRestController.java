@@ -156,7 +156,7 @@ public class UserRestController {
     @RequestMapping(method = RequestMethod.POST,
             value = "/public/-/user/import", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public String importUserFromExcel(@RequestParam("fileToUpload") MultipartFile file) {
+    public String importUserFromExcel(@RequestParam("fileUserToUpload") MultipartFile file) {
         LOGGER.info("API import user from excel invoke !!!!!!!!!!!!!!!!!!!!!!!!!");
         Response response = null;
         try {
@@ -260,9 +260,22 @@ public class UserRestController {
         response.setContentType("application/octet-stream");
         String headerKey = "Content-Disposition";
 
-        String headerValue = "attachment; filename=Don_vi-" + ".xlsx";
+        String currentDate = DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT_D);
+
+        String headerValue = "attachment; filename=Don_vi-" + currentDate + ".xlsx";
         response.setHeader(headerKey, headerValue);
         ExcelUtil.exportUserToExcel(response);
+    }
+
+    @RequestMapping(value = "/public/-/user/export/sample", method = RequestMethod.GET)
+    public void ExportSampleUserExcelFile(HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+
+        String headerValue = "attachment; filename=Don_vi-(File_mau).xlsx";
+        response.setHeader(headerKey, headerValue);
+        ExcelUtil.exportSampleUserExcelFile(response);
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);

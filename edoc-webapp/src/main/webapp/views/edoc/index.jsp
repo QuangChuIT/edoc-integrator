@@ -20,7 +20,7 @@
     <div class="edoc-table-user">
         <div class="table-responsive">
             <div class="row user-import" id="user-import-excel">
-                <button class="btn btn-primary import-excel-button">
+                <button class="btn btn-primary import-excel-button" id="importUserFromExcel">
                     <i class="fa fa-arrow-circle-up fa-fw"></i>
                     <spring:message code="edoc.import.report"/>
                 </button>
@@ -44,11 +44,9 @@
     <div class="edoc-table-organ">
         <div class="table-responsive">
             <div class="row user-import" id="organ-import-excel">
-                <button class="btn btn-primary import-excel-button">
+                <button class="btn btn-primary import-excel-button" id="importOrganFromExcel">
                     <i class="fa fa-arrow-circle-up fa-fw"></i>
                     <spring:message code="edoc.import.report"/>
-                    <input type="file" name="importOrganFromExcel" id="importOrganFromExcel" class="form-control">
-                </button>
                 <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
                     <i class="fa fa-arrow-circle-down fa-fw"></i>
                     <spring:message code="edoc.export.report"/>

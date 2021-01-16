@@ -21,7 +21,7 @@ public class ExcelUtil {
         return excelService.readExcelFileForUser(file);
     }
 
-    public static List<EdocDynamicContact> importOrganFromExcel(MultipartFile file) throws IOException {
+    public static Map<String, Object> importOrganFromExcel(MultipartFile file) throws IOException {
         return excelService.readExcelFileForOrganization(file);
     }
 
@@ -30,8 +30,16 @@ public class ExcelUtil {
         excelService.ExportUserToExcel(response);
     }
 
+    public static void exportSampleUserExcelFile(HttpServletResponse response) throws IOException {
+        excelService.exportSampleUserExcelFile(response);
+    }
+
     public static void exportOrganToExcel(HttpServletResponse response) throws IOException {
         excelService.ExportOrganToExcel(response);
+    }
+
+    public static void exportOrganSampleExcelFile(HttpServletResponse response) throws IOException {
+        excelService.ExportSampleOrganExcelFile(response);
     }
 
     public static long pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {

@@ -83,15 +83,21 @@ public class EdocDailyCounterService {
         return ePublic;
     }
 
-    public String getSentReceivedDocByYear(String year) {
+    public List<String> getSentReceivedDocByYear(String year) {
         Session session = edocDailyCounterDao.openCurrentSession();
         try {
             StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetSentReceivedDocument");
             storedProcedureQuery.registerStoredProcedureParameter("year", String.class, ParameterMode.IN);
             storedProcedureQuery.setParameter("year", year);
             List list = storedProcedureQuery.getResultList();
+            List<String> result = new ArrayList<>();
 
-            return new Gson().toJson(list);
+            for (Object object: list) {
+                List<String> num = Arrays.asList(new Gson().toJson(object).split(","));
+
+            }
+
+            return result;
         } catch (Exception e) {
             LOGGER.error(e);
             return null;
@@ -102,7 +108,7 @@ public class EdocDailyCounterService {
 
     public static void main(String[] args) {
         EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        String rs = edocDailyCounterService.getSentReceivedDocByYear("2020");
+        List<String> rs = edocDailyCounterService.getSentReceivedDocByYear("2020");
 
         System.out.println(rs);
     }

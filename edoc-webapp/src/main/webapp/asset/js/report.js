@@ -82,16 +82,16 @@ let edocReport = {
     },
     exportExcel: function (fromDate, toDate) {
         let url = "/public/-/stat/export/excel";
-        if (fromDate !== "" && toDate !== "") {
+        if (fromDate !== null && toDate !== null) {
             url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
         }
         $.ajax({
             type: "GET",
             url: url,
-            beforeSend: function (xhr) {
+            beforeSend: function () {
                 $("#overlay-public").show();
             },
-            success: function (response) {
+            success: function () {
                 let link = document.createElement('a');
                 let href = url;
                 link.style.display = 'none';
@@ -160,7 +160,6 @@ $(document).ready(function () {
             localStorage.setItem("toDateReport", toDate);
             edocReport.renderReportTable(fromDate, toDate);
         }
-
     });
 
     $("#exportReport").on("click", function (e) {
@@ -168,7 +167,6 @@ $(document).ready(function () {
         let fromDate = localStorage.getItem("fromDateReport");
         let toDate = localStorage.getItem("toDateReport");
         edocReport.exportExcel(fromDate, toDate);
-
     })
 });
 

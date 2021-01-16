@@ -1858,6 +1858,14 @@ a:focus {
     display: none;
 }
 
+#overlay-public{
+    position: fixed;
+    height: 40px;
+    z-index: 10000000000;
+    bottom: 40px;
+    right: 20px;
+    display: none;
+}
 .cv-spinner {
     height: 100%;
     display: flex;

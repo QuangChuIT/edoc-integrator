@@ -82,6 +82,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
             switch (soapAction) {
                 case EdXmlConstant.SEND_DOCUMENT_ACTION:
+                    LOGGER.info("-------------------------- Send document ------------------------");
+                    LOGGER.info(messageContext.getEnvelope().toString());
                     map = sendDocument(document, inMessageContext);
                     break;
                 case EdXmlConstant.GET_PENDING_DOCUMENT_ACTION:

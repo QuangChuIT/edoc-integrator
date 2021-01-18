@@ -131,7 +131,7 @@ public class DynamicRestContactController {
      * Excel File Upload
      */
     @RequestMapping(method = RequestMethod.POST,
-            value = "/public/-/organ/import")
+            value = "/public/-/organ/import", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String importOrganFromExcel(@RequestParam("fileOrganToUpload") MultipartFile file) {
         logger.info("API import organs from excel invoke !!!!!!!!!!!!!!!!!");

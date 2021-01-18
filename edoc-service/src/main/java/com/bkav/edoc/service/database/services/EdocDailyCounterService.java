@@ -93,7 +93,6 @@ public class EdocDailyCounterService {
             List<String> result = new ArrayList<>();
 
             for (Object object: list) {
-                List<String> num = Arrays.asList(new Gson().toJson(object).split(","));
 
             }
 

@@ -6,7 +6,6 @@
             <div class="container col-xs-12 col-sm-12 col-md-12 col-lg-12 wr-content col-centered">
                 <div class="boarder-all">
                     <div class="panel-body" id="publicTraceContent">
-
                     </div>
                 </div>
             </div>

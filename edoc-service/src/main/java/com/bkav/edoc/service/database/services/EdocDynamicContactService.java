@@ -208,6 +208,10 @@ public class EdocDynamicContactService {
         return organizationCacheEntries;
     }
 
+    public List<EdocDynamicContact> getDynamiccontactByAgency(boolean agency) {
+        return dynamicContactDaoImpl.getDynamicContactsByAgency(agency);
+    }
+
     public void createContact(EdocDynamicContact contact) {
         dynamicContactDaoImpl.createContact(contact);
     }

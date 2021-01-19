@@ -48,6 +48,10 @@ public class EdocDynamicContactServiceUtil {
         return DYNAMIC_CONTACT_SERVICE.getDynamicContactsByAgency(agency);
     }
 
+    public static List<EdocDynamicContact> getDynamicContactByAgency(boolean agency) {
+        return DYNAMIC_CONTACT_SERVICE.getDynamiccontactByAgency(agency);
+    }
+
     public static EdocDynamicContact findDynamicContactById(long contactId) {
         return DYNAMIC_CONTACT_SERVICE.findEdocDynamicContactById(contactId);
     }

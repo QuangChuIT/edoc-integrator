@@ -28,4 +28,8 @@ public class EdocAttachmentServiceUtil {
     public static boolean deleteAttachment(EdocAttachment attachment) {
         return attachmentService.deleteAttachment(attachment);
     }
+
+    public static List<EdocAttachment> getAttachmentByDocumentId(long documentId) {
+        return attachmentService.getEdocAttachmentsByDocId(documentId);
+    }
 }

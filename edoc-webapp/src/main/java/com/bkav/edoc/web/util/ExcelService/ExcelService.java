@@ -1,5 +1,6 @@
 package com.bkav.edoc.web.util.ExcelService;
 
+import com.bkav.edoc.converter.entity.EdocStatDetail;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
@@ -538,6 +539,76 @@ public class ExcelService {
         font.setBold(true);
         headerStyle.setFont(font);
     }
+
+   /* public void exportStatDetailForTayNinh(List<EdocStatDetail> edocStatDetails) throws IOException {
+        List<String> header_excel = Arrays.asList("Đơn vị", "Tổng", "Nhận nội bộ", "Nhận bên ngoài", "Ký số", "Không ký số");
+        int i = 0;
+        workbook = new XSSFWorkbook();
+
+        sheet = workbook.createSheet("Thống kê văn bản");
+        sheet.setColumnWidth(0, 15000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 5000);
+        sheet.setColumnWidth(3, 5000);
+        sheet.setColumnWidth(4, 5000);
+        sheet.setColumnWidth(5, 5000);
+        sheet.setDefaultRowHeight((short) 500);
+
+        Row header = sheet.createRow(0);
+
+        createHeaderStyle();
+
+        Cell headerCell;
+
+        for (String head: header_excel) {
+            headerCell = header.createCell(i);
+            headerCell.setCellValue(head);
+            headerCell.setCellStyle(headerStyle);
+            i++;
+        }
+
+        CellStyle style = workbook.createCellStyle();
+        style.setWrapText(true);
+        int numRow = 1;
+
+        for (EdocStatDetail edocStatDetail : edocStatDetails) {
+            Row row = sheet.createRow(numRow);
+
+            Cell cell = row.createCell(0);
+            EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(edocStatDetail.getOrganDomain());
+            cell.setCellValue(organ.getName());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue(edocStatDetail.getTotal());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue(edocStatDetail.getReceived_int());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(3);
+            cell.setCellValue(edocStatDetail.getReceived_ext());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(4);
+            cell.setCellValue(edocStatDetail.getSigned());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(5);
+            cell.setCellValue(edocStatDetail.getNot_signed());
+            cell.setCellStyle(style);
+            numRow++;
+        }
+
+        FileOutputStream outputStream = new FileOutputStream("/home/huynq/Desktop/ThongKeVanBanNhan.xlsx");
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+        LOGGER.info("Write users to Excel END!!!!!!!!!");
+    }
+
+    */
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.util.ExcelUtil.class);
 

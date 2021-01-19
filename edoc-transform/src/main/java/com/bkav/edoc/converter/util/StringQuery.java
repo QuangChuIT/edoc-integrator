@@ -18,15 +18,19 @@ public class StringQuery {
 
     public static final String GET_DATE_COUNTER = "Select distinct Date(sentDate) from edoc_document where year(sentDate)= 2020";
 
-    public static final String GET_DATE = "SELECT distinct Date(create_date) FROM edoc_document where Date(create_date) > \"2021-01-06\"";
+    public static final String GET_DATE = "SELECT distinct Date(create_date) FROM edoc_document where Date(create_date) > \"2020-12-31\"";
 
     /*public static final String GET_DATE_COUNTER = "Select distinct Date(sent_date) from edoc_document where year(sent_date) = 2020";*/
 
-    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from edoc_document where Date(sent_date) = ?";
+    public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select document_id, from_organ_domain, to_organ_domain, sent_date, send_ext from edoc_document where Date(sent_date) > ?";
 
-    public static final String GET_ALL_DOMAIN_CONTACT = "Select domain from edoc_dynamiccontact";
+    public static final String CHECK_SIGNED_ATTACHMENT = "Select count(*) from edoc_attachment where document_id = ? and name like \"%_Signed%\"";
 
-    public static final String GET_CONTACT_BY_DOMAIN = "Select * from edoc_dynamiccontact where domain= ?";
+    public static final String COUNT_SENT_EXT_DOCUMENT = "SELECT * FROM edoc_document where date(create_date) > ? and to_organ_domain = ? and received_ext = ?";
+
+    public static final String GET_DOC_CODE_BY_DOMAIN = "SELECT document_id FROM edoc_document where date(create_date) > ? and to_organ_domain = ? group by document_id";
+
+    public static final String GET_DOCID_BY_DOC_CODE = "SELECT document_id FROM edoc_document where date(create_date) > ? and doc_code = ?";
 
     /*public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from " +
             "edoc_document where Date(sent_date) = ? group by doc_code";*/

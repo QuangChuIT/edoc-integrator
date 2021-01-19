@@ -191,6 +191,13 @@
             <version>6.2.28</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.bkav.edoc</groupId>
+            <artifactId>edoc-transform</artifactId>
+            <version>6.2.28</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client -->
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>

@@ -1,6 +1,5 @@
 package com.bkav.edoc.converter.impl;
 
-import com.bkav.edoc.converter.entity.EdocStatDetail;
 import com.bkav.edoc.converter.util.DBConnectionUtil;
 import com.bkav.edoc.converter.util.DatabaseUtil;
 import com.bkav.edoc.converter.util.StringQuery;

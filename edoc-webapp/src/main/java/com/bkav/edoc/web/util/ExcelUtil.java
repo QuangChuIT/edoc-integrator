@@ -1,7 +1,5 @@
 package com.bkav.edoc.web.util;
 
-import com.bkav.edoc.converter.entity.EdocStatDetail;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.web.util.ExcelService.ExcelService;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +49,9 @@ public class ExcelUtil {
         excelService.ExportDailyCounterToExcel(response, fromDate, toDate);
     }
 
-    public static void exportStatDetailForTayNinh(List<EdocStatDetail> edocStatDetails) throws IOException {
+    /*public static void exportStatDetailForTayNinh(List<EdocStatDetail> edocStatDetails) throws IOException {
         excelService.exportStatDetailForTayNinh(edocStatDetails);
     }
+
+     */
 }

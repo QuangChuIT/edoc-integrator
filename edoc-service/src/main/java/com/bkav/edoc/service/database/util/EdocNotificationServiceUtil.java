@@ -18,4 +18,5 @@ public class EdocNotificationServiceUtil {
     public static List<EmailRequest> emailScheduleSend(Date fromDate, Date toDate) {
         return NOTIFICATION_SERVICE.getEmailRequestScheduleSend(fromDate, toDate);
     }
+
 }

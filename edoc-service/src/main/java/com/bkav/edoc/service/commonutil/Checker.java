@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.commonutil;
 
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.services.EdocDynamicContactService;
 import com.bkav.edoc.service.kernel.util.FileUtil;
 import com.bkav.edoc.service.kernel.util.InternetAddressUtil;
@@ -17,6 +18,7 @@ import org.apache.log4j.Logger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Checker {
     int level = 4;
@@ -56,7 +58,6 @@ public class Checker {
 
         errorList.addAll(checkOtherInfo(messageHeader.getOtherInfo()));
 
-
         if (errorList.size() > 0) {
 
             isSuccess = false;
@@ -69,15 +70,20 @@ public class Checker {
     public List<Organization> checkSendToVPCP(List<Organization> tos) {
         List<Organization> toesVPCP = new ArrayList<>();
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
-            for (Organization to : tos) {
-                String toDomain = to.getOrganId();
-                String[] arr = toDomain.split("\\.");
-                if (arr.length > 0) {
-                    String organId = arr[arr.length - 1];
-                    if (!stringList.contains(organId)) {
-                        toesVPCP.add(to);
+
+            List<String> domains = tos.stream().map(Organization::getOrganId).collect(Collectors.toList());
+            // Get all contact to get agency of every contact
+            List<EdocDynamicContact> contacts = edocDynamicContactService.getContactsByMultipleDomains(domains);
+            if (contacts.size() > 0) {
+                // filter contact to send vpcp
+                List<EdocDynamicContact> contactList = contacts.stream().filter(o -> !o.getAgency()).collect(Collectors.toList());
+                if (contactList.size() > 0) {
+                    List<String> contactOrgans = contactList.stream().map(EdocDynamicContact::getDomain).collect(Collectors.toList());
+                    // filter list pending
+                    for (Organization organization : tos) {
+                        if (contactOrgans.contains(organization.getOrganId())) {
+                            toesVPCP.add(organization);
+                        }
                     }
                 }
             }
@@ -87,6 +93,23 @@ public class Checker {
         return toesVPCP;
     }
 
+    public static void main(String[] args) {
+        List<Organization> organizations = new ArrayList<>();
+        Organization organization = new Organization();
+        organization.setOrganId("000.12.30.A36");
+        Organization organization1 = new Organization();
+        organization1.setOrganId("000.21.36.I03");
+        Organization organization2 = new Organization();
+        organization2.setOrganId("000.00.12.H23");
+        Organization organization3= new Organization();
+        organization3.setOrganId("000.00.00.G09");
+        organizations.add(organization);
+        organizations.add(organization1);
+        organizations.add(organization2);
+        organizations.add(organization3);
+        List<Organization> result = new Checker().checkSendToVPCP(organizations);
+        System.out.println(result.size());
+    }
     public ResponseFor checkSendToVPCP(ResponseFor responseFor) {
         try {
             String organIdExcept = PropsUtil.get("edoc.except.organId");

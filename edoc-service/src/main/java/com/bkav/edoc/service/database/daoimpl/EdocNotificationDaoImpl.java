@@ -91,9 +91,10 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
     public void setNotificationTaken(long documentId, String organId) throws SQLException {
         Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE EdocNotification en SET en.taken=:taken where en.receiverId=:receiverId and en.document.id=:documentId");
+        sql.append("UPDATE EdocNotification en SET en.taken=:taken, en.modifiedDate=:modifiedDate where en.receiverId=:receiverId and en.document.id=:documentId");
         Query query = currentSession.createQuery(sql.toString());
         query.setParameter("taken", true);
+        query.setParameter("modifiedDate", new Date());
         query.setParameter("receiverId", organId);
         query.setParameter("documentId", documentId);
         query.executeUpdate();
@@ -130,7 +131,7 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             query.setParameter("taken", false);
             query.setParameter("date", date);
             List<String> notifications = query.getResultList();
-            if(notifications != null) {
+            if (notifications != null) {
                 return notifications;
             } else {
                 return new ArrayList<>();

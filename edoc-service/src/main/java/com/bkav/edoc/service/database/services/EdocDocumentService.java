@@ -32,9 +32,11 @@ import javax.persistence.StoredProcedureQuery;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EdocDocumentService {
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
+    private final EdocDynamicContactService dynamicContactService = new EdocDynamicContactService();
     private final Mapper mapper = new Mapper();
     private final Checker checker = new Checker();
 
@@ -312,8 +314,9 @@ public class EdocDocumentService {
             List<Organization> toOrganizations = messageHeader.getToes();
             List<Organization> organToPending = new ArrayList<>();
             if (toesVPCP.size() > 0) {
+                List<String> organDomains = toesVPCP.stream().map(Organization::getOrganId).collect(Collectors.toList());
                 for (Organization organization : toOrganizations) {
-                    if (!toesVPCP.contains(organization)) {
+                    if (!organDomains.contains(organization.getOrganId())) {
                         organToPending.add(organization);
                     }
                 }

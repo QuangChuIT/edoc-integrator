@@ -40,6 +40,9 @@ public class EdocNotificationService {
         }
     }
 
+    public void updateNotification(EdocNotification notification){
+
+    }
     /**
      * get document id by domain
      *

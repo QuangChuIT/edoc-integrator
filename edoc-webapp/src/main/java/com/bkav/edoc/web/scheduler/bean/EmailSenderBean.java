@@ -97,7 +97,7 @@ public class EmailSenderBean {
                                 emailPDFRequest.setOrganName(contact.getName());
                                 emailPDFRequest.setBytes(bytes);
                                 pdfRequests.add(emailPDFRequest);
-                                for (User user : users) {
+                                /*for (User user : users) {
                                     String email = user.getEmailAddress();
                                     if (email != null && !email.equals("")) {
                                         LOGGER.info("-------------- Prepare send mail to email " + email + " of organ "
@@ -111,7 +111,7 @@ public class EmailSenderBean {
                                         LOGGER.error("Organization with domain " + contact.getDomain() + " with user "
                                                 + user.getUsername() + " don't have mail config !!!!!!!!!!!!!");
                                     }
-                                }
+                                }*/
                             }
                         }
                     }

@@ -124,7 +124,6 @@
     </bean>
 
     <!--Declare scheduler for send email warning document not taken by adapter-->
-    <!--Declare scheduler for public stat-->
     <bean name="sendEmailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendEmailJob"/>
         <property name="jobDataMap">
@@ -156,20 +155,19 @@
 
 
     <!--Declare scheduler for send message to telegram warning document not taken by adapter-->
-    <!--Declare scheduler for public stat-->
     <bean name="sendTelegramMessageJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendTelegramMessageJob"/>
         <property name="jobDataMap">
             <map>
-                <entry key="sendTelegramMessage" value-ref="sendTelegramMessage"/>
+                <entry key="sendTelegramMessageBean" value-ref="sendTelegramMessageBean"/>
             </map>
         </property>
     </bean>
 
     <bean id="sendTelegramMessageTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="sendTelegramMessageJobDetail"/>
-        <!--        <property name="cronExpression" value="* * 6 * * ?"/>-->
-        <property name="cronExpression" value="* */30 * ? * *"/>
+<!--        <property name="cronExpression" value="* * 6 * * ?"/>-->
+        <property name="cronExpression" value="0 */3 * ? * *"/>
         <!--        <property name="cronExpression" value="0 0 5 */4 * ?"/>-->
     </bean>
 
@@ -185,4 +183,5 @@
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
+
 </beans>

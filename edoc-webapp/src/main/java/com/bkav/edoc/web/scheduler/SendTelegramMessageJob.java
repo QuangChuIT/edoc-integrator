@@ -18,7 +18,7 @@ public class SendTelegramMessageJob extends QuartzJobBean {
         return messageToTelegramBean;
     }
 
-    public void setSendTelagramMessageJob(SendMessageToTelegramBean messageToTelegramBean) {
+    public void setMessageToTelegramBean(SendMessageToTelegramBean messageToTelegramBean) {
         this.messageToTelegramBean = messageToTelegramBean;
     }
 

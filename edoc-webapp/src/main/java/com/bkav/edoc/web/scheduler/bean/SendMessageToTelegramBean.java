@@ -37,7 +37,7 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Component("sendTelegramMessage")
+@Component("sendTelegramMessageBean")
 public class SendMessageToTelegramBean {
     @Autowired
     private MessageSourceUtil messageSourceUtil;

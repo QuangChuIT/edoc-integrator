@@ -31,7 +31,7 @@ public class DBConnectionUtil {
 				portalDBConnection = makeDBConnection(portalDBDriverClassName, portalDBConnectionURL, portalDBUser, portalDBPassword);
 				
 				_log.info(DBToolConstants.PORTAL_DB_CONNECTION_SUCCESS_MSG);
-			}else{
+			} else {
 				
 				_log.info(DBToolConstants.PORTAL_DB_INVALID_CONFIG_PARAM);
 				
@@ -47,7 +47,7 @@ public class DBConnectionUtil {
 
 	public static Connection initConvertDBConnection(){
 		
-		Connection portalDBConnection = null;
+		Connection convertDBConnection = null;
 		
 		try {
 			String convertDBDriverClassName = PropsUtil.get(DBToolConfigParams.CONVERT_DB_DRIVER_CLASSNAME);
@@ -61,8 +61,8 @@ public class DBConnectionUtil {
 			if(Validator.isNotNull(convertDBDriverClassName) && Validator.isNotNull(convertDBConnectionURL) && Validator.isNotNull(convertDBUser)){
 				
 				_log.info(DBToolConstants.CONVERT_DB_CONNECTING_MSG);
-				
-				portalDBConnection = makeDBConnection(convertDBDriverClassName, convertDBConnectionURL, convertDBUser, convertDBPassword);
+
+				convertDBConnection = makeDBConnection(convertDBDriverClassName, convertDBConnectionURL, convertDBUser, convertDBPassword);
 				
 				_log.info(DBToolConstants.CONVERT_DB_CONNECTION_SUCCESS_MSG);
 			
@@ -76,7 +76,7 @@ public class DBConnectionUtil {
 			e.printStackTrace();
 		}
 
-		return portalDBConnection;
+		return convertDBConnection;
 	}
 	
 	public static void closeConnection(Connection connection){

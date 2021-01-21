@@ -226,9 +226,11 @@ public class DatabaseUtil {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 EdocDocument edocDocument = new EdocDocument();
-                edocDocument.setFromOrganDomain(resultSet.getString(1));
-                edocDocument.setToOrganDomain(resultSet.getString(2));
-                edocDocument.setSentDate(resultSet.getDate(3));
+                edocDocument.setDocumentId(resultSet.getLong(1));
+                edocDocument.setFromOrganDomain(resultSet.getString(2));
+                edocDocument.setToOrganDomain(resultSet.getString(3));
+                edocDocument.setSentDate(resultSet.getDate(4));
+                edocDocument.setSendExt(resultSet.getBoolean(5));
                 documents.add(edocDocument);
             }
             resultSet.close();
@@ -239,21 +241,76 @@ public class DatabaseUtil {
         return documents;
     }
 
-//    public EdocDynamicContact getContactByDomain (Connection connection, String domain) {
-//        EdocDynamicContact contact = null;
-//
-//        try {
-//            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_CONTACT_BY_DOMAIN);
-//            preparedStatement.setString(1, domain);
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//            while (resultSet.next()) {
-//                contact = new EdocDynamicContact();
-//            }
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-//        return contact;
-//    }
+    public static boolean CheckSignedAttachment(Connection connection, long docId) {
+        boolean result = false;
+        int size = 0;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.CHECK_SIGNED_ATTACHMENT);
+            preparedStatement.setLong(1, docId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+                size = resultSet.getInt(1);
+            if (size > 0)
+                result = true;
+        } catch (SQLException throwable) {
+            LOGGER.error(throwable);
+        }
+        return result;
+    }
+
+    public static int countSentExt(Connection connection, String domain, String _counterDate, boolean received_ext) {
+        int size = 0;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.COUNT_SENT_EXT_DOCUMENT);
+            preparedStatement.setString(1, _counterDate);
+            preparedStatement.setString(2, domain);
+            preparedStatement.setBoolean(3, received_ext);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs != null) {
+                rs.last();          // moves cursor to the last row
+                size = rs.getRow(); // get row id
+            }
+        } catch (SQLException throwable) {
+            LOGGER.error(throwable);
+        }
+        return size;
+    }
+
+    public static List<Long> getDocCodeByOrganDomain(Connection connection, String _counterDate, String domain) {
+        List<Long> docCodes = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOC_CODE_BY_DOMAIN);
+            preparedStatement.setString(1, _counterDate);
+            preparedStatement.setString(2, domain);
+            ResultSet rs = preparedStatement.executeQuery();
+            int size_ = rs.getFetchSize();
+            while (rs.next()) {
+                long doc_code = rs.getLong(1);
+                docCodes.add(doc_code);
+            }
+        } catch (SQLException throwable) {
+            LOGGER.error(throwable);
+        }
+        return docCodes;
+    }
+
+    public static  List<Long> getDocumentIdByDocCode(Connection connection, String _counterDate, String doc_code) {
+        List<Long> docIds = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOCID_BY_DOC_CODE);
+            preparedStatement.setString(1, _counterDate);
+            preparedStatement.setString(2, doc_code);
+            ResultSet rs = preparedStatement.executeQuery();
+            int size_ = rs.getFetchSize();
+            while (rs.next()) {
+                long docId = rs.getLong(1);
+                docIds.add(docId);
+            }
+        } catch (SQLException throwable) {
+            LOGGER.error(throwable);
+        }
+        return docIds;
+    }
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseUtil.class);
 }

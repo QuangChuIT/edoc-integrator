@@ -24,7 +24,7 @@ public class EdocDocument implements Serializable {
     private boolean draft;
     private Date sentDate;
     private String docCode;
-    private Boolean sendExt;
+    private boolean sendExt;
     private String documentExtId;
     private Boolean visited;
     private String toOrganDomain;
@@ -234,11 +234,11 @@ public class EdocDocument implements Serializable {
         return draft;
     }
 
-    public Boolean getSendExt() {
+    public boolean getSendExt() {
         return sendExt;
     }
 
-    public void setSendExt(Boolean sendExt) {
+    public void setSendExt(boolean sendExt) {
         this.sendExt = sendExt;
     }
 
@@ -265,6 +265,8 @@ public class EdocDocument implements Serializable {
     public void setReceivedExt(boolean receivedExt) {
         this.receivedExt = receivedExt;
     }
+
+    public boolean getReceivedExt() { return this.receivedExt;}
 
     public String getDocCode() {
         return docCode;

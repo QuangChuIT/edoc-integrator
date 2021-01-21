@@ -21,11 +21,11 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
     }
 
     public List<EdocAttachment> getAttachmentsByDocumentId(long documentId) {
-        List<EdocAttachment> result = null;
         Session currentSession = openCurrentSession();
+        List<EdocAttachment> result = null;
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT ea FROM EdocAttachment ea where ea.document.id=:documentId");
+            sql.append("SELECT ea FROM EdocAttachment ea where ea.document.documentId=:documentId");
             Query<EdocAttachment> query = currentSession.createQuery(sql.toString(), EdocAttachment.class);
             query.setParameter("documentId", documentId);
             result = query.list();

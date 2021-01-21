@@ -166,7 +166,6 @@ let userManage = {
                         $.notify(user_message.user_add_new_success, "success");
                         $('#formAddUser').modal('toggle');
                         instance.renderUserDatatable();
-                        $('#edoc-add-user').empty();
                     } else {
                         $.notify(user_message.user_add_new_fail, "error");
                     }

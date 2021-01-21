@@ -119,6 +119,30 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         }
     }
 
+    @Override
+    public List<String> getEdocNotificationsNotTaken(Date date) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.receiverId FROM EdocNotification en WHERE en.taken=:taken and " +
+                    "DATE(en.modifiedDate) = DATE(:date) GROUP BY en.receiverId");
+            Query<String> query = session.createQuery(sql.toString(), String.class);
+            query.setParameter("taken", false);
+            query.setParameter("date", date);
+            List<String> notifications = query.getResultList();
+            if(notifications != null) {
+                return notifications;
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error get edoc notification not taken cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
     public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {
         Session session = openCurrentSession();
         try {

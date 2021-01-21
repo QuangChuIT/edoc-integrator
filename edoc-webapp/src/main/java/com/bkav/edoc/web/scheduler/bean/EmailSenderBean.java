@@ -103,6 +103,7 @@ public class EmailSenderBean {
                                                 + contact.getDomain() + "----------------------------");
 
                                         // send mail to each organ
+
                                         /*sendEmailToOrgans(edocTitleMailSender, null,
                                                 PropsUtil.get("mail.to.address"),
                                                 email, mail, bytes);
@@ -117,20 +118,16 @@ public class EmailSenderBean {
                             }
                         }
                     }
-                    // test run 2 times
-                    /*test++;
-                    if (test == 2)
-                        break;*/
                 }
                 if (num_documents > 0) {
                     LOGGER.info("--------------------- Start send email to admin ------------------------");
                     mailAdmin.put("TotalDocuments", num_documents);
                     // send mail to admin mail
-                    /*sendEmailToAdmin(edocTitleMailSender, null,
+                    sendEmailToAdmin(edocTitleMailSender, null,
                             PropsUtil.get("mail.to.address"),
-                            PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);*/
+                            PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
                     List<MailReceiverAdmin> mailReceivers = MailReceiverAdminServiceUtil.getAllMailReceiver();
-                    for (MailReceiverAdmin mailReceiver: mailReceivers) {
+                    for (MailReceiverAdmin mailReceiver : mailReceivers) {
                         String emailAdress = mailReceiver.getEmailAddress();
                         LOGGER.info("Start send email to " + emailAdress + "!!!!!!!!!!");
                         sendEmailToAdmin(edocTitleMailSender, null,

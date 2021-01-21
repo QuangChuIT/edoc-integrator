@@ -19,4 +19,7 @@ public class EdocNotificationServiceUtil {
         return NOTIFICATION_SERVICE.getEmailRequestScheduleSend(fromDate, toDate);
     }
 
+    public static List<EmailRequest> telegramScheduleSend(Date date) {
+        return NOTIFICATION_SERVICE.getEmailRequestTelegram(date);
+    }
 }

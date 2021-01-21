@@ -4,16 +4,21 @@ import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
-import com.bkav.edoc.service.database.entity.*;
+import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EdocNotification;
+import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
-import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -100,7 +105,7 @@ public class EdocNotificationService {
         int count_organ = 0;
         try {
             List<String> receiverIds = notificationDaoImpl.getReceiverIdNotTaken(fromDate, toDate);
-            for (String receiverId: receiverIds) {
+            for (String receiverId : receiverIds) {
                 if (checkOrganToSendEmail(receiverId)) {
                     EmailRequest emailRequest = new EmailRequest();
                     emailRequest.setReceiverId(receiverId);
@@ -119,6 +124,30 @@ public class EdocNotificationService {
         } finally {
             notificationDaoImpl.closeCurrentSession(session);
         }
+    }
+
+    public List<EmailRequest> getEmailRequestTelegram(Date date) {
+        List<EmailRequest> emailRequests = new ArrayList<>();
+        int count_organ = 0;
+        try {
+            List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            for (String notification : notifications) {
+                EmailRequest emailRequest = new EmailRequest();
+                emailRequest.setReceiverId(notification);
+                List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
+                emailRequest.setNumberOfDocument(documents.size());
+                emailRequest.setEdocDocument(documents);
+                emailRequests.add(emailRequest);
+                count_organ++;
+            }
+            LOGGER.info("-------------------------------- Total " + count_organ + " organ need to send telegram warning ------------------------------------");
+            return emailRequests;
+        } catch (
+                Exception e) {
+            LOGGER.error(e);
+            return emailRequests;
+        }
+
     }
 
     private boolean checkOrganToSendEmail(String organId) {

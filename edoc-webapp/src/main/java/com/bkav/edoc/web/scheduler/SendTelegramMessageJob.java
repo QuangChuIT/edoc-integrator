@@ -12,14 +12,10 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import java.util.Date;
 
 public class SendTelegramMessageJob extends QuartzJobBean {
-    private SendMessageToTelegramBean messageToTelegramBean;
+    private SendMessageToTelegramBean sendTelegramMessageBean;
 
-    public SendMessageToTelegramBean getMessageToTelegramBean() {
-        return messageToTelegramBean;
-    }
-
-    public void setMessageToTelegramBean(SendMessageToTelegramBean messageToTelegramBean) {
-        this.messageToTelegramBean = messageToTelegramBean;
+    public void setSendTelegramMessageBean(SendMessageToTelegramBean sendTelegramMessageBean) {
+        this.sendTelegramMessageBean = sendTelegramMessageBean;
     }
 
     @Override
@@ -28,7 +24,7 @@ public class SendTelegramMessageJob extends QuartzJobBean {
         boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.sendtelegram"), true);
         if(runScheduler){
             LOGGER.info("Run scheduler send telegram message !!!!!!!!!");
-            messageToTelegramBean.runScheduleSendMessageToTelegram();
+            sendTelegramMessageBean.runScheduleSendMessageToTelegram();
             LOGGER.info("End scheduler send telegram message !!!!!!!!!");
         }
     }

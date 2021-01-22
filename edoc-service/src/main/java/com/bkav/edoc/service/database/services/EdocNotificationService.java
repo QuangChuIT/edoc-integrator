@@ -135,13 +135,15 @@ public class EdocNotificationService {
         try {
             List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (String notification : notifications) {
-                EmailRequest emailRequest = new EmailRequest();
-                emailRequest.setReceiverId(notification);
-                List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
-                emailRequest.setNumberOfDocument(documents.size());
-                emailRequest.setEdocDocument(documents);
-                emailRequests.add(emailRequest);
-                count_organ++;
+                if(checkOrganReceiveNotify(notification)) {
+                    EmailRequest emailRequest = new EmailRequest();
+                    emailRequest.setReceiverId(notification);
+                    List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
+                    emailRequest.setNumberOfDocument(documents.size());
+                    emailRequest.setEdocDocument(documents);
+                    emailRequests.add(emailRequest);
+                    count_organ++;
+                }
             }
             LOGGER.info("-------------------------------- Total " + count_organ + " organ need to send telegram warning ------------------------------------");
             return emailRequests;
@@ -150,7 +152,6 @@ public class EdocNotificationService {
             LOGGER.error(e);
             return emailRequests;
         }
-
     }
 
     private boolean checkOrganToSendEmail(String organId) {
@@ -162,6 +163,19 @@ public class EdocNotificationService {
             }
         } catch (Exception e) {
             LOGGER.error("Error check organ to stat cause " + e);
+        }
+        return result;
+    }
+
+    private boolean checkOrganReceiveNotify(String domain) {
+        boolean result = false;
+        try {
+            EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(domain);
+            if (contact != null) {
+                result = contact.getReceiveNotify();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
         }
         return result;
     }

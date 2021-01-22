@@ -20,14 +20,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * @author Brian Wing Shun Chan
@@ -99,6 +92,11 @@ public class DateUtil {
 
     public static int getDaysBetween(Date date1, Date date2) {
         return getDaysBetween(date1, date2, null);
+    }
+
+    public static int getMinuteBetween(Date date1, Date date2) {
+        long diff = date2.getTime() - date1.getTime();
+        return (int) (diff / (60 * 1000));
     }
 
     public static int getDaysBetween(

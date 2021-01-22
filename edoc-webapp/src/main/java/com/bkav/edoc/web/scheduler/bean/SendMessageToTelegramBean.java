@@ -2,7 +2,7 @@ package com.bkav.edoc.web.scheduler.bean;
 
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.EmailRequest;
+import com.bkav.edoc.service.database.entity.TelegramMessage;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
@@ -22,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component("sendTelegramMessageBean")
 public class SendMessageToTelegramBean {
@@ -37,36 +40,29 @@ public class SendMessageToTelegramBean {
             String warningMessage;
             int i = 1;
 
-            List<EmailRequest> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
+            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
             } else {
                 warningMessage = messageSourceUtil.getMessage("edoc.title.telegram",
                         new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
-                //System.out.println(warningMessage);
 
-                for (EmailRequest request : messageObject) {
-                    LOGGER.info("Starting count with organ domain " + request.getReceiverId());
-                    EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(request.getReceiverId());
+                for (TelegramMessage telegramMessage : messageObject) {
+                    LOGGER.info("Starting count with organ domain " + telegramMessage.getReceiverId());
+                    EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
                     String detailMessageOrgan = messageSourceUtil.getMessage("edoc.title.telegram.header",
-                            new Object[]{i, receiverContact.getName(), request.getNumberOfDocument()});
-                    List<EdocDocument> documents = request.getEdocDocument();
-                    LOGGER.info("Organ with domain " + request.getReceiverId() + " has " + documents.size() + " not taken documents");
-                    Map<String, String> map = new HashMap<>();
-                    for (EdocDocument document : documents) {
-                        String doc_code = document.getDocCode();
-                        EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
-                        String sender = senderOrgan.getName();
-                        String msg = "";
-                        if (map.containsKey(senderOrgan.getDomain())) {
-                            msg = map.get(senderOrgan.getDomain()) + ", " + doc_code;
-                        } else {
-                            msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, doc_code});
-                        }
-                        map.put(senderOrgan.getDomain(), msg);
-                    }
-                    String str = "";
+                            new Object[]{i, receiverContact.getName()});
+                    EdocDocument document = telegramMessage.getDocument();
+                    LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not taken document with code " + document.getDocCode());
+
+                    String doc_code = document.getDocCode();
+                    EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
+                    String sender = senderOrgan.getName();
+                    String value = doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
+                    String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                    sendTelegramMessage(msg);
+                    /*String str = "";
                     String sub_str = "";
                     for (Map.Entry<String, String> entry : map.entrySet()) {
                         if (str.length() < 3000) {
@@ -86,10 +82,10 @@ public class SendMessageToTelegramBean {
                         TimeUnit.SECONDS.sleep(2);
                         sendTelegramMessage(detailMessageOrgan + str);
                         //System.out.println(detailMessageOrgan + str);
-                    }
-                    LOGGER.info("End count !!!!!!!!!!");
+                    }*/
                     i++;
                 }
+                LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }
         } catch (Exception e) {
             LOGGER.error("Not send message to telegram cause " + e);
@@ -115,7 +111,7 @@ public class SendMessageToTelegramBean {
             /// Create list of parameters
             List<NameValuePair> nameValuePairs = new ArrayList<>();
             /// Add chatid to the list
-            nameValuePairs.add(new BasicNameValuePair("chat_id",  "-" + chatId));
+            nameValuePairs.add(new BasicNameValuePair("chat_id", "-" + chatId));
             /// Add text to the list
             nameValuePairs.add(new BasicNameValuePair("text", inputString));
             /// Set list of parameters as entity of the Http POST method
@@ -146,5 +142,6 @@ public class SendMessageToTelegramBean {
         //test.runScheduleSendMessageToTelegram();
     }
 
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final static Logger LOGGER = Logger.getLogger(SendMessageToTelegramBean.class);
 }

@@ -4,21 +4,16 @@ import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
-import com.bkav.edoc.service.database.entity.EdocDocument;
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.EdocNotification;
-import com.bkav.edoc.service.database.entity.EmailRequest;
+import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
+import com.bkav.edoc.service.kernel.util.DateUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -40,9 +35,10 @@ public class EdocNotificationService {
         }
     }
 
-    public void updateNotification(EdocNotification notification){
+    public void updateNotification(EdocNotification notification) {
 
     }
+
     /**
      * get document id by domain
      *
@@ -129,30 +125,36 @@ public class EdocNotificationService {
         }
     }
 
-    public List<EmailRequest> getEmailRequestTelegram(Date date) {
-        List<EmailRequest> emailRequests = new ArrayList<>();
-        int count_organ = 0;
+    public List<TelegramMessage> getTelegramMessages(Date date) {
+        List<TelegramMessage> telegramMessages = new ArrayList<>();
         try {
-            List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
-            for (String notification : notifications) {
-                EmailRequest emailRequest = new EmailRequest();
-                emailRequest.setReceiverId(notification);
-                List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
-                emailRequest.setNumberOfDocument(documents.size());
-                emailRequest.setEdocDocument(documents);
-                emailRequests.add(emailRequest);
-                count_organ++;
+            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            for (EdocNotification notification : notifications) {
+                // check if document not taken after 30m to notification
+                Date createDate = notification.getModifiedDate();
+                int diffMin = DateUtil.getMinuteBetween(createDate, date);
+                if (diffMin >= 30) {
+                    TelegramMessage telegramMessage = new TelegramMessage();
+                    telegramMessage.setReceiverId(notification.getReceiverId());
+                    telegramMessage.setDocument(notification.getDocument());
+                    telegramMessage.setCreateDate(createDate);
+                }
             }
-            LOGGER.info("-------------------------------- Total " + count_organ + " organ need to send telegram warning ------------------------------------");
-            return emailRequests;
+            return telegramMessages;
         } catch (
                 Exception e) {
             LOGGER.error(e);
-            return emailRequests;
+            return telegramMessages;
         }
 
     }
 
+    public static void main(String[] args) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+        new EdocNotificationService().getTelegramMessages(yesterday);
+    }
     private boolean checkOrganToSendEmail(String organId) {
         boolean result = false;
         try {
@@ -166,11 +168,6 @@ public class EdocNotificationService {
         return result;
     }
 
-    public static void main(String[] args) {
-        EdocNotificationService edocNotificationService = new EdocNotificationService();
-        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
-        /*edocNotificationService.getEmailRequestScheduleSend();*/
-    }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
 

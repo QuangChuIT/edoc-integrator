@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.util;
 
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
+import com.bkav.edoc.service.database.entity.TelegramMessage;
 import com.bkav.edoc.service.database.services.EdocNotificationService;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ public class EdocNotificationServiceUtil {
         return NOTIFICATION_SERVICE.getEmailRequestScheduleSend(fromDate, toDate);
     }
 
-    public static List<EmailRequest> telegramScheduleSend(Date date) {
-        return NOTIFICATION_SERVICE.getEmailRequestTelegram(date);
+    public static List<TelegramMessage> telegramScheduleSend(Date date) {
+        return NOTIFICATION_SERVICE.getTelegramMessages(date);
     }
 }

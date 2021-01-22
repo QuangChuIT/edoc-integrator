@@ -17,7 +17,7 @@ public interface EdocNotificationDao {
 
     List<String> getReceiverIdNotTaken(Date fromDate, Date toDate);
 
-    List<String> getEdocNotificationsNotTaken(Date date);
+    List<EdocNotification> getEdocNotificationsNotTaken(Date date);
 
     List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId);
 }

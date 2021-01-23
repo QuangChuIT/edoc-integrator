@@ -156,6 +156,7 @@
 <script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>
 <!-- Custom Theme JavaScript -->
 <script src="<c:url value="/asset/js/report.js" />"></script>
+<script src="<c:url value="/asset/js/trace.js" />"></script>
 <script src="<c:url value="/asset/js/datetime.js" />"></script>
 </body>
 </html>

@@ -117,7 +117,7 @@ let organManage = {
         });
     },
 
-    createOrgan: function() {
+    createOrgan: function(e) {
         let instance = this;
 
         let name = $("#name").val();
@@ -135,7 +135,8 @@ let organManage = {
         }
 
         if (validateOrgan(name, domain, inCharge, address, email)) {
-            console.log(app_message.edoc_validate_document_request_fail);
+            //console.log(app_message.edoc_validate_document_request_fail);
+            e.preventDefault();
         } else {
             let contactRequest = {
                 "name": name,
@@ -155,9 +156,9 @@ let organManage = {
                 success: function (response) {
                     if (response.code === 200) {
                         $.notify(organ_message.organ_add_new_success, "success");
+                        $('#addNewOrgan').trigger("reset");
                         $('#formAddOrgan').modal('toggle');
-                        instance.renderOrganDatatable();
-                        //$('#edoc-add-organ').empty();
+                        organManage.renderOrganDatatable();
                     } else {
                         $.notify(organ_message.organ_add_new_fail, "error");
                     }
@@ -204,9 +205,8 @@ let organManage = {
                 $.notify(organ_message.organ_edit_fail, "error");
             }
         });
-        $('#edoc-edit-organ').empty();
         $('#formEditOrgan').modal('toggle');
-        instance.renderOrganDatatable();
+        organManage.renderOrganDatatable();
     },
     deleteOrgan: function (organId) {
         let instance = this;
@@ -218,6 +218,7 @@ let organManage = {
                     200: function (response) {
                         $.notify(organ_message.organ_delete_success, "success");
                         $("#" + organId).remove();
+                        organManage.renderOrganDatatable();
                     },
                     400: function (response) {
                         $.notify(organ_message.organ_delete_fail, "error");
@@ -227,7 +228,6 @@ let organManage = {
                     }
                 }
             })
-            instance.renderOrganDatatable();
         }
     }
 }
@@ -414,6 +414,7 @@ function editOrganClick(organId) {
 }
 
 function validateOrgan(name, domain, inCharge, address, email) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     let domainRegex;
     if (name === "") {
@@ -421,42 +422,48 @@ function validateOrgan(name, domain, inCharge, address, email) {
             "Tên đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (domain === "") {
         $("#domain").notify(
             "Mã định danh không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (inCharge === "") {
         $("#inCharge").notify(
             "Đơn vị phụ trách không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (address === "") {
         $("#address").notify(
             "Địa chỉ không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (email === "") {
         $("#email").notify(
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(email)) {
             $("#email").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }

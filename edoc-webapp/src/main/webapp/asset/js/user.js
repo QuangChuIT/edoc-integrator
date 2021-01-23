@@ -121,6 +121,7 @@ let userManage = {
                     200: function (response) {
                         $.notify(user_message.user_delete_success, "success");
                         $("#" + userId).remove();
+                        userManage.renderUserDatatable();
                     },
                     400: function (response) {
                         $.notify(user_message.user_delete_fail, "error");
@@ -132,7 +133,7 @@ let userManage = {
             });
         }
     },
-    createUser: function () {
+    createUser: function (e) {
         let instance = this;
         //get displayName
         let addDisplayName = $("#addDisplayName").val();
@@ -146,7 +147,8 @@ let userManage = {
         let addEmailAddress = $("#addEmailAddress").val();
 
         if (validateAddUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
-            console.log(app_message.edoc_validate_document_request_fail);
+            e.preventDefault();
+            //console.log(app_message.edoc_validate_document_request_fail);
         } else {
             let addUserRequest = {
                 "displayName": addDisplayName,
@@ -164,8 +166,9 @@ let userManage = {
                 success: function (response) {
                     if (response.code === 200) {
                         $.notify(user_message.user_add_new_success, "success");
+                        $('#addNewUser').trigger("reset");
                         $('#formAddUser').modal('toggle');
-                        instance.renderUserDatatable();
+                        userManage.renderUserDatatable();
                     } else {
                         $.notify(user_message.user_add_new_fail, "error");
                     }
@@ -212,8 +215,7 @@ let userManage = {
                 }
             })
             $("#formEditUser").modal("toggle");
-            $('#edoc-edit-user').empty();
-            instance.renderUserDatatable();
+            edocDocument.renderUserDatatable();
         }
     },
     createUserRole: function (userId) {
@@ -457,40 +459,47 @@ $(document).on("click", "#btn-editUser-cancel", function (event) {
 });
 
 function validateAddUser(displayName, userName, organDomain, password, emailAddress) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (displayName === "") {
         $("#addDisplayName").notify(
             "Tên người dùng không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (userName === "") {
         $("#addUserName").notify(
             "Tên tài khoản không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (organDomain === "") {
         $("#addOrganDomain").notify(
             "Đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (password === "") {
         $("#password").notify(
             "Mật khẩu không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (password.length < 8) {
             $("#password").notify(
                 "Mật khẩu phải nhiều hơn 8 kí tự",
                 {position: "right"}
-            )
+            );
+            result = true;
+            return result;
         }
     }
     if (emailAddress === "") {
@@ -498,47 +507,54 @@ function validateAddUser(displayName, userName, organDomain, password, emailAddr
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(emailAddress)) {
             $("#addEmailAddress").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }
 
 function validateEditUser(displayName, organDomain, emailAddress) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (displayName === "") {
         $("#editDisplayName").notify(
             "Tên người dùng không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (organDomain === "") {
         $("#editOrganDomain").notify(
             "Đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (emailAddress === "") {
         $("#editEmailAddress").notify(
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(emailAddress)) {
             $("#editEmailAddress").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }

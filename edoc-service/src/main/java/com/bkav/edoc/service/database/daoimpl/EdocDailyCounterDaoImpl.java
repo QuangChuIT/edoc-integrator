@@ -105,10 +105,5 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
         this.persist(dailyCounter);
     }
 
-    public static void main(String[] args) {
-        EdocDailyCounterDaoImpl edocDailyCounterDao = new EdocDailyCounterDaoImpl();
-        System.out.println(edocDailyCounterDao.getExistYearInDailycounter());
-    }
-
     private final static Logger LOGGER = Logger.getLogger(EdocDailyCounterDaoImpl.class);
 }

@@ -92,9 +92,7 @@ public class EdocDailyCounterService {
             List list = storedProcedureQuery.getResultList();
             List<String> result = new ArrayList<>();
 
-            for (Object object: list) {
 
-            }
 
             return result;
         } catch (Exception e) {
@@ -103,13 +101,6 @@ public class EdocDailyCounterService {
         } finally {
             edocDailyCounterDao.closeCurrentSession(session);
         }
-    }
-
-    public static void main(String[] args) {
-        EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        List<String> rs = edocDailyCounterService.getSentReceivedDocByYear("2020");
-
-        System.out.println(rs);
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

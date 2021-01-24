@@ -123,12 +123,13 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT en FROM EdocNotification en WHERE en.taken=:taken and " +
-                    "DATE(en.modifiedDate) = DATE(:date)");
+                    "DATE(en.modifiedDate) = DATE(:date) and DATE(en.dateCreate) = DATE(:date)");
             Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
             query.setParameter("taken", false);
             query.setParameter("date", date);
             List<EdocNotification> notifications = query.getResultList();
             if (notifications != null) {
+                LOGGER.info("Get success list document not taken from date " + date + " with size " + notifications.size());
                 return notifications;
             } else {
                 return new ArrayList<>();

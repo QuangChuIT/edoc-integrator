@@ -8,7 +8,6 @@ import com.bkav.edoc.service.kernel.util.MimeTypesUtil;
 import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.util.EdXMLConfigKey;
 import com.bkav.edoc.service.util.EdXMLConfigUtil;
-import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
@@ -101,7 +100,7 @@ public class Checker {
         organization1.setOrganId("000.21.36.I03");
         Organization organization2 = new Organization();
         organization2.setOrganId("000.00.12.H23");
-        Organization organization3= new Organization();
+        Organization organization3 = new Organization();
         organization3.setOrganId("000.00.00.G09");
         organizations.add(organization);
         organizations.add(organization1);
@@ -110,14 +109,15 @@ public class Checker {
         List<Organization> result = new Checker().checkSendToVPCP(organizations);
         System.out.println(result.size());
     }
+
     public ResponseFor checkSendToVPCP(ResponseFor responseFor) {
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
             String toDomain = responseFor.getOrganId();
-            String organId = toDomain.substring(10, 13);
-            if (!stringList.contains(organId)) {
-                return responseFor;
+            EdocDynamicContact dynamicContact = edocDynamicContactService.findContactByDomain(toDomain);
+            if (dynamicContact != null) {
+                if (!dynamicContact.getAgency()) {
+                    return responseFor;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Error when check send status to vpcp for organ domain " + responseFor.getOrganId());

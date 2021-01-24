@@ -11,6 +11,8 @@
         <module>edoc-service</module>
         <module>edoc-webapp</module>
         <module>edoc-transform</module>
+        <module>edoc-edxml</module>
+        <module>EDXML</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -53,7 +55,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-
     </repositories>
     <dependencyManagement>
         <dependencies>
@@ -192,7 +193,7 @@
             <dependency>
                 <groupId>org.apache.oltu.oauth2</groupId>
                 <artifactId>org.apache.oltu.oauth2.client</artifactId>
-                <version>1.0.2</version>
+                <version>${oauth2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -307,6 +308,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <stax2-api.version>3.0.1</stax2-api.version>
         <log4j.version>1.2.17</log4j.version>
+        <oauth2.version>>1.0.2</oauth2.version>
         <quartz.scheduler.version>2.3.2</quartz.scheduler.version>
         <memcached.version>2.12.3</memcached.version>
         <org.hikaricp.version>3.3.1</org.hikaricp.version>

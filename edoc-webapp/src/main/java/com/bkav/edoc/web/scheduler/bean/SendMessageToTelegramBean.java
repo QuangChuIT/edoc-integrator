@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component("sendTelegramMessageBean")
 public class SendMessageToTelegramBean {
@@ -35,11 +36,11 @@ public class SendMessageToTelegramBean {
     private MessageSourceUtil messageSourceUtil;
 
     public void runScheduleSendMessageToTelegram() {
+        LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
             Date today = new Date();
             String warningMessage;
             int i = 1;
-
             List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
@@ -47,21 +48,26 @@ public class SendMessageToTelegramBean {
                 warningMessage = messageSourceUtil.getMessage("edoc.title.telegram",
                         new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
-
+                TimeUnit.SECONDS.sleep(2);
                 for (TelegramMessage telegramMessage : messageObject) {
-                    LOGGER.info("Starting count with organ domain " + telegramMessage.getReceiverId());
                     EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
-                    String detailMessageOrgan = messageSourceUtil.getMessage("edoc.title.telegram.header",
-                            new Object[]{i, receiverContact.getName()});
-                    EdocDocument document = telegramMessage.getDocument();
-                    LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not taken document with code " + document.getDocCode());
+                    if (receiverContact.getReceiveNotify()) {
+                        String detailMessageOrgan = messageSourceUtil.getMessage("edoc.title.telegram.header",
+                                new Object[]{i, receiverContact.getName()});
+                        sendTelegramMessage(detailMessageOrgan);
+                        TimeUnit.SECONDS.sleep(2);
+                        EdocDocument document = telegramMessage.getDocument();
+                        LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not taken document with code " + document.getDocCode());
 
-                    String doc_code = document.getDocCode();
-                    EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
-                    String sender = senderOrgan.getName();
-                    String value = doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
-                    String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
-                    sendTelegramMessage(msg);
+                        String doc_code = document.getDocCode();
+                        EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
+                        String sender = senderOrgan.getName();
+                        String value = doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
+                        String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                        sendTelegramMessage(msg);
+                        TimeUnit.SECONDS.sleep(2);
+                        i++;
+                    }
                     /*String str = "";
                     String sub_str = "";
                     for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -83,7 +89,7 @@ public class SendMessageToTelegramBean {
                         sendTelegramMessage(detailMessageOrgan + str);
                         //System.out.println(detailMessageOrgan + str);
                     }*/
-                    i++;
+
                 }
                 LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }

@@ -131,8 +131,7 @@ public class EdocTraceService {
 
     public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
 
-        List<EdocTrace> traces = traceDaoImpl.getEdocTracesByOrganId(responseForOrganId);
-        return traces;
+        return traceDaoImpl.getEdocTracesByOrganId(responseForOrganId);
     }
 
     /**

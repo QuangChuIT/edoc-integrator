@@ -8,10 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -87,6 +84,36 @@ public class DynamiccontactCheckReceiveNotify {
         } catch (Exception e) {
             LOGGER.error(e);
         }
+    }
+
+    public void updateReceiveNotify () {
+        List<EdocDynamicContact> allContact = EdocDynamicContactServiceUtil.getDynamicContactByAgency(true);
+        int count = 0;
+        try {
+            for (EdocDynamicContact contact: allContact) {
+                LOGGER.info("Update organ with domain " + contact.getDomain());
+                contact.setReceiveNotify(true);
+                contact.setModifiedDate(new Date());
+                EdocDynamicContactServiceUtil.updateContact(contact);
+                count++;
+            }
+            LOGGER.info("Updated " + count + " organ");
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+    }
+
+    private boolean checkOrganAgency(String organId) {
+        boolean result = false;
+        try {
+            EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(organId);
+            if (edocDynamicContact != null) {
+                result = edocDynamicContact.getAgency();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error check organ to stat cause " + e);
+        }
+        return result;
     }
 
     public static void main(String[] args) throws IOException {

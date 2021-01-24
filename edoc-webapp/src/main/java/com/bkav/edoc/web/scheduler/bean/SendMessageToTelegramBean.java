@@ -23,10 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component("sendTelegramMessageBean")
@@ -38,6 +35,9 @@ public class SendMessageToTelegramBean {
     public void runScheduleSendMessageToTelegram() {
         LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -2);
+            Date yesterday = cal.getTime();
             Date today = new Date();
             String warningMessage;
             int i = 1;
@@ -46,7 +46,7 @@ public class SendMessageToTelegramBean {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
             } else {
                 warningMessage = messageSourceUtil.getMessage("edoc.title.telegram",
-                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
+                        new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
                 TimeUnit.SECONDS.sleep(2);
                 for (TelegramMessage telegramMessage : messageObject) {
@@ -68,28 +68,6 @@ public class SendMessageToTelegramBean {
                         TimeUnit.SECONDS.sleep(2);
                         i++;
                     }
-                    /*String str = "";
-                    String sub_str = "";
-                    for (Map.Entry<String, String> entry : map.entrySet()) {
-                        if (str.length() < 3000) {
-                            str += entry.getValue();
-                        } else {
-                            String new_str = entry.getValue();
-                            sub_str += new_str;
-                        }
-                    }
-                    if (sub_str != "") {
-                        TimeUnit.SECONDS.sleep(2);
-                        sendTelegramMessage(detailMessageOrgan + str);
-                        sendTelegramMessage(sub_str);
-                        //System.out.println(detailMessageOrgan + str);
-                        //System.out.println(sub_str);
-                    } else {
-                        TimeUnit.SECONDS.sleep(2);
-                        sendTelegramMessage(detailMessageOrgan + str);
-                        //System.out.println(detailMessageOrgan + str);
-                    }*/
-
                 }
                 LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }
@@ -140,12 +118,6 @@ public class SendMessageToTelegramBean {
         } finally {
             httpclient.close();
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        SendMessageToTelegramBean test = new SendMessageToTelegramBean();
-        test.sendTelegramMessage("Bản Final");
-        //test.runScheduleSendMessageToTelegram();
     }
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");

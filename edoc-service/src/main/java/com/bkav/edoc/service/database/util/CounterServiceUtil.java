@@ -32,10 +32,4 @@ public class CounterServiceUtil {
     public static void reset(String name, int size) throws NoSuchCounterException {
         counterService.reset(name, size);
     }
-
-    public static void main(String[] args) {
-        long counter = CounterServiceUtil.increment(EdocAttachment.class.getName());
-        System.out.println(counter);
-
-    }
 }

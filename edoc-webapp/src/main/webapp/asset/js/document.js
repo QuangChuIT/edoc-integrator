@@ -286,7 +286,7 @@ let edocDocument = {
                             window.localEdocStorage.clearAttachments();
                             $.notify(app_message.edoc_publish_document_success, "success");
                             $('#edocFormAdd').modal('toggle');
-                            $("#outbox-menu").click();
+                            edocDocument.renderDatatable();
                         }
                         // $('#edoc-add-document').empty();
                         localEdocStorage.clearAttachments();

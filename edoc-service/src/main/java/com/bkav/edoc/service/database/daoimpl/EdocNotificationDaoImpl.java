@@ -144,7 +144,7 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
 
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
         new EdocNotificationDaoImpl().getEdocNotificationsNotTaken(yesterday);
     }

@@ -128,27 +128,61 @@ public class EdocNotificationService {
     public List<TelegramMessage> getTelegramMessages(Date date) {
         List<TelegramMessage> telegramMessages = new ArrayList<>();
         try {
+            int i = 0;
             List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (EdocNotification notification : notifications) {
                 // check if document not taken after 30m to notification
                 Date createDate = notification.getModifiedDate();
                 int diffMin = DateUtil.getMinuteBetween(createDate, date);
-                LOGGER.info("------------------------- Modified Date " + createDate + " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
+                LOGGER.info("------------------------- Modified Date " + createDate +
+                        " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
                 if (diffMin >= 30) {
                     TelegramMessage telegramMessage = new TelegramMessage();
                     telegramMessage.setReceiverId(notification.getReceiverId());
                     telegramMessage.setDocument(notification.getDocument());
                     telegramMessage.setCreateDate(createDate);
                     telegramMessages.add(telegramMessage);
+                    i++;
                 }
             }
             LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
+            /*List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            for (String notification : notifications) {
+                if(checkOrganReceiveNotify(notification)) {
+                    EmailRequest emailRequest = new EmailRequest();
+                    emailRequest.setReceiverId(notification);
+                    List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
+                    emailRequest.setNumberOfDocument(documents.size());
+                    emailRequest.setEdocDocument(documents);
+                    emailRequests.add(emailRequest);
+                    count_organ++;
+
+             */
+            /*int i = 0;
+            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            for (EdocNotification notification : notifications) {
+                // check if document not taken after 30m to notification
+                if (checkOrganReceiveNotify(notification.getReceiverId())) {
+                    Date createDate = notification.getModifiedDate();
+                    int diffMin = DateUtil.getMinuteBetween(createDate, date);
+                    if (diffMin >= 30) {
+                        TelegramMessage telegramMessage = new TelegramMessage();
+                        telegramMessage.setReceiverId(notification.getReceiverId());
+                        telegramMessage.setDocument(notification.getDocument());
+                        telegramMessage.setCreateDate(createDate);
+                        telegramMessages.add(telegramMessage);
+                        i++;
+                    }
+                }
+            }
+            System.out.println(i);*/
             return telegramMessages;
         } catch (Exception e) {
             LOGGER.error(e);
             return telegramMessages;
         }
     }
+
 
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();
@@ -183,13 +217,11 @@ public class EdocNotificationService {
         }
         return result;
     }
-
     /*public static void main(String[] args) {
         EdocNotificationService edocNotificationService = new EdocNotificationService();
         edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
         *//*edocNotificationService.getEmailRequestScheduleSend();*//*
     }*/
-
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
 

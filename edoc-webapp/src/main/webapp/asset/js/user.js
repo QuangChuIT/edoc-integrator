@@ -296,9 +296,6 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     });
-    $(document).on('click', 'input[type="checkbox"]', function () {
-        $('input[type="checkbox"]').not(this).prop('checked', false);
-    });
 
    /* $.get("/public/-/role/" + role_message.role_administrator, function (data){
         console.log(data);

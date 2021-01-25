@@ -73,4 +73,38 @@
             </div>
         </div>
     </div>
+    <div class="edoc-table-statistic">
+        <div class="table-responsive">
+            <div class="row report-search" id="statistic-detail">
+                <div class="col-md-2 col-sm-6 col-xs-12">
+                    <input type="text" class="report-time form-control" readonly
+                           id="fromStatDate" value="" name="fromStatDate"
+                           placeholder="<spring:message code="edoc.search.from.date"/>">
+                </div>
+                <div class="col-md-2 col-sm-6 col-xs-12">
+                    <div class="form-inline form-inline">
+                        <input type="text" class="report-time form-control"
+                               readonly id="toStatDate" name="toStatDate" value=""
+                               placeholder="<spring:message code="edoc.search.to.date"/>">
+                    </div>
+                </div>
+                <ul class="nav navbar-top-links report-action">
+                    <li>
+                        <button class="btn btn-info btn-report-group" id="btnRunStatistic">
+                            <i class="fa fa-calculator fa-fw"></i>
+                            <spring:message code="edoc.report.button"/>
+                        </button>
+                    </li>
+                    <!--<li class="dropdown">
+                        <button class="btn btn-primary btn-report-group" aria-haspopup="true" aria-expanded="false" id="exportStatistic">
+                            <i class="fa fa-arrow-circle-down fa-fw"></i>
+                            <spring:message code="edoc.export.report"/>
+                        </button>
+                    </li> -->
+                </ul>
+            </div>
+            <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-statistic">
+            </table>
+        </div>
+    </div>
 </div>

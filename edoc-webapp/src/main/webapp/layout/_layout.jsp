@@ -351,10 +351,35 @@
                         </div>
                         <div class="col-md-9 col-sm-6 col-xs-12">
                             <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                                <input type="checkbox" id="agencySelected" value="1"/>
+                                <input type="checkbox" name="agencySelected" id="agencySelected" value="1"/>
                             </div>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                <input type="checkbox" id="notAgencySelected" value="0"/><br/>
+                                <input type="checkbox" name="notAgencySelected" id="notAgencySelected" value="0"/><br/>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                                <span class="control-label"><spring:message code="organ.add.received.notify"/></span>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <span class="control-label"><spring:message code="organ.add.not.received.notify"/></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                                <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected" value="1"/>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected" value="0"/><br/>
                             </div>
                         </div>
                     </div>
@@ -1045,6 +1070,74 @@
             </div>
             <div class="col-md-9 col-sm-6 col-xs-12">
                 <input type="text" class="form-control" id="editAddress" value="${address}">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <span class="control-label"><spring:message code="organ.add.new.agency"/></span>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <span class="control-label"><spring:message code="organ.add.new.not.agency"/></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+            </div>
+
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                {{if agency == true}}
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <input type="checkbox" name="agencySelectedEdit" id="agencySelectedEdit" value="1" checked/>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="checkbox" name="notAgencySelectedEdit" id="notAgencySelectedEdit" value="0"/><br/>
+                </div>
+                {{else agency == false}}
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <input type="checkbox" name="agencySelectedEdit" id="agencySelectedEdit" value="1"/>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="checkbox" name="notAgencySelectedEdit" id="notAgencySelectedEdit" value="0" checked/><br/>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        <br>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <span class="control-label"><spring:message code="organ.add.received.notify"/></span>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <span class="control-label"><spring:message code="organ.add.not.received.notify"/></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+            </div>
+            <div class="col-md-9 col-sm-6 col-xs-12">
+                {{if receiveNotify == true}}
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected" checked/>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected"/><br/>
+                </div>
+                {{else receiveNotify== false}}
+                <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                    <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected"/>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected" checked/><br/>
+                </div>
+                {{/if}}
             </div>
         </div>
         <div class="form-group">
@@ -1764,7 +1857,7 @@
 <script src="<c:url value="/asset/js/document.js"/>"></script>
 <script src="<c:url value="/asset/js/user.js"/>"></script>
 <script src="<c:url value="/asset/js/organization.js"/>"></script>
-<script src="<c:url value="/asset/js/drawChart.js"/>"></script>
+<script src="<c:url value="/asset/js/statistic.js"/>"></script>
 <!-- Page-Level Demo Scripts - Tables - Use for reference -->
 <script src="<c:url value="/asset/js/attachment.js"/>"></script>
 </body>

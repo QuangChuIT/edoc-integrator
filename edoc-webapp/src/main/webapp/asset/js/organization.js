@@ -126,15 +126,10 @@ let organManage = {
         let email = $("#email").val();
         let inCharge = $("#inCharge").val();
         let telephone = $("#telephone").val();
-        let agency;
+        let agency = checkAgencySelected();
+        let receivedNotify = checkReceivedNotify();
 
-        if ($("#agencySelected").is(":checked")) {
-            agency = true;
-        } else if ($("#notAgencySelected").is(":checked")) {
-            agency = false;
-        }
-
-        if (validateOrgan(name, domain, inCharge, address, email)) {
+        if (validateOrgan(name, domain, inCharge, address, email, agency, receivedNotify)) {
             //console.log(app_message.edoc_validate_document_request_fail);
             e.preventDefault();
         } else {
@@ -145,7 +140,8 @@ let organManage = {
                 "email": email,
                 "inCharge": inCharge,
                 "telephone": telephone,
-                "agency": agency
+                "agency": agency,
+                "isReceivedNotify": receivedNotify
             };
             $.ajax({
                 type: "POST",
@@ -169,6 +165,7 @@ let organManage = {
             });
         }
     },
+
     editOrgan: function(id) {
         let instance = this;
 
@@ -178,6 +175,8 @@ let organManage = {
         let email = $("#editEmail").val();
         let inCharge = $("#editInCharge").val();
         let telephone = $("#editTelephone").val();
+        let agency = checkAgencySelected();
+        let receiveNotify = checkReceivedNotify();
 
         let contactRequest = {
             "id": id,
@@ -186,7 +185,9 @@ let organManage = {
             "address": address,
             "email": email,
             "inCharge": inCharge,
-            "telephone": telephone
+            "telephone": telephone,
+            "agency": agency,
+            "receiveNotify": receiveNotify
         };
         $.ajax({
             type: "PUT",
@@ -402,8 +403,43 @@ $(document).on('click', '#btn-edit-organ-cancel', function (e) {
     $("#formEditOrgan").modal('toggle');
 })
 
+$(document).on('click', "#agencySelected", function () {
+    if ($("input:checkbox[name='agencySelected']").prop("checked"))
+        $("input:checkbox[name='notAgencySelected']").prop("checked", false);
+});
+$(document).on('click', "#notAgencySelected", function () {
+    if ($("input:checkbox[name='notAgencySelected']").prop("checked"))
+        $("input:checkbox[name='agencySelected']").prop("checked", false);
+});
+
+$(document).on('click', "#receivedNotifySelected", function () {
+    if ($("input:checkbox[name='receivedNotifySelected']").prop("checked"))
+        $("input:checkbox[name='notReceivedNotifySelected']").prop("checked", false);
+});
+$(document).on('click', "#notReceivedNotifySelected", function () {
+    if ($("input:checkbox[name='notReceivedNotifySelected']").prop("checked"))
+        $("input:checkbox[name='receivedNotifySelected']").prop("checked", false);
+});
+
+function checkAgencySelected() {
+    if ($("#agencySelected").is(":checked")) {
+        return true;
+    } else if ($("#notAgencySelected").is(":checked")) {
+        return false;
+    }
+}
+
+function checkReceivedNotify() {
+    if ($("#receivedNotifySelected").is(":checked")) {
+        return true;
+    } else if ($("#notReceivedNotifySelected").is(":checked")) {
+        return false;
+    }
+}
+
 function editOrganClick(organId) {
     $.get("/contact/-/document/contacts/" + organId, function (data) {
+        console.log(data);
         $('#edoc-edit-organ').empty();
         $('#editOrganTemplate').tmpl(data).appendTo('#edoc-edit-organ');
     });
@@ -413,10 +449,9 @@ function editOrganClick(organId) {
     });
 }
 
-function validateOrgan(name, domain, inCharge, address, email) {
+function validateOrgan(name, domain, inCharge, address, email, agency, receivedNotify) {
     let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
-    let domainRegex;
     if (name === "") {
         $("#name").notify(
             "Tên đơn vị không được để trống !",
@@ -465,5 +500,21 @@ function validateOrgan(name, domain, inCharge, address, email) {
             result = true;
             return result;
         }
+    }
+    if (agency === null) {
+        $("#agency-select").notify(
+            "Phải chọn nội tỉnh hay ngoại tỉnh!",
+            {position: "right"}
+        );
+        result = true;
+        return result;
+    }
+    if (agreceivedNotifyency === null) {
+        $("#agency-select").notify(
+            "Phải chọn nhận cảnh báo hay không cảnh báo!",
+            {position: "right"}
+        );
+        result = true;
+        return result;
     }
 }

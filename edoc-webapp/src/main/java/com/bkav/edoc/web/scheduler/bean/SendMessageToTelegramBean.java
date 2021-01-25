@@ -41,6 +41,7 @@ public class SendMessageToTelegramBean {
             int i = 1;
 
             List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(yesterday);
+            Map<String, Object> teleMeassageSender = null;
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
             } else {
@@ -48,7 +49,10 @@ public class SendMessageToTelegramBean {
                         new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
 
+                Map<String, Object> teleMessageReceiver = null;
+
                 for (TelegramMessage telegramMessage : messageObject) {
+
                     LOGGER.info("Starting count with organ domain " + telegramMessage.getReceiverId());
                     EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
                     String detailMessageOrgan = messageSourceUtil.getMessage("edoc.title.telegram.header",
@@ -61,10 +65,20 @@ public class SendMessageToTelegramBean {
                     EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
                     String sender = senderOrgan.getName();
                     String value = doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
-                    String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+
+                    // Test
+                    String msg = "";
+                    if (teleMeassageSender.containsKey(sender)) {
+                        msg += ", " + messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                    } else {
+                        msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                        teleMeassageSender.put(sender, msg);
+                    }
+
                     sendTelegramMessage(msg);
                     i++;
                 }
+
                 LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }
         } catch (Exception e) {

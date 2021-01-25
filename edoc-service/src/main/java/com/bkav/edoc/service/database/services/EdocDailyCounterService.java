@@ -4,6 +4,7 @@ import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDailyCounterDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.service.xml.ed.Ed;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -76,7 +77,8 @@ public class EdocDailyCounterService {
 
     public EPublic getStat() {
         EPublic ePublic = new EPublic();
-        Long total = edocDailyCounterDao.getStat();
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        Long total = edocDailyCounterDao.getStat(year);
         ePublic.setTotal(total);
         ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(true));
         ePublic.setDateTime(DateUtils.format(new Date(), DateUtils.VN_DATETIME_FORMAT_NEW));
@@ -92,7 +94,9 @@ public class EdocDailyCounterService {
             List list = storedProcedureQuery.getResultList();
             List<String> result = new ArrayList<>();
 
-
+            for (Object o: list) {
+                result.add(new Gson().toJson(o));
+            }
 
             return result;
         } catch (Exception e) {
@@ -101,6 +105,11 @@ public class EdocDailyCounterService {
         } finally {
             edocDailyCounterDao.closeCurrentSession(session);
         }
+    }
+
+    public static void main(String[] args) {
+        EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
+        System.out.println(edocDailyCounterService.getStat().getTotal());
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

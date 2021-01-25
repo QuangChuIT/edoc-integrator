@@ -11,6 +11,7 @@ public class ContactRequest implements Serializable {
     private String address;
     private String telephone;
     private boolean agency;
+    private boolean receiveNotify;
 
     public long getId() {
         return id;
@@ -74,5 +75,13 @@ public class ContactRequest implements Serializable {
 
     public void setAgency(boolean agency) {
         this.agency = agency;
+    }
+
+    public boolean getReceivedNotify() {
+        return receiveNotify;
+    }
+
+    public void setReceivedNotify(boolean receivedNotify) {
+        this.receiveNotify = receivedNotify;
     }
 }

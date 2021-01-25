@@ -35,6 +35,54 @@ let edocChart = {
                 }
             }
         });
+    },
+    renderDetailStat: function () {
+        let instance = this;
+        instance.dataTable = $('#dataTables-statistic').DataTable({
+            ajax: {
+                url: "",
+                type: "GET",
+                dataSrc: ""
+            },
+            rowId: "organId",
+            responsive: true,
+            pageLength: 25,
+            autoWidth: true,
+            ordering: true,
+            searching: true,
+            bDestroy: true,
+            processing: true,
+            paging: true,
+            info: false,
+            columns: [
+                {
+                    "title": statistic_message.table_hesder_organ_name,
+                    "data": null
+                },
+                {
+                    "title": statistic_message.table_header_total,
+                    "data": null,
+                },
+                {
+                    "title": statistic_message.table_header_sent_int,
+                    "data": null,
+                },
+                {
+                    "title": statistic_message.table_header_sent_int,
+                    "data": null,
+                },
+                {
+                    "title": statistic_message.table_header_signed,
+                    "data": null
+                },
+                {
+                    "title": statistic_message.tables_header_not_signed,
+                    "data": null
+                }
+            ],
+            language: app_message.language,
+            "order": [[0, "asc"]],
+        });
     }
 }
 
@@ -79,20 +127,26 @@ var barChartData = {
 };
 
 $(document).ready(function() {
-    $("#report-menu.nav a").on("click", function (e) {
+    $("#report-menu.nav a:not(.not-click)").on("click", function (e) {
         e.preventDefault();
         let dataMode = $(this).attr("data-mode");
         if (dataMode != null) {
             edocChart.appSetting.mode = dataMode;
-            if (dataMode === "report") {
+            if (dataMode === "viewChart") {
                 $('.edoc-content > [class^=edoc-table]').hide();
+                $(".edoc-table-statistic").hide();
                 edocChart.drawChart();
                 $(".edoc-statistic").show();
+            } else if (dataMode === "viewDetail") {
+                $('.edoc-content > [class^=edoc-table]').hide();
+                $(".edoc-statistic").hide();
+                edocChart.renderDetailStat();
+                $(".edoc-table-statistic").show();
             } else {
                 edocDocument.renderDatatable();
                 $(".edoc-table").show();
             }
-            $("#side-menu.nav a").removeClass("active");
+            $("#report-menu.nav a").removeClass("active");
             $(this).addClass("active");
         }
     });

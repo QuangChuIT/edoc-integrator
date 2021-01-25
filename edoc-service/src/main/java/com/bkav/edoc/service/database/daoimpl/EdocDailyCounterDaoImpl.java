@@ -71,12 +71,13 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
     }
 
     @Override
-    public Long getStat() {
+    public Long getStat(int year) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT sum(dc.sent + dc.received) from EdocDailyCounter dc");
+            sql.append("SELECT sum(dc.sent + dc.received) from EdocDailyCounter dc where year(dateTime) = :year");
             Query<Long> query = session.createQuery(sql.toString(), Long.class);
+            query.setParameter("year", year);
             return query.uniqueResult();
         } catch (Exception e) {
             LOGGER.error(e);

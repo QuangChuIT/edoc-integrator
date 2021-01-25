@@ -63,10 +63,10 @@ public class DynamicRestContactController {
             method = RequestMethod.GET, //
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
-    public ResponseEntity<OrganizationCacheEntry> getOrgan(@PathVariable("organId") String organId) {
+    public ResponseEntity<EdocDynamicContact> getOrgan(@PathVariable("organId") String organId) {
         try {
             long organ_Id = Long.parseLong(organId);
-            OrganizationCacheEntry organ = EdocDynamicContactServiceUtil.findById(organ_Id);
+            EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(organ_Id);
             if (organ != null) {
                 return new ResponseEntity<>(organ, HttpStatus.OK);
             }
@@ -108,6 +108,8 @@ public class DynamicRestContactController {
                     organ.setAddress(contactRequest.getAddress());
                     organ.setEmail(contactRequest.getEmail());
                     organ.setInCharge(contactRequest.getInCharge());
+                    organ.setAgency(contactRequest.getAgency());
+                    organ.setReceiveNotify(contactRequest.getReceivedNotify());
                     if (!contactRequest.getTelephone().equals(""))
                         organ.setTelephone(contactRequest.getTelephone());
 
@@ -223,6 +225,7 @@ public class DynamicRestContactController {
                     String address = contactRequest.getAddress();
                     String telephone = contactRequest.getTelephone();
                     boolean agency = contactRequest.getAgency();
+                    boolean receivedNotify = contactRequest.getReceivedNotify();
 
                     EdocDynamicContact organ = new EdocDynamicContact();
                     organ.setName(name);
@@ -233,6 +236,7 @@ public class DynamicRestContactController {
                     organ.setTelephone(telephone);
                     organ.setStatus(true);
                     organ.setAgency(agency);
+                    organ.setReceiveNotify(receivedNotify);
                     String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
                     organ.setToken(newToken);
                     organ.setCreateDate(new Date());

@@ -1,5 +1,6 @@
 $(function () {
     $('#side-menu').metisMenu();
+    $('#report-menu').metisMenu();
 });
 
 //Loads the correct sidebar on window load,
@@ -23,6 +24,7 @@ $(function () {
         $('#' + t + 'C' + " ul li a").removeClass("active");
     });
 
+    $(".edoc-table-statistic").hide();
     $(".edoc-statistic").hide();
     $(".edoc-table-draft").hide();
     $(".edoc-report-table").hide();

@@ -128,7 +128,6 @@ public class EdocNotificationService {
     public List<TelegramMessage> getTelegramMessages(Date date) {
         List<TelegramMessage> telegramMessages = new ArrayList<>();
         try {
-            int i = 0;
             List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (EdocNotification notification : notifications) {
                 // check if document not taken after 30m to notification
@@ -142,7 +141,6 @@ public class EdocNotificationService {
                     telegramMessage.setDocument(notification.getDocument());
                     telegramMessage.setCreateDate(createDate);
                     telegramMessages.add(telegramMessage);
-                    i++;
                 }
             }
             LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");

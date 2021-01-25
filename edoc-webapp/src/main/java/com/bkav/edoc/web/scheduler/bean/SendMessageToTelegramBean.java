@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component("sendTelegramMessageBean")
@@ -35,9 +38,6 @@ public class SendMessageToTelegramBean {
     public void runScheduleSendMessageToTelegram() {
         LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -2);
-            Date yesterday = cal.getTime();
             Date today = new Date();
             String warningMessage;
             int i = 1;
@@ -46,7 +46,7 @@ public class SendMessageToTelegramBean {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
             } else {
                 warningMessage = messageSourceUtil.getMessage("edoc.title.telegram",
-                        new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT), messageObject.size()});
+                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
                 TimeUnit.SECONDS.sleep(2);
                 for (TelegramMessage telegramMessage : messageObject) {
@@ -62,7 +62,7 @@ public class SendMessageToTelegramBean {
                         String doc_code = document.getDocCode();
                         EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
                         String sender = senderOrgan.getName();
-                        String value = doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
+                        String value = document.getDocumentId() + "," +doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
                         String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
                         sendTelegramMessage(msg);
                         TimeUnit.SECONDS.sleep(2);

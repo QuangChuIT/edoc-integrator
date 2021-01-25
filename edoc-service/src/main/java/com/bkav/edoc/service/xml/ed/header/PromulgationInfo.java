@@ -11,6 +11,7 @@ import java.util.Date;
 public class PromulgationInfo extends BaseElement {
     private String place;
     private Date promulgationDate;
+    private String promulgationDateValue;
 
     public PromulgationInfo() {
     }
@@ -36,9 +37,22 @@ public class PromulgationInfo extends BaseElement {
         this.promulgationDate = promulgationDate;
     }
 
+
+    public String getPromulgationDateValue() {
+        return promulgationDateValue;
+    }
+
+    public void setPromulgationDateValue(String promulgationDateValue) {
+        this.promulgationDateValue = promulgationDateValue;
+    }
+
     public static PromulgationInfo fromContent(Element element) {
-        return new PromulgationInfo(BaseXmlUtils.getString(element, "Place"),
-                DateUtils.parse(BaseXmlUtils.getString(element, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT));
+        PromulgationInfo promulgationInfo = new PromulgationInfo();
+        promulgationInfo.setPlace(BaseXmlUtils.getString(element, "Place"));
+        promulgationInfo.setPromulgationDateValue(BaseXmlUtils.getString(element, "PromulgationDate"));
+        promulgationInfo.setPromulgationDate(DateUtils.parse(BaseXmlUtils.getString(element, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT));
+        return promulgationInfo;
+
     }
 
     @Override

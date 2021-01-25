@@ -21,7 +21,7 @@ public class SendTelegramMessageJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         LOGGER.info("Check send telegram message at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
-        boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.sendtelegram"), true);
+        boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.send.telegram"), true);
         if(runScheduler){
             LOGGER.info("Run scheduler send telegram message !!!!!!!!!");
             sendTelegramMessageBean.runScheduleSendMessageToTelegram();

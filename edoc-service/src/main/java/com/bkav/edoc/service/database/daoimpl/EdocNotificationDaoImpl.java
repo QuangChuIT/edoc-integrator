@@ -128,7 +128,8 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             query.setParameter("taken", false);
             query.setParameter("date", date);
             List<EdocNotification> notifications = query.getResultList();
-            if (notifications.size() > 0) {
+            if (notifications != null) {
+                LOGGER.info("Get success list document not taken from date " + date + " with size " + notifications.size());
                 return notifications;
             } else {
                 return new ArrayList<>();

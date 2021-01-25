@@ -128,7 +128,22 @@ public class EdocNotificationService {
     public List<TelegramMessage> getTelegramMessages(Date date) {
         List<TelegramMessage> telegramMessages = new ArrayList<>();
         try {
-
+            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            for (EdocNotification notification : notifications) {
+                // check if document not taken after 30m to notification
+                Date createDate = notification.getModifiedDate();
+                int diffMin = DateUtil.getMinuteBetween(createDate, date);
+                LOGGER.info("------------------------- Modified Date " + createDate +
+                        " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
+                if (diffMin >= 30) {
+                    TelegramMessage telegramMessage = new TelegramMessage();
+                    telegramMessage.setReceiverId(notification.getReceiverId());
+                    telegramMessage.setDocument(notification.getDocument());
+                    telegramMessage.setCreateDate(createDate);
+                    telegramMessages.add(telegramMessage);
+                }
+            }
+            LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
             /*List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (String notification : notifications) {
                 if(checkOrganReceiveNotify(notification)) {
@@ -141,8 +156,7 @@ public class EdocNotificationService {
                     count_organ++;
 
              */
-
-            int i = 0;
+            /*int i = 0;
             List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (EdocNotification notification : notifications) {
                 // check if document not taken after 30m to notification
@@ -159,13 +173,20 @@ public class EdocNotificationService {
                     }
                 }
             }
-            System.out.println(i);
+            System.out.println(i);*/
             return telegramMessages;
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             LOGGER.error(e);
             return telegramMessages;
         }
+    }
+
+
+    public static void main(String[] args) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date yesterday = cal.getTime();
+        new EdocNotificationService().getTelegramMessages(yesterday);
     }
 
     private boolean checkOrganToSendEmail(String organId) {
@@ -181,6 +202,7 @@ public class EdocNotificationService {
         return result;
     }
 
+
     private boolean checkOrganReceiveNotify(String domain) {
         boolean result = false;
         try {
@@ -193,6 +215,11 @@ public class EdocNotificationService {
         }
         return result;
     }
+    /*public static void main(String[] args) {
+        EdocNotificationService edocNotificationService = new EdocNotificationService();
+        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
+        *//*edocNotificationService.getEmailRequestScheduleSend();*//*
+    }*/
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
 

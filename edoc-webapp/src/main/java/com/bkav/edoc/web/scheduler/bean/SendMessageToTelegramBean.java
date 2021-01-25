@@ -23,7 +23,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component("sendTelegramMessageBean")
 public class SendMessageToTelegramBean {
@@ -32,26 +36,21 @@ public class SendMessageToTelegramBean {
     private MessageSourceUtil messageSourceUtil;
 
     public void runScheduleSendMessageToTelegram() {
+        LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -2);
-            Date yesterday = cal.getTime();
             Date today = new Date();
             String warningMessage;
             int i = 1;
 
-            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(yesterday);
-            Map<String, Object> teleMeassageSender = null;
+            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
             } else {
                 warningMessage = messageSourceUtil.getMessage("edoc.title.telegram",
-                        new Object[]{DateUtils.format(yesterday, DateUtils.VN_DATE_FORMAT), messageObject.size()});
+                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
 
-                Map<String, Object> teleMessageReceiver = null;
-
-                for (TelegramMessage telegramMessage : messageObject) {
+                /*for (TelegramMessage telegramMessage : messageObject) {
 
                     LOGGER.info("Starting count with organ domain " + telegramMessage.getReceiverId());
                     EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
@@ -77,6 +76,29 @@ public class SendMessageToTelegramBean {
 
                     sendTelegramMessage(msg);
                     i++;
+
+
+                 */
+                TimeUnit.SECONDS.sleep(2);
+                for (TelegramMessage telegramMessage : messageObject) {
+                    EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
+                    if (receiverContact.getReceiveNotify()) {
+                        String detailMessageOrgan = messageSourceUtil.getMessage("edoc.title.telegram.header",
+                                new Object[]{i, receiverContact.getName()});
+                        sendTelegramMessage(detailMessageOrgan);
+                        TimeUnit.SECONDS.sleep(2);
+                        EdocDocument document = telegramMessage.getDocument();
+                        LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not taken document with code " + document.getDocCode());
+
+                        String doc_code = document.getDocCode();
+                        EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
+                        String sender = senderOrgan.getName();
+                        String value = document.getDocumentId() + "," + doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
+                        String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                        sendTelegramMessage(msg);
+                        TimeUnit.SECONDS.sleep(2);
+                        i++;
+                    }
                 }
 
                 LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");

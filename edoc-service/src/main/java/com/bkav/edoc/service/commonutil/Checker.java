@@ -8,7 +8,6 @@ import com.bkav.edoc.service.kernel.util.MimeTypesUtil;
 import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.util.EdXMLConfigKey;
 import com.bkav.edoc.service.util.EdXMLConfigUtil;
-import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
@@ -101,7 +100,7 @@ public class Checker {
         organization1.setOrganId("000.21.36.I03");
         Organization organization2 = new Organization();
         organization2.setOrganId("000.00.12.H23");
-        Organization organization3= new Organization();
+        Organization organization3 = new Organization();
         organization3.setOrganId("000.00.00.G09");
         organizations.add(organization);
         organizations.add(organization1);
@@ -109,15 +108,20 @@ public class Checker {
         organizations.add(organization3);
         List<Organization> result = new Checker().checkSendToVPCP(organizations);
         System.out.println(result.size());
+       /* validateJavaDate("12/29/2016");
+        validateJavaDate("12-29-2016");
+        validateJavaDate("12,29,2016");
+        validateJavaDate("2016/12/29");*/
     }
+
     public ResponseFor checkSendToVPCP(ResponseFor responseFor) {
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
             String toDomain = responseFor.getOrganId();
-            String organId = toDomain.substring(10, 13);
-            if (!stringList.contains(organId)) {
-                return responseFor;
+            EdocDynamicContact dynamicContact = edocDynamicContactService.findContactByDomain(toDomain);
+            if (dynamicContact != null) {
+                if (!dynamicContact.getAgency()) {
+                    return responseFor;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Error when check send status to vpcp for organ domain " + responseFor.getOrganId());
@@ -322,7 +326,7 @@ public class Checker {
 
         errorList.addAll(checkProPlace(proInfo.getPlace()));
 
-        errorList.addAll(checkProDate(DateUtils.format(proInfo.getPromulgationDate())));
+        errorList.addAll(checkProDate(proInfo.getPromulgationDateValue()));
 
         return errorList;
     }
@@ -770,22 +774,21 @@ public class Checker {
 
         List<Error> errorList = new ArrayList<>();
 
-        String lastOfErrorCode = new StringBuilder("MessageHeader")
-                .append("Code").append("PromulgationDate").toString();
+        String lastOfErrorCode = new StringBuilder("MessageHeader").append(".PromulgationDate").toString();
 
-        if (checkDate(strDate)) {
+        if (validateJavaDate(strDate)) {
             int result = compareDate(strDate);
 
             if (result == ERROR_DATE_COMPARE) {
                 errorList.add(new Error(String.format("T.%s", lastOfErrorCode),
-                        "PromulgationDate is match type dd/MM/yyyy"));
+                        "M.PromulgationDate is match type yyyy/MM/dd"));
             } else if (result > 0) {
                 errorList.add(new Error(String.format("M.%s", lastOfErrorCode),
-                        "PromulgationDate can't greater current date"));
+                        "M.PromulgationDate can't greater current date"));
             }
         } else {
-            errorList.add(new Error("M.PROMULGATION_DATE",
-                    "PromulgationDate is match type dd/MM/yyyy"));
+            errorList.add(new Error("M.PromulgationDate",
+                    "PromulgationDate is match type yyyy/MM/dd"));
         }
 
         return errorList;
@@ -939,7 +942,7 @@ public class Checker {
 
     private int compareDate(String strDate) {
         try {
-            Date resultDate = dateFormat.parse(strDate);
+            Date resultDate = simpleDateFormat.parse(strDate);
 
             Date now = Calendar.getInstance().getTime();
 
@@ -949,9 +952,31 @@ public class Checker {
         }
     }
 
+
+    private boolean validateJavaDate(String strDate) {
+        /* Check if date is 'null' */
+        if (!strDate.trim().equals("")) {
+            /*
+             * Set preferred date format,
+             * For example MM-dd-yyyy, MM.dd.yyyy,dd.MM.yyyy etc.*/
+            simpleDateFormat.setLenient(false);
+            /* Create Date object
+             * parse the string into date
+             */
+            try {
+                Date javaDate = simpleDateFormat.parse(strDate);
+                LOGGER.info("---------------------------------- Check PromulgationDate is valid yyyy/MM/dd -----------------------------> " + javaDate);
+            } catch (ParseException e) {
+                LOGGER.info("---------------------------------- Check PromulgationDate is not valid yyyy/MM/dd -----------------------------> " + strDate);
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
             "dd/MM/yyyy");
-
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
     private static final int ERROR_DATE_COMPARE = -3;
 
     private final static Logger LOGGER = Logger.getLogger(Checker.class);

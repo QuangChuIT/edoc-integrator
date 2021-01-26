@@ -166,7 +166,7 @@
 
     <bean id="sendTelegramMessageTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="sendTelegramMessageJobDetail"/>
-        <property name="cronExpression" value="* */30 8-18 * * ?"/>
+        <property name="cronExpression" value="0 */30 8-18 * * ?"/>
         <!--<property name="cronExpression" value="0 */30 * ? * *"/>-->
         <!--<property name="cronExpression" value="* * 6 * * ?"/>-->
         <!--<property name="cronExpression" value="0 */2 9-10 ? * *"/>-->

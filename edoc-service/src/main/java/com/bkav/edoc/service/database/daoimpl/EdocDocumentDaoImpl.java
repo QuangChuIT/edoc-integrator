@@ -53,7 +53,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT ed from EdocDocument ed where ed.docCode = :docCode AND ed.toOrganDomain = :organDomain");
+            sql.append("SELECT ed from EdocDocument ed where ed.docCode = :docCode AND (ed.fromOrganDomain = :organDomain or ed.toOrganDomain = :organDomain)");
             Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("docCode", docCode);
             query.setParameter("organDomain", organDomain);

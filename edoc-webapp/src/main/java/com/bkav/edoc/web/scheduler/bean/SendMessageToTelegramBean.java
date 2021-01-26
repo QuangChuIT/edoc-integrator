@@ -42,7 +42,7 @@ public class SendMessageToTelegramBean {
             List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
-                warningMessage += messageSourceUtil.getMessage("edoc.title.all.taken", null);
+                warningMessage += messageSourceUtil.getMessage("edoc.title.all.taken", new Object[]{SIMPLE_DATE_FORMAT.format(today)});
                 sendTelegramMessage(warningMessage);
             } else {
                 warningMessage += messageSourceUtil.getMessage("edoc.title.telegram",

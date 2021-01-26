@@ -334,53 +334,32 @@
                             <input type="text" class="form-control" id="telephone" value="">
                         </div>
                     </div>
+                    <br>
                     <div class="form-group">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-5 col-sm-6 col-xs-12">
+                            <label class="control-label">
+                                <spring:message code="organ.add.new.agency"/>
+                            </label>
                         </div>
-                        <div class="col-md-9 col-sm-6 col-xs-12">
-                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                                <span class="control-label"><spring:message code="organ.add.new.agency"/></span>
-                            </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <span class="control-label"><spring:message code="organ.add.new.not.agency"/></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                        </div>
-                        <div class="col-md-9 col-sm-6 col-xs-12">
-                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                                <input type="checkbox" name="agencySelected" id="agencySelected" value="1"/>
-                            </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <input type="checkbox" name="notAgencySelected" id="notAgencySelected" value="0"/><br/>
-                            </div>
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                            <label class="switch">
+                                <input type="checkbox" id="agencySelected"/>
+                                <span class="slider round"></span>
+                            </label>
                         </div>
                     </div>
                     <br>
                     <div class="form-group">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-md-5 col-sm-6 col-xs-12">
+                            <label class="control-label">
+                                <spring:message code="organ.add.received.notify"/>
+                            </label>
                         </div>
-                        <div class="col-md-9 col-sm-6 col-xs-12">
-                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                                <span class="control-label"><spring:message code="organ.add.received.notify"/></span>
-                            </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <span class="control-label"><spring:message code="organ.add.not.received.notify"/></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-3 col-sm-6 col-xs-12">
-                        </div>
-                        <div class="col-md-9 col-sm-6 col-xs-12">
-                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                                <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected" value="1"/>
-                            </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected" value="0"/><br/>
-                            </div>
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                            <label class="switch">
+                                <input type="checkbox" id="receiveNotifySelected"/>
+                                <span class="slider round"></span>
+                            </label>
                         </div>
                     </div>
                     <br>
@@ -1072,74 +1051,49 @@
                 <input type="text" class="form-control" id="editAddress" value="${address}">
             </div>
         </div>
+        <br>
         <div class="form-group">
-            <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="col-md-5 col-sm-6 col-xs-12">
+                <label class="control-label" for="editAddress">
+                    ${organ_message.organ_table_header_agency}
+                </label>
             </div>
-            <div class="col-md-9 col-sm-6 col-xs-12">
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <span class="control-label"><spring:message code="organ.add.new.agency"/></span>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <span class="control-label"><spring:message code="organ.add.new.not.agency"/></span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-3 col-sm-6 col-xs-12">
-            </div>
-
-            <div class="col-md-9 col-sm-6 col-xs-12">
+            <div class="col-md-7 col-sm-6 col-xs-12">
                 {{if agency == true}}
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <input type="checkbox" name="agencySelectedEdit" id="agencySelectedEdit" value="1" checked/>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="checkbox" name="notAgencySelectedEdit" id="notAgencySelectedEdit" value="0"/><br/>
-                </div>
+                <label class="switch">
+                    <input type="checkbox" id="agencySelectedEdit" checked/>
+                    <span class="slider round"></span>
+                </label>
                 {{else agency == false}}
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <input type="checkbox" name="agencySelectedEdit" id="agencySelectedEdit" value="1"/>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="checkbox" name="notAgencySelectedEdit" id="notAgencySelectedEdit" value="0" checked/><br/>
-                </div>
+                <label class="switch">
+                    <input type="checkbox" id="agencySelectedEdit"/>
+                    <span class="slider round"></span>
+                </label>
                 {{/if}}
             </div>
         </div>
         <br>
         <div class="form-group">
-            <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="col-md-5 col-sm-6 col-xs-12">
+                <label class="control-label" for="editAddress">
+                    ${organ_message.organ_table_header_receive_notify}
+                </label>
             </div>
-            <div class="col-md-9 col-sm-6 col-xs-12">
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <span class="control-label"><spring:message code="organ.add.received.notify"/></span>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <span class="control-label"><spring:message code="organ.add.not.received.notify"/></span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-3 col-sm-6 col-xs-12">
-            </div>
-            <div class="col-md-9 col-sm-6 col-xs-12">
+            <div class="col-md-7 col-sm-6 col-xs-12">
                 {{if receiveNotify == true}}
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected" checked/>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected"/><br/>
-                </div>
-                {{else receiveNotify== false}}
-                <div class="col-md-6 col-sm-6 col-xs-12 currency">
-                    <input type="checkbox" name="receivedNotifySelected" id="receivedNotifySelected"/>
-                </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="checkbox" name="notReceivedNotifySelected" id="notReceivedNotifySelected" checked/><br/>
-                </div>
+                <label class="switch">
+                    <input type="checkbox" id="receiveNotifySelectedEdit" checked/>
+                    <span class="slider round"></span>
+                </label>
+                {{else receiveNotify == false}}
+                <label class="switch">
+                    <input type="checkbox" id="receiveNotifySelectedEdit"/>
+                    <span class="slider round"></span>
+                </label>
                 {{/if}}
             </div>
         </div>
+        <br>
         <div class="form-group">
             <div class="col-md-3 col-sm-6 col-xs-12">
             </div>
@@ -1239,6 +1193,16 @@
                         <i class="fa fa-unlock-alt" aria-hidden="true"></i>
                     </a>
                     <input type="password" class="form-control input-token" readonly id="token" password-shown="false" value="{{if token}}${token}{{else}}${app_message.no_data}{{/if}}">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <label class="control-label" for="telephone">
+                        ${organ_message.table_header_modified_date}
+                    </label>
+                </div>
+                <div class="col-md-9 col-sm-6 col-xs-12">
+                    <input type="text" class="form-control" readonly id="telephone" value="{{if modifiedDate}}${convertToDate(modifiedDate).formatDate()}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
              <div class="form-group">

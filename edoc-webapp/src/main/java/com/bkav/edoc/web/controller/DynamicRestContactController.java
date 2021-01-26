@@ -84,6 +84,7 @@ public class DynamicRestContactController {
             OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
             String newToken = TokenUtil.getRandomNumber(contact.getDomain(), contact.getName());
             contact.setToken(newToken);
+            contact.setModifiedDate(new Date());
             EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, contact);
             OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
             return new ResponseEntity<>(cacheEntry, HttpStatus.OK);
@@ -102,18 +103,18 @@ public class DynamicRestContactController {
                 errors = validateUtil.validateAddOrgan(contactRequest);
                 if (errors.size() == 0) {
                     EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(contactRequest.getId());
-                    OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(organ);
                     organ.setDomain(contactRequest.getDomain());
                     organ.setName(contactRequest.getName());
                     organ.setAddress(contactRequest.getAddress());
                     organ.setEmail(contactRequest.getEmail());
                     organ.setInCharge(contactRequest.getInCharge());
                     organ.setAgency(contactRequest.getAgency());
-                    organ.setReceiveNotify(contactRequest.getReceivedNotify());
+                    organ.setReceiveNotify(contactRequest.getReceiveNotify());
+                    organ.setModifiedDate(new Date());
                     if (!contactRequest.getTelephone().equals(""))
                         organ.setTelephone(contactRequest.getTelephone());
 
-                    EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, organ);
+                    EdocDynamicContactServiceUtil.updateContact(organ);
                     message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {
                     code = 400;
@@ -225,7 +226,7 @@ public class DynamicRestContactController {
                     String address = contactRequest.getAddress();
                     String telephone = contactRequest.getTelephone();
                     boolean agency = contactRequest.getAgency();
-                    boolean receivedNotify = contactRequest.getReceivedNotify();
+                    boolean receiveNotify = contactRequest.getReceiveNotify();
 
                     EdocDynamicContact organ = new EdocDynamicContact();
                     organ.setName(name);
@@ -236,10 +237,11 @@ public class DynamicRestContactController {
                     organ.setTelephone(telephone);
                     organ.setStatus(true);
                     organ.setAgency(agency);
-                    organ.setReceiveNotify(receivedNotify);
+                    organ.setReceiveNotify(receiveNotify);
                     String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
                     organ.setToken(newToken);
                     organ.setCreateDate(new Date());
+                    organ.setModifiedDate(new Date());
 
                     EdocDynamicContactServiceUtil.createContact(organ);
                     message = messageSourceUtil.getMessage("organ.message.create.success", null);

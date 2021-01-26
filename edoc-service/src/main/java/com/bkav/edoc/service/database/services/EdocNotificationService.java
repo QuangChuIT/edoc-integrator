@@ -130,17 +130,21 @@ public class EdocNotificationService {
         try {
             List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
             for (EdocNotification notification : notifications) {
-                // check if document not taken after 30m to notification
-                Date createDate = notification.getModifiedDate();
-                int diffMin = DateUtil.getMinuteBetween(createDate, date);
-                LOGGER.info("------------------------- Modified Date " + createDate +
-                        " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
-                if (diffMin >= 30) {
-                    TelegramMessage telegramMessage = new TelegramMessage();
-                    telegramMessage.setReceiverId(notification.getReceiverId());
-                    telegramMessage.setDocument(notification.getDocument());
-                    telegramMessage.setCreateDate(createDate);
-                    telegramMessages.add(telegramMessage);
+                EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(notification.getReceiverId());
+                if (contact.getReceiveNotify()) {
+                    // check if document not taken after 30m to notification
+                    Date createDate = notification.getModifiedDate();
+                    int diffMin = DateUtil.getMinuteBetween(createDate, date);
+                    LOGGER.info("------------------------- Modified Date " + createDate +
+                            " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
+                    if (diffMin >= 30) {
+                        TelegramMessage telegramMessage = new TelegramMessage();
+                        telegramMessage.setReceiverId(notification.getReceiverId());
+                        telegramMessage.setReceiverName(contact.getName());
+                        telegramMessage.setDocument(notification.getDocument());
+                        telegramMessage.setCreateDate(createDate);
+                        telegramMessages.add(telegramMessage);
+                    }
                 }
             }
             LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
@@ -184,9 +188,10 @@ public class EdocNotificationService {
 
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
+        cal.add(Calendar.DATE, -7);
+        cal.add(Calendar.HOUR, 9);
         Date yesterday = cal.getTime();
-        new EdocNotificationService().getTelegramMessages(yesterday);
+        System.out.println(new EdocNotificationService().getTelegramMessages(yesterday).size());
     }
 
     private boolean checkOrganToSendEmail(String organId) {
@@ -201,25 +206,6 @@ public class EdocNotificationService {
         }
         return result;
     }
-
-
-    private boolean checkOrganReceiveNotify(String domain) {
-        boolean result = false;
-        try {
-            EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(domain);
-            if (contact != null) {
-                result = contact.getReceiveNotify();
-            }
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-        return result;
-    }
-    /*public static void main(String[] args) {
-        EdocNotificationService edocNotificationService = new EdocNotificationService();
-        edocNotificationService.removePendingDocumentId("000.01.32.H53", 285);
-        *//*edocNotificationService.getEmailRequestScheduleSend();*//*
-    }*/
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
 

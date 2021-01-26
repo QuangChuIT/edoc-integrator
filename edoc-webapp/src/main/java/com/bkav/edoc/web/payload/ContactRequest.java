@@ -77,11 +77,11 @@ public class ContactRequest implements Serializable {
         this.agency = agency;
     }
 
-    public boolean getReceivedNotify() {
+    public boolean getReceiveNotify() {
         return receiveNotify;
     }
 
-    public void setReceivedNotify(boolean receivedNotify) {
-        this.receiveNotify = receivedNotify;
+    public void setReceiveNotify(boolean receiveNotify) {
+        this.receiveNotify = receiveNotify;
     }
 }

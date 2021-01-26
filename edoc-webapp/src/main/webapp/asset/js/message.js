@@ -154,6 +154,7 @@ let organ_message = {
     "table_header_email": "Địa chỉ email",
     "table_header_address": "Địa chỉ",
     "table_header_phonenumber": "Số điện thoại",
+    "table_header_modified_date": "Thời gian chỉnh sửa cuối",
     // Config for user detail form
     "organ_table_header_name": "Tên tổ chức",
     "organ_table_header_incharge": "Phụ trách",
@@ -161,6 +162,8 @@ let organ_message = {
     "organ_table_header_email": "Địa chỉ email",
     "organ_table_header_address": "Địa chỉ",
     "organ_table_header_phonenumber": "Số điện thoại",
+    "organ_table_header_agency": "Nội tỉnh",
+    "organ_table_header_receive_notify": "Nhận thông báo",
     "organ_token": "Token",
     "organ_status": "Trạng thái",
     "organ_parent": "Đơn vị cha",

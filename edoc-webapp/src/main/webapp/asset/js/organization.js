@@ -127,9 +127,9 @@ let organManage = {
         let inCharge = $("#inCharge").val();
         let telephone = $("#telephone").val();
         let agency = checkAgencySelected();
-        let receivedNotify = checkReceivedNotify();
+        let receiveNotify = checkReceivedNotify();
 
-        if (validateOrgan(name, domain, inCharge, address, email, agency, receivedNotify)) {
+        if (validateOrgan(name, domain, inCharge, address, email)) {
             //console.log(app_message.edoc_validate_document_request_fail);
             e.preventDefault();
         } else {
@@ -141,7 +141,7 @@ let organManage = {
                 "inCharge": inCharge,
                 "telephone": telephone,
                 "agency": agency,
-                "isReceivedNotify": receivedNotify
+                "receiveNotify": receiveNotify
             };
             $.ajax({
                 type: "POST",
@@ -175,8 +175,8 @@ let organManage = {
         let email = $("#editEmail").val();
         let inCharge = $("#editInCharge").val();
         let telephone = $("#editTelephone").val();
-        let agency = checkAgencySelected();
-        let receiveNotify = checkReceivedNotify();
+        let agency = checkAgencySelectedEdit();
+        let receiveNotify = checkReceivedNotifyEdit();
 
         let contactRequest = {
             "id": id,
@@ -403,36 +403,32 @@ $(document).on('click', '#btn-edit-organ-cancel', function (e) {
     $("#formEditOrgan").modal('toggle');
 })
 
-$(document).on('click', "#agencySelected", function () {
-    if ($("input:checkbox[name='agencySelected']").prop("checked"))
-        $("input:checkbox[name='notAgencySelected']").prop("checked", false);
-});
-$(document).on('click', "#notAgencySelected", function () {
-    if ($("input:checkbox[name='notAgencySelected']").prop("checked"))
-        $("input:checkbox[name='agencySelected']").prop("checked", false);
-});
-
-$(document).on('click', "#receivedNotifySelected", function () {
-    if ($("input:checkbox[name='receivedNotifySelected']").prop("checked"))
-        $("input:checkbox[name='notReceivedNotifySelected']").prop("checked", false);
-});
-$(document).on('click', "#notReceivedNotifySelected", function () {
-    if ($("input:checkbox[name='notReceivedNotifySelected']").prop("checked"))
-        $("input:checkbox[name='receivedNotifySelected']").prop("checked", false);
-});
-
 function checkAgencySelected() {
     if ($("#agencySelected").is(":checked")) {
         return true;
-    } else if ($("#notAgencySelected").is(":checked")) {
+    } else {
+        return false;
+    }
+}
+function checkAgencySelectedEdit() {
+    if ($("#agencySelectedEdit").is(":checked")) {
+        return true;
+    } else {
         return false;
     }
 }
 
 function checkReceivedNotify() {
-    if ($("#receivedNotifySelected").is(":checked")) {
+    if ($("#receiveNotifySelected").is(":checked")) {
         return true;
-    } else if ($("#notReceivedNotifySelected").is(":checked")) {
+    } else {
+        return false;
+    }
+}
+function checkReceivedNotifyEdit() {
+    if ($("#receiveNotifySelectedEdit").is(":checked")) {
+        return true;
+    } else {
         return false;
     }
 }
@@ -449,7 +445,7 @@ function editOrganClick(organId) {
     });
 }
 
-function validateOrgan(name, domain, inCharge, address, email, agency, receivedNotify) {
+function validateOrgan(name, domain, inCharge, address, email) {
     let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (name === "") {
@@ -500,21 +496,5 @@ function validateOrgan(name, domain, inCharge, address, email, agency, receivedN
             result = true;
             return result;
         }
-    }
-    if (agency === null) {
-        $("#agency-select").notify(
-            "Phải chọn nội tỉnh hay ngoại tỉnh!",
-            {position: "right"}
-        );
-        result = true;
-        return result;
-    }
-    if (agreceivedNotifyency === null) {
-        $("#agency-select").notify(
-            "Phải chọn nhận cảnh báo hay không cảnh báo!",
-            {position: "right"}
-        );
-        result = true;
-        return result;
     }
 }

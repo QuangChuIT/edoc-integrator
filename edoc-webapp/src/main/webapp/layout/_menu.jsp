@@ -121,10 +121,16 @@
                     <a href="javascript:void(0)" data-mode="viewChart" id="repot-chart"><spring:message
                             code="edoc.report.chart"/></a>
                 </li>
+                <%
+                    if(roleKey.equals("ADMIN") || roleKey.equals("SUPER ADMIN")) {
+                %>
                 <li>
                     <a href="javascript:void(0)" data-mode="viewDetail" id="report-detail"><spring:message
                             code="edoc.report.view.detail"/></a>
                 </li>
+                <%
+                    }
+                %>
             </ul>
         </li>
     </ul>

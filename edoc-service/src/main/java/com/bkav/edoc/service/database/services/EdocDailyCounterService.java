@@ -85,31 +85,18 @@ public class EdocDailyCounterService {
         return ePublic;
     }
 
-    public List<String> getSentReceivedDocByYear(String year) {
-        Session session = edocDailyCounterDao.openCurrentSession();
-        try {
-            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetSentReceivedDocument");
-            storedProcedureQuery.registerStoredProcedureParameter("year", String.class, ParameterMode.IN);
-            storedProcedureQuery.setParameter("year", year);
-            List list = storedProcedureQuery.getResultList();
-            List<String> result = new ArrayList<>();
-
-            for (Object o: list) {
-                result.add(new Gson().toJson(o));
-            }
-
-            return result;
-        } catch (Exception e) {
-            LOGGER.error(e);
-            return null;
-        } finally {
-            edocDailyCounterDao.closeCurrentSession(session);
-        }
+    public String getSentReceivedForChart(int year, String organDomain) {
+        Map<String, List<Long>> map = new HashMap<>();
+        List<Long> sent = edocDailyCounterDao.getSentByMonth(year, organDomain);
+        map.put("sent", sent);
+        List<Long> received = edocDailyCounterDao.getReceivedByMonth(year, organDomain);
+        map.put("received", received);
+        return new Gson().toJson(map);
     }
 
     public static void main(String[] args) {
         EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        System.out.println(edocDailyCounterService.getStat().getTotal());
+        System.out.println(edocDailyCounterService.getSentReceivedForChart(2020, ""));
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

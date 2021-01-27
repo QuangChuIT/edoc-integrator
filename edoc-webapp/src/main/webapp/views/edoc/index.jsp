@@ -63,10 +63,12 @@
     <div class="edoc-statistic">
         <div class="table-responsive">
             <div class="row user-import" id="search-by-year">
-<%--                <div class="col-md-2 col-sm-6 col-xs-12">--%>
-<%--                    <input type="text" class="report-time form-control" readonly--%>
-<%--                            id="year-picker" value="" name="year" placeholder="Chọn năm">--%>
-<%--                </div>--%>
+            <%--<div class="col-md-2 col-sm-6 col-xs-12">
+            </div>
+                    <button class="btn btn-info btn-report-group" id="btnRunDrawChart">
+                        <i class="fa fa-calculator fa-fw"></i>
+                        <spring:message code="edoc.report.button"/>
+                    </button> --%>
             </div>
             <div id="chart-area">
                 <canvas id="canvas"></canvas>
@@ -75,7 +77,7 @@
     </div>
     <div class="edoc-table-statistic">
         <div class="table-responsive">
-            <div class="row report-search" id="statistic-detail">
+            <%--<div class="row report-search" id="statistic-detail">
                 <div class="col-md-2 col-sm-6 col-xs-12">
                     <input type="text" class="report-time form-control" readonly
                            id="fromStatDate" value="" name="fromStatDate"
@@ -102,7 +104,7 @@
                         </button>
                     </li> -->
                 </ul>
-            </div>
+            </div> --%>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-statistic">
             </table>
         </div>

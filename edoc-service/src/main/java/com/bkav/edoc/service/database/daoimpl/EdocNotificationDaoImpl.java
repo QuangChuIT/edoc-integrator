@@ -8,10 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long> implements EdocNotificationDao {
 
@@ -91,9 +88,10 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
     public void setNotificationTaken(long documentId, String organId) throws SQLException {
         Session currentSession = openCurrentSession();
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE EdocNotification en SET en.taken=:taken where en.receiverId=:receiverId and en.document.id=:documentId");
+        sql.append("UPDATE EdocNotification en SET en.taken=:taken, en.modifiedDate=:modifiedDate where en.receiverId=:receiverId and en.document.id=:documentId");
         Query query = currentSession.createQuery(sql.toString());
         query.setParameter("taken", true);
+        query.setParameter("modifiedDate", new Date());
         query.setParameter("receiverId", organId);
         query.setParameter("documentId", documentId);
         query.executeUpdate();
@@ -117,6 +115,38 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         } finally {
             closeCurrentSession(session);
         }
+    }
+
+    @Override
+    public List<EdocNotification> getEdocNotificationsNotTaken(Date date) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en FROM EdocNotification en WHERE en.taken=:taken and " +
+                    "DATE(en.modifiedDate) = DATE(:date) and DATE(en.dateCreate) = DATE(:date)");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("taken", false);
+            query.setParameter("date", date);
+            List<EdocNotification> notifications = query.getResultList();
+            if (notifications != null) {
+                LOGGER.info("Get success list document not taken from date " + date + " with size " + notifications.size());
+                return notifications;
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error get edoc notification not taken cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
+    public static void main(String[] args) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -2);
+        Date yesterday = cal.getTime();
+        new EdocNotificationDaoImpl().getEdocNotificationsNotTaken(yesterday);
     }
 
     public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {

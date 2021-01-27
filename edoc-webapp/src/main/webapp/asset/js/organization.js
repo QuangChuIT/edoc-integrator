@@ -117,7 +117,7 @@ let organManage = {
         });
     },
 
-    createOrgan: function() {
+    createOrgan: function(e) {
         let instance = this;
 
         let name = $("#name").val();
@@ -126,16 +126,12 @@ let organManage = {
         let email = $("#email").val();
         let inCharge = $("#inCharge").val();
         let telephone = $("#telephone").val();
-        let agency;
-
-        if ($("#agencySelected").is(":checked")) {
-            agency = true;
-        } else if ($("#notAgencySelected").is(":checked")) {
-            agency = false;
-        }
+        let agency = checkAgencySelected();
+        let receiveNotify = checkReceivedNotify();
 
         if (validateOrgan(name, domain, inCharge, address, email)) {
-            console.log(app_message.edoc_validate_document_request_fail);
+            //console.log(app_message.edoc_validate_document_request_fail);
+            e.preventDefault();
         } else {
             let contactRequest = {
                 "name": name,
@@ -144,7 +140,8 @@ let organManage = {
                 "email": email,
                 "inCharge": inCharge,
                 "telephone": telephone,
-                "agency": agency
+                "agency": agency,
+                "receiveNotify": receiveNotify
             };
             $.ajax({
                 type: "POST",
@@ -155,9 +152,9 @@ let organManage = {
                 success: function (response) {
                     if (response.code === 200) {
                         $.notify(organ_message.organ_add_new_success, "success");
+                        $('#addNewOrgan').trigger("reset");
                         $('#formAddOrgan').modal('toggle');
-                        instance.renderOrganDatatable();
-                        //$('#edoc-add-organ').empty();
+                        organManage.renderOrganDatatable();
                     } else {
                         $.notify(organ_message.organ_add_new_fail, "error");
                     }
@@ -168,6 +165,7 @@ let organManage = {
             });
         }
     },
+
     editOrgan: function(id) {
         let instance = this;
 
@@ -177,6 +175,8 @@ let organManage = {
         let email = $("#editEmail").val();
         let inCharge = $("#editInCharge").val();
         let telephone = $("#editTelephone").val();
+        let agency = checkAgencySelectedEdit();
+        let receiveNotify = checkReceivedNotifyEdit();
 
         let contactRequest = {
             "id": id,
@@ -185,7 +185,9 @@ let organManage = {
             "address": address,
             "email": email,
             "inCharge": inCharge,
-            "telephone": telephone
+            "telephone": telephone,
+            "agency": agency,
+            "receiveNotify": receiveNotify
         };
         $.ajax({
             type: "PUT",
@@ -204,9 +206,8 @@ let organManage = {
                 $.notify(organ_message.organ_edit_fail, "error");
             }
         });
-        $('#edoc-edit-organ').empty();
         $('#formEditOrgan').modal('toggle');
-        instance.renderOrganDatatable();
+        organManage.renderOrganDatatable();
     },
     deleteOrgan: function (organId) {
         let instance = this;
@@ -218,6 +219,7 @@ let organManage = {
                     200: function (response) {
                         $.notify(organ_message.organ_delete_success, "success");
                         $("#" + organId).remove();
+                        organManage.renderOrganDatatable();
                     },
                     400: function (response) {
                         $.notify(organ_message.organ_delete_fail, "error");
@@ -227,7 +229,6 @@ let organManage = {
                     }
                 }
             })
-            instance.renderOrganDatatable();
         }
     }
 }
@@ -278,48 +279,103 @@ $(document).on("click", ".organ-view-token", function (e) {
     }
 });
 
-$(document).on("change", "#importOrganFromExcel", function (e) {
+$(document).on("click", "#importOrganFromExcel", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
-    let form = $('#formImportOrgan')[0];
-    let data = new FormData(form);
-    $.ajax({
-        type: "POST",
-        enctype: 'multipart/form-data',
-        url: "/public/-/organ/import",
-        data: data,
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
-        contentType: false,
-        cache: false,
-        success: function (response) {
-            if (response === "OK")
-                $.notify(organ_message.organ_import_from_excel_success, "success");
-            else if (response === "BAD_REQUEST")
-                $.notify(organ_message.organ_import_invalid_format_file, "error");
-            else if (response === "NOT_ACCEPTABLE")
-                $.notify(organ_message.organ_import_from_excel_invalid_column, "error");
+    Swal.fire({
+        title: 'Chọn tệp tải lên',
+        input: 'file',
+        showCancelButton: true,
+        confirmButtonText: 'Tải lên',
+        cancelButtonText: 'Hủy bỏ',
+        onBeforeOpen: () => {
+            $(".swal2-file").change(function () {
+                var reader = new FileReader();
+                reader.readAsDataURL(this.files[0]);
+            });
         },
-        error: (e) => {
-            $.notify(organ_message.organ_import_from_excel_fail, "error");
+        inputAttributes: {
+            'accept': "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            'aria-label': 'Upload your profile picture'
+        },
+        html: '<a href="/public/-/organ/export/sample"><u>hoặc tải về tệp mẫu</u></a>'
+    }).then((file) => {
+        if (file.value) {
+            let formData = new FormData();
+            let file = $('.swal2-file')[0].files[0];
+            formData.append("fileOrganToUpload", file);
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/public/-/organ/import",
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                willOpen: function () {
+                    $("#overlay").show();
+                },
+                success: function(response) {
+                    let successOptions = {
+                        autoHideDelay: 200000,
+                        showAnimation: "fadeIn",
+                        autoHide: false,
+                        clickToHide: true,
+                        hideAnimation: "fadeOut",
+                        hideDuration: 700,
+                        arrowShow: false
+                    };
+                    if (response.code === 400) {
+                        successOptions.className = "error";
+                        if (response.errors.length > 0) {
+                            response.errors.forEach(function (obj) {
+                                $.notify(obj, successOptions);
+                            });
+                        }
+                        $.notify(response.message, successOptions);
+                    } else if (response.code === 200) {
+                        successOptions.className = "success";
+                        $.notify(response.message, successOptions);
+                    } else {
+                        successOptions.className = "error";
+                        $.notify(response.message, "error", successOptions);
+                    }
+                },
+                error: (e) => {
+                    $.notify(organ_message.organ_import_from_excel_fail, "error");
+                },
+            }).done(function () {
+                $("#overlay").hide();
+            });
         }
     });
 });
 
 $(document).on('click', '#exportOrganToExcel', function (e) {
     e.preventDefault();
+    let url = "/public/-/organ/export"
     $.ajax({
         type: "GET",
-        url: "/public/-/organ/export",
-        processData: false, //prevent jQuery from automatically transforming the data into a query string
+        url: url,
+        processData: false,
         contentType: false,
-        cache: false,
-        success: function (response) {
-            $.notify(organ_message.organ_export_to_excel_success, "success");
+        beforeSend: function () {
+            $("#overlay").show();
+        },
+        success: function () {
+            let link = document.createElement('a');
+            let href = url;
+            link.style.display = 'none';
+            link.setAttribute('href', href);
+            link.click();
         },
         error: (e) => {
             $.notify(organ_message.organ_export_to_excel_fail, "error");
         }
-    })
+    }).done(function () {
+        $("#overlay").hide();
+        $.notify(organ_message.organ_export_to_excel_success, "success");
+    });
 })
 
 $(document).on("contextmenu", "#dataTables-organ>tbody>tr", function (event) {
@@ -347,8 +403,39 @@ $(document).on('click', '#btn-edit-organ-cancel', function (e) {
     $("#formEditOrgan").modal('toggle');
 })
 
+function checkAgencySelected() {
+    if ($("#agencySelected").is(":checked")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+function checkAgencySelectedEdit() {
+    if ($("#agencySelectedEdit").is(":checked")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function checkReceivedNotify() {
+    if ($("#receiveNotifySelected").is(":checked")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+function checkReceivedNotifyEdit() {
+    if ($("#receiveNotifySelectedEdit").is(":checked")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function editOrganClick(organId) {
     $.get("/contact/-/document/contacts/" + organId, function (data) {
+        console.log(data);
         $('#edoc-edit-organ').empty();
         $('#editOrganTemplate').tmpl(data).appendTo('#edoc-edit-organ');
     });
@@ -359,49 +446,55 @@ function editOrganClick(organId) {
 }
 
 function validateOrgan(name, domain, inCharge, address, email) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
-    let domainRegex;
     if (name === "") {
         $("#name").notify(
             "Tên đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (domain === "") {
         $("#domain").notify(
             "Mã định danh không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (inCharge === "") {
         $("#inCharge").notify(
             "Đơn vị phụ trách không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (address === "") {
         $("#address").notify(
             "Địa chỉ không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (email === "") {
         $("#email").notify(
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(email)) {
             $("#email").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }

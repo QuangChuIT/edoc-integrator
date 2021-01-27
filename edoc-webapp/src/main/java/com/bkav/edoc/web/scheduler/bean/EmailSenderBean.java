@@ -1,11 +1,9 @@
 package com.bkav.edoc.web.scheduler.bean;
 
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.EmailPDFRequest;
-import com.bkav.edoc.service.database.entity.EmailRequest;
-import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
+import com.bkav.edoc.service.database.util.MailReceiverAdminServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.FilePDFUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
@@ -76,7 +74,8 @@ public class EmailSenderBean {
                     num_documents += emailObject.getNumberOfDocument();
                     LOGGER.info("Start send email to organ with domain " + emailObject.getReceiverId() + " !!!!!!!");
                     EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(emailObject.getReceiverId());
-                    if (contact != null) {
+                    boolean is_notify = contact.getReceiveNotify();
+                    if (is_notify) {
                         if (emailObject.getNumberOfDocument() > 0) {
                             Set<User> users = contact.getUsers();
                             if (users.size() > 0) {
@@ -102,10 +101,14 @@ public class EmailSenderBean {
                                     if (email != null && !email.equals("")) {
                                         LOGGER.info("-------------- Prepare send mail to email " + email + " of organ "
                                                 + contact.getDomain() + "----------------------------");
+
                                         // send mail to each organ
-                                        sendEmailToOrgans(edocTitleMailSender, null,
+
+                                        /*sendEmailToOrgans(edocTitleMailSender, null,
                                                 PropsUtil.get("mail.to.address"),
                                                 email, mail, bytes);
+
+                                         */
                                         LOGGER.info("-------------- Send email to organ with id " + emailObject.getReceiverId() + " ended ----------------");
                                     } else {
                                         LOGGER.error("Organization with domain " + contact.getDomain() + " with user "
@@ -115,21 +118,22 @@ public class EmailSenderBean {
                             }
                         }
                     }
-                    // test run 2 times
-                    /*test++;
-                    if (test == 2)
-                        break;*/
                 }
                 if (num_documents > 0) {
                     LOGGER.info("--------------------- Start send email to admin ------------------------");
                     mailAdmin.put("TotalDocuments", num_documents);
                     // send mail to admin mail
-                    /*sendEmailToAdmin(edocTitleMailSender, null,
-                            PropsUtil.get("mail.to.address"),
-                            PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);*/
                     sendEmailToAdmin(edocTitleMailSender, null,
                             PropsUtil.get("mail.to.address"),
-                            "chuvanquang96@gmail.com", mailAdmin, pdfRequests);
+                            PropsUtil.get("admin.mail.username"), mailAdmin, pdfRequests);
+                    List<MailReceiverAdmin> mailReceivers = MailReceiverAdminServiceUtil.getAllMailReceiver();
+                    for (MailReceiverAdmin mailReceiver : mailReceivers) {
+                        String emailAdress = mailReceiver.getEmailAddress();
+                        LOGGER.info("Start send email to " + emailAdress + "!!!!!!!!!!");
+                        sendEmailToAdmin(edocTitleMailSender, null,
+                                PropsUtil.get("mail.to.address"),
+                                emailAdress, mailAdmin, pdfRequests);
+                    }
                     LOGGER.info("------------------------------- Send email to admin ended -----------------------------");
                 }
             }
@@ -227,7 +231,7 @@ public class EmailSenderBean {
     public static void main(String[] args) {
         System.out.println("Start...");
         EmailSenderBean emailSenderBean = new EmailSenderBean();
-        //emailSenderBean.runScheduleSendEmail();
+        emailSenderBean.runScheduleSendEmail();
         System.out.println(EmailSenderBean.encodeForUrl("Sở thông tin truyền thông hà nội"));
         System.out.println("End!!!!");
     }

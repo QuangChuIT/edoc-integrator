@@ -7,7 +7,9 @@ import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.payload.ContactRequest;
+import com.bkav.edoc.web.payload.ImportExcelError;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.*;
 import com.google.gson.Gson;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,10 +63,10 @@ public class DynamicRestContactController {
             method = RequestMethod.GET, //
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
-    public ResponseEntity<OrganizationCacheEntry> getOrgan(@PathVariable("organId") String organId) {
+    public ResponseEntity<EdocDynamicContact> getOrgan(@PathVariable("organId") String organId) {
         try {
             long organ_Id = Long.parseLong(organId);
-            OrganizationCacheEntry organ = EdocDynamicContactServiceUtil.findById(organ_Id);
+            EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(organ_Id);
             if (organ != null) {
                 return new ResponseEntity<>(organ, HttpStatus.OK);
             }
@@ -81,6 +84,7 @@ public class DynamicRestContactController {
             OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
             String newToken = TokenUtil.getRandomNumber(contact.getDomain(), contact.getName());
             contact.setToken(newToken);
+            contact.setModifiedDate(new Date());
             EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, contact);
             OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
             return new ResponseEntity<>(cacheEntry, HttpStatus.OK);
@@ -99,16 +103,18 @@ public class DynamicRestContactController {
                 errors = validateUtil.validateAddOrgan(contactRequest);
                 if (errors.size() == 0) {
                     EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(contactRequest.getId());
-                    OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(organ);
                     organ.setDomain(contactRequest.getDomain());
                     organ.setName(contactRequest.getName());
                     organ.setAddress(contactRequest.getAddress());
                     organ.setEmail(contactRequest.getEmail());
                     organ.setInCharge(contactRequest.getInCharge());
+                    organ.setAgency(contactRequest.getAgency());
+                    organ.setReceiveNotify(contactRequest.getReceiveNotify());
+                    organ.setModifiedDate(new Date());
                     if (!contactRequest.getTelephone().equals(""))
                         organ.setTelephone(contactRequest.getTelephone());
 
-                    EdocDynamicContactServiceUtil.updateContact(organizationCacheEntry, organ);
+                    EdocDynamicContactServiceUtil.updateContact(organ);
                     message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {
                     code = 400;
@@ -128,49 +134,67 @@ public class DynamicRestContactController {
      * Excel File Upload
      */
     @RequestMapping(method = RequestMethod.POST,
-            value = "/public/-/organ/import")
-    public HttpStatus importOrganFromExcel(@RequestParam("importOrganFromExcel") MultipartFile file) {
-        List<String> errors = new ArrayList<>();
-        long count = 0;
+            value = "/public/-/organ/import", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String importOrganFromExcel(@RequestParam("fileOrganToUpload") MultipartFile file) {
+        logger.info("API import organs from excel invoke !!!!!!!!!!!!!!!!!");
+        Response response = null;
         try {
             if (validateUtil.checkExtensionFile(file)) {
                 if(validateUtil.checkHeaderExcelFileForOrgan(file)) {
-                    List<EdocDynamicContact> organs = ExcelUtil.importOrganFromExcel(file);
-                    for (EdocDynamicContact organ: organs) {
-                        organ.setCreateDate(new Date());
-                        EdocDynamicContactServiceUtil.createContact(organ);
-                        count++;
+                    Map<String, Object>  map = ExcelUtil.importOrganFromExcel(file);
+                    List<ImportExcelError> importExcelErrors = (List<ImportExcelError>) map.get("errors");
+                    if (importExcelErrors.size() > 0) {
+                        List<String> errors = messageSourceUtil.convertToMessage(importExcelErrors);
+                        response = new Response(400, new ArrayList<>(), messageSourceUtil.getMessage("data.invalid", null));
+                    } else {
+                        List<EdocDynamicContact> organs = (List<EdocDynamicContact>) map.get("organs");
+                        for (EdocDynamicContact organ: organs) {
+                            EdocDynamicContactServiceUtil.createContact(organ);
+                        }
+                        logger.info("Convert data from excel success with organ size " + organs.size() + "!!!!!!!!");
+                        String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.organ.file.success", null);
+                        response = new Response(200, new ArrayList<>(), readFileSuccess);
                     }
-                    String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
-                    errors.add(readFileSuccess);
-                    return HttpStatus.OK;
                 } else {
-                    return HttpStatus.NOT_ACCEPTABLE;
+                    response = new Response(400, new ArrayList<>(), messageSourceUtil.getMessage("organ.error.header", null));
                 }
             } else {
                 String invalidFormat = messageSourceUtil.getMessage("edoc.message.user.file.format.error", null);
-                logger.error(invalidFormat);
-                errors.add(invalidFormat);
-                return HttpStatus.BAD_REQUEST;
+                response = new Response(400, new ArrayList<>(), invalidFormat);
             }
         } catch (Exception e) {
             String uploadExcelError = messageSourceUtil.getMessage("edoc.message.file.upload.error", null);
+            List<String> error = new ArrayList<>();
+            error.add(e.getMessage());
             logger.error(uploadExcelError + e.getMessage());
-            errors.add(uploadExcelError);
-            return HttpStatus.INTERNAL_SERVER_ERROR;
+            response = new Response(500, error, uploadExcelError);
         }
+        return new Gson().toJson(response);
     }
 
-//    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
-//    public HttpStatus exportOrganToExcel() throws IOException {
-//        boolean result = true;
-//        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
-//        result = ExcelUtil.exportOrganToExcel(organs);
-//        if (result)
-//            return HttpStatus.OK;
-//        else
-//            return HttpStatus.BAD_REQUEST;
-//    }
+    @RequestMapping(value = "/public/-/organ/export", method = RequestMethod.GET)
+    public void exportOrganToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+
+        String currentDate = DateUtils.format(new Date(), DateUtils.VN_DATE_FORMAT_D);
+
+        String headerValue = "attachment; filename=To_chuc-" + currentDate + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        ExcelUtil.exportOrganToExcel(response);
+    }
+
+    @RequestMapping(value = "/public/-/organ/export/sample", method = RequestMethod.GET)
+    public void ExportSampleUserExcelFile(HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/octet-stream");
+        String headerKey = "Content-Disposition";
+
+        String headerValue = "attachment; filename=To_chuc-(File_mau).xlsx";
+        response.setHeader(headerKey, headerValue);
+        ExcelUtil.exportOrganSampleExcelFile(response);
+    }
 
     @DeleteMapping(value = "/public/-/organ/delete/{organId}")
     public HttpStatus deleteOrgan(@PathVariable("organId") Long organId) {
@@ -202,6 +226,7 @@ public class DynamicRestContactController {
                     String address = contactRequest.getAddress();
                     String telephone = contactRequest.getTelephone();
                     boolean agency = contactRequest.getAgency();
+                    boolean receiveNotify = contactRequest.getReceiveNotify();
 
                     EdocDynamicContact organ = new EdocDynamicContact();
                     organ.setName(name);
@@ -212,9 +237,11 @@ public class DynamicRestContactController {
                     organ.setTelephone(telephone);
                     organ.setStatus(true);
                     organ.setAgency(agency);
+                    organ.setReceiveNotify(receiveNotify);
                     String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
                     organ.setToken(newToken);
                     organ.setCreateDate(new Date());
+                    organ.setModifiedDate(new Date());
 
                     EdocDynamicContactServiceUtil.createContact(organ);
                     message = messageSourceUtil.getMessage("organ.message.create.success", null);

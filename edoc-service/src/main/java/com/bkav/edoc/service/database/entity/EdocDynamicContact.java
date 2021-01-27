@@ -24,6 +24,8 @@ public class EdocDynamicContact implements Serializable {
     private boolean status;
     private boolean agency;
     private Date createDate;
+    private Date modifiedDate;
+    private boolean receiveNotify;
     @JsonIgnore
     private Set<User> users;
 
@@ -170,5 +172,19 @@ public class EdocDynamicContact implements Serializable {
         this.createDate = createDate;
     }
 
+    public Date getModifiedDate() {
+        return modifiedDate;
+    }
 
+    public void setModifiedDate(Date modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public boolean getReceiveNotify() {
+        return receiveNotify;
+    }
+
+    public void setReceiveNotify(boolean receiveNotify) {
+        this.receiveNotify = receiveNotify;
+    }
 }

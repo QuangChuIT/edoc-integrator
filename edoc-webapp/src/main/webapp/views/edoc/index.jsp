@@ -20,7 +20,7 @@
     <div class="edoc-table-user">
         <div class="table-responsive">
             <div class="row user-import" id="user-import-excel">
-                <button class="btn btn-primary import-excel-button">
+                <button class="btn btn-primary import-excel-button" id="importUserFromExcel">
                     <i class="fa fa-arrow-circle-up fa-fw"></i>
                     <spring:message code="edoc.import.report"/>
                 </button>
@@ -44,11 +44,9 @@
     <div class="edoc-table-organ">
         <div class="table-responsive">
             <div class="row user-import" id="organ-import-excel">
-                <button class="btn btn-primary import-excel-button">
+                <button class="btn btn-primary import-excel-button" id="importOrganFromExcel">
                     <i class="fa fa-arrow-circle-up fa-fw"></i>
                     <spring:message code="edoc.import.report"/>
-                    <input type="file" name="importOrganFromExcel" id="importOrganFromExcel" class="form-control">
-                </button>
                 <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
                     <i class="fa fa-arrow-circle-down fa-fw"></i>
                     <spring:message code="edoc.export.report"/>
@@ -65,14 +63,48 @@
     <div class="edoc-statistic">
         <div class="table-responsive">
             <div class="row user-import" id="search-by-year">
-                <div class="col-md-2 col-sm-6 col-xs-12">
-                    <input type="text" class="report-time form-control" readonly
-                            id="year-picker" value="" name="year" placeholder="Chọn năm">
-                </div>
+<%--                <div class="col-md-2 col-sm-6 col-xs-12">--%>
+<%--                    <input type="text" class="report-time form-control" readonly--%>
+<%--                            id="year-picker" value="" name="year" placeholder="Chọn năm">--%>
+<%--                </div>--%>
             </div>
             <div id="chart-area">
                 <canvas id="canvas"></canvas>
             </div>
+        </div>
+    </div>
+    <div class="edoc-table-statistic">
+        <div class="table-responsive">
+            <div class="row report-search" id="statistic-detail">
+                <div class="col-md-2 col-sm-6 col-xs-12">
+                    <input type="text" class="report-time form-control" readonly
+                           id="fromStatDate" value="" name="fromStatDate"
+                           placeholder="<spring:message code="edoc.search.from.date"/>">
+                </div>
+                <div class="col-md-2 col-sm-6 col-xs-12">
+                    <div class="form-inline form-inline">
+                        <input type="text" class="report-time form-control"
+                               readonly id="toStatDate" name="toStatDate" value=""
+                               placeholder="<spring:message code="edoc.search.to.date"/>">
+                    </div>
+                </div>
+                <ul class="nav navbar-top-links report-action">
+                    <li>
+                        <button class="btn btn-info btn-report-group" id="btnRunStatistic">
+                            <i class="fa fa-calculator fa-fw"></i>
+                            <spring:message code="edoc.report.button"/>
+                        </button>
+                    </li>
+                    <!--<li class="dropdown">
+                        <button class="btn btn-primary btn-report-group" aria-haspopup="true" aria-expanded="false" id="exportStatistic">
+                            <i class="fa fa-arrow-circle-down fa-fw"></i>
+                            <spring:message code="edoc.export.report"/>
+                        </button>
+                    </li> -->
+                </ul>
+            </div>
+            <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-statistic">
+            </table>
         </div>
     </div>
 </div>

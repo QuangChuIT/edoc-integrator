@@ -184,5 +184,29 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         return result;
     }
 
+    @Override
+    public List<EdocDynamicContact> getContactByMultipleDomain(List<String> domains) {
+        Session session = openCurrentSession();
+        List<EdocDynamicContact> contacts;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT edc FROM EdocDynamicContact edc where edc.domain in (:domains)");
+            Query<EdocDynamicContact> query = session.createQuery(sql.toString(), EdocDynamicContact.class);
+            query.setParameter("domains", domains);
+            contacts = query.getResultList();
+            if (contacts != null) {
+                return contacts;
+            } else {
+                contacts = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error get list contact by multiple domain cause " + e.getMessage());
+            contacts = new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+        return contacts;
+    }
+
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);
 }

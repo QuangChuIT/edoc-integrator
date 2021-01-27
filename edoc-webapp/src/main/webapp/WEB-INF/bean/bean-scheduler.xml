@@ -124,7 +124,6 @@
     </bean>
 
     <!--Declare scheduler for send email warning document not taken by adapter-->
-    <!--Declare scheduler for public stat-->
     <bean name="sendEmailJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendEmailJob"/>
         <property name="jobDataMap">
@@ -136,8 +135,9 @@
 
     <bean id="sendEmailTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="sendEmailJobDetail"/>
+        <property name="cronExpression" value="* * 6 * * ?"/>
 <!--        <property name="cronExpression" value="0 */5 * ? * *"/>-->
-        <property name="cronExpression" value="0 0 5 */4 * ?"/>
+<!--        <property name="cronExpression" value="0 0 5 */4 * ?"/>-->
     </bean>
 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
@@ -152,4 +152,37 @@
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
+
+
+    <!--Declare scheduler for send message to telegram warning document not taken by adapter-->
+    <bean name="sendTelegramMessageJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.SendTelegramMessageJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="sendTelegramMessageBean" value-ref="sendTelegramMessageBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="sendTelegramMessageTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="sendTelegramMessageJobDetail"/>
+        <property name="cronExpression" value="0 */30 8-18 * * ?"/>
+        <!--<property name="cronExpression" value="0 */30 * ? * *"/>-->
+        <!--<property name="cronExpression" value="* * 6 * * ?"/>-->
+        <!--<property name="cronExpression" value="0 */2 9-10 ? * *"/>-->
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="sendTelegramMessageTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
+
 </beans>

@@ -1,10 +1,13 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
+import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.EPublic;
 import com.bkav.edoc.service.database.entity.EPublicStat;
+import com.bkav.edoc.service.database.entity.EPublicStatisticDetail;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
+import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.ExcelUtil;
 import org.apache.log4j.Logger;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,17 @@ public class PublicStatRestController {
     @GetMapping(value = "/public/-/document/stat", produces = {MediaType.APPLICATION_JSON_VALUE})
     public EPublic getStat() {
         return EdocDailyCounterServiceUtil.getStat();
+    }
+
+    @RequestMapping(value = "/public/-/statistic/detail", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public List<EPublicStatisticDetail> getStatisticDetail(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+        try {
+
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+        return null;
     }
 
     @RequestMapping(value = "/public/-/document/trace",

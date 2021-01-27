@@ -61,7 +61,6 @@ public class PostUserToSSO {
             SSLContext.setDefault(ctx);
             CloseableHttpResponse response = httpclient.execute(httpPost);
             try {
-
                 HttpEntity httpEntity = response.getEntity();
                 if (httpEntity != null) {
                     result = EntityUtils.toString(httpEntity);

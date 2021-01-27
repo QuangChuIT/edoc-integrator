@@ -134,7 +134,7 @@ let user_message = {
     "user_import_from_excel_fail": "Tải lên dữ liệu người dùng thất bại !",
     "user_import_from_excel_conflic": "Dữ liệu bị trùng",
     "user_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
-    "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công, file được lưu tại thư mục Downloads",
+    "user_export_to_excel_success": "Xuất dữ liệu người dùng thành công!",
     "user_export_to_excel_fail": "Xuất dữ liệu người dùng thất bại!",
     "user_add_new_success": "Tạo người dùng mới thành công",
     "user_add_new_fail": "Tạo người dùng mới thất bại",
@@ -154,6 +154,7 @@ let organ_message = {
     "table_header_email": "Địa chỉ email",
     "table_header_address": "Địa chỉ",
     "table_header_phonenumber": "Số điện thoại",
+    "table_header_modified_date": "Thời gian chỉnh sửa cuối",
     // Config for user detail form
     "organ_table_header_name": "Tên tổ chức",
     "organ_table_header_incharge": "Phụ trách",
@@ -161,6 +162,8 @@ let organ_message = {
     "organ_table_header_email": "Địa chỉ email",
     "organ_table_header_address": "Địa chỉ",
     "organ_table_header_phonenumber": "Số điện thoại",
+    "organ_table_header_agency": "Nội tỉnh",
+    "organ_table_header_receive_notify": "Nhận thông báo",
     "organ_token": "Token",
     "organ_status": "Trạng thái",
     "organ_parent": "Đơn vị cha",
@@ -175,7 +178,7 @@ let organ_message = {
     "organ_import_from_excel_fail": "Nhập dữ liệu đơn vị thất bại",
     "organ_import_from_excel_conflic": "Dữ liệu bị trùng",
     "organ_import_from_excel_invalid_column": "File có thông tin cột không đúng!",
-    "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công, file được lưu tại thư mục Downloads",
+    "organ_export_to_excel_success": "Xuất dữ liệu đơn vị thành công!",
     "organ_export_to_excel_fail": "Xuất dữ liệu đơn vị thất bại!",
     "organ_delete_success": "Xóa đơn vị thành công",
     "organ_delete_fail": "Xóa đơn vị thất bại",
@@ -196,4 +199,13 @@ let chart_message = {
     "chart_sent_document": "Gửi",
     "chart_received_document": "Nhận",
     "chart_in_year": "Thống kê văn bản gửi - nhận trong năm "
+}
+
+let statistic_message = {
+    "table_hesder_organ_name": "Đơn vị",
+    "table_header_total": "Tổng gửi",
+    "table_header_sent_ext": "Gửi bên ngoài",
+    "table_header_sent_int": "Gửi nội bộ",
+    "table_header_signed": "Có ký số",
+    "tables_header_not_signed": "Không ký số"
 }

@@ -91,11 +91,11 @@ public class ValidateUtil {
     public List<String> validateAddOrgan(ContactRequest contactRequest) {
         List<String> errors = new ArrayList<>();
         if (contactRequest.getName().equals("")) {
-            errors.add(messageSourceUtil.getMessage("organ.error.name", null));
+            errors.add(messageSourceUtil.getMessage("organ.add.error.name", null));
         }
 
         if (contactRequest.getDomain().equals("")) {
-            errors.add(messageSourceUtil.getMessage("organ.error.domain", null));
+            errors.add(messageSourceUtil.getMessage("organ.add.error.domain", null));
         }
 
         /*if (contactRequest.getAddress().equals("")) {

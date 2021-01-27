@@ -1,6 +1,7 @@
 package com.bkav.edoc.service.database.dao;
 
 import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.entity.EdocNotification;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -15,6 +16,8 @@ public interface EdocNotificationDao {
     void setNotificationTaken(long documentId, String organId) throws SQLException;
 
     List<String> getReceiverIdNotTaken(Date fromDate, Date toDate);
+
+    List<EdocNotification> getEdocNotificationsNotTaken(Date date);
 
     List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId);
 }

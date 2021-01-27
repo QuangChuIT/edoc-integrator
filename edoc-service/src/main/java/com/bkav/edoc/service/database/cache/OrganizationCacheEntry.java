@@ -14,6 +14,7 @@ public class OrganizationCacheEntry implements Serializable {
     private boolean status;
     private Long parent;
     private boolean isAgency;
+    private boolean receivedNotify;
 
     public Long getId() {
         return id;
@@ -99,11 +100,19 @@ public class OrganizationCacheEntry implements Serializable {
         return status;
     }
 
-    public boolean isAgency() {
+    public boolean getAgency() {
         return isAgency;
     }
 
     public void setAgency(boolean agency) {
         isAgency = agency;
+    }
+
+    public boolean getReceivedNotify() {
+        return receivedNotify;
+    }
+
+    public void setReceivedNotify(boolean receivedNotify) {
+        this.receivedNotify = receivedNotify;
     }
 }

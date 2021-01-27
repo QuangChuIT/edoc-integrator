@@ -25,6 +25,10 @@ public class EdocDynamicContactService {
         return dynamicContactDaoImpl.findByDomain(domain);
     }
 
+    public List<EdocDynamicContact> getContactsByMultipleDomains(List<String> domains) {
+        return dynamicContactDaoImpl.getContactByMultipleDomain(domains);
+    }
+
     public String getNameByOrganId(String organId) {
         return dynamicContactDaoImpl.getNameByOrganId(organId);
     }
@@ -206,6 +210,10 @@ public class EdocDynamicContactService {
         }
 
         return organizationCacheEntries;
+    }
+
+    public List<EdocDynamicContact> getDynamiccontactByAgency(boolean agency) {
+        return dynamicContactDaoImpl.getDynamicContactsByAgency(agency);
     }
 
     public void createContact(EdocDynamicContact contact) {

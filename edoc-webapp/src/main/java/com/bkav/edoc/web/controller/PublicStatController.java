@@ -4,6 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class PublicStatController {
@@ -17,8 +21,9 @@ public class PublicStatController {
     public String publicStatDetail() {
         return "publicReportDetail";
     }
+
     @RequestMapping(value = "/public/trace", method = RequestMethod.GET)
-    public String publicTrace(){
+    public String publicTrace() {
         return "publicTracePage";
     }
 }

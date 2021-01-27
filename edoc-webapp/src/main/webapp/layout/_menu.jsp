@@ -111,10 +111,21 @@
 <nav id="reportTabC" class="navbar-default sidebar fade in tab-container">
     <ul class="nav edoc-menu" id="report-menu">
         <li>
-            <a href="javascript:void(0)" data-mode="report" id="detail-report">
+            <a href="javascript:void(0)" data-mode="report" class="report-menu not-click">
                 <i class="fa fa-table fa-fw"></i>
-                <span class="menu-title"><spring:message code="edoc.report.view.detail"/></span>
+                <span class="menu-title"><spring:message code="edoc.report.statistic"/></span>
+                <span class="fa arrow"></span>
             </a>
+            <ul class="nav nav-second-level">
+                <li>
+                    <a href="javascript:void(0)" data-mode="viewChart" id="repot-chart"><spring:message
+                            code="edoc.report.chart"/></a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" data-mode="viewDetail" id="report-detail"><spring:message
+                            code="edoc.report.view.detail"/></a>
+                </li>
+            </ul>
         </li>
     </ul>
 </nav>

@@ -4,6 +4,7 @@ import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDailyCounterDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.service.xml.ed.Ed;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -76,22 +77,28 @@ public class EdocDailyCounterService {
 
     public EPublic getStat() {
         EPublic ePublic = new EPublic();
-        Long total = edocDailyCounterDao.getStat();
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        Long total = edocDailyCounterDao.getStat(year);
         ePublic.setTotal(total);
         ePublic.setTotalOrgan(edocDynamicContactService.countOrgan(true));
         ePublic.setDateTime(DateUtils.format(new Date(), DateUtils.VN_DATETIME_FORMAT_NEW));
         return ePublic;
     }
 
-    public String getSentReceivedDocByYear(String year) {
+    public List<String> getSentReceivedDocByYear(String year) {
         Session session = edocDailyCounterDao.openCurrentSession();
         try {
             StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetSentReceivedDocument");
             storedProcedureQuery.registerStoredProcedureParameter("year", String.class, ParameterMode.IN);
             storedProcedureQuery.setParameter("year", year);
             List list = storedProcedureQuery.getResultList();
+            List<String> result = new ArrayList<>();
 
-            return new Gson().toJson(list);
+            for (Object o: list) {
+                result.add(new Gson().toJson(o));
+            }
+
+            return result;
         } catch (Exception e) {
             LOGGER.error(e);
             return null;
@@ -102,9 +109,7 @@ public class EdocDailyCounterService {
 
     public static void main(String[] args) {
         EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        String rs = edocDailyCounterService.getSentReceivedDocByYear("2020");
-
-        System.out.println(rs);
+        System.out.println(edocDailyCounterService.getStat().getTotal());
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

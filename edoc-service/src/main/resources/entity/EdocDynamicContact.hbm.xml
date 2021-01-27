@@ -23,6 +23,8 @@
         <property name="token" type="string" column="token"/>
         <property name="agency" type="boolean" column="agency"/>
         <property name="createDate" type="timestamp" column="create_date"/>
+        <property name="modifiedDate" type="timestamp" column="modified_date"/>
+        <property name="receiveNotify" type="boolean" column="receive_notify"/>
         <set name="users" table="user_" cascade="all"
              inverse="true" lazy="true" fetch="select">
             <key>

@@ -121,6 +121,7 @@ let userManage = {
                     200: function (response) {
                         $.notify(user_message.user_delete_success, "success");
                         $("#" + userId).remove();
+                        userManage.renderUserDatatable();
                     },
                     400: function (response) {
                         $.notify(user_message.user_delete_fail, "error");
@@ -132,7 +133,7 @@ let userManage = {
             });
         }
     },
-    createUser: function () {
+    createUser: function (e) {
         let instance = this;
         //get displayName
         let addDisplayName = $("#addDisplayName").val();
@@ -146,7 +147,8 @@ let userManage = {
         let addEmailAddress = $("#addEmailAddress").val();
 
         if (validateAddUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
-            console.log(app_message.edoc_validate_document_request_fail);
+            e.preventDefault();
+            //console.log(app_message.edoc_validate_document_request_fail);
         } else {
             let addUserRequest = {
                 "displayName": addDisplayName,
@@ -164,9 +166,9 @@ let userManage = {
                 success: function (response) {
                     if (response.code === 200) {
                         $.notify(user_message.user_add_new_success, "success");
+                        $('#addNewUser').trigger("reset");
                         $('#formAddUser').modal('toggle');
-                        instance.renderUserDatatable();
-                        $('#edoc-add-user').empty();
+                        userManage.renderUserDatatable();
                     } else {
                         $.notify(user_message.user_add_new_fail, "error");
                     }
@@ -213,8 +215,7 @@ let userManage = {
                 }
             })
             $("#formEditUser").modal("toggle");
-            $('#edoc-edit-user').empty();
-            instance.renderUserDatatable();
+            edocDocument.renderUserDatatable();
         }
     },
     createUserRole: function (userId) {
@@ -295,9 +296,6 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     });
-    $(document).on('click', 'input[type="checkbox"]', function () {
-        $('input[type="checkbox"]').not(this).prop('checked', false);
-    });
 
    /* $.get("/public/-/role/" + role_message.role_administrator, function (data){
         console.log(data);
@@ -313,7 +311,7 @@ $(document).ready(function () {
 });
 
 // Call ajax to import users from excel file
-$(document).on("click", ".import-excel-button", function (e) {
+$(document).on("click", "#importUserFromExcel", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
     Swal.fire({
@@ -333,12 +331,12 @@ $(document).on("click", ".import-excel-button", function (e) {
             'aria-label': 'Upload your profile picture'
 
         },
-        html: '<a href="/"><u>hoặc tải về tệp mẫu</u></a>'
+        html: '<a href="/public/-/user/export/sample"><u>hoặc tải về tệp mẫu</u></a>'
     }).then((file) => {
         if (file.value) {
             let formData = new FormData();
             let file = $('.swal2-file')[0].files[0];
-            formData.append("fileToUpload", file);
+            formData.append("fileUserToUpload", file);
             $.ajax({
                 type: "POST",
                 enctype: 'multipart/form-data',
@@ -347,7 +345,7 @@ $(document).on("click", ".import-excel-button", function (e) {
                 processData: false, //prevent jQuery from automatically transforming the data into a query string
                 contentType: false,
                 cache: false,
-                beforeSend: function ( xhr ) {
+                beforeSend: function () {
                     $("#overlay").show();
                 },
                 success: function (response) {
@@ -389,21 +387,30 @@ $(document).on("click", ".import-excel-button", function (e) {
 // Call ajax to export users to Excel file
 $(document).on('click', '#exportUserToExcel', function (e) {
     e.preventDefault();
+    let url = "/public/-/user/export"
     $.ajax({
-        type: "POST",
-        url: "/public/-/user/export",
+        type: "GET",
+        url: url,
         processData: false, //prevent jQuery from automatically transforming the data into a query string
         contentType: false,
         cache: false,
-        success: function (response) {
-            if (response === "OK") {
-                $.notify(user_message.user_export_to_excel_success, "success");
-            }
+        beforeSend: function () {
+            $("#overlay").show();
+        },
+        success: function () {
+            let link = document.createElement('a');
+            let href = url;
+            link.style.display = 'none';
+            link.setAttribute('href', href);
+            link.click();
         },
         error: (e) => {
             $.notify(user_message.user_export_to_excel_fail, "error");
         }
-    })
+    }).done(function () {
+        $("#overlay").hide();
+        $.notify(user_message.user_export_to_excel_success, "success");
+    });
 })
 
 $(".toggle-password").click(function () {
@@ -449,40 +456,47 @@ $(document).on("click", "#btn-editUser-cancel", function (event) {
 });
 
 function validateAddUser(displayName, userName, organDomain, password, emailAddress) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (displayName === "") {
         $("#addDisplayName").notify(
             "Tên người dùng không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (userName === "") {
         $("#addUserName").notify(
             "Tên tài khoản không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (organDomain === "") {
         $("#addOrganDomain").notify(
             "Đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (password === "") {
         $("#password").notify(
             "Mật khẩu không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (password.length < 8) {
             $("#password").notify(
                 "Mật khẩu phải nhiều hơn 8 kí tự",
                 {position: "right"}
-            )
+            );
+            result = true;
+            return result;
         }
     }
     if (emailAddress === "") {
@@ -490,47 +504,54 @@ function validateAddUser(displayName, userName, organDomain, password, emailAddr
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(emailAddress)) {
             $("#addEmailAddress").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }
 
 function validateEditUser(displayName, organDomain, emailAddress) {
+    let result = false;
     let emailRegex = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
     if (displayName === "") {
         $("#editDisplayName").notify(
             "Tên người dùng không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (organDomain === "") {
         $("#editOrganDomain").notify(
             "Đơn vị không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     }
     if (emailAddress === "") {
         $("#editEmailAddress").notify(
             "Địa chỉ thư điện tử không được để trống !",
             {position: "right"}
         );
-        return true;
+        result = true;
+        return result;
     } else {
         if (!emailRegex.test(emailAddress)) {
             $("#editEmailAddress").notify(
                 "Địa chỉ thư điện tử không đúng định dạng!",
                 {position: "right"}
             );
-            return true;
+            result = true;
+            return result;
         }
     }
 }

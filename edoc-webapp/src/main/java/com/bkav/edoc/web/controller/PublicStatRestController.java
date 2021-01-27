@@ -1,10 +1,8 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
-import com.bkav.edoc.service.database.daoimpl.EdocDailyCounterDaoImpl;
 import com.bkav.edoc.service.database.entity.EPublic;
 import com.bkav.edoc.service.database.entity.EPublicStat;
-import com.bkav.edoc.service.database.entity.EPublicStatisticDetail;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;

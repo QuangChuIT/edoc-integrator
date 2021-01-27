@@ -21,6 +21,8 @@
         <property name="website" type="string" column="website"/>
         <property name="status" type="boolean" column="status"/>
         <property name="token" type="string" column="token"/>
+        <property name="agency" type="boolean" column="agency"/>
+        <property name="createDate" type="timestamp" column="create_date"/>
         <set name="users" table="user_" cascade="all"
              inverse="true" lazy="true" fetch="select">
             <key>

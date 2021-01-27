@@ -248,13 +248,7 @@ let userManage = {
         $('#formPermission').modal('toggle');
     }
 }
-$(document).on("ready", function () {
-    $("#editOrganDomain").select2({
-        tags: true,
-        maximumSelectionLength: 1,
-        width: "auto"
-    });
-});
+
 $(document).ready(function () {
     // Show detail of user-login info
     $(".user-info").on('click', function () {
@@ -296,19 +290,14 @@ $(document).ready(function () {
         maximumSelectionLength: 1,
         width: "auto"
     });
+    $("#editOrganDomain").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
+    });
     $(document).on('click', 'input[type="checkbox"]', function () {
         $('input[type="checkbox"]').not(this).prop('checked', false);
     });
-
-    // Click to show modal for upload file
-    // Developing...
-    // $("#importUserFromExcel").on('click', function (e) {
-    //     e.preventDefault();
-    //     $('#importExcelModal').modal({
-    //         backdrop: 'static',
-    //         keyboard: false
-    //     })
-    // })
 
    /* $.get("/public/-/role/" + role_message.role_administrator, function (data){
         console.log(data);
@@ -328,7 +317,7 @@ $(document).on("click", ".import-excel-button", function (e) {
     //stop submit the form, we will post it manually.
     e.preventDefault();
     Swal.fire({
-        title: 'Chọn file tải lên',
+        title: 'Chọn tệp tải lên',
         input: 'file',
         showCancelButton: true,
         confirmButtonText: 'Tải lên',
@@ -343,7 +332,8 @@ $(document).on("click", ".import-excel-button", function (e) {
             'accept': "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             'aria-label': 'Upload your profile picture'
 
-        }
+        },
+        html: '<a href="/"><u>hoặc tải về tệp mẫu</u></a>'
     }).then((file) => {
         if (file.value) {
             let formData = new FormData();
@@ -419,7 +409,7 @@ $(document).on('click', '#exportUserToExcel', function (e) {
 $(".toggle-password").click(function () {
     $(this).toggleClass("fa-eye fa-eye-slash");
     let input = $($(this).attr("toggle"));
-    if (input.attr("type") == "password") {
+    if (input.attr("type") === "password") {
         input.attr("type", "text");
     } else {
         input.attr("type", "password");

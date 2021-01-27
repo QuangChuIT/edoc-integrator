@@ -44,8 +44,8 @@ public class EdocDynamicContactServiceUtil {
         return DYNAMIC_CONTACT_SERVICE.findById(organId);
     }
 
-    public static List<OrganizationCacheEntry> getDyCacheEntriesByFilterDomain(String domain) {
-        return DYNAMIC_CONTACT_SERVICE.getDynamicContactsByFilterDomain(domain);
+    public static List<OrganizationCacheEntry> getDyCacheEntriesByAgency(boolean agency) {
+        return DYNAMIC_CONTACT_SERVICE.getDynamicContactsByAgency(agency);
     }
 
     public static EdocDynamicContact findDynamicContactById(long contactId) {
@@ -56,7 +56,15 @@ public class EdocDynamicContactServiceUtil {
         DYNAMIC_CONTACT_SERVICE.updateContact(organizationCacheEntry, contact);
     }
 
+    public static void updateContact(EdocDynamicContact contact) {
+        DYNAMIC_CONTACT_SERVICE.updateContact(contact);
+    }
+
     public static boolean deleteContact(long organId) {
         return DYNAMIC_CONTACT_SERVICE.deleteOrgan(organId);
+    }
+
+    public static List<String> getAllDomain() {
+        return DYNAMIC_CONTACT_SERVICE.getAllDomain();
     }
 }

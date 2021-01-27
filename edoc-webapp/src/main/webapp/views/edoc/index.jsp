@@ -62,4 +62,17 @@
             </table>
         </div>
     </div>
+    <div class="edoc-statistic">
+        <div class="table-responsive">
+            <div class="row user-import" id="search-by-year">
+                <div class="col-md-2 col-sm-6 col-xs-12">
+                    <input type="text" class="report-time form-control" readonly
+                            id="year-picker" value="" name="year" placeholder="Chọn năm">
+                </div>
+            </div>
+            <div id="chart-area">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
 </div>

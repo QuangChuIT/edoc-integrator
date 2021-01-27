@@ -288,7 +288,7 @@ let edocDocument = {
                             $('#edocFormAdd').modal('toggle');
                             $("#outbox-menu").click();
                         }
-                        $('#edoc-add-document').empty();
+                        // $('#edoc-add-document').empty();
                         localEdocStorage.clearAttachments();
                     } else {
                         $.notify(app_message.edoc_publish_document_error, "error");
@@ -480,6 +480,7 @@ $(document).ready(function () {
         if (dataMode != null) {
             edocDocument.appSetting.mode = dataMode;
             $('.edoc-content > [class^=edoc-table]').hide();
+            $(".edoc-statistic").hide();
             if (dataMode === "draft") {
                 edocDocument.renderDaftTable();
                 $(".edoc-table-draft").show();

@@ -22,8 +22,7 @@
     request.setAttribute("priorityList", priorityList);
     List<EdocDocumentType> typeList = EdocTypeServiceUtil.getTypes();
     request.setAttribute("typeList", typeList);
-    String organToQuery = PropsUtil.get("edoc.except.organId");
-    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByFilterDomain(organToQuery);
+    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByAgency(true);
     String organLogin = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
     String organCookie = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION_INFO);
     String userLogin = new String(Base64.decode(organCookie), StandardCharsets.UTF_8);
@@ -156,32 +155,6 @@
         </div>
     </div>
     <!-- /.modal-content -->
-</div>
-
-<div class="modal fade" id="importExcelModal" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="fileuploader fileuploader-theme-dragdrop">
-                <input type="hidden" name="fileuploader-list-files" value="[]"/>
-                <input type="file" name="files[]" multiple="multiple" id="inputFileUpload"/>
-                <div class="fileuploader-input">
-                    <div class="fileuploader-input-inner">
-                        <div class="fileuploader-icon-main"></div>
-                        <h3 class="fileuploader-input-caption">
-                            <span><spring:message code="modal.import.excel.dragdrop"/></span>
-                        </h3>
-                        <p><spring:message code="modal.import.excel.or"/></p>
-                        <button type="button" class="fileuploader-input-button">
-                            <span><spring:message code="modal.import.excel.choose"/></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="fileuploader-items">
-                <ul class="fileuploader-items-list"></ul>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="modal fade" id="formAddUser" role="dialog">
@@ -361,6 +334,31 @@
                             <input type="text" class="form-control" id="telephone" value="">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                                <span class="control-label"><spring:message code="organ.add.new.agency"/></span>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <span class="control-label"><spring:message code="organ.add.new.not.agency"/></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-9 col-sm-6 col-xs-12">
+                            <div class="col-md-6 col-sm-6 col-xs-12 currency">
+                                <input type="checkbox" id="agencySelected" value="1"/>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="checkbox" id="notAgencySelected" value="0"/><br/>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
                     <div class="form-group">
                         <div class="col-md-3 col-sm-6 col-xs-12">
                         </div>
@@ -1732,6 +1730,7 @@
         <span>&nbsp;Đang xử lý</span>
     </div>
 </div>
+
 <%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
@@ -1740,6 +1739,11 @@
 <script src="<c:url value="/asset/js/jquery.formatter.js"/>"></script>
 <script src="<c:url value="/asset/js/select2.min.js"/>"></script>
 <script src="<c:url value="/asset/js/sweetalert2.min.js"/>"></script>
+
+<!-- Chart JS -->
+<script src="<c:url value="/asset/js/chartJS/Chart.min.js"/>"></script>
+<script src="<c:url value="/asset/js/chartJS/utils.js"/>"></script>
+
 <%--datetimepicker--%>
 <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>
 <!-- Bootstrap Core JavaScript -->
@@ -1760,6 +1764,7 @@
 <script src="<c:url value="/asset/js/document.js"/>"></script>
 <script src="<c:url value="/asset/js/user.js"/>"></script>
 <script src="<c:url value="/asset/js/organization.js"/>"></script>
+<script src="<c:url value="/asset/js/drawChart.js"/>"></script>
 <!-- Page-Level Demo Scripts - Tables - Use for reference -->
 <script src="<c:url value="/asset/js/attachment.js"/>"></script>
 </body>

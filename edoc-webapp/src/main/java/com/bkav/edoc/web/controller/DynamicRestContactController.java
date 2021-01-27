@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +137,7 @@ public class DynamicRestContactController {
                 if(validateUtil.checkHeaderExcelFileForOrgan(file)) {
                     List<EdocDynamicContact> organs = ExcelUtil.importOrganFromExcel(file);
                     for (EdocDynamicContact organ: organs) {
+                        organ.setCreateDate(new Date());
                         EdocDynamicContactServiceUtil.createContact(organ);
                         count++;
                     }
@@ -159,16 +161,16 @@ public class DynamicRestContactController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
-    public HttpStatus exportOrganToExcel() throws IOException {
-        boolean result = true;
-        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
-        result = ExcelUtil.exportOrganToExcel(organs);
-        if (result)
-            return HttpStatus.OK;
-        else
-            return HttpStatus.BAD_REQUEST;
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/public/-/organ/export")
+//    public HttpStatus exportOrganToExcel() throws IOException {
+//        boolean result = true;
+//        List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getAllDynamicContacts();
+//        result = ExcelUtil.exportOrganToExcel(organs);
+//        if (result)
+//            return HttpStatus.OK;
+//        else
+//            return HttpStatus.BAD_REQUEST;
+//    }
 
     @DeleteMapping(value = "/public/-/organ/delete/{organId}")
     public HttpStatus deleteOrgan(@PathVariable("organId") Long organId) {
@@ -199,6 +201,7 @@ public class DynamicRestContactController {
                     String email = contactRequest.getEmail();
                     String address = contactRequest.getAddress();
                     String telephone = contactRequest.getTelephone();
+                    boolean agency = contactRequest.getAgency();
 
                     EdocDynamicContact organ = new EdocDynamicContact();
                     organ.setName(name);
@@ -208,8 +211,10 @@ public class DynamicRestContactController {
                     organ.setEmail(email);
                     organ.setTelephone(telephone);
                     organ.setStatus(true);
+                    organ.setAgency(agency);
                     String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
                     organ.setToken(newToken);
+                    organ.setCreateDate(new Date());
 
                     EdocDynamicContactServiceUtil.createContact(organ);
                     message = messageSourceUtil.getMessage("organ.message.create.success", null);

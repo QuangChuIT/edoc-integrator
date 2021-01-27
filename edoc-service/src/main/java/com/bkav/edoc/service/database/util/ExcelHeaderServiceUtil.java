@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.util;
 
+import com.bkav.edoc.service.database.entity.ExcelDailyCounterHeader;
 import com.bkav.edoc.service.database.entity.ExcelOrganHeader;
 import com.bkav.edoc.service.database.entity.ExcelUserHeader;
 import com.bkav.edoc.service.database.services.ExcelHeaderService;
@@ -23,5 +24,9 @@ public class ExcelHeaderServiceUtil {
 
     public static ExcelOrganHeader getOrganHeaderById(long id) {
         return EXCEL_HEADER_SERVICE.findOrganById(id);
+    }
+
+    public static ExcelDailyCounterHeader getDailyCounterHeaderById(long id) {
+        return EXCEL_HEADER_SERVICE.getDailyCounterHeaderById(id);
     }
 }

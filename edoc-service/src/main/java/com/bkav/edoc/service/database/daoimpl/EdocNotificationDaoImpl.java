@@ -127,7 +127,12 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("receiverId", receiverId);
             query.setParameter("taken", false);
-            return query.getResultList();
+            List<EdocDocument> result = query.getResultList();
+            if (result != null) {
+                return result;
+            } else {
+                return new ArrayList<>();
+            }
         } catch (Exception e) {
             LOGGER.error(e);
             return new ArrayList<>();

@@ -3,6 +3,7 @@ package com.bkav.edoc.service.database.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 public class EdocDynamicContact implements Serializable {
@@ -21,6 +22,8 @@ public class EdocDynamicContact implements Serializable {
     private String version;
     private String token;
     private boolean status;
+    private boolean agency;
+    private Date createDate;
     @JsonIgnore
     private Set<User> users;
 
@@ -150,4 +153,22 @@ public class EdocDynamicContact implements Serializable {
     public void setUsers(Set<User> users) {
         this.users = users;
     }
+
+    public boolean getAgency() {
+        return agency;
+    }
+
+    public void setAgency(boolean agency) {
+        this.agency = agency;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+
 }

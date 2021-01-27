@@ -35,6 +35,12 @@
 <div id="wrapper">
     <tiles:insertAttribute name="body"/>
 </div>
+<div id="overlay-public">
+    <div class="cv-spinner">
+        <span class="loading-spinner"></span>
+        <span>&nbsp;Đang xử lý</span>
+    </div>
+</div>
 <script id="edocPublicStatTmpl" type="text/x-jquery-tmpl">
     <div>
         <a href="<c:url value="/public/stat/detail"/>">

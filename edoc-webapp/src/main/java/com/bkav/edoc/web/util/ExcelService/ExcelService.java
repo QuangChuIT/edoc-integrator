@@ -1,11 +1,10 @@
 package com.bkav.edoc.web.util.ExcelService;
 
-import com.bkav.edoc.service.database.entity.EdocDynamicContact;
-import com.bkav.edoc.service.database.entity.Role;
-import com.bkav.edoc.service.database.entity.User;
-import com.bkav.edoc.service.database.entity.UserRole;
+import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.util.*;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.payload.ImportExcelError;
+import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
 import org.apache.log4j.Logger;
@@ -14,10 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -131,6 +129,8 @@ public class ExcelService {
                                 contact.setEmail(user.getEmailAddress());
                                 String token = TokenUtil.getRandomNumber(organ_id, user.getDisplayName());
                                 contact.setToken(token);
+                                contact.setCreateDate(new Date());
+                                contact.setStatus(true);
                                 EdocDynamicContactServiceUtil.createContact(contact);
                                 user.setDynamicContact(contact);
                             } else {
@@ -218,8 +218,7 @@ public class ExcelService {
     // Fixing & Optimizing code.
     // Processing...
     //
-
-    public boolean ExportUserToExcel(List<User> users) throws IOException {
+/*    public boolean ExportUserToExcel(List<User> users) throws IOException {
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Danh sách tài khoản");
@@ -285,7 +284,7 @@ public class ExcelService {
             numRow++;
         }
         String userHomeDir = System.getProperty("user.home");
-        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_tai_khoan.xlsx");
+        File currDir = new File(userHomeDir + "/Downloads/Danh_sach_tai_khoan.xlsx");
         String path = currDir.getAbsolutePath();
 
         FileOutputStream outputStream = new FileOutputStream(path);
@@ -376,9 +375,11 @@ public class ExcelService {
             cell.setCellStyle(style);
 
         }
-        String userHomeDir = System.getProperty("user.home");
-        File currDir = new File(userHomeDir + File.separator + "Downloads" + File.separator + "Danh_sach_to_chuc.xlsx");
+        String userHomeDir = System.getProperty("user.dir");
+        File currDir = new File(userHomeDir + File.separator + "../Downloads/Danh_sach_to_chuc.xlsx");
+        LOGGER.info("Current path: " + currDir);
         String path = currDir.getAbsolutePath();
+        LOGGER.info("Absolute path: " + path);
 
         FileOutputStream outputStream = new FileOutputStream(path);
         LOGGER.info("Export Excel file with path: " + path);
@@ -386,6 +387,8 @@ public class ExcelService {
         workbook.close();
         return true;
     }
+
+ */
 
     public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
@@ -425,6 +428,77 @@ public class ExcelService {
             count++;
         }
         return count;
+    }
+
+    public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {
+        List<EPublicStat> eStats;
+        if (fromDate == null || toDate == null)
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null);
+        else
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate);
+        Workbook workbook = new XSSFWorkbook();
+
+        Sheet sheet = workbook.createSheet("Thống kê văn bản điện tử");
+        sheet.setColumnWidth(0, 15000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 4000);
+        sheet.setColumnWidth(3, 5000);
+
+        sheet.setDefaultRowHeight((short) 450);
+
+        Row header = sheet.createRow(0);
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 14);
+        font.setBold(true);
+        headerStyle.setFont(font);
+
+        Cell headerCell;
+
+        // Write header row to excel file for organization
+        for (int i = 0, j = 1; i < 4; i++, j++) {
+            headerCell = header.createCell(i);
+            headerCell.setCellValue(ExcelHeaderServiceUtil.getDailyCounterHeaderById(j).getHeaderName());
+            headerCell.setCellStyle(headerStyle);
+        }
+
+        CellStyle style = workbook.createCellStyle();
+        style.setWrapText(true);
+        int numRow = 1;
+
+        for (EPublicStat ePublicStat : eStats) {
+            Row row = sheet.createRow(numRow);
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue(ePublicStat.getOrganName());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue(ePublicStat.getSent());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue(ePublicStat.getReceived());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(3);
+            cell.setCellValue(ePublicStat.getTotal());
+            cell.setCellStyle(style);
+
+            numRow++;
+        }
+
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+
+        LOGGER.info("Write data to Excel end!!!!!");
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.util.ExcelUtil.class);

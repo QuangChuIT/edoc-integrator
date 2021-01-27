@@ -10,6 +10,7 @@ public class ContactRequest implements Serializable {
     private String email;
     private String address;
     private String telephone;
+    private boolean agency;
 
     public long getId() {
         return id;
@@ -65,5 +66,13 @@ public class ContactRequest implements Serializable {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public boolean getAgency() {
+        return agency;
+    }
+
+    public void setAgency(boolean agency) {
+        this.agency = agency;
     }
 }

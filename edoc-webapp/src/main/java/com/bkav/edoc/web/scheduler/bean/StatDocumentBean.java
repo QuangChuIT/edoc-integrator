@@ -2,9 +2,10 @@ package com.bkav.edoc.web.scheduler.bean;
 
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
 import com.bkav.edoc.service.database.entity.EdocDocument;
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
-import com.bkav.edoc.web.util.PropsUtil;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class StatDocumentBean {
         try {
             Calendar yesterday = Calendar.getInstance();
             Map<String, EdocDailyCounter> dailyCounterMap = new HashMap<>();
-            //yesterday.add(Calendar.DATE, -1);
+            yesterday.add(Calendar.DATE, -1);
             //yesterday.add(Calendar.HOUR, 7);
             _counterDate = yesterday.getTime();
             LOGGER.info("Counter date prepare stat " + _counterDate);
@@ -83,14 +84,9 @@ public class StatDocumentBean {
     private boolean checkOrganToStat(String organId) {
         boolean result = false;
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
-            List<String> stringList = Arrays.asList(organIdExcept.split("#"));
-            String[] arr = organId.split("\\.");
-            if (arr.length > 0) {
-                String organCode = arr[arr.length - 1];
-                if (stringList.contains(organCode)) {
-                    result = true;
-                }
+            EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(organId);
+            if (edocDynamicContact != null) {
+                result = edocDynamicContact.getAgency();
             }
         } catch (Exception e) {
             LOGGER.error("Error check organ to stat cause " + e);

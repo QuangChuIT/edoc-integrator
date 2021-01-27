@@ -23,6 +23,7 @@ $(function () {
         $('#' + t + 'C' + " ul li a").removeClass("active");
     });
 
+    $(".edoc-statistic").hide();
     $(".edoc-table-draft").hide();
     $(".edoc-report-table").hide();
 

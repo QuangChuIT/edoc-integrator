@@ -8,9 +8,11 @@ public interface EdocDynamicContactDao {
 
     EdocDynamicContact findByDomain(String domain);
 
-    List<EdocDynamicContact> getDynamicContactsByDomainFilter(String domain);
+    List<EdocDynamicContact> getDynamicContactsByAgency(boolean agency);
 
-    Long countOrgan(String organDomain);
+    List<String> getAllDomain();
+
+    Long countOrgan(boolean agency);
 
     boolean checkPermission(String organId, String token);
 

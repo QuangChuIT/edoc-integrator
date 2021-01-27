@@ -1,13 +1,10 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
-import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.EPublic;
 import com.bkav.edoc.service.database.entity.EPublicStat;
-import com.bkav.edoc.service.database.entity.EPublicStatisticDetail;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
-import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.ExcelUtil;
 import org.apache.log4j.Logger;
@@ -42,15 +39,17 @@ public class PublicStatRestController {
         return EdocDailyCounterServiceUtil.getStat();
     }
 
-    @RequestMapping(value = "/public/-/statistic/detail", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public List<EPublicStatisticDetail> getStatisticDetail(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+    @RequestMapping(value = "/public/-/statistic/chart", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<String> getSentReceivedForChart(@RequestParam(value = "year") int year,
+                                                          @RequestParam(value = "organDomain", required = false) String organDomain) {
+        String results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, organDomain);
         try {
-
+            if (results.length() > 0)
+                return new ResponseEntity<>(results, HttpStatus.OK);
         } catch (Exception e) {
             LOGGER.error(e);
         }
-        return null;
+        return new ResponseEntity<>(results, HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/public/-/document/trace",
@@ -88,6 +87,8 @@ public class PublicStatRestController {
             ExcelUtil.exportExcelDailyCounter(response, fromDateValue, toDateValue);
         }
     }
+
+
 
     private static final Logger LOGGER = Logger.getLogger(PublicStatRestController.class);
 }

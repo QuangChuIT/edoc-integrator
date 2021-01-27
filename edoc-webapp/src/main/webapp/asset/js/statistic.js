@@ -81,47 +81,27 @@ let edocChart = {
                 }
             ],
             language: app_message.language,
-            "order": [[0, "asc"]],
+            "order": [[1, "asc"]],
         });
     }
 }
 
-var barChartData = {
+let fix_sent = [5443, 6718, 8593, 7811, 7674, 9347, 10296, 10221, 10807, 10743, 10592, 16599]
+
+let fix_received = [20610, 25496, 24886, 25020, 26631, 29516, 34652, 25120, 25953, 25919, 23776, 30787]
+
+let sent, received;
+
+let barChartData = {
     labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
     datasets: [{
         label: chart_message.chart_sent_document,
         backgroundColor: window.chartColors.red,
-        data: [
-            5443,
-            6718,
-            8593,
-            7811,
-            7674,
-            9347,
-            10296,
-            10221,
-            10807,
-            10743,
-            10592,
-            16599
-        ]
+        data: fix_sent
     }, {
         label: chart_message.chart_received_document,
         backgroundColor: window.chartColors.blue,
-        data: [
-            20610,
-            25496,
-            24886,
-            25020,
-            26631,
-            29516,
-            34652,
-            25120,
-            25953,
-            25919,
-            23776,
-            30787
-        ]
+        data: fix_received
     }]
 
 };
@@ -151,8 +131,32 @@ $(document).ready(function() {
         }
     });
 
-    $("#year-picker").on('click', function(e) {
+    $("#btnRunDrawChart").on('click', function(e) {
         e.preventDefault();
-
+        console.log("clicked");
+        let year = $("#year-picker").val();
+        let organDomain = $(this).attr("data-id");
+        ajax_chart(2020, "");
     })
 })
+
+function ajax_chart(year, organDomain) {
+    let url = "/public/-/statistic/chart";
+    if (organDomain != "") {
+        url = url + "?year=" + year + "&organDomain=" + organDomain;
+    } else {
+        url = url + "?year=" + year + "&organDomain=''";
+    }
+    console.log(url);
+    $.ajax({
+        type: "GET",
+        url: url,
+        contentType: "application/json;charset=utf-8",
+        cache: false,
+        success: function(data, status) {
+            console.log(data);
+            sent = data.sent;
+            received = data.received;
+        }
+    })
+}

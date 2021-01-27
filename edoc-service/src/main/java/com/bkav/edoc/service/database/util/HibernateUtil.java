@@ -71,7 +71,7 @@ public class HibernateUtil {
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/ExcelDailyCounterHeader.hbm.xml"));
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/UserRole.hbm.xml"));
                 configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/Role.hbm.xml"));
-                configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/MailReceiverAdmin.hbm.xml"));
+                //configuration.addInputStream(HibernateUtil.class.getClassLoader().getResourceAsStream("entity/MailReceiverAdmin.hbm.xml"));
                 serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             }

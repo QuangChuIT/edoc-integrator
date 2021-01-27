@@ -2,10 +2,14 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocDailyCounterDao;
 import com.bkav.edoc.service.database.entity.EdocDailyCounter;
+import com.bkav.edoc.service.database.services.EdocDailyCounterService;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -85,6 +89,61 @@ public class EdocDailyCounterDaoImpl extends RootDaoImpl<EdocDailyCounter, Long>
         } finally {
             closeCurrentSession(session);
         }
+    }
+
+    public List<Long> getSentByMonth(int year, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            if (!organDomain.equals("")) {
+                sql.append("select sum(sent) from EdocDailyCounter where year(dateTime) = :year and organDomain = :organDomain group by month(dateTime)");
+                Query<Long> query = session.createQuery(sql.toString(), Long.class);
+                query.setParameter("year", year);
+                query.setParameter("organDomain", organDomain);
+                return query.getResultList();
+            }
+            else {
+                sql.append("select sum(sent) from EdocDailyCounter where year(dateTime) = :year group by month(dateTime)");
+                Query<Long> query = session.createQuery(sql.toString(), Long.class);
+                query.setParameter("year", year);
+                return query.getResultList();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
+    public List<Long> getReceivedByMonth(int year, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            if (!organDomain.equals("")) {
+                sql.append("select sum(received) from EdocDailyCounter where year(dateTime) = :year and organDomain = :organDomain group by month(dateTime)");
+                Query<Long> query = session.createQuery(sql.toString(), Long.class);
+                query.setParameter("year", year);
+                query.setParameter("organDomain", organDomain);
+                return query.getResultList();
+            } else {
+                sql.append("select sum(received) from EdocDailyCounter where year(dateTime) = :year group by month(dateTime)");
+                Query<Long> query = session.createQuery(sql.toString(), Long.class);
+                query.setParameter("year", year);
+                return query.getResultList();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
+    public static void main(String[] args) {
+        EdocDailyCounterDaoImpl edocDailyCounterDao = new EdocDailyCounterDaoImpl();
+        System.out.println(edocDailyCounterDao.getReceivedByMonth(2020, "000.00.39.H36"));
+        //System.out.println(edocDailyCounterDao.getExistYearInDailycounter());
     }
 
     public List<Integer> getExistYearInDailycounter() {

@@ -27,6 +27,7 @@ public class EdocController {
     public String uploadFileHandler(HttpServletRequest request,
                                     @RequestParam MultipartFile file_doc) {
         System.out.println("--------------------------------- ok -----------------------------");
+        String organ = request.getParameter("organ");
         if (!file_doc.isEmpty()) {
             try {
                 byte[] bytes = file_doc.getBytes();

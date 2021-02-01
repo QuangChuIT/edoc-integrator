@@ -207,6 +207,10 @@ public class EdocNotificationService {
         return result;
     }
 
+    public boolean checkExistNotification(String organDomain, long documentId) {
+        return notificationDaoImpl.checkExistNotification(organDomain, documentId);
+    }
+
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);
 
 }

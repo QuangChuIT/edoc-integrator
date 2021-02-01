@@ -57,20 +57,20 @@
 <script id="edocPublicTraceTmpl" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">
         <div class="form-group">
-            <div class="col-md-1 col-sm-6 col-xs-12">
+            <div class="col-md-2 col-sm-6 col-xs-12">
                 <label class="control-label " for="subjectInfo">${app_message.edoc_table_header_subject}</label>
             </div>
-            <div class="col-md-11 col-sm-6 col-xs-12">
+            <div class="col-md-10 col-sm-6 col-xs-12">
                 <textarea class="form-control" readonly rows="2" id="subjectInfo">${subject}</textarea>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-1 col-sm-6 col-xs-12">
+            <div class="col-md-2 col-sm-6 col-xs-12">
                 <label class="control-label " for="toOrganInfo">
                     ${app_message.edoc_organ_process}
                 </label>
             </div>
-            <div class="col-md-11 col-sm-6 col-xs-12">
+            <div class="col-md-10 col-sm-6 col-xs-12">
                 <textarea class="form-control" readonly rows="3" id="toOrganInfo">${toOrganName}</textarea>
             </div>
         </div>

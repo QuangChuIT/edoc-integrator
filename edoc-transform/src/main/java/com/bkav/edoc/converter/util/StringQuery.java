@@ -32,6 +32,8 @@ public class StringQuery {
 
     public static final String GET_DOCID_BY_DOC_CODE = "SELECT document_id FROM edoc_document where date(create_date) > ? and doc_code = ?";
 
+    public static final String GET_DOCUMENT_BY_DATE = "Select * From edoc_document where date(create_date) > \"2021-01-25\"";
+
     /*public static final String GET_DOCUMENT_BY_COUNTER_DATE = "Select from_organ_domain, to_organ_domain, sent_date from " +
             "edoc_document where Date(sent_date) = ? group by doc_code";*/
 }

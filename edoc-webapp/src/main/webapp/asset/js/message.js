@@ -204,8 +204,8 @@ let chart_message = {
 let statistic_message = {
     "table_hesder_organ_name": "Đơn vị",
     "table_header_total": "Tổng gửi",
-    "table_header_sent_ext": "Gửi bên ngoài",
-    "table_header_sent_int": "Gửi nội bộ",
+    "table_header_recieved_ext": "Nhận bên ngoài",
+    "table_header_received_int": "Nhận nội bộ",
     "table_header_signed": "Có ký số",
     "tables_header_not_signed": "Không ký số"
 }

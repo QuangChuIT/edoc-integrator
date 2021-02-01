@@ -62,13 +62,14 @@
     </div>
     <div class="edoc-statistic">
         <div class="table-responsive">
-            <div class="row user-import" id="search-by-year">
-            <%--<div class="col-md-2 col-sm-6 col-xs-12">
-            </div>
-                    <button class="btn btn-info btn-report-group" id="btnRunDrawChart">
-                        <i class="fa fa-calculator fa-fw"></i>
-                        <spring:message code="edoc.report.button"/>
-                    </button> --%>
+            <div class="row user-import" id="search-statistic-header">
+                <div class="col-md-2 col-sm-6 col-xs-12" id="search-by-year">
+                    <select class="report-time form-control" id="yearPicker"></select>
+                </div>
+                <button class="btn btn-info btn-report-group" id="btnRunDrawChart">
+                    <i class="fa fa-calculator fa-fw"></i>
+                    <spring:message code="edoc.report.button"/>
+                </button>
             </div>
             <div id="chart-area">
                 <canvas id="canvas"></canvas>
@@ -77,7 +78,7 @@
     </div>
     <div class="edoc-table-statistic">
         <div class="table-responsive">
-            <%--<div class="row report-search" id="statistic-detail">
+            <div class="row report-search" id="statistic-detail">
                 <div class="col-md-2 col-sm-6 col-xs-12">
                     <input type="text" class="report-time form-control" readonly
                            id="fromStatDate" value="" name="fromStatDate"
@@ -97,14 +98,14 @@
                             <spring:message code="edoc.report.button"/>
                         </button>
                     </li>
-                    <!--<li class="dropdown">
+                    <li class="dropdown">
                         <button class="btn btn-primary btn-report-group" aria-haspopup="true" aria-expanded="false" id="exportStatistic">
                             <i class="fa fa-arrow-circle-down fa-fw"></i>
                             <spring:message code="edoc.export.report"/>
                         </button>
-                    </li> -->
+                    </li>
                 </ul>
-            </div> --%>
+            </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-statistic">
             </table>
         </div>

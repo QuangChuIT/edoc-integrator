@@ -12,7 +12,6 @@
         <module>edoc-webapp</module>
         <module>edoc-transform</module>
         <module>EDXML</module>
-        <module>edoc-web-service</module>
     </modules>
 
     <packaging>pom</packaging>

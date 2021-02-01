@@ -13,10 +13,7 @@ import javax.persistence.StoredProcedureQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> implements EdocDocumentDao {
 
@@ -222,6 +219,97 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             }
         }
         return result;
+    }
+
+    public int countReceivedExtDoc(String fromDate, String toDate, boolean received_ext, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ed from EdocDocument ed where ed.receivedExt = :received_ext and date(ed.createDate) > date(:fromDate) and date(ed.createDate) < date(:toDate) and ed.toOrganDomain = :organDomain");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("received_ext", received_ext);
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+            query.setParameter("organDomain", organDomain);
+
+            return query.getResultList().size();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return 0;
+    }
+
+    public List<Long> getDocCodeByOrganDomain (String fromDate, String toDate, String organDomain) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed.documentId FROM EdocDocument ed where date(ed.createDate) > date(:fromDate) and date(ed.createDate) < date(:toDate) and ed.toOrganDomain = :organDomain group by ed.documentId");
+            Query<Long> query = session.createQuery(sql.toString(), Long.class);
+            query.setParameter("fromDate", fromDate);
+            query.setParameter("toDate", toDate);
+            query.setParameter("organDomain", organDomain);
+
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return null;
+    }
+
+    public List<EdocDocument> getDocumentByDate (Date date) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ed From EdocDocument ed where date(ed.createDate) = date(:date)");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("date", date);
+            List<EdocDocument> results = query.getResultList();
+            if (results.size() > 0)
+                return results;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Date> getDateInRange(Date fromDate, Date toDate) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            if (fromDate == null && toDate == null) {
+                sql.append("Select distinct date(ed.createDate) from EdocDocument ed");
+                Query<Date> query = session.createQuery(sql.toString(), Date.class);
+                return query.getResultList();
+            }
+            else {
+                sql.append("Select distinct date(ed.createDate) from EdocDocument ed where date(ed.createDate) >= :fromDate and date(createDate) <= :toDate");
+                Query<Date> query = session.createQuery(sql.toString(), Date.class);
+                query.setParameter("fromDate", fromDate);
+                query.setParameter("toDate", toDate);
+                return query.getResultList();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        String yesterday = "2021-01-26";
+        java.sql.Date yes = java.sql.Date.valueOf(yesterday);
+        String now = "2021-01-28";
+        java.sql.Date no = java.sql.Date.valueOf(now);
+
+        EdocDocumentDaoImpl edocDocumentDao = new EdocDocumentDaoImpl();
+        System.out.println(edocDocumentDao.getDateInRange(yes, no));
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentDaoImpl.class);

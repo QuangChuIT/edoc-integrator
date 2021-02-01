@@ -8,6 +8,8 @@ import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.AppUtil;
+import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.executor.ExecutorServiceUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
@@ -19,10 +21,13 @@ import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.resource.QueryString;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.util.CommonUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -36,7 +41,6 @@ import java.util.stream.Collectors;
 
 public class EdocDocumentService {
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
-    private final EdocDynamicContactService dynamicContactService = new EdocDynamicContactService();
     private final Mapper mapper = new Mapper();
     private final Checker checker = new Checker();
 
@@ -111,22 +115,14 @@ public class EdocDocumentService {
             storedProcedureQuery.setParameter("offset", 1);
             storedProcedureQuery.setParameter("size", 10);
             List<EdocDocument> documents = storedProcedureQuery.getResultList();
-            System.out.println(documents.size());
+
             int count = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
-            System.out.println(count);
             return documents;
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
         } finally {
             documentDaoImpl.closeCurrentSession(session);
-        }
-    }
-
-    public static void main(String[] args) {
-        List<EdocDocument> documents = new EdocDocumentService().getDocumentList();
-        for (EdocDocument document : documents) {
-            System.out.println(document.getDocumentDetail().getSignerFullName());
         }
     }
 
@@ -620,6 +616,108 @@ public class EdocDocumentService {
         } finally {
             documentDaoImpl.closeCurrentSession(session);
         }
+    }
+
+    public int countReceivedExtDocument(String fromDate, String toDate, boolean received_ext, String organDomain) {
+        return documentDaoImpl.countReceivedExtDoc(fromDate, toDate, received_ext, organDomain);
+    }
+
+    public List<Long> getDocCodeByOrganDomain (String fromDate, String toDate, String organDomain) {
+        return documentDaoImpl.getDocCodeByOrganDomain(fromDate, toDate, organDomain);
+    }
+
+    public List<EdocDocument> getDocumentByDate (Date date) {
+        return documentDaoImpl.getDocumentByDate(date);
+    }
+
+    public void getDailycounterDocument(Date fromDate, Date toDate) {
+        Map<String, EdocDailyCounter> dailyCounterMap = null;
+        List<Date> dateList = documentDaoImpl.getDateInRange(fromDate, toDate);
+        for (Date date: dateList) {
+            dailyCounterMap = new HashMap<>();
+            LOGGER.info("Starting counter document in date: " + date);
+            List<EdocDocument> documents = documentDaoImpl.getDocumentByDate(date);
+            for (EdocDocument document: documents) {
+                String fromOrgan = document.getFromOrganDomain();
+                if (checkAgencyOrgan(fromOrgan)) {
+                    countSent(fromOrgan, dailyCounterMap, date);
+                }
+
+                String toOrgans = document.getToOrganDomain();
+                String[] toOrgansList = toOrgans.split("#");
+                for (String toOrgan : toOrgansList) {
+                    if (checkAgencyOrgan(toOrgan)) {
+                        countReceived(toOrgan, dailyCounterMap, date);
+                    }
+                }
+            }
+            //System.out.println(new Gson().toJson(dailyCounterMap));
+            submitDatabase(dailyCounterMap);
+        }
+    }
+
+    private void submitDatabase(Map<String, EdocDailyCounter> dailyCounterMap) {
+        for (Map.Entry<String, EdocDailyCounter> entry : dailyCounterMap.entrySet()) {
+            EdocDailyCounter dailyCounter = entry.getValue();
+            EdocDailyCounterServiceUtil.createDailyCounter(dailyCounter);
+        }
+    }
+
+    private boolean checkAgencyOrgan(String organDomain) {
+        boolean result = false;
+        try {
+            EdocDynamicContact edocDynamicContact = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
+            if (edocDynamicContact != null) {
+                result = edocDynamicContact.getAgency();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error check organ to stat cause " + e);
+        }
+        return result;
+    }
+
+    private void countSent(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap, Date date) {
+        EdocDailyCounter dailyCounter;
+        if (dailyCounterMap.containsKey(organDomain)) {
+            dailyCounter = dailyCounterMap.get(organDomain);
+            dailyCounterMap.remove(organDomain);
+            int sent = dailyCounter.getSent() + 1;
+            dailyCounter.setSent(sent);
+        } else {
+            dailyCounter = new EdocDailyCounter();
+            dailyCounter.setSent(1);
+            dailyCounter.setDateTime(date);
+            dailyCounter.setReceived(0);
+            dailyCounter.setOrganDomain(organDomain);
+        }
+        dailyCounterMap.put(organDomain, dailyCounter);
+    }
+
+    private void countReceived(String organDomain, Map<String, EdocDailyCounter> dailyCounterMap, Date date) {
+        EdocDailyCounter dailyCounter;
+        if (dailyCounterMap.containsKey(organDomain)) {
+            dailyCounter = dailyCounterMap.get(organDomain);
+            dailyCounterMap.remove(organDomain);
+            int received = dailyCounter.getReceived() + 1;
+            dailyCounter.setReceived(received);
+        } else {
+            dailyCounter = new EdocDailyCounter();
+            dailyCounter.setSent(0);
+            dailyCounter.setDateTime(date);
+            dailyCounter.setReceived(1);
+            dailyCounter.setOrganDomain(organDomain);
+        }
+        dailyCounterMap.put(organDomain, dailyCounter);
+    }
+
+    public static void main(String[] args) {
+        String yesterday = "2021-01-26";
+        java.sql.Date yes = java.sql.Date.valueOf(yesterday);
+        String now = "2021-01-28";
+        java.sql.Date no = java.sql.Date.valueOf(now);
+
+        EdocDocumentService edocDocumentService = new EdocDocumentService();
+        edocDocumentService.getDailycounterDocument(yes, no);
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentService.class);

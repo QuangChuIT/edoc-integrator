@@ -11,8 +11,10 @@ import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
+import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -88,5 +90,13 @@ public class EdocDocumentServiceUtil {
     public static EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
                                            StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
         return DOCUMENT_SERVICE.addDocument(messageHeader, traces, attachments, outDocumentId, edocAttachmentCacheEntries, errors);
+    }
+
+    public static List<EdocDocument> getDocumentByDate (Date date) {
+        return DOCUMENT_SERVICE.getDocumentByDate(date);
+    }
+
+    public static void getDailycounterDocument(Date fromDate, Date toDate) {
+        DOCUMENT_SERVICE.getDailycounterDocument(fromDate, toDate);
     }
 }

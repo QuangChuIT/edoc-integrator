@@ -51,4 +51,8 @@
     <definition name="publicTracePage" extends="public.layout">
         <put-attribute name="body" value="/views/public_trace.jsp"/>
     </definition>
+
+    <definition name="dailycounterConvert" extends="public.layout">
+        <put-attribute name="body" value="/views/dailycounter_converter.jsp"/>
+    </definition>
 </tiles-definitions>

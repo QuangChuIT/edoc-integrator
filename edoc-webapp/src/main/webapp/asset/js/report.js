@@ -76,8 +76,9 @@ let edocReport = {
             $("#fromDate").val("");
             $("#toDate").val("");
         } else {
+            let beginDate = new Date(new Date().getFullYear(), 0, 1).formatDate();
             let currentDate = new Date().formatDate();
-            $("#filterLabel").html(app_message.edoc_report_default_filter + "<span class='time-filter'>" + currentDate + "</span>");
+            $("#filterLabel").html(app_message.edoc_report_filter + "<span class='time-filter'>" + beginDate + " - " + currentDate + "</span>");
         }
     },
     exportExcel: function (fromDate, toDate) {

@@ -76,7 +76,8 @@ let edocReport = {
             $("#fromDate").val("");
             $("#toDate").val("");
         } else {
-            let beginDate = new Date(new Date().getFullYear(), 0, 1).formatDate();
+            let beginDate = new Date(new Date().getFullYear() + 1, 0, 1).formatDate();
+            console.log(new Date().getFullYear());
             let currentDate = new Date().formatDate();
             $("#filterLabel").html(app_message.edoc_report_filter + "<span class='time-filter'>" + beginDate + " - " + currentDate + "</span>");
         }

@@ -38,11 +38,11 @@
                            placeholder="<spring:message code="edoc.search.to.date"/>">
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12"></div>
-            </div>
+            </div><br>
             <br>
             <div class="form-group">
-                <div></div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="col-md-4 col-sm-6 col-xs-12"></div>
+                <div class="col-md-8 col-sm-6 col-xs-12">
                     <button class="btn btn-info btn-report-group" id="btnRunStatisticDetail">
                         <i class="fa fa-calculator fa-fw"></i>
                         <spring:message code="edoc.report.button"/>

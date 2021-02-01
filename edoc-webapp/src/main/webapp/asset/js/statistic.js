@@ -1,4 +1,3 @@
-let appSettings;
 let ctx, yearTitle;
 let edocChart = {
     appSetting: {
@@ -11,15 +10,6 @@ let edocChart = {
         requestTimeout: 5000, // Timeout request for ajax,
         dataTable: null,
         mode: "report"
-    },
-    init: function () {
-        let instance = this;
-        appSettings = instance.appSetting;
-
-        if (typeof jQuery === 'undefined') {
-            edocReport.log("Can not load jQuery environment");
-            return;
-        }
     },
     drawChart: function() {
         ctx = document.getElementById('canvas').getContext('2d');
@@ -113,7 +103,6 @@ let barChartData = {
 let id;
 
 $(document).ready(function() {
-    edocChart.init();
     $.datetimepicker.setLocale('vi');
     $("#fromStatisticDate").datetimepicker({
         i18n: {

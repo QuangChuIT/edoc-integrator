@@ -3,9 +3,7 @@ package com.bkav.edoc.filter;
 import org.apache.log4j.Logger;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Enumeration;
 
 public class EdocServiceFilter implements Filter {
     /**
@@ -66,17 +64,7 @@ public class EdocServiceFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         LOG.info("------------------ Edoc Service Filter Invoker ------------------");
-        try {
-            HttpServletRequest httpServletRequest = ((HttpServletRequest) request);
-            Enumeration<String> params = httpServletRequest.getParameterNames();
-            String organ = httpServletRequest.getQueryString();
-            LOG.info(organ);
-            String token = httpServletRequest.getParameter("Token");
-            LOG.info(token);
-            chain.doFilter(request, response);
-        } catch (Exception e) {
-            LOG.error(e);
-        }
+        chain.doFilter(request, response);
     }
 
     /**

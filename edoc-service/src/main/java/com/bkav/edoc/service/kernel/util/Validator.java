@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,10 +36,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the boolean arrays are equal.
      *
-     * @param  booleanArray1 the first boolean array
-     * @param  booleanArray2 the second boolean array
+     * @param booleanArray1 the first boolean array
+     * @param booleanArray2 the second boolean array
      * @return <code>true</code> if the booleans arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(
             boolean[] booleanArray1, boolean[] booleanArray2) {
@@ -59,10 +58,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the byte arrays are equal.
      *
-     * @param  byteArray1 the first byte array
-     * @param  byteArray2 the second byte array
+     * @param byteArray1 the first byte array
+     * @param byteArray2 the second byte array
      * @return <code>true</code> if the byte arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(byte[] byteArray1, byte[] byteArray2) {
         byteArray1 = ArrayUtil.clone(byteArray1);
@@ -76,13 +75,17 @@ public class Validator {
         return Arrays.equals(byteArray1, byteArray2);
     }
 
+    public static boolean isNullOrEmpty(String s) {
+        return s == null || "".equals(s);
+    }
+
     /**
      * Returns <code>true</code> if the char arrays are equal.
      *
-     * @param  charArray1 the first char array
-     * @param  charArray2 the second char array
+     * @param charArray1 the first char array
+     * @param charArray2 the second char array
      * @return <code>true</code> if the char arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(char[] charArray1, char[] charArray2) {
         charArray1 = ArrayUtil.clone(charArray1);
@@ -99,10 +102,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the double arrays are equal.
      *
-     * @param  doubleArray1 the first double array
-     * @param  doubleArray2 the second double array
+     * @param doubleArray1 the first double array
+     * @param doubleArray2 the second double array
      * @return <code>true</code> if the double arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(
             double[] doubleArray1, double[] doubleArray2) {
@@ -121,10 +124,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the float arrays are equal.
      *
-     * @param  floatArray1 the first float array
-     * @param  floatArray2 the second char array
+     * @param floatArray1 the first float array
+     * @param floatArray2 the second char array
      * @return <code>true</code> if the float arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(
             float[] floatArray1, float[] floatArray2) {
@@ -143,10 +146,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the int arrays are equal.
      *
-     * @param  intArray1 the first int array
-     * @param  intArray2 the second int array
+     * @param intArray1 the first int array
+     * @param intArray2 the second int array
      * @return <code>true</code> if the int arrays are equal; <code>false</code>
-     *         otherwise
+     * otherwise
      */
     public static boolean equalsSorted(int[] intArray1, int[] intArray2) {
         intArray1 = ArrayUtil.clone(intArray1);
@@ -163,10 +166,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the long arrays are equal.
      *
-     * @param  longArray1 the first long array
-     * @param  longArray2 the second long array
+     * @param longArray1 the first long array
+     * @param longArray2 the second long array
      * @return <code>true</code> if the long arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(long[] longArray1, long[] longArray2) {
         longArray1 = ArrayUtil.clone(longArray1);
@@ -183,10 +186,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the object arrays are equal.
      *
-     * @param  objArray1 the first object array
-     * @param  objArray2 the second object array
+     * @param objArray1 the first object array
+     * @param objArray2 the second object array
      * @return <code>true</code> if the object arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(Object[] objArray1, Object[] objArray2) {
         objArray1 = ArrayUtil.clone(objArray1);
@@ -203,10 +206,10 @@ public class Validator {
     /**
      * Returns <code>true</code> if the short arrays are equal.
      *
-     * @param  shortArray1 the first short array
-     * @param  shortArray2 the second short array
+     * @param shortArray1 the first short array
+     * @param shortArray2 the second short array
      * @return <code>true</code> if the short arrays are equal; <code>false
-     *         </code>otherwise
+     * </code>otherwise
      */
     public static boolean equalsSorted(
             short[] shortArray1, short[] shortArray2) {
@@ -227,9 +230,9 @@ public class Validator {
      * requirements are that the string consist of two parts separated by an @
      * symbol, and that it contain no whitespace.
      *
-     * @param  address the string to check
+     * @param address the string to check
      * @return <code>true</code> if the string is an email address;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isAddress(String address) {
         if (isNull(address)) {
@@ -257,9 +260,9 @@ public class Validator {
      * Returns <code>true</code> if the string is an alphanumeric name, meaning
      * it contains nothing but English letters, numbers, and spaces.
      *
-     * @param  name the string to check
+     * @param name the string to check
      * @return <code>true</code> if the string is an Alphanumeric name;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isAlphanumericName(String name) {
         if (isNull(name)) {
@@ -282,9 +285,9 @@ public class Validator {
      * This includes characters with integer values between 32 and 126
      * (inclusive).
      *
-     * @param  c the character to check
+     * @param c the character to check
      * @return <code>true</code> if the character is in the ASCII character set;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isAscii(char c) {
         int i = c;
@@ -316,9 +319,9 @@ public class Validator {
      * Returns <code>true</code> if the character is an upper or lower case
      * English letter.
      *
-     * @param  c the character to check
+     * @param c the character to check
      * @return <code>true</code> if the character is an upper or lower case
-     *         English letter; <code>false</code> otherwise
+     * English letter; <code>false</code> otherwise
      */
     public static boolean isChar(char c) {
         int x = c;
@@ -336,9 +339,9 @@ public class Validator {
      * Returns <code>true</code> if string consists only of upper and lower case
      * English letters.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string consists only of upper and lower
-     *         case English letters
+     * case English letters
      */
     public static boolean isChar(String s) {
         if (isNull(s)) {
@@ -358,9 +361,9 @@ public class Validator {
      * Returns <code>true</code> if the string contains content. The only
      * requirement is that it contain content that is not whitespace.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string contains content;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isContent(String s) {
         if (isNotNull(
@@ -375,11 +378,11 @@ public class Validator {
     /**
      * Returns <code>true</code> if the date is valid in the Gregorian calendar.
      *
-     * @param  month the month to check
-     * @param  day the day to check
-     * @param  year the year to check
+     * @param month the month to check
+     * @param day   the day to check
+     * @param year  the year to check
      * @return <code>true</code> if the date is valid in the Gregorian calendar;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isDate(int month, int day, int year) {
         return isGregorianDate(month, day, year);
@@ -389,9 +392,9 @@ public class Validator {
      * Returns <code>true</code> if the character is a digit between 0 and 9
      * (inclusive).
      *
-     * @param  c the character to check
+     * @param c the character to check
      * @return <code>true</code> if the character is a digit between 0 and 9
-     *         (inclusive); <code>false</code> otherwise
+     * (inclusive); <code>false</code> otherwise
      */
     public static boolean isDigit(char c) {
         int x = c;
@@ -407,9 +410,9 @@ public class Validator {
      * Returns <code>true</code> if the string consists of only digits between 0
      * and 9 (inclusive).
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string consists of only digits between 0
-     *         and 9 (inclusive); <code>false</code> otherwise
+     * and 9 (inclusive); <code>false</code> otherwise
      */
     public static boolean isDigit(String s) {
         if (isNull(s)) {
@@ -430,9 +433,9 @@ public class Validator {
      * RFC-1034 (section 3), RFC-1123 (section 2.1), and RFC-952 (section B.
      * Lexical grammar).
      *
-     * @param  domainName the string to check
+     * @param domainName the string to check
      * @return <code>true</code> if the string is a valid domain name;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isDomain(String domainName) {
 
@@ -482,9 +485,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the string is a valid email address.
      *
-     * @param  emailAddress the string to check
+     * @param emailAddress the string to check
      * @return <code>true</code> if the string is a valid email address;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isEmailAddress(String emailAddress) {
         if (isNull(emailAddress)) {
@@ -500,9 +503,9 @@ public class Validator {
      * Returns <code>true</code> if the character is a special character in an
      * email address.
      *
-     * @param  c the character to check
+     * @param c the character to check
      * @return <code>true</code> if the character is a special character in an
-     *         email address; <code>false</code> otherwise
+     * email address; <code>false</code> otherwise
      */
     public static boolean isEmailAddressSpecialChar(char c) {
 
@@ -520,9 +523,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the file extension is valid.
      *
-     * @param  fileExtension string to check
+     * @param fileExtension string to check
      * @return <code>true</code> if the extension is valid; <code>false</code>
-     *         otherwise
+     * otherwise
      */
     public static boolean isFileExtension(String fileExtension) {
         if (isNull(fileExtension) ||
@@ -595,11 +598,11 @@ public class Validator {
     /**
      * Returns <code>true</code> if the date is valid in the Gregorian calendar.
      *
-     * @param  month the month (0-based, meaning 0 for January)
-     * @param  day the day of the month
-     * @param  year the year
+     * @param month the month (0-based, meaning 0 for January)
+     * @param day   the day of the month
+     * @param year  the year
      * @return <code>true</code> if the date is valid; <code>false</code>
-     *         otherwise
+     * otherwise
      */
     public static boolean isGregorianDate(int month, int day, int year) {
         if ((month < 0) || (month > 11)) {
@@ -632,10 +635,10 @@ public class Validator {
      * present the only requirement is that the string is not <code>null</code>;
      * it does not actually check the format of the string.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is a hexidecimal number;
-     *         <code>false</code> otherwise
-     * @see    #isNull(String)
+     * <code>false</code> otherwise
+     * @see #isNull(String)
      */
     public static boolean isHex(String s) {
         if (isNull(s)) {
@@ -648,9 +651,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the string is a valid host name.
      *
-     * @param  name the string to check
+     * @param name the string to check
      * @return <code>true</code> if the string is a valid host name;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isHostName(String name) {
         if (isNull(name)) {
@@ -682,9 +685,9 @@ public class Validator {
      * Returns <code>true</code> if the string is an HTML document. The only
      * requirement is that it contain the opening and closing html tags.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is an HTML document;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isHTML(String s) {
         if (isNull(s)) {
@@ -704,9 +707,9 @@ public class Validator {
      * Returns <code>true</code> if the string is a valid IPv4 or IPv6 IP
      * address.
      *
-     * @param  ipAddress the string to check
+     * @param ipAddress the string to check
      * @return <code>true</code> if the string is a valid IPv4 or IPv6 IP
-     *         address; <code>false</code> otherwise
+     * address; <code>false</code> otherwise
      */
     public static boolean isIPAddress(String ipAddress) {
         if (isIPv4Address(ipAddress) || isIPv6Address(ipAddress)) {
@@ -719,9 +722,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the string is a valid IPv4 IP address.
      *
-     * @param  ipAddress the string to check
+     * @param ipAddress the string to check
      * @return <code>true</code> if the string is a valid IPv4 IP address;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isIPv4Address(String ipAddress) {
         Matcher matcher = _ipv4AddressPattern.matcher(ipAddress);
@@ -732,9 +735,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the string is a valid IPv6 IP address.
      *
-     * @param  ipAddress the string to check
+     * @param ipAddress the string to check
      * @return <code>true</code> if the string is a valid IPv6 IP address;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isIPv6Address(String ipAddress) {
         if (isNull(ipAddress)) {
@@ -756,11 +759,11 @@ public class Validator {
     /**
      * Returns <code>true</code> if the date is valid in the Julian calendar.
      *
-     * @param  month the month (0-based, meaning 0 for January)
-     * @param  day the day of the month
-     * @param  year the year
+     * @param month the month (0-based, meaning 0 for January)
+     * @param day   the day of the month
+     * @param year  the year
      * @return <code>true</code> if the date is valid in the Julian calendar;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isJulianDate(int month, int day, int year) {
         if ((month < 0) || (month > 11)) {
@@ -790,9 +793,9 @@ public class Validator {
      * Returns <code>true</code> if the string contains a valid number according
      * to the Luhn algorithm, commonly used to validate credit card numbers.
      *
-     * @param  number the string to check
+     * @param number the string to check
      * @return <code>true</code> if the string contains a valid number according
-     *         to the Luhn algorithm; <code>false</code> otherwise
+     * to the Luhn algorithm; <code>false</code> otherwise
      */
     public static boolean isLUHN(String number) {
         if (number == null) {
@@ -832,9 +835,9 @@ public class Validator {
      * Returns <code>true</code> if the string is a name, meaning it contains
      * nothing but English letters and spaces.
      *
-     * @param  name the string to check
+     * @param name the string to check
      * @return <code>true</code> if the string is a name; <code>false</code>
-     *         otherwise
+     * otherwise
      */
     public static boolean isName(String name) {
         if (isNull(name)) {
@@ -857,9 +860,9 @@ public class Validator {
      * <code>null</code>, meaning it is neither a <code>null</code> reference or
      * zero.
      *
-     * @param  l the long number object to check
+     * @param l the long number object to check
      * @return <code>true</code> if the long number object is not
-     *         <code>null</code>; <code>false</code> otherwise
+     * <code>null</code>; <code>false</code> otherwise
      */
     public static boolean isNotNull(Long l) {
         return !isNull(l);
@@ -870,9 +873,9 @@ public class Validator {
      * the rules from {@link #isNotNull(Long)} or {@link #isNotNull(String)} if
      * the object is one of these types.
      *
-     * @param  obj the object to check
+     * @param obj the object to check
      * @return <code>true</code> if the object is not <code>null</code>;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNotNull(Object obj) {
         return !isNull(obj);
@@ -884,9 +887,9 @@ public class Validator {
      * the string "<code>null</code>", with or without leading or trailing
      * whitespace.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is not <code>null</code>;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNotNull(String s) {
         return !isNull(s);
@@ -896,9 +899,9 @@ public class Validator {
      * Returns <code>true</code> if the long number object is <code>null</code>,
      * meaning it is either a <code>null</code> reference or zero.
      *
-     * @param  l the long number object to check
+     * @param l the long number object to check
      * @return <code>true</code> if the long number object is <code>null</code>;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNull(Long l) {
         if ((l == null) || (l.longValue() == 0)) {
@@ -913,9 +916,9 @@ public class Validator {
      * rules from {@link #isNull(Long)} or {@link #isNull(String)} if the object
      * is one of these types.
      *
-     * @param  obj the object to check
+     * @param obj the object to check
      * @return <code>true</code> if the object is <code>null</code>;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNull(Object obj) {
         if (obj instanceof Long) {
@@ -935,9 +938,9 @@ public class Validator {
      * string "<code>null</code>", with or without leading or trailing
      * whitespace.
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is <code>null</code>;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNull(String s) {
         if (s == null) {
@@ -983,9 +986,9 @@ public class Validator {
      * Returns <code>true</code> if the string is a decimal integer number,
      * meaning it contains nothing but decimal digits.
      *
-     * @param  number the string to check
+     * @param number the string to check
      * @return <code>true</code> if the string is a decimal integer number;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isNumber(String number) {
         if (isNull(number)) {
@@ -1006,9 +1009,9 @@ public class Validator {
      * is at least four characters long and contains only letters and decimal
      * digits.
      *
-     * @param  password the string to check
+     * @param password the string to check
      * @return <code>true</code> if the string is a valid password;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isPassword(String password) {
         if (isNull(password)) {
@@ -1033,9 +1036,9 @@ public class Validator {
      * requirement is that there are decimal digits in the string; length and
      * format are not checked.
      *
-     * @param  phoneNumber the string to check
+     * @param phoneNumber the string to check
      * @return <code>true</code> if the string is a valid phone number;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isPhoneNumber(String phoneNumber) {
         return isNumber(StringUtil.extractDigits(phoneNumber));
@@ -1058,9 +1061,9 @@ public class Validator {
      * Returns <code>true</code> if the string is a valid URL based on the rules
      * in {@link URL}.
      *
-     * @param  url the string to check
+     * @param url the string to check
      * @return <code>true</code> if the string is a valid URL;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isUrl(String url) {
         return isUrl(url, false);
@@ -1070,10 +1073,10 @@ public class Validator {
      * Returns <code>true</code> if the string is a valid URL based on the rules
      * in {@link URL}. This method can also validate root relative URLs.
      *
-     * @param  url the string to check
-     * @param  acceptRootRelative whether a root relative URL should be accepted
+     * @param url                the string to check
+     * @param acceptRootRelative whether a root relative URL should be accepted
      * @return <code>true</code> if the string is a valid URL;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isUrl(String url, boolean acceptRootRelative) {
         if (isNotNull(url)) {
@@ -1099,9 +1102,9 @@ public class Validator {
     /**
      * Returns <code>true</code> if the string is a valid variable name in Java.
      *
-     * @param  variableName the string to check
+     * @param variableName the string to check
      * @return <code>true</code> if the string is a valid variable name in Java;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isVariableName(String variableName) {
         if (isNull(variableName) ||
@@ -1123,9 +1126,9 @@ public class Validator {
      * Returns <code>true</code> if the string is a valid variable term, meaning
      * it begins with "[$" and ends with "$]".
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is a valid variable term;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isVariableTerm(String s) {
         if (s.startsWith(_VARIABLE_TERM_BEGIN) &&
@@ -1142,9 +1145,9 @@ public class Validator {
      * either the <code>null</code> character '0' or whitespace according to
      * {@link Character#isWhitespace(char)}.
      *
-     * @param  c the character to check
+     * @param c the character to check
      * @return <code>true</code> if the character is whitespace;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isWhitespace(char c) {
         int i = c;
@@ -1161,9 +1164,9 @@ public class Validator {
      * requirement is that it contain either the xml start tag "<?xml" or the
      * empty document tag "<root />".
      *
-     * @param  s the string to check
+     * @param s the string to check
      * @return <code>true</code> if the string is an XML document;
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public static boolean isXml(String s) {
         if (isNull(s)) {

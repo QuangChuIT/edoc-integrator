@@ -23,4 +23,8 @@ public class EdocNotificationServiceUtil {
     public static List<TelegramMessage> telegramScheduleSend(Date date) {
         return NOTIFICATION_SERVICE.getTelegramMessages(date);
     }
+
+    public static List<Long> getDocumentIdsByOrganId(String organId) {
+        return NOTIFICATION_SERVICE.getDocumentIdsByOrganId(organId);
+    }
 }

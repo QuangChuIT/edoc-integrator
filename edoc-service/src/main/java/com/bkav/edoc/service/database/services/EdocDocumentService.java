@@ -281,7 +281,6 @@ public class EdocDocumentService {
                 long size;
                 InputStream is = attachment.getInputStream();
                 size = attUtil.saveToFile(specPath, is);
-                is.close();
                 if (size > 0) {
                     String name = attachment.getName();
                     String type = attachment.getContentType();
@@ -401,6 +400,10 @@ public class EdocDocumentService {
         long businessDocType = traceHeaderList.getBusiness().getBusinessDocType();
         // with new document, business doc type = 0
         return businessDocType == 0;
+    }
+
+    public EdocDocument getDocumentByCode(String docCode) {
+        return documentDaoImpl.getDocumentByDocCode(docCode);
     }
 
     public void updateDocument(EdocDocument edocDocument) {

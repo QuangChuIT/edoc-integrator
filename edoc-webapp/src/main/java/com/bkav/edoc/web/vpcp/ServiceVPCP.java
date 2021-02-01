@@ -292,10 +292,22 @@ public class ServiceVPCP {
     }
 
     private List<Organization> filterOrgan(List<Organization> organizations) {
-        String currentOrgan = com.bkav.edoc.web.util.PropsUtil.get("edoc.root.organDomain");
-        return organizations.stream()
-                .filter(organ -> organ.getOrganId().contains(currentOrgan))
-                .collect(Collectors.toList());
+        List<String> organs = new ArrayList<>();
+        List<Organization> result = new ArrayList<>();
+        organizations.forEach(o -> organs.add(o.getOrganId()));
+        List<EdocDynamicContact> dynamicContacts = EdocDynamicContactServiceUtil.getContactsByMultipleDomains(organs);
+        if (dynamicContacts.size() > 0) {
+            List<EdocDynamicContact> agencies = dynamicContacts.stream().filter(EdocDynamicContact::getAgency).collect(Collectors.toList());
+            if (agencies.size() > 0) {
+                List<String> organDomains = agencies.stream().map(EdocDynamicContact::getDomain).collect(Collectors.toList());
+                for (Organization domain : organizations) {
+                    if (organDomains.contains(domain.getOrganId())) {
+                        result.add(domain);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     static {

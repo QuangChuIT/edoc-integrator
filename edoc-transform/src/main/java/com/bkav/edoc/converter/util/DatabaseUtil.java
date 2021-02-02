@@ -217,7 +217,6 @@ public class DatabaseUtil {
         return result;
     }
 
-
     public static List<EdocDocument> getDocumentByCounterDate(Connection connection, java.sql.Date _counterDate) {
         List<EdocDocument> documents = new ArrayList<>();
         try {
@@ -230,7 +229,7 @@ public class DatabaseUtil {
                 edocDocument.setFromOrganDomain(resultSet.getString(2));
                 edocDocument.setToOrganDomain(resultSet.getString(3));
                 edocDocument.setSentDate(resultSet.getDate(4));
-                edocDocument.setSendExt(resultSet.getBoolean(5));
+                edocDocument.setDocCode(resultSet.getString(5));
                 documents.add(edocDocument);
             }
             resultSet.close();

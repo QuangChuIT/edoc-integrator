@@ -65,12 +65,12 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-2 col-sm-6 col-xs-12">
+            <div class="col-md-2 col-xs-12">
                 <label class="control-label " for="toOrganInfo">
                     ${app_message.edoc_organ_process}
                 </label>
             </div>
-            <div class="col-md-10 col-sm-6 col-xs-12">
+            <div class="col-md-10 col-xs-12">
                 <textarea class="form-control" readonly rows="3" id="toOrganInfo">${toOrganName}</textarea>
             </div>
         </div>
@@ -95,13 +95,13 @@
                                                 <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
                                             </div>
                                 </div>
-                                    <div class="col-md-2 col-sm-6 col-xs-12 text-center">
+                                    <div class="col-md-2 col-xs-12 text-center">
                                         ${getStatusOfTrace(statusCode)}
                                     </div>
-                                    <div class="col-md-1 col-sm-6 col-xs-12 text-center">
+                                    <div class="col-md-1 col-xs-12 text-center">
                                         <span>${convertToDate(timeStamp).formatTime()}</span>
                                     </div>
-                                    <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
+                                    <div class="col-md-1 col-xs-12 text-right" >
                                         <span>${convertToDate(timeStamp).formatDate()}</span>
                                     </div>
                                 </div>
@@ -114,17 +114,17 @@
                                 <div class="col-md-8 col-sm-6 col-xs-12">
                                     <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
                                 </div>
-                                <div class="col-md-2 col-sm-6 col-xs-12 text-center">
+                                <div class="col-md-2 col-xs-12 text-center">
                                     {{if taken == false}}
                                         ${app_message.edoc_not_received_message}
                                     {{else}}
                                         ${app_message.edoc_received_message}
                                     {{/if}}
                                 </div>
-                                <div class="col-md-1 col-sm-6 col-xs-12 text-center">
+                                <div class="col-md-1 col-xs-12 text-center">
                                     <span>${convertToDate(modifiedDate).formatTime()}</span>
                                 </div>
-                                <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
+                                <div class="col-md-1 col-xs-12 text-right" >
                                     <span>${convertToDate(modifiedDate).formatDate()}</span>
                                 </div>
                             </div>

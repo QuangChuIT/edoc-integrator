@@ -3,6 +3,7 @@ package com.bkav.edoc.web.vpcp;
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocTraceServiceUtil;
@@ -262,8 +263,9 @@ public class ServiceVPCP {
                                 //Get message header
                                 MessageStatus messageStatus = (MessageStatus) ed.getHeader().getMessageHeader();
                                 LOGGER.info(messageStatus.toString());
-                                boolean success = EdocTraceServiceUtil.addTrace(messageStatus);
-                                if (success) {
+                                List<Error> errors = new ArrayList<>();
+                                EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);
+                                if (edocTrace != null) {
                                     LOGGER.info("Done save status vpcp from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
                                     status = "done";
                                 } else {

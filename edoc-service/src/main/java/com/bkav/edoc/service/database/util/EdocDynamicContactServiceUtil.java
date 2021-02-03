@@ -49,7 +49,7 @@ public class EdocDynamicContactServiceUtil {
     }
 
     public static List<EdocDynamicContact> getDynamicContactByAgency(boolean agency) {
-        return DYNAMIC_CONTACT_SERVICE.getDynamiccontactByAgency(agency);
+        return DYNAMIC_CONTACT_SERVICE.getDynamicContactByAgency(agency);
     }
 
     public static EdocDynamicContact findDynamicContactById(long contactId) {

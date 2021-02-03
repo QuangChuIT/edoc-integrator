@@ -1,7 +1,6 @@
 package com.bkav.edoc.service.xml.status.builder;
 
 import com.bkav.edoc.service.resource.EdXmlConstant;
-import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.Content;
 import com.bkav.edoc.service.xml.base.builder.BuildException;
 import com.bkav.edoc.service.xml.base.util.BaseXmlUtils;
@@ -19,7 +18,7 @@ public class StatusXmlBuilder {
     public StatusXmlBuilder() {
     }
 
-    protected static Document buildDocument(Status paramStatus, String paramString) throws BuildException {
+    protected static Document buildDocument(Status paramStatus) throws BuildException {
         try {
             Element rootElement = new Element(FILE_EXTENSION, EdXmlConstant.EDXML_URI);
             Document document = new Document(rootElement);
@@ -32,16 +31,15 @@ public class StatusXmlBuilder {
         }
     }
 
-    public static Content build(Status status) throws BuildException {
+    public static Content build(Status status, String path) throws BuildException {
         File tmpFile = Files.createTempDir();
-        Document document = buildDocument(status, tmpFile.getPath());
+        Document document = buildDocument(status);
         MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
         // ghi file ra thu muc
-        String fileName = "UpdateTrace" + "." + messageStatus.getFrom().getOrganId();
-        String filePath = PropsUtil.get("VPCP.attachment.dir");
+        String fileName = "GetStatus" + "." + messageStatus.getFrom().getOrganId();
         Content content;
         try {
-            content = BaseXmlUtils.buildContent(document, fileName, "edxml", filePath);
+            content = BaseXmlUtils.buildContent(document, fileName, "edxml", path);
         } catch (Exception e) {
             throw new BuildException("Error occurs during write content to file", e);
         } finally {
@@ -56,4 +54,5 @@ public class StatusXmlBuilder {
         }
         return content;
     }
+
 }

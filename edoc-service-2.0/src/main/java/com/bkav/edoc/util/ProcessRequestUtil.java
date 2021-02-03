@@ -46,7 +46,7 @@ public class ProcessRequestUtil {
             checkPermission.setToken(token);
             Report permission = CHECKER.checkPermission(checkPermission);
             if (!permission.isIsSuccess()) {
-                errors.add(new Error("Permission", "Organ don't have permission on EdocService !!!"));
+                errors.add(new Error("Unauthorized", "Organization is not authorized !!!"));
             }
         }
         return errors;

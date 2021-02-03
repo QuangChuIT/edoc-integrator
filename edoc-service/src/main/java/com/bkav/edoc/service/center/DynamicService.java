@@ -13,6 +13,7 @@ import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.util.CommonUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.util.ResponseUtil;
 import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
@@ -304,8 +305,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             }
 
             if (errorList.isEmpty()) {
+                LOGGER.info("--------------------------------- Confirm Receiver Invoke by " + organId + " : " + documentId + " ----------------------------------");
                 // remove pending document
-                this.removePendingDocumentId(organId, documentId);
+                notificationService.removePendingDocId(organId, documentId);
                /* // TODO if document of VPCP send request confirm done or fail
                 EdocDocument document = documentService.getDocument(documentId);
                 if (document.isReceivedExt()) {
@@ -361,8 +363,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            List<Error> errors = new ArrayList<>();
             // update trace
-            if (!traceService.updateTrace(status)) {
+            if (traceService.updateTrace(status, errors) != null) {
 
                 errorList.add(new Error("M.updateTrace",
                         "Error process update trace cause not found document with trace or save error!"));
@@ -380,7 +383,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     if (existDocument) {
                         Header header = new Header(status);
                         Status statusToSend = new Status(header);
-                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(statusToSend);
+                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(statusToSend, PropsUtil.get("edoc.edxml.file.location"));
                         if (sendEdocResult != null) {
                             LOGGER.info("-------------------- Send status to VPCP status " + sendEdocResult.getStatus());
                             LOGGER.info("-------------------- Send status to VPCP Desc: " + sendEdocResult.getErrorDesc());
@@ -775,37 +778,6 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         }
     }
 
-    /**
-     * remove pending document
-     *
-     * @param domain
-     * @param documentId
-     */
-    private void removePendingDocumentId(String domain, long documentId) {
-        // remove in cache
-        removePendingDocumentIdInCache(domain, documentId);
-        // remove in db
-        notificationService.removePendingDocumentId(domain, documentId);
-    }
-
-    /**
-     * remove pending document in cache
-     *
-     * @param domain
-     * @param documentId
-     */
-    private void removePendingDocumentIdInCache(String domain, long documentId) {
-        List obj = RedisUtil.getInstance().get(RedisKey.getKey(domain,
-                RedisKey.GET_PENDING_KEY), List.class);
-
-        if (obj != null) {
-            List<Long> oldDocumentIds = CommonUtil.convertToListLong(obj);
-            oldDocumentIds.remove(documentId);
-
-            RedisUtil.getInstance().set(RedisKey.getKey(domain,
-                    RedisKey.GET_PENDING_KEY), oldDocumentIds);
-        }
-    }
 
     private static final Logger LOGGER = Logger.getLogger(DynamicService.class);
 

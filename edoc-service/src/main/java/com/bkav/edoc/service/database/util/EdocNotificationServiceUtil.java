@@ -27,4 +27,9 @@ public class EdocNotificationServiceUtil {
     public static List<Long> getDocumentIdsByOrganId(String organId) {
         return NOTIFICATION_SERVICE.getDocumentIdsByOrganId(organId);
     }
+
+    public static void removePendingDocId(String organId, long docId) {
+        NOTIFICATION_SERVICE.removePendingDocId(organId, docId);
+    }
+
 }

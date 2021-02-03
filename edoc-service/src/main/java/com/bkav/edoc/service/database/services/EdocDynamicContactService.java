@@ -212,7 +212,7 @@ public class EdocDynamicContactService {
         return organizationCacheEntries;
     }
 
-    public List<EdocDynamicContact> getDynamiccontactByAgency(boolean agency) {
+    public List<EdocDynamicContact> getDynamicContactByAgency(boolean agency) {
         return dynamicContactDaoImpl.getDynamicContactsByAgency(agency);
     }
 

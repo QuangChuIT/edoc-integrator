@@ -1,5 +1,7 @@
 package com.bkav.edoc.payload;
 
+import com.bkav.edoc.service.xml.base.header.Organization;
+
 import java.util.List;
 
 public class GetOrganizationResp extends BaseResp {

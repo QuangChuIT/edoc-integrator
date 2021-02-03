@@ -50,11 +50,11 @@ public class ServiceVPCP {
         return this.knobstickServiceImp.sendEdoc(header.toString(), filePath);
     }
 
-    public SendEdocResult sendStatus(Status status) {
+    public SendEdocResult sendStatus(Status status, String path) {
         SendEdocResult sendEdocResult = null;
         try {
             // build status edxml
-            Content content = StatusXmlBuilder.build(status);
+            Content content = StatusXmlBuilder.build(status, path);
             String filePath = content.getContent().getPath();
             MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
             JSONObject header = new JSONObject();

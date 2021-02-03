@@ -17,5 +17,12 @@
         <property name="lastModifyByUserId" type="long" column="last_modify_by_user_id"/>
         <property name="lastModifyOnDate" type="timestamp" column="last_modify_on_date"/>
         <property name="version" type="timestamp" column="version"/>
+        <set name="userRoles" table="user_role" cascade="all"
+             inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="roleId"/>
+            </key>
+            <one-to-many class="com.bkav.edoc.service.database.entity.UserRole"/>
+        </set>
     </class>
 </hibernate-mapping>

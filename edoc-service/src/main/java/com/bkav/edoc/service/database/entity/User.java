@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class User implements Serializable {
     private long userId;
@@ -19,6 +21,7 @@ public class User implements Serializable {
     private String lastLoginIP;
     private String displayName;
     private boolean sso;
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public User() {
     }
@@ -117,5 +120,13 @@ public class User implements Serializable {
 
     public void setSso(boolean sso) {
         this.sso = sso;
+    }
+
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
     }
 }

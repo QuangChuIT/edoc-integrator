@@ -22,5 +22,12 @@
         <property name="lastLoginDate" type="timestamp"/>
         <property name="lastLoginIP" type="string"/>
         <property name="sso" type="boolean" column="sso"/>
+        <set name="userRoles" table="user_role" cascade="all"
+             inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="userId"/>
+            </key>
+            <one-to-many class="com.bkav.edoc.service.database.entity.UserRole"/>
+        </set>
     </class>
 </hibernate-mapping>

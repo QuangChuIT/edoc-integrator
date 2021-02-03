@@ -198,7 +198,7 @@ public class EdocController {
         return gson.toJson(sendDocResp);
     }
 
-    @RequestMapping(value = "/getPendingDocIds", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/getPendingDocIds", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getPendingDocIDs(HttpServletRequest request) {
         LOGGER.info("----------------------- Get Pending Doc Ids Invoke --------------------");
@@ -369,7 +369,7 @@ public class EdocController {
         return gson.toJson(confirmReceivedResp);
     }
 
-    @RequestMapping(value = "/getOrganizations", method = RequestMethod.POST,
+    @RequestMapping(value = "/getOrganizations", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getOrganizations(HttpServletRequest request) {

@@ -17,11 +17,11 @@
     User user = new Gson().fromJson(userLog, User.class);
     UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
     String roleKey = "USER";
-    if(userRole != null){
+    /*if(userRole != null){
         long roleId= userRole.getRoleId();
         Role role = RoleServiceUtil.getRole(roleId);
         roleKey = role.getRoleKey();
-    }
+    }*/
 %>
 <div class="edoc-action">
     <button class="btn btn-lg btn-create-edoc">

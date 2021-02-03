@@ -75,7 +75,7 @@ public class ResponseFor extends BaseElement {
     public static ResponseFor fromContent(Element paramElement) {
         return new ResponseFor(BaseXmlUtils.getString(paramElement, "OrganId"),
                 BaseXmlUtils.getString(paramElement, "Code"),
-                DateUtils.parse(BaseXmlUtils.getString(paramElement, "PromulgationDate"), DateUtils.DEFAULT_DATETIME_FORMAT),
+                DateUtils.parse(BaseXmlUtils.getString(paramElement, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT),
                 BaseXmlUtils.getString(paramElement, "DocumentId"));
     }
 

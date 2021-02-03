@@ -324,6 +324,22 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return new ArrayList<>();
     }
 
+    public List<String> getDocCodeByCounterDate (Date _counterDate) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select docCode from EdocDocument where date(createDate) = :_counterDate group by docCode");
+            Query<String> query = session.createQuery(sql.toString(), String.class);
+            query.setParameter("_counterDate", _counterDate);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
     public static void main(String[] args) {
         String yesterday = "2021-01-26";
         java.sql.Date yes = java.sql.Date.valueOf(yesterday);

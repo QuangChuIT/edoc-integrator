@@ -713,15 +713,26 @@ public class EdocDocumentService {
         dailyCounterMap.put(organDomain, dailyCounter);
     }
 
-    public static void main(String[] args) {
+    public List<String> getDocCodeByCounterDate (Date _counterDate) {
+        return documentDaoImpl.getDocCodeByCounterDate(_counterDate);
+    }
+
+    /*public static void main(String[] args) {
         String yesterday = "2021-01-26";
         java.sql.Date yes = java.sql.Date.valueOf(yesterday);
         String now = "2021-01-28";
         java.sql.Date no = java.sql.Date.valueOf(now);
 
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -3);
+        Date date = cal.getTime();
+
         EdocDocumentService edocDocumentService = new EdocDocumentService();
-        edocDocumentService.getDailycounterDocument(yes, no);
+        //edocDocumentService.getDailycounterDocument(yes, no);
+        System.out.println(edocDocumentService.getDocCodeByCounterDate(date));
     }
+
+     */
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentService.class);
 }

@@ -112,4 +112,8 @@ public class EdocDocumentServiceUtil {
     public static boolean checkNewDocument(TraceHeaderList traceHeaderList) {
         return DOCUMENT_SERVICE.checkNewDocument(traceHeaderList);
     }
+
+    public static List<String> getDocCodeByCounterDate (Date _counterDate) {
+        return DOCUMENT_SERVICE.getDocCodeByCounterDate(_counterDate);
+    }
 }

@@ -217,11 +217,12 @@ public class DatabaseUtil {
         return result;
     }
 
-    public static List<EdocDocument> getDocumentByCounterDate(Connection connection, java.sql.Date _counterDate) {
+    public static List<EdocDocument> getDocumentByCounterDate(Connection connection, java.sql.Date _counterDate, String doc_code) {
         List<EdocDocument> documents = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOCUMENT_BY_COUNTER_DATE);
             preparedStatement.setDate(1, _counterDate);
+            preparedStatement.setString(2, doc_code);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 EdocDocument edocDocument = new EdocDocument();
@@ -229,7 +230,6 @@ public class DatabaseUtil {
                 edocDocument.setFromOrganDomain(resultSet.getString(2));
                 edocDocument.setToOrganDomain(resultSet.getString(3));
                 edocDocument.setSentDate(resultSet.getDate(4));
-                edocDocument.setDocCode(resultSet.getString(5));
                 documents.add(edocDocument);
             }
             resultSet.close();
@@ -238,6 +238,22 @@ public class DatabaseUtil {
             LOGGER.error(throwable);
         }
         return documents;
+    }
+
+    public static List<String> getDocCodeByCounterDate (Connection connection, java.sql.Date _counterDate) {
+        List<String> docCode = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOC_CODE_BY_COUNTER_DATE);
+            preparedStatement.setDate(1, _counterDate);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String doc_code = resultSet.getString(1);
+                docCode.add(doc_code);
+            }
+        } catch (SQLException throwables) {
+            LOGGER.error(throwables);
+        }
+        return docCode;
     }
 
     public static boolean CheckSignedAttachment(Connection connection, long docId) {
@@ -291,24 +307,6 @@ public class DatabaseUtil {
             LOGGER.error(throwable);
         }
         return docCodes;
-    }
-
-    public static  List<Long> getDocumentIdByDocCode(Connection connection, String _counterDate, String doc_code) {
-        List<Long> docIds = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(StringQuery.GET_DOCID_BY_DOC_CODE);
-            preparedStatement.setString(1, _counterDate);
-            preparedStatement.setString(2, doc_code);
-            ResultSet rs = preparedStatement.executeQuery();
-            int size_ = rs.getFetchSize();
-            while (rs.next()) {
-                long docId = rs.getLong(1);
-                docIds.add(docId);
-            }
-        } catch (SQLException throwable) {
-            LOGGER.error(throwable);
-        }
-        return docIds;
     }
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseUtil.class);

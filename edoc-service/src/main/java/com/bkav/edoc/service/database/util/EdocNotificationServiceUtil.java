@@ -27,4 +27,7 @@ public class EdocNotificationServiceUtil {
     public static boolean checkExistNotification(String organ, long docId) {
         return NOTIFICATION_SERVICE.checkExistNotification(organ, docId);
     }
+    public static List<Long> getDocumentIdsByOrganId(String organId) {
+        return NOTIFICATION_SERVICE.getDocumentIdsByOrganId(organId);
+    }
 }

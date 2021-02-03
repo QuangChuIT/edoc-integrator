@@ -13,7 +13,7 @@ let edocChart = {
     },
     drawChart: function() {
         ctx = document.getElementById('canvas').getContext('2d');
-        window.myBar = new Chart(ctx, {
+        myBar = new Chart(ctx, {
             type: 'bar',
             data: barChartData,
             options: {
@@ -190,7 +190,7 @@ $(document).ready(function() {
                 $('.edoc-content > [class^=edoc-table]').hide();
                 $(".edoc-statistic").hide();
                 $("#statistic-detail").show();
-                edocChart.renderDetailStat();
+                //edocChart.renderDetailStat();
                 $(".edoc-table-statistic").show();
             } else {
                 edocDocument.renderDatatable();
@@ -203,7 +203,7 @@ $(document).ready(function() {
 
     $("#btnRunDrawChart").on('click', function(e) {
         e.preventDefault();
-        //ctx.clearRect(0, 0, document.getElementById('canvas').width, document.getElementById('canvas').height)
+        ctx.clearRect(0, 0, document.getElementById('canvas').width, document.getElementById('canvas').height)
 
         let val = document.getElementById("yearPicker");
         let year = val.options[val.selectedIndex].text;
@@ -217,7 +217,7 @@ $(document).ready(function() {
         end: new Date().getFullYear(),
         step: 1,
         order: 'asc',
-        selected: new Date().getFullYear(),
+        selected: new Date().getFullYear() + 1,
         formatDisplay: null,
         displayAsValue: true
     })

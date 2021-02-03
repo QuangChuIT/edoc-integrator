@@ -5,12 +5,13 @@ import com.bkav.edoc.service.database.services.EdocDynamicContactService;
 import com.bkav.edoc.service.kernel.util.FileUtil;
 import com.bkav.edoc.service.kernel.util.InternetAddressUtil;
 import com.bkav.edoc.service.kernel.util.MimeTypesUtil;
+import com.bkav.edoc.service.kernel.util.Validator;
 import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.util.EdXMLConfigKey;
 import com.bkav.edoc.service.util.EdXMLConfigUtil;
+import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.*;
 import org.apache.log4j.Logger;
 
@@ -174,6 +175,7 @@ public class Checker {
         }
         return report;
     }
+
 
     public Report checkPermission(CheckPermission checkPermission) {
         Report report;
@@ -714,8 +716,7 @@ public class Checker {
 
         String lastOfErrorCode = new StringBuilder("MessageHeader")
                 .append("Code").append("CodeNumber").toString();
-
-        if (codeNumber.isEmpty()) {
+        if (Validator.isNullOrEmpty(codeNumber)) {
 
             errorList.add(new Error(String.format("N.%s", lastOfErrorCode),
                     "CodeNumber is required."));
@@ -737,7 +738,7 @@ public class Checker {
         List<Error> errorList = new ArrayList<>();
         String lastOfErrorCode = new StringBuilder("MessageHeader")
                 .append("Code").append("CodeNotation").toString();
-        if (codeNotation.isEmpty()) {
+        if (Validator.isNullOrEmpty(codeNotation)) {
 
             errorList.add(new Error(String.format("N.%s", lastOfErrorCode),
                     "CodeNotation is required."));

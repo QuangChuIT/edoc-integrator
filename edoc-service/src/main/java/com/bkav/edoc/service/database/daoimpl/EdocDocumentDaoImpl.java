@@ -194,6 +194,28 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
     }
 
     @Override
+    public EdocDocument getDocumentByDocCode(String docCode) {
+        Session currentSession = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed FROM EdocDocument ed where ed.docCode = :code");
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("code", docCode);
+            List<EdocDocument> result = query.list();
+            if (result != null && result.size() > 0) {
+                return result.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error find document by code " + docCode + " cause " + Arrays.toString(e.getStackTrace()));
+            return null;
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+    }
+
+    @Override
     public boolean removeDocument(long documentId) {
         Session session = openCurrentSession();
         boolean result;

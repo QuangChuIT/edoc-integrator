@@ -46,6 +46,10 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocByCodeAndDomain(docCode, organDomain);
     }
 
+    public static boolean checkExistDocument(String documentId){
+        return DOCUMENT_SERVICE.checkExistDocument(documentId);
+    }
+
     public static EdocDocument getDocument(long documentId) {
         EdocDocument document = DOCUMENT_SERVICE.getDocument(documentId);
         return DOCUMENT_SERVICE.getDocument(documentId);
@@ -87,10 +91,15 @@ public class EdocDocumentServiceUtil {
         DOCUMENT_SERVICE.updateDraftToPublishDocument(documentId);
     }
 
+    public static EdocDocument getDocumentByCode(String docCode) {
+        return DOCUMENT_SERVICE.getDocumentByCode(docCode);
+    }
+
     public static EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
                                            StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
         return DOCUMENT_SERVICE.addDocument(messageHeader, traces, attachments, outDocumentId, edocAttachmentCacheEntries, errors);
     }
+
 
     public static List<EdocDocument> getDocumentByDate (Date date) {
         return DOCUMENT_SERVICE.getDocumentByDate(date);
@@ -98,5 +107,9 @@ public class EdocDocumentServiceUtil {
 
     public static void getDailycounterDocument(Date fromDate, Date toDate) {
         DOCUMENT_SERVICE.getDailycounterDocument(fromDate, toDate);
+    }
+
+    public static boolean checkNewDocument(TraceHeaderList traceHeaderList) {
+        return DOCUMENT_SERVICE.checkNewDocument(traceHeaderList);
     }
 }

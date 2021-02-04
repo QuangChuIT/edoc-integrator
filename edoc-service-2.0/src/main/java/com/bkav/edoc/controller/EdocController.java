@@ -34,8 +34,8 @@ import com.bkav.edoc.service.xml.status.builder.StatusXmlBuilder;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.util.EdocServiceConstant;
+import com.bkav.edoc.util.EdocUtil;
 import com.bkav.edoc.util.MessageType;
-import com.bkav.edoc.util.ProcessRequestUtil;
 import com.google.gson.Gson;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -77,7 +77,7 @@ public class EdocController {
     @ResponseBody
     public String sendDocument(HttpServletRequest request) {
         LOGGER.info("----------------------- Send Document Invoke --------------------");
-        Map<String, String> headers = ProcessRequestUtil.getHeaders(request);
+        Map<String, String> headers = EdocUtil.getHeaders(request);
         List<Error> errors = new ArrayList<>();
         SendDocResp sendDocResp = new SendDocResp();
         try {
@@ -88,7 +88,7 @@ public class EdocController {
             Calendar cal = Calendar.getInstance();
             String SEPARATOR = EdXmlConstant.SEPARATOR;
             if (inputStream == null) {
-                errors.add(new Error("EdocFileError", "File Doc input stream must init !!!!"));
+                errors.add(new Error("File Not Found", "Not found edxml file in request"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");
                 sendDocResp.setDocId(0L);
@@ -139,7 +139,7 @@ public class EdocController {
                     if (EdocDocumentServiceUtil.checkNewDocument(traceHeaderList)) {
                         // check exist document
                         if (EdocDocumentServiceUtil.checkExistDocument(messageHeader.getDocumentId())) {
-                            errors.add(new Error("M.Exist", "Document is exist on ESB !!!!"));
+                            errors.add(new Error("ExistDoc", "Document is exist"));
                         }
                     }
                     if (errors.size() == 0) {
@@ -154,9 +154,9 @@ public class EdocController {
                             sendDocResp.setStatus("Success");
                             sendDocResp.setDocId(document.getDocumentId());
                         } else {
-                            errors.add(new Error("E.SendDocument", "Error send document with docCode " + messageHeader.getCode().toString()));
+                            errors.add(new Error("SendDocument", "Send document error docCode " + messageHeader.getCode().toString()));
                             errors.addAll(errorList);
-                            LOGGER.error("Error save document with document code " + messageHeader.getCode());
+                            LOGGER.error("Error save document with docCode " + messageHeader.getCode());
                             sendDocResp.setCode("9999");
                             sendDocResp.setStatus("Fail");
                             sendDocResp.setDocId(0L);
@@ -185,13 +185,13 @@ public class EdocController {
                     }
                 }
             } else {
-                errors.add(new Error("M.MessageType", "UnSupport Message Type !!!"));
+                errors.add(new Error("MessageType", "UnSupport Message Type !!!"));
             }
             sendDocResp.setErrors(errors);
         } catch (Exception e) {
             sendDocResp.setStatus("Error");
             sendDocResp.setCode("9999");
-            errors.add(new Error("E.Server", e.getMessage()));
+            errors.add(new Error("InternalServer", e.getMessage()));
             sendDocResp.setDocId(0L);
             LOGGER.error("Error process request send edoc file cause " + e);
         }
@@ -202,7 +202,7 @@ public class EdocController {
     @ResponseBody
     public String getPendingDocIDs(HttpServletRequest request) {
         LOGGER.info("----------------------- Get Pending Doc Ids Invoke --------------------");
-        Map<String, String> headerMap = ProcessRequestUtil.getHeaders(request);
+        Map<String, String> headerMap = EdocUtil.getHeaders(request);
         GetPendingDocIDsResp getPendingDocIDsResp = new GetPendingDocIDsResp();
         List<Error> errors = new ArrayList<>();
         List<Long> notifications;
@@ -220,25 +220,25 @@ public class EdocController {
                     if (notifications == null) {
                         notifications = new ArrayList<>();
                     }
-                    LOGGER.info("Get Pending Doc Ids Success -----------------> " + notifications);
+                    LOGGER.info("Get Pending Doc Ids Success " + notifications);
                 } else {
                     List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId);
                     notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
-                    LOGGER.info("Get Pending Trace Ids Success -----------------> " + notifications);
+                    LOGGER.info("Get Pending Trace Ids Success " + notifications);
                 }
                 getPendingDocIDsResp.setStatus("Success");
                 getPendingDocIDsResp.setDocIDs(notifications);
                 getPendingDocIDsResp.setCode("0");
             } else {
-                errors.add(new Error("M.MessageType", "UnSupport Message Type !!!"));
+                errors.add(new Error("MessageType", "UnSupport Message Type"));
                 getPendingDocIDsResp.setStatus("Error");
                 getPendingDocIDsResp.setDocIDs(new ArrayList<>());
                 getPendingDocIDsResp.setCode("9999");
             }
             getPendingDocIDsResp.setErrors(errors);
         } catch (Exception e) {
-            LOGGER.error("Error get pending doc ids for organ " + organId + " cause " + e.getMessage());
-            errors.add(new Error("M.GetPending", e.getMessage()));
+            LOGGER.error("Get pending doc ids for organ " + organId + " cause " + e.getMessage());
+            errors.add(new Error("GetPending", e.getMessage()));
             getPendingDocIDsResp.setStatus("Error");
             getPendingDocIDsResp.setCode("9999");
             getPendingDocIDsResp.setErrors(errors);
@@ -253,20 +253,20 @@ public class EdocController {
     @ResponseBody
     public String getDocument(HttpServletRequest request) {
         LOGGER.info("----------------------- Get Document Invoke --------------------");
-        Map<String, String> headerMap = ProcessRequestUtil.getHeaders(request);
+        Map<String, String> headerMap = EdocUtil.getHeaders(request);
         GetDocumentResp getDocumentResp = new GetDocumentResp();
-        List<Error> errors = ProcessRequestUtil.validateHeader(headerMap);
+        List<Error> errors = EdocUtil.validateHeader(headerMap);
         if (errors.size() > 0) {
             getDocumentResp.setErrors(errors);
             getDocumentResp.setCode("9999");
             getDocumentResp.setStatus("Error");
-            LOGGER.warn("Get Document Error -----------------> " + errors);
+            LOGGER.warn("Get Document Error " + errors);
         } else {
             try {
                 String docIdValue = headerMap.get(EdocServiceConstant.DOC_ID);
                 String messageType = headerMap.get(EdocServiceConstant.MESSAGE_TYPE);
                 if (Validator.isNullOrEmpty(docIdValue)) {
-                    errors.add(new Error("R.DocID", "DocId must init !!!!"));
+                    errors.add(new Error("DocID", "Invalid DocID"));
                     getDocumentResp.setErrors(errors);
                     getDocumentResp.setCode("9999");
                     getDocumentResp.setStatus("Error");
@@ -294,13 +294,13 @@ public class EdocController {
                                     getDocumentResp.setCode("0");
                                     getDocumentResp.setFilePath(fileName);
                                 } else {
-                                    errors.add(new Error("M.GetDocument", "Get document error !"));
+                                    errors.add(new Error("GetDocument", "Get Document Error"));
                                     getDocumentResp.setErrors(errors);
                                     getDocumentResp.setCode("9999");
                                     getDocumentResp.setStatus("Error");
                                 }
                             } else {
-                                errors.add(new Error("M.GetDocument", "Get document from database error !"));
+                                errors.add(new Error("GetDocument", "Get Document From Database Error"));
                                 getDocumentResp.setErrors(errors);
                                 getDocumentResp.setCode("9999");
                                 getDocumentResp.setStatus("Error");
@@ -322,7 +322,7 @@ public class EdocController {
                                 getDocumentResp.setCode("0");
                                 getDocumentResp.setFilePath(content.getContent().getPath());
                             } else {
-                                errors.add(new Error("M.GetDocument", "Get document error !"));
+                                errors.add(new Error("GetDocument", "Get Status Error"));
                                 getDocumentResp.setErrors(errors);
                                 getDocumentResp.setCode("9999");
                                 getDocumentResp.setStatus("Error");
@@ -342,14 +342,14 @@ public class EdocController {
     @ResponseBody
     public String confirmReceived(HttpServletRequest request) {
         LOGGER.info("----------------------- Confirm Received Invoke --------------------");
-        Map<String, String> headerMap = ProcessRequestUtil.getHeaders(request);
+        Map<String, String> headerMap = EdocUtil.getHeaders(request);
         ConfirmReceivedResp confirmReceivedResp = new ConfirmReceivedResp();
         List<Error> errors = new ArrayList<>();
         String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
         try {
             String docIdValue = headerMap.get(EdocServiceConstant.DOC_ID);
             if (Validator.isNullOrEmpty(docIdValue)) {
-                errors.add(new Error("M.DocID", "Document Id must init !!!"));
+                errors.add(new Error("DocID", "Invalid DocID"));
                 confirmReceivedResp.setCode("9999");
                 confirmReceivedResp.setErrors(errors);
                 confirmReceivedResp.setStatus("Fail");
@@ -361,7 +361,7 @@ public class EdocController {
                 confirmReceivedResp.setCode("0");
             }
         } catch (Exception e) {
-            errors.add(new Error("M.ConfirmReceived", e.getMessage()));
+            errors.add(new Error("ConfirmReceived", e.getMessage()));
             confirmReceivedResp.setCode("9999");
             confirmReceivedResp.setErrors(errors);
             confirmReceivedResp.setStatus("Fail");
@@ -389,7 +389,7 @@ public class EdocController {
             organizationResp.setErrors(new ArrayList<>());
             organizationResp.setStatus("Success");
         } catch (Exception e) {
-            errors.add(new Error("M.ConfirmReceived", e.getMessage()));
+            errors.add(new Error("ConfirmReceived", e.getMessage()));
             organizationResp.setCode("9999");
             organizationResp.setErrors(errors);
             organizationResp.setStatus("Fail");

@@ -129,4 +129,6 @@ public class User implements Serializable {
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
     }
+
+
 }

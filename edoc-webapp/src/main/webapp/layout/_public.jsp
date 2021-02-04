@@ -57,36 +57,36 @@
 <script id="edocPublicTraceTmpl" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">
         <div class="form-group">
-            <div class="col-md-1 col-sm-6 col-xs-12">
+            <div class="col-md-2 col-xs-3">
                 <label class="control-label " for="subjectInfo">${app_message.edoc_table_header_subject}</label>
             </div>
-            <div class="col-md-11 col-sm-6 col-xs-12">
+            <div class="col-md-10 col-xs-9">
                 <textarea class="form-control" readonly rows="2" id="subjectInfo">${subject}</textarea>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-1 col-sm-6 col-xs-12">
+            <div class="col-md-2 col-xs-3">
                 <label class="control-label " for="toOrganInfo">
                     ${app_message.edoc_organ_process}
                 </label>
             </div>
-            <div class="col-md-11 col-sm-6 col-xs-12">
+            <div class="col-md-10 col-xs-9">
                 <textarea class="form-control" readonly rows="3" id="toOrganInfo">${toOrganName}</textarea>
             </div>
         </div>
         <div class="form-group trace-area">
-            <div class="col-md-12 col-xs-12 col-sm-12">
+            <div class="col-md-12 col-sm-12">
                 <span class="field-title">
                     ${app_message.edoc_trace}
                 </span>
             </div>
             <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12 traces">
+                <div class="col-md-12 col-xs-12 traces">
                     {{if traces.length > 0}}
                         {{each traces}}
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="staff-comment col-md-8 col-sm-6 col-xs-12" id="trace_${traceId}">
+                                    <div class="staff-comment col-md-8 col-xs-7" id="trace_${traceId}">
                                             <div class="staff-handler>
 
                                                 <span><i class="fa fa-info-circle fa-fw"></i>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>
@@ -95,13 +95,13 @@
                                                 <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
                                             </div>
                                 </div>
-                                    <div class="col-md-2 col-sm-6 col-xs-12 text-center">
+                                    <div class="col-md-2 col-xs-3 text-center">
                                         ${getStatusOfTrace(statusCode)}
                                     </div>
-                                    <div class="col-md-1 col-sm-6 col-xs-12 text-center">
+                                    <div class="col-md-1 col-xs-2 text-center">
                                         <span>${convertToDate(timeStamp).formatTime()}</span>
                                     </div>
-                                    <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
+                                    <div class="col-md-1 col-xs-12 text-right" >
                                         <span>${convertToDate(timeStamp).formatDate()}</span>
                                     </div>
                                 </div>
@@ -111,20 +111,20 @@
                     {{else}}
                         {{each notifications}}
                             <div class="form-group">
-                                <div class="col-md-8 col-sm-6 col-xs-12">
+                                <div class="col-md-8 col-xs-12">
                                     <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
                                 </div>
-                                <div class="col-md-2 col-sm-6 col-xs-12 text-center">
+                                <div class="col-md-2 col-xs-12 text-center">
                                     {{if taken == false}}
                                         ${app_message.edoc_not_received_message}
                                     {{else}}
                                         ${app_message.edoc_received_message}
                                     {{/if}}
                                 </div>
-                                <div class="col-md-1 col-sm-6 col-xs-12 text-center">
+                                <div class="col-md-1 col-xs-12 text-center">
                                     <span>${convertToDate(modifiedDate).formatTime()}</span>
                                 </div>
-                                <div class="col-md-1 col-sm-6 col-xs-12 text-right" >
+                                <div class="col-md-1 col-xs-12 text-right" >
                                     <span>${convertToDate(modifiedDate).formatDate()}</span>
                                 </div>
                             </div>

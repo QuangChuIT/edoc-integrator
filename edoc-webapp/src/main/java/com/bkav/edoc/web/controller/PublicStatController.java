@@ -26,4 +26,7 @@ public class PublicStatController {
     public String publicTrace() {
         return "publicTracePage";
     }
+
+    @RequestMapping(value = "/public/dailycounter/convert", method = RequestMethod.GET)
+    public String publicDailycounterConvert() { return "dailycounterConvert";}
 }

@@ -98,5 +98,23 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         return result;
     }
 
+    public boolean checkSignedAttachment(long documentId) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ea from EdocAttachment ea where ea.document.documentId = :documentId and ea.name like :signed");
+            Query<EdocAttachment> query = session.createQuery(sql.toString(), EdocAttachment.class);
+            query.setParameter("documentId", documentId);
+            query.setParameter("signed", "%_Signed%");
+            if (query.getResultList().size() > 0)
+                return true;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return false;
+    }
+
     private static final Logger LOGGER = Logger.getLogger(EdocAttachmentService.class);
 }

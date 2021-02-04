@@ -24,6 +24,10 @@ public class StatDocumentBean {
             LOGGER.info("Counter date prepare stat " + _counterDate);
             if (!EdocDailyCounterServiceUtil.checkExistCounter(_counterDate)) {
                 LOGGER.info("Prepare stat document with counter date " + _counterDate);
+//                List<String> docCodes = EdocDocumentServiceUtil.getDocCodeByCounterDate(_counterDate);
+//                for (String docCode : docCodes) {
+//                    List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
+//                }
                 List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
                 LOGGER.info("List document to stat " + documents.size());
                 for (EdocDocument document : documents) {

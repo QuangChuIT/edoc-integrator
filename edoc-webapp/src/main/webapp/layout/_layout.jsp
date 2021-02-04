@@ -1798,8 +1798,9 @@
 <script src="<c:url value="/asset/js/sweetalert2.min.js"/>"></script>
 
 <!-- Chart JS -->
-<script src="<c:url value="/asset/js/chartJS/Chart.min.js"/>"></script>
-<script src="<c:url value="/asset/js/chartJS/utils.js"/>"></script>
+<script src="<c:url value="/asset/js/lib/Chart.min.js"/>"></script>
+<script src="<c:url value="/asset/js/lib/utils.js"/>"></script>
+<script src="<c:url value="/asset/js/lib/year-select.js"/>"></script>
 
 <%--datetimepicker--%>
 <script src="<c:url value="/asset/js/jquery.datetimepicker.full.js"/>"></script>

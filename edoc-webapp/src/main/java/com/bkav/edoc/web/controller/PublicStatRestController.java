@@ -3,14 +3,17 @@ package com.bkav.edoc.web.controller;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.entity.EPublic;
 import com.bkav.edoc.service.database.entity.EPublicStat;
+import com.bkav.edoc.service.database.entity.EdocStatisticDetail;
+import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
+import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
+import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.web.util.ExcelUtil;
+import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.service.database.entity.EdocAttachment;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.EdocAttachmentServiceUtil;
-import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
-import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
-import com.bkav.edoc.service.util.PropsUtil;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
-import com.bkav.edoc.web.util.ExcelUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
@@ -51,16 +54,36 @@ public class PublicStatRestController {
     }
 
     @RequestMapping(value = "/public/-/statistic/chart", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<String> getSentReceivedForChart(@RequestParam(value = "year") int year,
-                                                          @RequestParam(value = "organDomain", required = false) String organDomain) {
-        String results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, organDomain);
-        try {
-            if (results.length() > 0)
-                return new ResponseEntity<>(results, HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.error(e);
+    public ResponseEntity<String> getSentReceivedForChart(@RequestParam(value = "year", required = false) String year_str,
+                                                          @RequestParam(value = "userId", required = false) String userId) {
+        String results;
+        int year = Integer.parseInt(year_str);
+        Long id = new Long(userId);
+        User user = UserServiceUtil.findUserById(id);
+        if (user == null)
+            results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
+        else {
+            if (user.getUsername().equals(PropsUtil.get("user.admin.username"))) {
+                results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
+            } else {
+                results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, user.getDynamicContact().getDomain());
+            }
         }
+        if (results.length() > 0)
+            return new ResponseEntity<>(results, HttpStatus.OK);
         return new ResponseEntity<>(results, HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "/public/-/statistic/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public List<EdocStatisticDetail> getStatisticDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
+                                                        @RequestParam(value = "toDate", required = false) String toDate,
+                                                        @RequestParam(value = "organDomain", required = false) String organDomain) {
+
+        if (fromDate == null || toDate == null || organDomain == null) {
+            return EdocDailyCounterServiceUtil.getStatisticDetail(null, null, null);
+        } else {
+            return EdocDailyCounterServiceUtil.getStatisticDetail(fromDate, toDate, organDomain);
+        }
     }
 
     @GetMapping(value = "/public/-/document/attachments")
@@ -143,6 +166,18 @@ public class PublicStatRestController {
             LOGGER.error(e);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "/public/-/dailycounter/converter", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public HttpStatus dailycounterConvert(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+        if (fromDate != null && toDate != null) {
+            Date fromDateValue = DateUtils.parse(fromDate);
+            Date toDateValue = DateUtils.parse(toDate);
+            EdocDocumentServiceUtil.getDailycounterDocument(fromDateValue, toDateValue);
+            return HttpStatus.OK;
+        }
+        return HttpStatus.BAD_REQUEST;
     }
 
     @RequestMapping(value = "/public/-/stat/export/excel", method = RequestMethod.GET)

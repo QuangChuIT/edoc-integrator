@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/EdocService")
 public class EdocController {
-    private static final Logger LOGGER = Logger.getLogger(EdocController.class);
     private static final Gson gson = new Gson();
     private static final Checker CHECKER = new Checker();
     private final EdocDocumentService documentService = new EdocDocumentService();
@@ -396,4 +395,6 @@ public class EdocController {
         }
         return gson.toJson(organizationResp);
     }
+
+    private static final Logger LOGGER = Logger.getLogger(EdocController.class);
 }

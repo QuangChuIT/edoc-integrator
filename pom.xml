@@ -11,11 +11,8 @@
         <module>edoc-service</module>
         <module>edoc-webapp</module>
         <module>edoc-transform</module>
-<<<<<<< HEAD
-        <module>EDXML</module>
         <module>edoc-service-2.0</module>
-=======
->>>>>>> 5b8d919a76b1514b24c10a0140483d2a595b9c33
+
     </modules>
 
     <packaging>pom</packaging>

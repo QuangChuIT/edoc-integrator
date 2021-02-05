@@ -9,10 +9,10 @@ import com.bkav.edoc.service.kernel.util.Validator;
 import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.util.EdXMLConfigKey;
 import com.bkav.edoc.service.util.EdXMLConfigUtil;
-import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.ed.header.*;
+import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import org.apache.log4j.Logger;
 
 import java.text.ParseException;
@@ -65,6 +65,40 @@ public class Checker {
         }
 
         return new Report(isSuccess, new ErrorList(errorList));
+    }
+
+    public Report checkMessageStatus(MessageStatus messageStatus) throws Exception {
+        List<Error> errorList = new ArrayList<>();
+
+        boolean isSuccess = true;
+
+        errorList.addAll(checkFrom(messageStatus.getFrom()));
+
+        errorList.addAll(checkResponseFor(messageStatus.getResponseFor()));
+        if (Validator.isNullOrEmpty(messageStatus.getStatusCode())) {
+            errorList.add(new Error("MessageHeader.StatusCode", "StatusCode is required"));
+        }
+        if (errorList.size() > 0) {
+            isSuccess = false;
+        }
+        return new Report(isSuccess, new ErrorList(errorList));
+
+    }
+
+    private List<Error> checkResponseFor(ResponseFor responseFor) throws Exception {
+
+        List<Error> errorList = new ArrayList<>(checkOrganId(responseFor.getOrganId(), true));
+        String lastOfErrorCode = new StringBuilder("MessageHeader").append("ResponseFor").append("Code").toString();
+
+        if (Validator.isNullOrEmpty(responseFor.getCode())) {
+            errorList.add(new Error(String.format("%s", lastOfErrorCode), "Code is required"));
+        }
+
+        if (Validator.isNullOrEmpty(responseFor.getDocumentId())) {
+            errorList.add(new Error("MessageHeader.ResponseFor.DocumentId", "DocumentId is required"));
+        }
+        return errorList;
+
     }
 
     public List<Organization> checkSendToVPCP(List<Organization> tos) {
@@ -159,17 +193,17 @@ public class Checker {
                     boolean result = edocDynamicContactService.checkPermission(keyInfo.getOrganId(), keyInfo.getToken());
                     report = new Report(result, new ErrorList(errorList));
                 } else {
-                    errorList.add(new Error("M.CheckSignature", "OrganId or Token is required"));
+                    errorList.add(new Error("CheckSignature", "OrganId or Token is required"));
 
                     report = new Report(false, new ErrorList(errorList));
                 }
             } else {
-                errorList.add(new Error("M.CheckSignature", "Error get KeyInfo"));
+                errorList.add(new Error("CheckSignature", "Error get KeyInfo"));
 
                 report = new Report(false, new ErrorList(errorList));
             }
         } else {
-            errorList.add(new Error("M.CheckSignature", "Error get Signature"));
+            errorList.add(new Error("CheckSignature", "Error get Signature"));
 
             report = new Report(false, new ErrorList(errorList));
         }
@@ -188,13 +222,13 @@ public class Checker {
                 report = new Report(result, new ErrorList(errorList));
 
             } else {
-                errorList.add(new Error("M.CheckPermission", "OrganId or Token is required"));
+                errorList.add(new Error("CheckPermission", "OrganId or Token is required"));
 
                 report = new Report(false, new ErrorList(errorList));
             }
 
         } else {
-            errorList.add(new Error("M.CheckPermission", "Error get check permission request null"));
+            errorList.add(new Error("CheckPermission", "Error get check permission request null"));
 
             report = new Report(false, new ErrorList(errorList));
         }
@@ -245,7 +279,7 @@ public class Checker {
                 if (!map.containsKey(to.getOrganId())) {
                     map.put(to.getOrganId(), to);
                 } else {
-                    errorList.add(new Error("N.MessageHeader.To.OrganId",
+                    errorList.add(new Error("MessageHeader.To.OrganId",
                             "To OrganId is duplicate."));
                     break;
                 }
@@ -384,12 +418,12 @@ public class Checker {
 
         if (subject.isEmpty()) {
 
-            errorList.add(new Error("N.MessageHeader.Subject",
+            errorList.add(new Error("MessageHeader.Subject",
                     "Subject is required."));
         }
         if (checkLength(subject, 500)) {
 
-            errorList.add(new Error("R.MessageHeader.Subject",
+            errorList.add(new Error("MessageHeader.Subject",
                     "Subject is out of range."));
         }
         return errorList;
@@ -405,7 +439,7 @@ public class Checker {
 
         if (checkLength(content, 500)) {
 
-            errorList.add(new Error("R.MessageHeader.Content",
+            errorList.add(new Error("MessageHeader.Content",
                     "Content is out of range."));
 
         }
@@ -422,7 +456,7 @@ public class Checker {
 
         if (checkLength(documentId, 15)) {
 
-            errorList.add(new Error("R.DocumentId",
+            errorList.add(new Error("DocumentId",
                     "DocumentId is out of range."));
         }
         return errorList;
@@ -782,13 +816,13 @@ public class Checker {
 
             if (result == ERROR_DATE_COMPARE) {
                 errorList.add(new Error(String.format("T.%s", lastOfErrorCode),
-                        "M.PromulgationDate is match type yyyy/MM/dd"));
+                        "PromulgationDate is match type yyyy/MM/dd"));
             } else if (result > 0) {
                 errorList.add(new Error(String.format("M.%s", lastOfErrorCode),
-                        "M.PromulgationDate can't greater current date"));
+                        "PromulgationDate can't greater current date"));
             }
         } else {
-            errorList.add(new Error("M.PromulgationDate",
+            errorList.add(new Error("PromulgationDate",
                     "PromulgationDate is match type yyyy/MM/dd"));
         }
 

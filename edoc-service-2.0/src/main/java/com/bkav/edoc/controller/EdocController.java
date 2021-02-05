@@ -36,6 +36,7 @@ import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.util.EdocServiceConstant;
 import com.bkav.edoc.util.EdocUtil;
 import com.bkav.edoc.util.MessageType;
+import com.bkav.edoc.util.ShaUtil;
 import com.google.gson.Gson;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -81,7 +82,22 @@ public class EdocController {
         SendDocResp sendDocResp = new SendDocResp();
         try {
             String organId = headers.get(EdocServiceConstant.ORGAN_ID);
+            String hashFile = headers.get("hash-edoc");
+            if (Validator.isNullOrEmpty(hashFile)) {
+                errors.add(new Error("BadRequest", "Bad Request"));
+                sendDocResp.setStatus("Fail");
+                sendDocResp.setCode("9999");
+                sendDocResp.setErrors(errors);
+                return gson.toJson(sendDocResp);
+            }
             String messageType = headers.get(EdocServiceConstant.MESSAGE_TYPE);
+            if (Validator.isNullOrEmpty(messageType) || !EdocServiceConstant.MESSAGE_TYPES.contains(messageType)) {
+                errors.add(new Error("BadRequest", "Bad Request"));
+                sendDocResp.setStatus("Fail");
+                sendDocResp.setCode("9999");
+                sendDocResp.setErrors(errors);
+                return gson.toJson(sendDocResp);
+            }
             InputStream inputStream = request.getInputStream();
             String docIdUUid = UUidUtils.generate();
             Calendar cal = Calendar.getInstance();
@@ -91,100 +107,113 @@ public class EdocController {
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");
                 sendDocResp.setDocId(0L);
-            } else if (!Validator.isNullOrEmpty(messageType) && (messageType.equals("EDOC") || messageType.equals("STATUS"))) {
-                String dataPath;
-                if (messageType.equals("EDOC")) {
-                    dataPath = organId + SEPARATOR +
-                            cal.get(Calendar.YEAR) + SEPARATOR +
-                            (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
-                            cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
-                            EdocServiceConstant.SEND_DOCUMENT + docIdUUid + ".edxml";
-                } else {
-                    dataPath = organId + SEPARATOR +
-                            cal.get(Calendar.YEAR) + SEPARATOR +
-                            (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
-                            cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
-                            EdocServiceConstant.SEND_STATUS + docIdUUid + ".edxml";
+                return gson.toJson(sendDocResp);
+            }
+            String dataPath;
+            if (messageType.equals("EDOC")) {
+                dataPath = organId + SEPARATOR +
+                        cal.get(Calendar.YEAR) + SEPARATOR +
+                        (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
+                        cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
+                        EdocServiceConstant.SEND_DOCUMENT + docIdUUid + ".edxml";
+            } else {
+                dataPath = organId + SEPARATOR +
+                        cal.get(Calendar.YEAR) + SEPARATOR +
+                        (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
+                        cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
+                        EdocServiceConstant.SEND_STATUS + docIdUUid + ".edxml";
+            }
+            String specPath = eDocPath +
+                    (eDocPath.endsWith(SEPARATOR) ? "" : SEPARATOR) +
+                    dataPath;
+            long size = attUtil.saveToFile(specPath, inputStream);
+            LOGGER.info("Save edoc file success with size " + size);
+            File file = new File(specPath);
+            InputStream fileInputStream = new FileInputStream(file);
+            String hash = ShaUtil.generateSHA256(specPath);
+            if (!hash.equals(hashFile)) {
+                errors.add(new Error("EdocHash", "Edoc file hash not match"));
+                sendDocResp.setCode("9999");
+                sendDocResp.setStatus("Error");
+                sendDocResp.setDocId(0L);
+                return gson.toJson(sendDocResp);
+            }
+            // process add edoc
+            if (messageType.equals(MessageType.EDOC.name())) {
+                Ed ed = EdXmlParser.getInstance().parse(fileInputStream);
+                LOGGER.info("-------------------- Parser success document --------------------");
+                //Get message header
+                MessageHeader messageHeader = (MessageHeader) ed.getHeader().getMessageHeader();
+                // create trace header list
+                //Get trace header list
+                TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
+                //Get attachment
+                List<Attachment> attachments = ed.getAttachments();
+                // validate edxml file
+                //check message
+                Report reportMessageHeader = CHECKER.checkMessageHeader(messageHeader);
+                Report reportTraceHeader = CHECKER.checkTraceHeaderList(traceHeaderList);
+                if (!reportMessageHeader.isIsSuccess()) {
+                    errors.addAll(reportMessageHeader.getErrorList().getErrors());
                 }
-                String specPath = eDocPath +
-                        (eDocPath.endsWith(SEPARATOR) ? "" : SEPARATOR) +
-                        dataPath;
-                long size = attUtil.saveToFile(specPath, inputStream);
-                LOGGER.info("Save edoc file success with size " + size);
-                File file = new File(specPath);
-                InputStream fileInputStream = new FileInputStream(file);
-                // process add edoc
-                if (messageType.equals(MessageType.EDOC.name())) {
-                    Ed ed = EdXmlParser.getInstance().parse(fileInputStream);
-                    LOGGER.info("-------------------- Parser success document --------------------");
-                    //Get message header
-                    MessageHeader messageHeader = (MessageHeader) ed.getHeader().getMessageHeader();
-                    // create trace header list
-                    //Get trace header list
-                    TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
-                    //Get attachment
-                    List<Attachment> attachments = ed.getAttachments();
-                    // validate edxml file
-                    //check message
-                    Report reportMessageHeader = CHECKER.checkMessageHeader(messageHeader);
-                    Report reportTraceHeader = CHECKER.checkTraceHeaderList(traceHeaderList);
-                    if (!reportMessageHeader.isIsSuccess()) {
-                        errors.addAll(reportMessageHeader.getErrorList().getErrors());
+                if (!reportTraceHeader.isIsSuccess()) {
+                    errors.addAll(reportTraceHeader.getErrorList().getErrors());
+                }
+                // only check exist with new document
+                if (EdocDocumentServiceUtil.checkNewDocument(traceHeaderList)) {
+                    // check exist document
+                    if (EdocDocumentServiceUtil.checkExistDocument(messageHeader.getDocumentId())) {
+                        errors.add(new Error("ExistDoc", "Document is exist"));
                     }
-                    if (!reportTraceHeader.isIsSuccess()) {
-                        errors.addAll(reportTraceHeader.getErrorList().getErrors());
-                    }
-                    // only check exist with new document
-                    if (EdocDocumentServiceUtil.checkNewDocument(traceHeaderList)) {
-                        // check exist document
-                        if (EdocDocumentServiceUtil.checkExistDocument(messageHeader.getDocumentId())) {
-                            errors.add(new Error("ExistDoc", "Document is exist"));
-                        }
-                    }
-                    if (errors.size() == 0) {
-                        StringBuilder documentEsbId = new StringBuilder();
-                        List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-                        List<Error> errorList = new ArrayList<>();
-                        EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader,
-                                traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errorList);
-                        if (document != null) {
-                            LOGGER.info("Save document from  successfully from file  to database document id " + documentEsbId.toString());
-                            sendDocResp.setCode("0");
-                            sendDocResp.setStatus("Success");
-                            sendDocResp.setDocId(document.getDocumentId());
-                        } else {
-                            errors.add(new Error("SendDocument", "Send document error docCode " + messageHeader.getCode().toString()));
-                            errors.addAll(errorList);
-                            LOGGER.error("Error save document with docCode " + messageHeader.getCode());
-                            sendDocResp.setCode("9999");
-                            sendDocResp.setStatus("Fail");
-                            sendDocResp.setDocId(0L);
-                        }
+                }
+                if (errors.size() == 0) {
+                    StringBuilder documentEsbId = new StringBuilder();
+                    List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
+                    List<Error> errorList = new ArrayList<>();
+                    EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader,
+                            traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errorList);
+                    if (document != null) {
+                        LOGGER.info("Save document from  successfully from file  to database document id " + documentEsbId.toString());
+                        sendDocResp.setCode("0");
+                        sendDocResp.setStatus("Success");
+                        sendDocResp.setDocId(document.getDocumentId());
                     } else {
+                        errors.add(new Error("SendDocument", "Send document error docCode " + messageHeader.getCode().toString()));
+                        errors.addAll(errorList);
+                        LOGGER.error("Error save document with docCode " + messageHeader.getCode());
                         sendDocResp.setCode("9999");
                         sendDocResp.setStatus("Fail");
                         sendDocResp.setDocId(0L);
                     }
                 } else {
-                    // Process add status
-                    Status status = StatusXmlParser.parse(fileInputStream);
-                    LOGGER.info("Parser success status from file " + specPath);
-                    //Get message header
-                    MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
+                    sendDocResp.setCode("9999");
+                    sendDocResp.setStatus("Fail");
+                    sendDocResp.setDocId(0L);
+                }
+            } else {
+                // Process add status
+                Status status = StatusXmlParser.parse(fileInputStream);
+                LOGGER.info("Parser success status from file " + specPath);
+                //Get message header
+                MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
+                Report report = CHECKER.checkMessageStatus(messageStatus);
+                if (!report.isIsSuccess()) {
+                    errors.addAll(report.getErrorList().getErrors());
+                    sendDocResp.setStatus("Fail");
+                    sendDocResp.setCode("9999");
+                    sendDocResp.setDocId(0L);
+                } else {
                     EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);
                     if (edocTrace != null) {
                         sendDocResp.setStatus("Success");
-                        sendDocResp.setErrors(errors);
                         sendDocResp.setCode("0");
                         sendDocResp.setDocId(edocTrace.getTraceId());
                     } else {
                         sendDocResp.setStatus("Error");
-                        sendDocResp.setErrors(errors);
                         sendDocResp.setCode("0");
+                        sendDocResp.setDocId(0L);
                     }
                 }
-            } else {
-                errors.add(new Error("MessageType", "UnSupport Message Type !!!"));
             }
             sendDocResp.setErrors(errors);
         } catch (Exception e) {

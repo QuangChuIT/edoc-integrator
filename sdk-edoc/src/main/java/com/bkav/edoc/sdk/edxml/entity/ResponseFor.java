@@ -1,27 +1,17 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.service.resource.StringPool;
-import com.bkav.edoc.service.xml.base.BaseElement;
-import com.bkav.edoc.service.xml.base.util.BaseXmlUtils;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.sdk.edxml.util.DateUtils;
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
-import javax.xml.bind.annotation.*;
 import java.util.Date;
 
-@XmlRootElement(name = "ResponseFor", namespace = StringPool.TARGET_NAMESPACE)
-@XmlType(name = "ResponseFor", propOrder = {"organId", "code", "promulgationDate", "documentId"})
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ResponseFor extends BaseElement {
+public class ResponseFor extends CommonElement implements IElement<ResponseFor> {
 
-    @XmlElement(name = "OrganId")
     private String organId;
-    @XmlElement(name = "Code")
     private String code;
-    @XmlElement(name = "PromulgationDate")
     private Date promulgationDate;
-    @XmlElement(name = "DocumentId")
     private String documentId;
 
     public ResponseFor() {
@@ -72,25 +62,27 @@ public class ResponseFor extends BaseElement {
         this.documentId = documentId;
     }
 
-    public static ResponseFor fromContent(Element paramElement) {
-        return new ResponseFor(BaseXmlUtils.getString(paramElement, "OrganId"),
-                BaseXmlUtils.getString(paramElement, "Code"),
-                DateUtils.parse(BaseXmlUtils.getString(paramElement, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT),
-                BaseXmlUtils.getString(paramElement, "DocumentId"));
-    }
-
-    public void accumulate(Element parentElement) {
-        Element responseFor = this.accumulate(parentElement, "ResponseFor");
-        this.accumulate(responseFor, "OrganId", this.organId);
-        this.accumulate(responseFor, "Code", this.code);
-        this.accumulate(responseFor, "DocumentId", this.documentId);
-        this.accumulate(responseFor, "PromulgationDate", DateUtils.format(this.promulgationDate));
-    }
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("OrganId",
                 this.organId).add("Code", this.code).add("DocumentId",
                 this.documentId).add("PromulgationDate", this.promulgationDate).toString();
+    }
+
+    @Override
+    public void createElement(Element element) {
+        Element responseFor = this.createElement(element, "ResponseFor");
+        this.createElement(responseFor, "OrganId", this.organId);
+        this.createElement(responseFor, "Code", this.code);
+        this.createElement(responseFor, "DocumentId", this.documentId);
+        this.createElement(responseFor, "PromulgationDate", DateUtils.format(this.promulgationDate));
+    }
+
+    @Override
+    public ResponseFor getData(Element element) {
+        return new ResponseFor(EdxmlUtils.getString(element, "OrganId"),
+                EdxmlUtils.getString(element, "Code"),
+                DateUtils.parse(EdxmlUtils.getString(element, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT),
+                EdxmlUtils.getString(element, "DocumentId"));
     }
 }

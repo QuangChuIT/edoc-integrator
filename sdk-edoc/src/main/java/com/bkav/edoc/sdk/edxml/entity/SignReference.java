@@ -1,6 +1,5 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.service.xml.base.BaseElement;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import org.jdom2.Element;
@@ -8,7 +7,7 @@ import org.jdom2.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignReference extends BaseElement {
+public class SignReference extends CommonElement implements IElement<SignReference> {
     private String URI;
     private List<String> transforms;
     private String digestMethod;
@@ -66,12 +65,34 @@ public class SignReference extends BaseElement {
         this.digestValue = digestValue;
     }
 
-    public static SignReference fromContent(Element elementNode) {
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(super.getClass()).add("URI", this.URI).add("Transforms", this.transforms)
+                .add("DigestMethod Algorithm", this.digestMethod).add("DigestValue", this.digestValue).toString();
+    }
+
+    @Override
+    public void createElement(Element element) {
+        element.setAttribute("URI", Strings.nullToEmpty(this.URI));
+        Element SignReference;
+        if (this.transforms != null && !this.transforms.isEmpty()) {
+            SignReference = this.createWithoutPrefix(element, "Transforms");
+            for (String str : this.transforms) {
+                Element transform = this.createWithoutPrefix(SignReference, "Transform");
+                this.createAttWithoutPrefix(transform, "Algorithm", str);
+            }
+        }
+        SignReference = this.createWithoutPrefix(element, "DigestMethod");
+        this.createAttWithoutPrefix(SignReference, "Algorithm", this.digestMethod);
+    }
+
+    @Override
+    public SignReference getData(Element rootElement) {
         SignReference signReference = new SignReference();
-        signReference.setURI(getAttributeWithPrefix(elementNode, "URI"));
-        List<Element> elementList = elementNode.getChildren();
+        signReference.setURI(this.getAttributeWithPrefix(rootElement, "URI"));
+        List<Element> elementList = rootElement.getChildren();
         if (elementList != null && elementList.size() != 0) {
-            Element element = null;
+            Element element;
             for (Element thisElement : elementList) {
                 element = thisElement;
                 if ("Transforms".equals(element.getName())) {
@@ -94,26 +115,5 @@ public class SignReference extends BaseElement {
 
         }
         return signReference;
-    }
-
-    public void accumulate(Element element) {
-        element.setAttribute("URI", Strings.nullToEmpty(this.URI));
-        Element SignReference;
-        if (this.transforms != null && !this.transforms.isEmpty()) {
-            SignReference = this.accumulateWithoutPrefix(element, "Transforms");
-            for (String str : this.transforms) {
-                Element transform = this.accumulateWithoutPrefix(SignReference, "Transform");
-                this.accumulateAttWithoutPrefix(transform, "Algorithm", str);
-            }
-        }
-        SignReference = this.accumulateWithoutPrefix(element, "DigestMethod");
-        this.accumulateAttWithoutPrefix(SignReference, "Algorithm", this.digestMethod);
-        this.accumulateWithoutPrefix(element, "DigestValue", this.digestValue);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(super.getClass()).add("URI", this.URI).add("Transforms", this.transforms)
-                .add("DigestMethod Algorithm", this.digestMethod).add("DigestValue", this.digestValue).toString();
     }
 }

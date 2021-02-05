@@ -40,8 +40,8 @@ public class X509Data extends CommonElement implements IElement<X509Data> {
 
     @Override
     public void createElement(Element element) {
-        this.accumulateWithoutPrefix(element, "X509SubjectName", this.x509SubjectName);
-        this.accumulateWithoutPrefix(element, "X509Certificate", this.x509Certificate);
+        this.createAttWithoutPrefix(element, "X509SubjectName", this.x509SubjectName);
+        this.createAttWithoutPrefix(element, "X509Certificate", this.x509Certificate);
     }
 
     @Override

@@ -1,11 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.service.xml.base.BaseElement;
-import com.bkav.edoc.service.xml.base.util.BaseXmlUtils;
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
-public class SignerInfo extends BaseElement {
+public class SignerInfo extends CommonElement implements IElement<SignerInfo> {
     private String competence;
     private String position;
     private String fullName;
@@ -43,21 +42,24 @@ public class SignerInfo extends BaseElement {
         this.fullName = fullName;
     }
 
-    public static SignerInfo fromContent(Element element) {
-        return new SignerInfo(BaseXmlUtils.getString(element, "Competence"),
-                BaseXmlUtils.getString(element, "Position"),
-                BaseXmlUtils.getString(element, "FullName"));
-    }
-
-    public void accumulate(Element elementNode) {
-        Element signerInfo = this.accumulate(elementNode, "SignerInfo");
-        this.accumulate(signerInfo, "Competence", this.competence);
-        this.accumulate(signerInfo, "Position", this.position);
-        this.accumulate(signerInfo, "FullName", this.fullName);
-    }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("Competence", this.competence).add("Position", this.position).add("FullName", this.fullName).toString();
+    }
+
+    @Override
+    public void createElement(Element rootElement) {
+        Element signerInfo = this.createElement(rootElement, "SignerInfo");
+        this.createElement(signerInfo, "Competence", this.competence);
+        this.createElement(signerInfo, "Position", this.position);
+        this.createElement(signerInfo, "FullName", this.fullName);
+    }
+
+    @Override
+    public SignerInfo getData(Element element) {
+        return new SignerInfo(EdxmlUtils.getString(element, "Competence"),
+                EdxmlUtils.getString(element, "Position"),
+                EdxmlUtils.getString(element, "FullName"));
     }
 }

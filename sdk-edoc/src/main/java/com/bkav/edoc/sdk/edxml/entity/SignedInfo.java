@@ -53,36 +53,10 @@ public class SignedInfo extends CommonElement implements IElement<SignedInfo> {
         this.reference.add(signReference);
     }
 
-    public static SignedInfo fromContent(Element element) {
-        SignedInfo signedInfo = new SignedInfo();
-        List<Element> childrenElement = element.getChildren();
-        if (childrenElement != null && childrenElement.size() != 0) {
-            for (Element children : childrenElement) {
-                if ("CanonicalizationMethod".equals(children.getName())) {
-                    signedInfo.setCanonicalizationMethod(getAttributeWithPrefix(children, "Algorithm"));
-                }
-
-                if ("SignatureMethod".equals(children.getName())) {
-                    signedInfo.setSignatureMethod(getAttributeWithPrefix(children, "Algorithm"));
-                }
-
-                if ("Reference".equals(children.getName())) {
-                    signedInfo.addReference(SignReference.fromContent(children));
-                }
-            }
-        }
-        return signedInfo;
-    }
-
-    public void accumulate(Element element) {
-
-
-    }
-
-    private void accumulateWithoutPrefix(Element element, CommonElement commonElement, String name) {
+    private void accumulateWithoutPrefix(Element element, CommonElement commonElement) {
         if (commonElement != null) {
-            if (!Strings.isNullOrEmpty(name)) {
-                element = this.createWithoutPrefix(element, name);
+            if (!Strings.isNullOrEmpty("Reference")) {
+                element = this.createWithoutPrefix(element, "Reference");
             }
 
             commonElement.createElement(element);
@@ -104,12 +78,29 @@ public class SignedInfo extends CommonElement implements IElement<SignedInfo> {
         Element signatureMethod = this.createWithoutPrefix(signedInfo, "SignatureMethod");
         this.createAttWithoutPrefix(signatureMethod, "Algorithm", this.signatureMethod);
         for (SignReference signReference : this.reference) {
-            this.accumulateWithoutPrefix(signedInfo, signReference, "Reference");
+            this.accumulateWithoutPrefix(signedInfo, signReference);
         }
     }
 
     @Override
     public SignedInfo getData(Element element) {
-        return null;
+        SignedInfo signedInfo = new SignedInfo();
+        List<Element> childrenElement = element.getChildren();
+        if (childrenElement != null && childrenElement.size() != 0) {
+            for (Element children : childrenElement) {
+                if ("CanonicalizationMethod".equals(children.getName())) {
+                    signedInfo.setCanonicalizationMethod(this.getAttributeWithPrefix(children, "Algorithm"));
+                }
+
+                if ("SignatureMethod".equals(children.getName())) {
+                    signedInfo.setSignatureMethod(getAttributeWithPrefix(children, "Algorithm"));
+                }
+
+                if ("Reference".equals(children.getName())) {
+                    signedInfo.addReference(new SignReference().getData(children));
+                }
+            }
+        }
+        return signedInfo;
     }
 }

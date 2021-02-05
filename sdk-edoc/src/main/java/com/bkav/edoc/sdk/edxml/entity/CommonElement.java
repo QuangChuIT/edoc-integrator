@@ -8,14 +8,14 @@ import org.jdom2.Element;
 
 public abstract class CommonElement {
 
-    public abstract void createElement(Element element);
+    public abstract void createElement(Element rootElement);
 
-    public static String getAttribute(Element element, String attrName) {
+    public String getAttribute(Element element, String attrName) {
         Attribute attribute = element.getAttribute(EdXmlConstant.EDXML_PREFIX + ":" + attrName);
         return attribute == null ? null : attribute.getValue();
     }
 
-    public static String getAttributeWithPrefix(Element element, String attrName) {
+    public String getAttributeWithPrefix(Element element, String attrName) {
         Attribute attribute = element.getAttribute(attrName);
         return attribute == null ? null : attribute.getValue();
     }
@@ -32,13 +32,13 @@ public abstract class CommonElement {
         }
     }
 
-    protected Element createElement(Element element, String eName, int eValue) {
+    public Element createElement(Element rootElement, String eName, int eValue) {
         if (eValue < 0) {
             return null;
         } else {
             Element newElement = new Element(eName, EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
             newElement.setText(String.valueOf(eValue));
-            element.addContent(newElement);
+            rootElement.addContent(newElement);
             return newElement;
         }
     }
@@ -49,7 +49,7 @@ public abstract class CommonElement {
         return rootElement;
     }
 
-    protected Element createElement(Element rootElement, String eName, String eValue) {
+    public Element createElement(Element rootElement, String eName, String eValue) {
         if (Validator.isNullOrEmpty(eValue) || Validator.isNullOrEmpty(eName)) {
             return null;
         } else {
@@ -69,13 +69,13 @@ public abstract class CommonElement {
         }
     }
 
-    protected Element createWithoutPrefix(Element rootElement, String eName) {
-        Element newElement = new Element(eName, "http://www.mic.gov.vn/TBT/QCVN_102_2016");
+    public Element createWithoutPrefix(Element rootElement, String eName) {
+        Element newElement = new Element(eName, EdXmlConstant.EDXML_URI);
         rootElement.addContent(newElement);
         return newElement;
     }
 
-    protected Element createElementWithoutPrefix(Element rootElement, String eName, String eValue) {
+    public Element createWithoutPrefix(Element rootElement, String eName, String eValue) {
         if (Strings.isNullOrEmpty(eValue)) {
             return null;
         } else {

@@ -44,10 +44,10 @@ public class Signature extends CommonElement implements IElement<Signature> {
         this.keyInfo = keyInfo;
     }
 
-    private void accumulateWithoutPrefix(Element element, CommonElement commonElement, String elementName) {
+    private void createWithoutPrefix(Element element, CommonElement commonElement, String eName) {
         if (commonElement != null) {
-            if (!Strings.isNullOrEmpty(elementName)) {
-                element = this.createWithoutPrefix(element, elementName);
+            if (!Strings.isNullOrEmpty(eName)) {
+                element = this.createWithoutPrefix(element, eName);
             }
 
             commonElement.createElement(element);
@@ -63,9 +63,9 @@ public class Signature extends CommonElement implements IElement<Signature> {
     @Override
     public void createElement(Element element) {
         Element signature = this.createWithoutPrefix(element, "Signature");
-        this.accumulateWithoutPrefix(signature, this.signedInfo, (String) null);
-        this.accumulateWithoutPrefix(signature, "SignatureValue", this.signatureValue);
-        this.accumulateWithoutPrefix(signature, this.keyInfo, (String) null);
+        this.createWithoutPrefix(signature, this.signedInfo, (String) null);
+        this.createWithoutPrefix(signature, "SignatureValue", this.signatureValue);
+        this.createWithoutPrefix(signature, this.keyInfo, (String) null);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Signature extends CommonElement implements IElement<Signature> {
         if (childrenElements != null && childrenElements.size() != 0) {
             for (Element children : childrenElements) {
                 if ("SignedInfo".equals(children.getName())) {
-                    signature.setSignedInfo(SignedInfo.fromContent(children));
+                    signature.setSignedInfo(new SignedInfo().getData(children));
                 }
 
                 if ("SignatureValue".equals(children.getName())) {

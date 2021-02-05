@@ -1,14 +1,13 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.service.xml.base.BaseElement;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.sdk.edxml.util.DateUtils;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
 import java.util.Date;
 import java.util.List;
 
-public class TraceHeader extends BaseElement {
+public class TraceHeader extends CommonElement implements IElement<TraceHeader> {
     private String organId;
     private Date timestamp;
 
@@ -36,7 +35,21 @@ public class TraceHeader extends BaseElement {
         this.timestamp = timestamp;
     }
 
-    public static TraceHeader fromContent(Element element) {
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(super.getClass()).add("OrganId", this.organId).add("Timestamp", this.timestamp).toString();
+    }
+
+    @Override
+    public void createElement(Element rootElement) {
+        Element traceHeader = this.createElement(rootElement, "TraceHeader");
+        this.createElement(traceHeader, "OrganId", this.organId);
+        this.createElement(traceHeader, "Timestamp", DateUtils.format(this.timestamp, "yyyy/MM/dd HH:mm:ss"));
+    }
+
+    @Override
+    public TraceHeader getData(Element element) {
         TraceHeader traceHeader = new TraceHeader();
         List<Element> childrenElements = element.getChildren();
         if (childrenElements != null && childrenElements.size() != 0) {
@@ -51,16 +64,5 @@ public class TraceHeader extends BaseElement {
 
         }
         return traceHeader;
-    }
-
-    public void accumulate(Element element) {
-        Element traceHeader = this.accumulate(element, "TraceHeader");
-        this.accumulate(traceHeader, "OrganId", this.organId);
-        this.accumulate(traceHeader, "Timestamp", DateUtils.format(this.timestamp, "yyyy/MM/dd HH:mm:ss"));
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(super.getClass()).add("OrganId", this.organId).add("Timestamp", this.timestamp).toString();
     }
 }

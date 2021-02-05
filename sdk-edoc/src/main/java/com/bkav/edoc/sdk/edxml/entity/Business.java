@@ -110,10 +110,10 @@ public class Business extends CommonElement implements IElement<Business> {
             this.businessDocumentInfo.accumulate(businessElement);
         }
         if (replacementInfoList != null) {
-            this.replacementInfoList.accumulate(businessElement);
+            this.replacementInfoList.createElement(businessElement);
         }
         if (staffInfo != null) {
-            this.staffInfo.accumulate(businessElement);
+            this.staffInfo.createElement(businessElement);
         }
     }
 
@@ -136,13 +136,13 @@ public class Business extends CommonElement implements IElement<Business> {
                     business.setBusinessDocReason(childElement.getText());
                 }
                 if ("StaffInfo".equals(childElement.getName())) {
-                    business.setStaffInfo(StaffInfo.fromContent(childElement));
+                    business.setStaffInfo(new StaffInfo().getData(childElement));
                 }
                 if ("BussinessDocumentInfo".equals(childElement.getName()) || "BusinessDocumentInfo".equals(childElement.getName())) {
                     business.setBusinessDocumentInfo(BusinessDocumentInfo.fromContent(childElement));
                 }
                 if ("ReplacementInfoList".equals(childElement.getName())) {
-                    business.setReplacementInfoList(ReplacementInfoList.fromContent(childElement));
+                    business.setReplacementInfoList(new ReplacementInfoList().getData(childElement));
                 }
             }
         }

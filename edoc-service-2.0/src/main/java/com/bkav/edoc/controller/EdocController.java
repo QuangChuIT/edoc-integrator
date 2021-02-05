@@ -131,13 +131,13 @@ public class EdocController {
             File file = new File(specPath);
             InputStream fileInputStream = new FileInputStream(file);
             String hash = ShaUtil.generateSHA256(specPath);
-            if (!hash.equals(hashFile)) {
+            /*if (hash.equals(hashFile)) {
                 errors.add(new Error("EdocHash", "Edoc file hash not match"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");
                 sendDocResp.setDocId(0L);
                 return gson.toJson(sendDocResp);
-            }
+            }*/
             // process add edoc
             if (messageType.equals(MessageType.EDOC.name())) {
                 Ed ed = EdXmlParser.getInstance().parse(fileInputStream);

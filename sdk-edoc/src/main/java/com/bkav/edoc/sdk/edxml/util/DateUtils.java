@@ -30,7 +30,7 @@ public class DateUtils {
             try {
                 return simpleDateFormat.parse(dateStrValue);
             } catch (ParseException e) {
-                System.out.println("Could not parse [{" + dateStrValue + "}] to date with given format [{" + format + "}] to date");
+                System.out.println("Parser error with date format " + format + " value " + dateStrValue);
                 return null;
             }
         }

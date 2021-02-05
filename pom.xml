@@ -11,6 +11,7 @@
         <module>edoc-service</module>
         <module>edoc-webapp</module>
         <module>edoc-transform</module>
+        <module>sdk-edoc</module>
     </modules>
 
     <packaging>pom</packaging>

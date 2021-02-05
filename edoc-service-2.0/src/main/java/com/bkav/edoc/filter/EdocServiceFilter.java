@@ -1,9 +1,17 @@
 package com.bkav.edoc.filter;
 
+import com.bkav.edoc.payload.BaseResp;
+import com.bkav.edoc.service.xml.base.header.Error;
+import com.bkav.edoc.util.EdocUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class EdocServiceFilter implements Filter {
     /**
@@ -63,12 +71,20 @@ public class EdocServiceFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        try {
-            LOG.info("---------------------------- ok ------------------------- ");
+        LOG.info("------------------ Edoc Service Filter Invoker ------------------");
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        Map<String, String> headerMap = EdocUtil.getHeaders(req);
+        List<Error> errors = EdocUtil.validateHeader(headerMap);
+        if (errors.size() > 0) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            BaseResp baseResp = new BaseResp();
+            baseResp.setCode("9999");
+            baseResp.setStatus("False");
+            baseResp.setErrors(errors);
+            response.getWriter().write(new Gson().toJson(baseResp));
+        } else {
             chain.doFilter(request, response);
-        } catch (Exception ex) {
-            LOG.error(ex);
         }
     }
 

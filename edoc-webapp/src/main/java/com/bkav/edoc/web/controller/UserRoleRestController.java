@@ -56,7 +56,7 @@ public class UserRoleRestController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @RequestMapping(value = "/public/-/create/role/", method= RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/public/-/create/role/", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> createUserRole(@RequestBody UserRoleRequest userRoleRequest) {
         List<String> errors = new ArrayList<>();
         try {
@@ -65,7 +65,7 @@ public class UserRoleRestController {
             long userId = userRoleRequest.getUserId();
             long roleId = userRoleRequest.getRoleId();
 
-            if (!UserRoleServiceUtil.checkExistUserRole(userId)) {
+            /*if (!UserRoleServiceUtil.checkExistUserRole(userId)) {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userId);
                 userRole.setRoleId(roleId);
@@ -82,12 +82,13 @@ public class UserRoleRestController {
                 message = messageSourceUtil.getMessage("user.message.create.role.success", null);
                 Response response = new Response(code, errors, message);
                 return new ResponseEntity<>(response, HttpStatus.valueOf(code));
-            }
+            }*/
         } catch (Exception e) {
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        return null;
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRoleRestController.class);

@@ -3,6 +3,7 @@ package com.bkav.edoc.web.vpcp;
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocTraceServiceUtil;
@@ -262,8 +263,9 @@ public class ServiceVPCP {
                                 //Get message header
                                 MessageStatus messageStatus = (MessageStatus) ed.getHeader().getMessageHeader();
                                 LOGGER.info(messageStatus.toString());
-                                boolean success = EdocTraceServiceUtil.addTrace(messageStatus);
-                                if (success) {
+                                List<Error> errors = new ArrayList<>();
+                                EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);
+                                if (edocTrace != null) {
                                     LOGGER.info("Done save status vpcp from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
                                     status = "done";
                                 } else {
@@ -292,10 +294,22 @@ public class ServiceVPCP {
     }
 
     private List<Organization> filterOrgan(List<Organization> organizations) {
-        String currentOrgan = com.bkav.edoc.web.util.PropsUtil.get("edoc.root.organDomain");
-        return organizations.stream()
-                .filter(organ -> organ.getOrganId().contains(currentOrgan))
-                .collect(Collectors.toList());
+        List<String> organs = new ArrayList<>();
+        List<Organization> result = new ArrayList<>();
+        organizations.forEach(o -> organs.add(o.getOrganId()));
+        List<EdocDynamicContact> dynamicContacts = EdocDynamicContactServiceUtil.getContactsByMultipleDomains(organs);
+        if (dynamicContacts.size() > 0) {
+            List<EdocDynamicContact> agencies = dynamicContacts.stream().filter(EdocDynamicContact::getAgency).collect(Collectors.toList());
+            if (agencies.size() > 0) {
+                List<String> organDomains = agencies.stream().map(EdocDynamicContact::getDomain).collect(Collectors.toList());
+                for (Organization domain : organizations) {
+                    if (organDomains.contains(domain.getOrganId())) {
+                        result.add(domain);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     static {

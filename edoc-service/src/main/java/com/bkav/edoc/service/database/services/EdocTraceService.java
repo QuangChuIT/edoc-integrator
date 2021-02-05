@@ -11,11 +11,11 @@ import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
+import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class EdocTraceService {
@@ -23,7 +23,7 @@ public class EdocTraceService {
     private final EdocTraceDaoImpl traceDaoImpl = new EdocTraceDaoImpl();
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
 
-    public boolean updateTrace(MessageStatus status) {
+    public EdocTrace updateTrace(MessageStatus status, List<Error> errors) {
         Session currentSession = traceDaoImpl.openCurrentSession();
         try {
             // get info from status
@@ -60,7 +60,8 @@ public class EdocTraceService {
             EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
-                return false;
+                errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));
+                return null;
             }
             // set info to edoc trace
             EdocTrace edocTrace = new EdocTrace();
@@ -100,13 +101,14 @@ public class EdocTraceService {
                 MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
             }
             currentSession.getTransaction().commit();
-            return true;
+            return edocTrace;
         } catch (Exception e) {
             LOGGER.error("Error update trace with status " + status.toString() + " cause " + Arrays.toString(e.getStackTrace()));
+            errors.add(new Error("M.UpdateStatus", "Error update status !!!"));
             if (currentSession != null) {
                 currentSession.getTransaction().rollback();
             }
-            return false;
+            return null;
         } finally {
             traceDaoImpl.closeCurrentSession(currentSession);
         }
@@ -144,6 +146,10 @@ public class EdocTraceService {
             trace.setEnable(false);
             traceDaoImpl.disableEdocTrace(trace);
         }
+    }
+
+    public EdocTrace getTrace(long traceId) {
+        return traceDaoImpl.findById(traceId);
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocTraceService.class);

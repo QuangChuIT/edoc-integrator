@@ -88,4 +88,9 @@ public class EdocAttachmentService {
     public void insertAttachment(EdocAttachment edocAttachment) {
         attachmentDaoImpl.insertAttachments(edocAttachment);
     }
+
+    public boolean checkSignedAttachment (long docId) {
+        return attachmentDaoImpl.checkSignedAttachment(docId);
+
+    }
 }

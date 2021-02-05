@@ -10,6 +10,9 @@ import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.kernel.util.DateUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
+import com.bkav.edoc.service.redis.RedisKey;
+import com.bkav.edoc.service.redis.RedisUtil;
+import com.bkav.edoc.service.util.CommonUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
@@ -35,8 +38,38 @@ public class EdocNotificationService {
         }
     }
 
-    public void updateNotification(EdocNotification notification) {
+    /**
+     * remove pending document
+     *
+     * @param domain
+     * @param documentId
+     */
+    public void removePendingDocId(String domain, long documentId) {
+        LOGGER.info("------------------------ Prepare remove pending document with document id " + documentId + " : " + domain + " ------------------------");
+        // remove in cache
+        removePendingDocumentIdInCache(domain, documentId);
+        // remove in db
+        this.removePendingDocumentId(domain, documentId);
+    }
 
+    /**
+     * remove pending document in cache
+     *
+     * @param domain
+     * @param documentId
+     */
+    private void removePendingDocumentIdInCache(String domain, long documentId) {
+        List obj = RedisUtil.getInstance().get(RedisKey.getKey(domain,
+                RedisKey.GET_PENDING_KEY), List.class);
+
+        if (obj != null) {
+            List<Long> oldDocumentIds = CommonUtil.convertToListLong(obj);
+            LOGGER.info("--------------------- Before remove document in cache list of document in cache" + oldDocumentIds);
+            oldDocumentIds.remove(documentId);
+            LOGGER.info("--------------------- Remove pending document in cache for document " + documentId + " organ domain " + domain + " " + oldDocumentIds);
+            RedisUtil.getInstance().set(RedisKey.getKey(domain,
+                    RedisKey.GET_PENDING_KEY), oldDocumentIds);
+        }
     }
 
     /**
@@ -74,6 +107,7 @@ public class EdocNotificationService {
                     edocNotification.setTaken(true);
                     edocNotification.setModifiedDate(new Date());
                     notificationDaoImpl.saveOrUpdate(edocNotification);
+                    LOGGER.info("Update notification set taken success for notification with document id " + documentId + " : " + edocNotification.getReceiverId());
                     String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
                     DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
                     if (documentCacheUpdate != null) {
@@ -205,6 +239,10 @@ public class EdocNotificationService {
             LOGGER.error("Error check organ to stat cause " + e);
         }
         return result;
+    }
+
+    public boolean checkExistNotification(String organDomain, long documentId) {
+        return notificationDaoImpl.checkExistNotification(organDomain, documentId);
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationService.class);

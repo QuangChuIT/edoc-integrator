@@ -3,6 +3,7 @@ package com.bkav.edoc.service.database.daoimpl;
 import com.bkav.edoc.service.database.dao.EdocNotificationDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
+import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -169,6 +170,24 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         } finally {
             closeCurrentSession(session);
         }
+    }
+
+    public boolean checkExistNotification(String organDomain, long documentId) {
+       Session session = openCurrentSession();
+       try {
+           StringBuilder sql = new StringBuilder();
+           sql.append("Select en from EdocNotification en where en.receiverId = :organDomain and en.document.documentId =:documentId");
+           Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+           query.setParameter("organDomain", organDomain);
+           query.setParameter("documentId", documentId);
+           if (query.getResultList().size() > 0)
+               return true;
+       } catch (Exception e) {
+           LOGGER.error(e);
+       } finally {
+           closeCurrentSession(session);
+       }
+       return false;
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationDaoImpl.class);

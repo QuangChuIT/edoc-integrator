@@ -1,7 +1,6 @@
 package com.bkav.edoc.service.database.dao;
 
 import com.bkav.edoc.service.database.entity.EdocDocument;
-import org.hibernate.query.Query;
 
 import java.util.Date;
 import java.util.List;
@@ -22,6 +21,8 @@ public interface EdocDocumentDao {
     List<EdocDocument> getDocuments(String organId, int start, int size);
 
     EdocDocument addNewDocument(EdocDocument edocDocument);
+
+    EdocDocument getDocumentByDocCode(String docCode);
 
     boolean removeDocument(long documentId);
 }

@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class UserRole implements Serializable {
     private long id;
-    private long userId;
-    private long roleId;
+    private User user;
+    private Role role;
 
     public UserRole() {
     }
@@ -18,19 +18,19 @@ public class UserRole implements Serializable {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public long getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoleId(long roleId) {
-        this.roleId = roleId;
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

@@ -27,20 +27,25 @@ public class DailyCounterConvert {
             while (rs.next()) {
                 Map<String, EdocDailyCounter> dailyCounterMap = new HashMap<>();
                 _counterDate = rs.getDate(1);
-                LOGGER.info("Starting counter document in data: " + _counterDate);
-                List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate);
-                for (EdocDocument document : documents) {
-                    String fromOrgan = document.getFromOrganDomain();
+                LOGGER.info("Starting counter document in date: " + _counterDate);
+                List<String> docCodes = DatabaseUtil.getDocCodeByCounterDate(connection, _counterDate);
+                for (String docCode: docCodes) {
+                    List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate, docCode);
+                    String fromOrgan = "";
+                    for (EdocDocument document : documents) {
+                        LOGGER.info("Start count with document id: " + document.getDocumentId());
+                        fromOrgan = document.getFromOrganDomain();
+
+                        String toOrgans = document.getToOrganDomain();
+                        String[] toOrgansList = toOrgans.split("#");
+                        for (String toOrgan : toOrgansList) {
+                            if (checkCurrentOrgan(toOrgan)) {
+                                countReceived(toOrgan, dailyCounterMap);
+                            }
+                        }
+                    }
                     if (checkCurrentOrgan(fromOrgan)) {
                         countSent(fromOrgan, dailyCounterMap);
-                    }
-
-                    String toOrgans = document.getToOrganDomain();
-                    String[] toOrgansList = toOrgans.split("#");
-                    for (String toOrgan : toOrgansList) {
-                        if (checkCurrentOrgan(toOrgan)) {
-                            countReceived(toOrgan, dailyCounterMap);
-                        }
                     }
                 }
                 submitDatabase(dailyCounterMap);
@@ -302,4 +307,16 @@ public class DailyCounterConvert {
         LOGGER.info("Done!!!!!!!!!!!!!!");
     }
     */
+
+    public static void main(String[] args) throws SQLException {
+        System.out.println("Processing...");
+        long startTime = System.currentTimeMillis();
+
+        DailyCounterConvert dailyCounterConverter = new DailyCounterConvert();
+        dailyCounterConverter.runCounterStatDocument();
+
+        long endTime = System.currentTimeMillis();
+        LOGGER.info("Run time: " + (endTime-startTime)/60000.0 + " minutes");
+        LOGGER.info("Done!!!!!!!!!!!!!!");
+    }
 }

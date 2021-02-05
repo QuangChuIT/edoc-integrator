@@ -23,3 +23,7 @@ function getDate() {
 function getCurrentMonth() {
     return new Date().getMonth();
 }
+
+function getCurrentYear() {
+    return new Date().getFullYear();
+}

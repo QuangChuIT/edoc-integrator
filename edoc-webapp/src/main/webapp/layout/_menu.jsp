@@ -17,11 +17,11 @@
     User user = new Gson().fromJson(userLog, User.class);
     UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
     String roleKey = "USER";
-    if(userRole != null){
+    /*if(userRole != null){
         long roleId= userRole.getRoleId();
         Role role = RoleServiceUtil.getRole(roleId);
         roleKey = role.getRoleKey();
-    }
+    }*/
 %>
 <div class="edoc-action">
     <button class="btn btn-lg btn-create-edoc">
@@ -118,13 +118,19 @@
             </a>
             <ul class="nav nav-second-level">
                 <li>
-                    <a href="javascript:void(0)" data-mode="viewChart" id="repot-chart"><spring:message
+                    <a href="javascript:void(0)" data-mode="viewChart" data-id="<%=user.getUserId()%>" id="repot-chart"><spring:message
                             code="edoc.report.chart"/></a>
                 </li>
+                <%
+                    if(roleKey.equals("ADMIN") || roleKey.equals("SUPER ADMIN")) {
+                %>
                 <li>
-                    <a href="javascript:void(0)" data-mode="viewDetail" id="report-detail"><spring:message
+                    <a href="javascript:void(0)" data-mode="viewDetail" data-id="<%=user.getUserId()%>" id="report-detail"><spring:message
                             code="edoc.report.view.detail"/></a>
                 </li>
+                <%
+                    }
+                %>
             </ul>
         </li>
     </ul>

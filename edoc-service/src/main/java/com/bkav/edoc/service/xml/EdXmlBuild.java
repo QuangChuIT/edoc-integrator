@@ -644,7 +644,7 @@ public class EdXmlBuild {
 
         Content content = null;
         try {
-            content = StatusXmlBuilder.build(new Status(header));
+            content = StatusXmlBuilder.build(new Status(header), "");
         } catch (BuildException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

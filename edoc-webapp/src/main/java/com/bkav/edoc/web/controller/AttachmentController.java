@@ -3,6 +3,7 @@ package com.bkav.edoc.web.controller;
 import com.bkav.edoc.service.database.entity.EdocAttachment;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
 import com.bkav.edoc.service.util.PropsUtil;
+import com.bkav.edoc.web.auth.CookieUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +27,7 @@ public class AttachmentController {
     private final EdocAttachmentService attachmentService = new EdocAttachmentService();
 
     @RequestMapping(value = "/attachment/-/edoc-attachment/{attachmentId}", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long attachmentId) {
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long attachmentId, HttpServletRequest request) {
         if (attachmentId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -61,9 +63,15 @@ public class AttachmentController {
     }
 
     @RequestMapping(value = "/attachment/-/download/{attachmentId}", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> downloadAttachment(@PathVariable Long attachmentId) throws IOException {
+    public ResponseEntity<InputStreamResource> downloadAttachment(@PathVariable Long attachmentId, HttpServletRequest request) throws IOException {
         HttpHeaders responseHeader = new HttpHeaders();
         try {
+            String organDomain = CookieUtil.getValue(request, "Organization");
+            if (organDomain == null) {
+                return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+            } else {
+
+            }
             if (attachmentId == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -94,7 +102,8 @@ public class AttachmentController {
             InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(data));
             InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
             return new ResponseEntity<>(inputStreamResource, responseHeader, HttpStatus.OK);
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            logger.error("Error process download file with attachment id " + attachmentId);
             return new ResponseEntity<>(null, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -12,4 +12,5 @@ public interface EdocAttachmentDao {
 
     boolean insertAttachments(EdocAttachment edocAttachment);
 
+    boolean checkAllowDownAttachment(String organDomain, long attachmentId);
 }

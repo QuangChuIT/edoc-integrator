@@ -63,13 +63,13 @@ public class Header extends CommonElement implements IElement<Header> {
         if (elementList != null && elementList.size() != 0) {
             for (Element children : elementList) {
                 if ("MessageHeader".equals(children.getName())) {
-                    header.setMessageHeader(messageHeader.fromContent(children));
+                    header.setMessageHeader(new MessageHeader().getData(children));
                 }
                 if ("TraceHeaderList".equals(children.getName())) {
-                    header.setTraceHeaderList(TraceHeaderList.fromContent(children));
+                    header.setTraceHeaderList(new TraceHeaderList().getData(children));
                 }
                 if ("Signature".equals(children.getName())) {
-                    header.setSignature(Signature.fromContent(children));
+                    header.setSignature(new Signature().getData(children));
                 }
             }
 

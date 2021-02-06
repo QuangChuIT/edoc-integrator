@@ -118,8 +118,8 @@ public class Attachment {
         this.description = paramString;
     }
 
-    public void accumulate(Element element, String fileName) throws IOException {
-        Element attachment = this.accumulateWithoutPrefix(element, "Attachment");
+    public void createAttachment(Element element, String fileName) throws IOException {
+        Element attachment = this.createWithoutPrefix(element, "Attachment");
         if (this.contentId == null) {
             this.contentId = UUID.randomUUID().toString();
         }
@@ -153,7 +153,7 @@ public class Attachment {
 
         this.accumulateWithoutPrefix(attachment, "ContentType", this.contentType);
         this.contentTransferEncoded = BaseEncoding.base64().encode(ByteStreams.toByteArray(inputStream));
-        this.accumulate(attachment, "ContentTransferEncoded", this.contentTransferEncoded);
+        this.createElement(attachment, "ContentTransferEncoded", this.contentTransferEncoded);
         inputStream.close();
     }
 
@@ -258,7 +258,7 @@ public class Attachment {
         }
     }
 
-    protected Element accumulateWithoutPrefix(Element element, String elementName, String value) {
+    public Element accumulateWithoutPrefix(Element element, String elementName, String value) {
         if (Strings.isNullOrEmpty(value)) {
             return null;
         } else {
@@ -269,13 +269,13 @@ public class Attachment {
         }
     }
 
-    protected Element accumulateWithoutPrefix(Element element, String attrName) {
+    public Element createWithoutPrefix(Element element, String attrName) {
         Element newElement = new Element(attrName, EdXmlConstant.EDXML_URI);
         element.addContent(newElement);
         return newElement;
     }
 
-    protected Element accumulate(Element element, String elementName, String value) {
+    public Element createElement(Element element, String elementName, String value) {
         if (Strings.isNullOrEmpty(value)) {
             return null;
         } else {
@@ -285,5 +285,4 @@ public class Attachment {
             return newElement;
         }
     }
-
 }

@@ -28,7 +28,7 @@ public class FileUtils {
         return counter;
     }
 
-    public static int remove(File file, boolean ignoreCannotDelete) throws Exception {
+    public static int delete(File file, boolean ignoreCannotDelete) throws Exception {
         int counter = 0;
         if (file.exists()) {
             if (file.isDirectory()) {
@@ -46,10 +46,10 @@ public class FileUtils {
         return counter;
     }
 
-    public static void removeIfExist(String path) throws Exception {
+    public static void deleteIfExist(String path) throws Exception {
         File file = new File(path);
         if (file.exists()) {
-            remove(file, true);
+            delete(file, true);
         }
 
     }

@@ -34,6 +34,6 @@ public class EdocDailyCounterServiceUtil {
     }
 
     public static List<EdocStatisticDetail> getStatisticDetail (String fromDate, String toDate, String organDomain) {
-        return EDOC_DAILY_COUNTER_SERVICE.getStatisticDetail(fromDate, toDate, organDomain);
+        return EDOC_DAILY_COUNTER_SERVICE.getStatisticSentReceivedExtDetail(fromDate, toDate, organDomain);
     }
 }

@@ -56,13 +56,14 @@ public class PublicStatRestController {
     @RequestMapping(value = "/public/-/statistic/chart", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<String> getSentReceivedForChart(@RequestParam(value = "year", required = false) String year_str,
                                                           @RequestParam(value = "userId", required = false) String userId) {
-        String results;
+        String results = "";
         int year = Integer.parseInt(year_str);
         Long id = new Long(userId);
         User user = UserServiceUtil.findUserById(id);
-        if (user == null)
-            results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
-        else {
+        if (user == null) {
+            LOGGER.error("Not found user with id " + id + " !!!!!!!!!!!!!");
+            //results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
+        } else {
             if (user.getUsername().equals(PropsUtil.get("user.admin.username"))) {
                 results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
             } else {
@@ -77,13 +78,20 @@ public class PublicStatRestController {
     @RequestMapping(value = "/public/-/statistic/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<EdocStatisticDetail> getStatisticDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
                                                         @RequestParam(value = "toDate", required = false) String toDate,
-                                                        @RequestParam(value = "organDomain", required = false) String organDomain) {
+                                                        @RequestParam(value = "userId") String userId) {
 
-        if (fromDate == null || toDate == null || organDomain == null) {
-            return EdocDailyCounterServiceUtil.getStatisticDetail(null, null, null);
+        Long id = new Long(userId);
+        User user = UserServiceUtil.findUserById(id);
+        if(user == null) {
+            LOGGER.error("Not found user with id " + id + " !!!!!!!!!!!!!");
         } else {
-            return EdocDailyCounterServiceUtil.getStatisticDetail(fromDate, toDate, organDomain);
+            if (user.getUsername().equals(PropsUtil.get("user.admin.username"))) {
+                // get all data in range of date.
+            } else {
+                // get data of organ in range of date
+            }
         }
+        return null;
     }
 
     @GetMapping(value = "/public/-/document/attachments")
@@ -170,7 +178,8 @@ public class PublicStatRestController {
 
     @RequestMapping(value = "/public/-/dailycounter/converter", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public HttpStatus dailycounterConvert(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+    public HttpStatus dailycounterConvert(@RequestParam(value = "fromDate", required = false) String fromDate,
+                                          @RequestParam(value = "toDate", required = false) String toDate) {
         if (fromDate != null && toDate != null) {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);

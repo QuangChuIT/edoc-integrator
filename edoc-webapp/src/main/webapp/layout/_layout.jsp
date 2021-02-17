@@ -826,6 +826,15 @@
     </div>
 
 </script>
+<script id="userEmailTemplate" type="text/x-jquery-tmpl">
+    <div>
+        {{if emailAddress}}
+            <span>${emailAddress}</span>
+        {{else}}
+            <span>${app_message.no_data}</span>
+        {{/if}}
+    </div>
+</script>
 <script id="userStatusTemplate" type="text/x-jquery-tmpl">
     <div>
         {{if status === false}}
@@ -834,7 +843,6 @@
             <span>${user_message.user_table_header_status_1}</span>
         {{/if}}
     </div>
-
 </script>
 <script id="userTemplate" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">
@@ -1117,8 +1125,21 @@
         <span>${name}</span>
     </a>
 </div>
-
 </script>
+<script id="organEmailTemplate" type="text/x-jquery-tmpl">
+<div>
+    {{if email}}
+    <a href=javascript:void(0)" title="${email}" data-id="${id}" class="organ-email">
+        <span>${email}</span>
+    </a>
+    {{else}}
+    <a href=javascript:void(0)" title="${email}" data-id="${id}" class="organ-email">
+        <span>${app_message.no_data}</span>
+    </a>
+    {{/if}}
+</div>
+</script>
+
 <script id="organDetailTemplate" type="text/x-jquery-tmpl">
     <form class="form-horizontal" action="javascript:void(0)">
         <div class="form-group">

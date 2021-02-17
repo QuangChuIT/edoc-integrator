@@ -93,7 +93,10 @@ let userManage = {
                 },
                 {
                     "title": user_message.table_header_emailAddress,
-                    "data": "emailAddress",
+                    "data": null,
+                    "render": function (data) {
+                        return $('#userEmailTemplate').tmpl(data).html();
+                    }
                 },
                 {
                     "title": user_message.table_header_organize,

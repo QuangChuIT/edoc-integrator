@@ -25,6 +25,8 @@ public class ExcelService {
     private Sheet sheet;
     private CellStyle headerStyle;
     private XSSFFont font;
+    private CellStyle cellStyle;
+    private DataFormat fmt;
 
     public Map<String, Object> readExcelFileForUser(MultipartFile file) throws IOException {
         List<User> users = new ArrayList<>();
@@ -33,51 +35,53 @@ public class ExcelService {
         InputStream inputStream = file.getInputStream();
 
         // Create workbook, sheet of excel
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
+        workbook = new XSSFWorkbook(inputStream);
+        sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
 
         // Read each row of excel file
         int rowNum = 0;
+        int totalCols = 0;
         while (rows.hasNext()) {
             Row currentRow = rows.next();
             // skip & check header
             if (rowNum == 0) {
+                totalCols = currentRow.getPhysicalNumberOfCells();
                 rowNum++;
                 continue;
             }
 
-            Iterator<Cell> cellsInRow = currentRow.iterator();
-
             User user = new User();
 
-            int cellIndex = 0;
-            while (cellsInRow.hasNext()) {
-                Cell currentCell = cellsInRow.next();
-                currentCell.setCellType(Cell.CELL_TYPE_STRING);
+            for (int cellInd = 0; cellInd < totalCols; cellInd++) {
+                Cell cell = currentRow.getCell(cellInd);
+                if (cell != null) {
+                    createCellStyle();
+                    cell.setCellStyle(cellStyle);
+                }
                 ImportExcelError importExcelError = null;
-                switch (cellIndex) {
+
+                switch (cellInd) {
                     case 1:
-                        String username = currentCell.getStringCellValue();
-                        if (username.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.username");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.username");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
+                            String username = cell.getStringCellValue();
                             user.setUsername(username);
                         }
                         break;
-
                     case 2:
-                        String password = currentCell.getStringCellValue();
                         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
-                        if (password.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.password.empty");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.password.empty");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
+                            String password = cell.getStringCellValue();
                             if (!password.matches(passwordRegex)) {
-                                importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.password.invalid");
+                                importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.password.invalid");
                                 errors.add(importExcelError);
                                 flag = false;
                             } else {
@@ -87,13 +91,14 @@ public class ExcelService {
                         break;
 
                     case 3:
-                        String email = currentCell.getStringCellValue();
                         String emailRegex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
-                        if (email.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.email.empty");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.email.empty");
                             errors.add(importExcelError);
+                            user.setEmailAddress("");
                             flag = false;
                         } else {
+                            String email = cell.getStringCellValue();
                             user.setEmailAddress(email);
                             /*if (!email.matches(emailRegex)) {
                                 importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.email.invalid");
@@ -106,23 +111,23 @@ public class ExcelService {
                         break;
 
                     case 4:
-                        String displayName = currentCell.getStringCellValue();
-                        if (displayName.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.fullname");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.fullname");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
-                            user.setDisplayName(currentCell.getStringCellValue());
+                            String displayName = cell.getStringCellValue();
+                            user.setDisplayName(cell.getStringCellValue());
                         }
                         break;
 
                     case 5:
-                        String organ_id = currentCell.getStringCellValue().trim();
-                        if (organ_id.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "user.error.organId");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "user.error.organId");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
+                            String organ_id = cell.getStringCellValue().trim();
                             EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(organ_id);
                             if (organ == null) {
                                 // create organ
@@ -142,17 +147,13 @@ public class ExcelService {
                         }
                         break;
                 }
-                cellIndex++;
+                user.setCreateDate(new Date());
+                user.setModifiedDate(new Date());
+                user.setStatus(true);
+                if (flag == true)
+                    users.add(user);
+                rowNum++;
             }
-            Date currentDate = new Date();
-            user.setCreateDate(currentDate);
-            user.setModifiedDate(currentDate);
-            user.setLastLoginDate(currentDate);
-            user.setStatus(true);
-            if (flag) {
-                users.add(user);
-            }
-            rowNum++;
         }
         workbook.close();
         Map<String, Object> map = new HashMap<>();
@@ -167,71 +168,94 @@ public class ExcelService {
         boolean flag = true;
         InputStream inputStream = file.getInputStream();
 
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
+        workbook = new XSSFWorkbook(inputStream);
+        sheet = workbook.getSheetAt(0);
         Iterator<Row> rows = sheet.iterator();
 
+        int totalCols = 0;
         int rowNum = 0;
         while (rows.hasNext()) {
             Row currentRow = rows.next();
             // skip & check header
             if (rowNum == 0) {
+                totalCols = currentRow.getPhysicalNumberOfCells();
                 rowNum++;
                 continue;
             }
 
-            Iterator<Cell> cellsInRow = currentRow.iterator();
-
             EdocDynamicContact organ = new EdocDynamicContact();
 
-            int cellIndex = 0;
-            while (cellsInRow.hasNext()) {
-                Cell currentCell = cellsInRow.next();
-                currentCell.setCellType(Cell.CELL_TYPE_STRING);
+            for (int cellInd = 0; cellInd < totalCols; cellInd++) {
+                Cell cell = currentRow.getCell(cellInd);
+                if (cell != null) {
+                    createCellStyle();
+                    cell.setCellStyle(cellStyle);
+                }
                 ImportExcelError importExcelError = null;
-                switch (cellIndex) {
+                switch (cellInd) {
                     case 1:
-                        String name = currentCell.getStringCellValue();
-                        if (name.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "organ.error.name");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "organ.error.name");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
+                            String name = cell.getStringCellValue();
                             organ.setName(name);
                         }
                         break;
                     case 2:
-                        organ.setInCharge(currentCell.getStringCellValue());
+                        if (cell == null)
+                            break;
+                        else {
+                            String inCharge = cell.getStringCellValue();
+                            organ.setInCharge(inCharge);
+                        }
                         break;
                     case 3:
-                        String domain = currentCell.getStringCellValue();
-                        if (domain.equals("")) {
-                            importExcelError = new ImportExcelError(cellIndex, rowNum, "organ.error.domain");
+                        if (cell == null) {
+                            importExcelError = new ImportExcelError(cellInd, rowNum, "organ.error.domain");
                             errors.add(importExcelError);
                             flag = false;
                         } else {
+                            String domain = cell.getStringCellValue();
                             organ.setDomain(domain);
                         }
                         break;
                     case 4:
-                        organ.setEmail(currentCell.getStringCellValue());
+                        if (cell == null)
+                            organ.setEmail("");
+                        else {
+                            String email = cell.getStringCellValue();
+                            organ.setEmail(email);
+                        }
                         break;
                     case 5:
-                        organ.setAddress(currentCell.getStringCellValue());
+                        if (cell == null)
+                            break;
+                        else {
+                            String address = cell.getStringCellValue();
+                            organ.setAddress(address);
+                        }
                         break;
                     case 6:
-                        organ.setTelephone(currentCell.getStringCellValue());
+                        if (cell == null)
+                            break;
+                        else {
+                            String telephone = cell.getStringCellValue();
+                            organ.setTelephone(telephone);
+                        }
                         break;
                 }
-                cellIndex++;
             }
             String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
             organ.setToken(newToken);
             organ.setCreateDate(new Date());
+            organ.setModifiedDate(new Date());
             organ.setAgency(true);
             organ.setStatus(true);
-            if (flag)
+            if (flag) {
                 organs.add(organ);
+            }
             rowNum++;
         }
         workbook.close();
@@ -537,75 +561,11 @@ public class ExcelService {
         headerStyle.setFont(font);
     }
 
-   /* public void exportStatDetailForTayNinh(List<EdocStatDetail> edocStatDetails) throws IOException {
-        List<String> header_excel = Arrays.asList("Đơn vị", "Tổng", "Nhận nội bộ", "Nhận bên ngoài", "Ký số", "Không ký số");
-        int i = 0;
-        workbook = new XSSFWorkbook();
-
-        sheet = workbook.createSheet("Thống kê văn bản");
-        sheet.setColumnWidth(0, 15000);
-        sheet.setColumnWidth(1, 4000);
-        sheet.setColumnWidth(2, 5000);
-        sheet.setColumnWidth(3, 5000);
-        sheet.setColumnWidth(4, 5000);
-        sheet.setColumnWidth(5, 5000);
-        sheet.setDefaultRowHeight((short) 500);
-
-        Row header = sheet.createRow(0);
-
-        createHeaderStyle();
-
-        Cell headerCell;
-
-        for (String head: header_excel) {
-            headerCell = header.createCell(i);
-            headerCell.setCellValue(head);
-            headerCell.setCellStyle(headerStyle);
-            i++;
-        }
-
-        CellStyle style = workbook.createCellStyle();
-        style.setWrapText(true);
-        int numRow = 1;
-
-        for (EdocStatDetail edocStatDetail : edocStatDetails) {
-            Row row = sheet.createRow(numRow);
-
-            Cell cell = row.createCell(0);
-            EdocDynamicContact organ = EdocDynamicContactServiceUtil.findContactByDomain(edocStatDetail.getOrganDomain());
-            cell.setCellValue(organ.getName());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(1);
-            cell.setCellValue(edocStatDetail.getTotal());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(2);
-            cell.setCellValue(edocStatDetail.getReceived_int());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(3);
-            cell.setCellValue(edocStatDetail.getReceived_ext());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(4);
-            cell.setCellValue(edocStatDetail.getSigned());
-            cell.setCellStyle(style);
-
-            cell = row.createCell(5);
-            cell.setCellValue(edocStatDetail.getNot_signed());
-            cell.setCellStyle(style);
-            numRow++;
-        }
-
-        FileOutputStream outputStream = new FileOutputStream("/home/huynq/Desktop/ThongKeVanBanNhan.xlsx");
-        workbook.write(outputStream);
-        workbook.close();
-        outputStream.close();
-        LOGGER.info("Write users to Excel END!!!!!!!!!");
+    private void createCellStyle() {
+        cellStyle = workbook.createCellStyle();
+        fmt = workbook.createDataFormat();
+        cellStyle.setDataFormat(fmt.getFormat("@"));
     }
-
-    */
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.util.ExcelUtil.class);
 

@@ -316,7 +316,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                         GetChangeStatusResult statusResult = ServiceVPCP.getInstance().confirmReceived(extDocumentId, "done");
                         LOGGER.info("Confirm Receiver to VPCP with docId " + document.getDocumentId() + " result code " + statusResult.getStatus());
                     } else {
-                        LOGGER.error("Found document to confirm to VPCP but docId VPCPdocId VPCP null !!!!!!!!!");
+                        LOGGER.error("Found document to confirm to VPCP but docId VPCP docId VPCP null !!!!!!!!!");
                     }
                 }*/
             }

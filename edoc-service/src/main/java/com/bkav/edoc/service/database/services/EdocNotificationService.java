@@ -2,10 +2,13 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
+import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.kernel.util.DateUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
@@ -13,10 +16,14 @@ import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.util.CommonUtil;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -159,19 +166,32 @@ public class EdocNotificationService {
         }
     }
 
-    public List<TelegramMessage> getTelegramMessages(Date date) {
+    public List<TelegramMessage> getTelegramMessages() {
         List<TelegramMessage> telegramMessages = new ArrayList<>();
         try {
-            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
+            //List<EdocNotification> notifications = notificationDaoImpl.getEdocNotifyNotTaken(date);
+            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotifyNotTaken();
             for (EdocNotification notification : notifications) {
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(notification.getReceiverId());
-                if (contact.getReceiveNotify()) {
-                    // check if document not taken after 30m to notification
-                    Date createDate = notification.getModifiedDate();
-                    int diffMin = DateUtil.getMinuteBetween(createDate, date);
+                if (contact != null) {
+                    if (contact.getReceiveNotify()) {
+                        // check if document not taken after 30m to notification
+                        Date createDate = notification.getModifiedDate();
+                    /*int diffMin = DateUtil.getMinuteBetween(createDate, date);
                     LOGGER.info("------------------------- Modified Date " + createDate +
                             " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
                     if (diffMin >= 30) {
+                        TelegramMessage telegramMessage = new TelegramMessage();
+                        telegramMessage.setReceiverId(notification.getReceiverId());
+                        telegramMessage.setReceiverName(contact.getName());
+                        telegramMessage.setDocument(notification.getDocument());
+                        telegramMessage.setCreateDate(createDate);
+                        telegramMessages.add(telegramMessage);
+                    }*/
+
+                        LOGGER.info("------------------------- Modified Date " + createDate +
+                                " ------------------ organ " + notification.getReceiverId());
+
                         TelegramMessage telegramMessage = new TelegramMessage();
                         telegramMessage.setReceiverId(notification.getReceiverId());
                         telegramMessage.setReceiverName(contact.getName());
@@ -182,36 +202,6 @@ public class EdocNotificationService {
                 }
             }
             LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
-            /*List<String> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
-            for (String notification : notifications) {
-                if(checkOrganReceiveNotify(notification)) {
-                    EmailRequest emailRequest = new EmailRequest();
-                    emailRequest.setReceiverId(notification);
-                    List<EdocDocument> documents = notificationDaoImpl.getDocumentNotTakenByReceiverId(notification);
-                    emailRequest.setNumberOfDocument(documents.size());
-                    emailRequest.setEdocDocument(documents);
-                    emailRequests.add(emailRequest);
-                    count_organ++;
-
-             */
-            /*int i = 0;
-            List<EdocNotification> notifications = notificationDaoImpl.getEdocNotificationsNotTaken(date);
-            for (EdocNotification notification : notifications) {
-                // check if document not taken after 30m to notification
-                if (checkOrganReceiveNotify(notification.getReceiverId())) {
-                    Date createDate = notification.getModifiedDate();
-                    int diffMin = DateUtil.getMinuteBetween(createDate, date);
-                    if (diffMin >= 30) {
-                        TelegramMessage telegramMessage = new TelegramMessage();
-                        telegramMessage.setReceiverId(notification.getReceiverId());
-                        telegramMessage.setDocument(notification.getDocument());
-                        telegramMessage.setCreateDate(createDate);
-                        telegramMessages.add(telegramMessage);
-                        i++;
-                    }
-                }
-            }
-            System.out.println(i);*/
             return telegramMessages;
         } catch (Exception e) {
             LOGGER.error(e);
@@ -219,13 +209,53 @@ public class EdocNotificationService {
         }
     }
 
+    /*public Map<String, Object> getAllDocumentNotTaken(PaginationCriteria paginationCriteria) {
+        int totalRecords = 0;
+        List<EdocDocument> documents = new ArrayList<>();
+        Session session = notificationDaoImpl.openCurrentSession();
+        Map<String, Object> map = null;
+        try {
+            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetOrganizations", EdocDynamicContact.class);
+            storedProcedureQuery.registerStoredProcedureParameter("orderBy", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("keyword", String.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("pageIdx", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("pageSize", Integer.class, ParameterMode.IN);
+            storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
+            storedProcedureQuery.setParameter("orderBy", paginationCriteria.getOrderBy());
+            storedProcedureQuery.setParameter("keyword", paginationCriteria.getSearch());
+            storedProcedureQuery.setParameter("pageIdx", paginationCriteria.getPageNumber());
+            storedProcedureQuery.setParameter("pageSize", paginationCriteria.getPageSize());
+            totalRecords = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
+
+            List list = storedProcedureQuery.getResultList();
+
+            if (list != null && list.size() > 0) {
+                for (Object object : list) {
+                    EdocDynamicContact contact = (EdocDynamicContact) object;
+                    OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
+                    contacts.add(cacheEntry);
+                }
+                map = new HashMap<>();
+                map.put("contacts", contacts);
+                map.put("totalContacts", totalRecords);
+                return map;
+            }
+            return null;
+        } catch (Exception e) {
+            LOGGER.error("Error get contacts cause " + e.getMessage());
+            return map;
+        } finally {
+            dynamicContactDaoImpl.closeCurrentSession(session);
+        }
+    }*/
+
 
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -7);
-        cal.add(Calendar.HOUR, 9);
+        cal.add(Calendar.DATE, -20);
         Date yesterday = cal.getTime();
-        System.out.println(new EdocNotificationService().getTelegramMessages(yesterday).size());
+        Date today = new Date();
+        System.out.println(new EdocNotificationService().getTelegramMessages().size());
     }
 
     private boolean checkOrganToSendEmail(String organId) {

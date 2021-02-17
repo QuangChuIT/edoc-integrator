@@ -20,8 +20,8 @@ public class EdocNotificationServiceUtil {
         return NOTIFICATION_SERVICE.getEmailRequestScheduleSend(fromDate, toDate);
     }
 
-    public static List<TelegramMessage> telegramScheduleSend(Date date) {
-        return NOTIFICATION_SERVICE.getTelegramMessages(date);
+    public static List<TelegramMessage> telegramScheduleSend() {
+        return NOTIFICATION_SERVICE.getTelegramMessages();
     }
 
     public static boolean checkExistNotification(String organ, long docId) {

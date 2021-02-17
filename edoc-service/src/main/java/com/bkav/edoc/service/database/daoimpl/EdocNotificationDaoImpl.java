@@ -143,11 +143,34 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         }
     }
 
+    public List<EdocNotification> getEdocNotifyNotTaken() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en FROM EdocNotification en WHERE en.taken=:taken");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("taken", false);
+            List<EdocNotification> notifications = query.getResultList();
+            if (notifications != null) {
+                LOGGER.info("Get success list document not taken with size " + notifications.size());
+                return notifications;
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error get edoc notification not taken cause " + e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            closeCurrentSession(session);
+        }
+    }
+
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -2);
+        cal.add(Calendar.DATE, -30);
+        Date now = new Date();
         Date yesterday = cal.getTime();
-        new EdocNotificationDaoImpl().getEdocNotificationsNotTaken(yesterday);
+        new EdocNotificationDaoImpl().getEdocNotifyNotTaken();
     }
 
     public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {

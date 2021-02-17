@@ -320,7 +320,6 @@ public class EdocController {
                                     getDocumentResp.setData(data);
                                     getDocumentResp.setStatus("Success");
                                     getDocumentResp.setCode("0");
-                                    getDocumentResp.setFilePath(fileName);
                                 } else {
                                     errors.add(new Error("GetDocument", "Get Document Error"));
                                     getDocumentResp.setErrors(errors);
@@ -348,7 +347,6 @@ public class EdocController {
                                 getDocumentResp.setData(data);
                                 getDocumentResp.setStatus("Success");
                                 getDocumentResp.setCode("0");
-                                getDocumentResp.setFilePath(content.getContent().getPath());
                             } else {
                                 errors.add(new Error("GetDocument", "Get Status Error"));
                                 getDocumentResp.setErrors(errors);

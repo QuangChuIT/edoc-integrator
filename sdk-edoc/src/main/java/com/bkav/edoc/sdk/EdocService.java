@@ -138,7 +138,6 @@ public class EdocService {
                 fileOutputStream.write(data.getBytes(StandardCharsets.UTF_8));
                 fileOutputStream.flush();
                 fileOutputStream.close();
-                getDocumentResp.setFilePath(specDataPath);
             }
         } catch (Exception e) {
             e.printStackTrace();

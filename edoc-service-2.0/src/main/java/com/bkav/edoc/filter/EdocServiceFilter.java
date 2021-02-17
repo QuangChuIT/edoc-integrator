@@ -2,7 +2,7 @@ package com.bkav.edoc.filter;
 
 import com.bkav.edoc.payload.BaseResp;
 import com.bkav.edoc.service.xml.base.header.Error;
-import com.bkav.edoc.util.ProcessRequestUtil;
+import com.bkav.edoc.util.EdocUtil;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
@@ -74,8 +74,8 @@ public class EdocServiceFilter implements Filter {
         LOG.info("------------------ Edoc Service Filter Invoker ------------------");
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        Map<String, String> headerMap = ProcessRequestUtil.getHeaders(req);
-        List<Error> errors = ProcessRequestUtil.validateHeader(headerMap);
+        Map<String, String> headerMap = EdocUtil.getHeaders(req);
+        List<Error> errors = EdocUtil.validateHeader(headerMap);
         if (errors.size() > 0) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             BaseResp baseResp = new BaseResp();

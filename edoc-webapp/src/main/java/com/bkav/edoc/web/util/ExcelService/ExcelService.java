@@ -401,13 +401,13 @@ public class ExcelService {
                     // Set SSO field to true
                     user.setSso(true);
                     UserServiceUtil.createUser(user);
-                    if (!UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
+                    /*if (!UserRoleServiceUtil.checkExistUserRole(user.getUserId())) {
                         UserRole userRole = new UserRole();
                         Role role = RoleServiceUtil.getRoleByRoleName("USER");
                         userRole.setUserId(user.getUserId());
                         userRole.setRoleId(role.getRoleId());
                         UserRoleServiceUtil.createUserRole(userRole);
-                    }
+                    }*/
                 }
             } else {
                 LOGGER.info("Duplicate user with username " + user.getUsername());

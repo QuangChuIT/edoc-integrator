@@ -11,7 +11,9 @@
         <module>edoc-service</module>
         <module>edoc-webapp</module>
         <module>edoc-transform</module>
-        <module>EDXML</module>
+        <module>sdk-edoc</module>
+        <module>edoc-service-2.0</module>
+
     </modules>
 
     <packaging>pom</packaging>

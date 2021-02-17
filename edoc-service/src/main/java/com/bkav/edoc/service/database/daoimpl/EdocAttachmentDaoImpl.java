@@ -67,6 +67,11 @@ public class EdocAttachmentDaoImpl extends RootDaoImpl<EdocAttachment, Long> imp
         }
     }
 
+    @Override
+    public boolean checkAllowDownAttachment(String organDomain, long attachmentId) {
+        return false;
+    }
+
     public void updateAttachment(EdocAttachment attachment) {
         try (Session session = openCurrentSession()) {
             session.beginTransaction();

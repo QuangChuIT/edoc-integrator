@@ -27,7 +27,7 @@ public class AttachmentController {
     private final EdocAttachmentService attachmentService = new EdocAttachmentService();
 
     @RequestMapping(value = "/attachment/-/edoc-attachment/{attachmentId}", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long attachmentId) {
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable Long attachmentId, HttpServletRequest request) {
         if (attachmentId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -69,49 +69,49 @@ public class AttachmentController {
             String organDomain = CookieUtil.getValue(request, "Organization");
             if (organDomain == null) {
                 return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+            }
+            if (attachmentId == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else {
-                if (attachmentId == null) {
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                EdocAttachment attachment = attachmentService.getAttachmentById(attachmentId);
+
+                if (attachment == null) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+
+                String fromOrgan = attachment.getOrganDomain();
+                String toOrgan = attachment.getToOrganDomain();
+                if (fromOrgan.equals(organDomain) || toOrgan.contains(organDomain)) {
+                    String specPath = attachment.getFullPath();
+
+                    String fullPath = PropsUtil.get("edxml.attachment.dir");
+
+                    String filePath = fullPath + "/attachment/" + specPath;
+
+                    File file = new File(filePath);
+
+                    byte[] data = FileUtils.readFileToByteArray(file);
+
+                    String filename = URLEncoder.encode(attachment.getName(),
+                            StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+                    // Set mimeType response
+                    responseHeader.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+                    // Config information file response
+                    responseHeader.set("Content-disposition", "attachment; filename=" + filename);
+                    responseHeader.setContentLength(data.length);
+                    InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(data));
+                    InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+                    return new ResponseEntity<>(inputStreamResource, responseHeader, HttpStatus.OK);
                 } else {
-                    EdocAttachment attachment = attachmentService.getAttachmentById(attachmentId);
-
-                    if (attachment == null) {
-                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                    }
-
-                    String fromOrgan = attachment.getOrganDomain();
-                    String toOrgan = attachment.getToOrganDomain();
-                    if (fromOrgan.equals(organDomain) || toOrgan.contains(organDomain)) {
-                        String specPath = attachment.getFullPath();
-
-                        String fullPath = PropsUtil.get("edxml.attachment.dir");
-
-                        String filePath = fullPath + "/attachment/" + specPath;
-
-                        File file = new File(filePath);
-
-                        byte[] data = FileUtils.readFileToByteArray(file);
-
-                        String filename = URLEncoder.encode(attachment.getName(),
-                                StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
-                        // Set mimeType response
-                        responseHeader.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-                        // Config information file response
-                        responseHeader.set("Content-disposition", "attachment; filename=" + filename);
-                        responseHeader.setContentLength(data.length);
-                        InputStream inputStream = new BufferedInputStream(new ByteArrayInputStream(data));
-                        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
-                        return new ResponseEntity<>(inputStreamResource, responseHeader, HttpStatus.OK);
-                    } else {
-                        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
-                    }
+                    return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
                 }
             }
         } catch (Exception e) {
             logger.error("Error process download file with attachmentId " + attachmentId);
             return new ResponseEntity<>(null, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     private final static Logger logger = Logger.getLogger(AttachmentController.class);

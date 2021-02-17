@@ -2,6 +2,8 @@ package com.bkav.edoc.service.database.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Role implements Serializable {
     private long roleId;
@@ -14,6 +16,7 @@ public class Role implements Serializable {
     private long lastModifyByUserId;
     private Date lastModifyOnDate;
     private Date version;
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public Role() {
     }
@@ -98,4 +101,11 @@ public class Role implements Serializable {
         this.version = version;
     }
 
+    public Set<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(Set<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
 }

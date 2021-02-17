@@ -5,12 +5,7 @@ import com.bkav.edoc.service.kernel.util.FileUtil;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -188,8 +183,6 @@ public class ArchiveUtil {
 
             }
 
-        } else {
-            result = false;
         }
 
         return result;

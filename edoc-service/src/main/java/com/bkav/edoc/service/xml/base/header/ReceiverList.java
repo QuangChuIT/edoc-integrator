@@ -2,7 +2,6 @@ package com.bkav.edoc.service.xml.base.header;
 
 import com.bkav.edoc.service.xml.base.BaseElement;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import org.jdom2.Element;
 
 import java.util.ArrayList;

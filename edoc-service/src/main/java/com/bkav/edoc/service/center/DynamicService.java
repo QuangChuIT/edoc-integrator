@@ -7,6 +7,8 @@ import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.*;
+import com.bkav.edoc.service.memcached.MemcachedKey;
+import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.mineutil.*;
 import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
@@ -145,6 +147,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            updateReceivedNotify(report, checkPermission);
             contacts = edocDynamicContactService.getAllDynamicContact();
             if (contacts == null) {
                 contacts = new ArrayList<>();
@@ -230,6 +233,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            updateReceivedNotify(report, checkPermission);
             String organId = extractMime.getOrganId(envelop, EdXmlConstant.GET_TRACE);
             if (organId == null || organId.isEmpty()) {
                 errorList.add(new Error("M.OrganId", "OrganId is required."));
@@ -295,6 +299,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            updateReceivedNotify(report, checkPermission);
             if (organId == null || organId.isEmpty()) {
                 errorList.add(new Error("M.OrganId", "OrganId is required."));
             }
@@ -363,6 +368,10 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            CheckPermission checkPermission = new CheckPermission();
+            checkPermission.setToken(signature.getKeyInfo().getToken());
+            checkPermission.setOrganId(signature.getKeyInfo().getOrganId());
+            updateReceivedNotify(report, checkPermission);
             List<Error> errors = new ArrayList<>();
             // update trace
             if (traceService.updateTrace(status, errors) != null) {
@@ -439,6 +448,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
                 return map;
             }
+            updateReceivedNotify(report, checkPermission);
             // check document id and organ id
             if (documentId > 0L && organId != null && !organId.isEmpty()) {
                 // Check permission with document
@@ -570,6 +580,10 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                     return map;
                 }
+                CheckPermission checkPermission = new CheckPermission();
+                checkPermission.setToken(signature.getKeyInfo().getToken());
+                checkPermission.setOrganId(signature.getKeyInfo().getOrganId());
+                updateReceivedNotify(report, checkPermission);
                 //check message
                 report = checker.checkMessageHeader(messageHeader);
 
@@ -711,7 +725,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
             return map;
         }
-
+        updateReceivedNotify(report, checkPermission);
         if (organId == null || organId.isEmpty()) {
             List<Error> errorList = new ArrayList<>();
             errorList.add(new Error("M.OrganId", "OrganId is required."));
@@ -752,6 +766,32 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
         map.put(StringPool.CHILD_BODY_KEY, responseDocument);
         return map;
+    }
+
+    private void updateReceivedNotify(Report report, CheckPermission checkPermission) {
+        if (report.isIsSuccess()) {
+            String cacheKey = MemcachedKey.getKey(checkPermission.getOrganId(), MemcachedKey.ORGAN_RECEIVED_REPORT);
+            Boolean isReceivedNotification = (Boolean) MemcachedUtil.getInstance().read(cacheKey);
+            if (isReceivedNotification != null) {
+                if (!isReceivedNotification) {
+                    LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
+                    EdocDynamicContact edocDynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
+                    edocDynamicContact.setReceiveNotify(true);
+                    edocDynamicContactService.updateContact(edocDynamicContact);
+                    LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
+                    MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
+                }
+            } else {
+                EdocDynamicContact dynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
+                if (!dynamicContact.getReceiveNotify()) {
+                    LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
+                    dynamicContact.setReceiveNotify(true);
+                    edocDynamicContactService.updateContact(dynamicContact);
+                    LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
+                    MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
+                }
+            }
+        }
     }
 
     /**

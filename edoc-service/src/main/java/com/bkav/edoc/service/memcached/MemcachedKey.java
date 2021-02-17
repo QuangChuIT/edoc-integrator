@@ -21,6 +21,8 @@ public class MemcachedKey {
 
     public static final String PRIORITY_KEY = "Priority_";
 
+    public static final String ORGAN_RECEIVED_REPORT = "ReportContact_";
+
     public final static String GLOBAL_IDS_FOR_TEST = "GlobalIdsForTest";
 
     public final static String[] DEFAULT_SERVER = new String[]{"127.0.0.1:11211"};

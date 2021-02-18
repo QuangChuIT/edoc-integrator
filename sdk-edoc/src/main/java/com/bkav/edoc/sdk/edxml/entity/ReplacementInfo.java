@@ -1,6 +1,9 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class ReplacementInfo {
     private String documentId;
@@ -30,6 +33,22 @@ public class ReplacementInfo {
         this.organIdList = organIdList;
     }
 
+    public static ReplacementInfo getData(Element element) {
+        ReplacementInfo replacementInfo = new ReplacementInfo();
+        List<Element> elements = element.getChildren();
+        if (elements != null && elements.size() != 0) {
+            for (Element thisElement : elements) {
+                if ("DocumentId".equals(thisElement.getName())) {
+                    replacementInfo.setDocumentId(thisElement.getText());
+                }
+
+                if ("OrganIdList".equals(thisElement.getName())) {
+                    replacementInfo.setOrganIdList(OrganIdList.getData(thisElement));
+                }
+            }
+        }
+        return replacementInfo;
+    }
 
     @Override
     public String toString() {

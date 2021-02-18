@@ -1,6 +1,9 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.DateUtils;
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 import java.util.Date;
 
@@ -57,6 +60,13 @@ public class ResponseFor {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    public static ResponseFor getData(Element paramElement) {
+        return new ResponseFor(EdxmlUtils.getString(paramElement, "OrganId"),
+                EdxmlUtils.getString(paramElement, "Code"),
+                DateUtils.parse(EdxmlUtils.getString(paramElement, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT),
+                EdxmlUtils.getString(paramElement, "DocumentId"));
     }
 
     @Override

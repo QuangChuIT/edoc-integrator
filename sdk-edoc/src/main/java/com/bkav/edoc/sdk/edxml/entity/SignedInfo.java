@@ -1,6 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,27 @@ public class SignedInfo {
         this.reference.add(signReference);
     }
 
+
+    public static SignedInfo getData(Element element) {
+        SignedInfo signedInfo = new SignedInfo();
+        List<Element> childrenElement = element.getChildren();
+        if (childrenElement != null && childrenElement.size() != 0) {
+            for (Element children : childrenElement) {
+                if ("CanonicalizationMethod".equals(children.getName())) {
+                    signedInfo.setCanonicalizationMethod(EdxmlUtils.getAttributeWithPrefix(children, "Algorithm"));
+                }
+
+                if ("SignatureMethod".equals(children.getName())) {
+                    signedInfo.setSignatureMethod(EdxmlUtils.getAttributeWithPrefix(children, "Algorithm"));
+                }
+
+                if ("Reference".equals(children.getName())) {
+                    signedInfo.addReference(SignReference.getData(children));
+                }
+            }
+        }
+        return signedInfo;
+    }
 
     @Override
     public String toString() {

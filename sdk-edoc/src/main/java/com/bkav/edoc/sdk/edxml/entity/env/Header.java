@@ -3,6 +3,9 @@ package com.bkav.edoc.sdk.edxml.entity.env;
 import com.bkav.edoc.sdk.edxml.entity.MessageHeader;
 import com.bkav.edoc.sdk.edxml.entity.Signature;
 import com.bkav.edoc.sdk.edxml.entity.TraceHeaderList;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class Header {
     private MessageHeader messageHeader;
@@ -51,4 +54,23 @@ public class Header {
         this.signature = signature;
     }
 
+    public static Header fromContent(Element element, MessageHeader messageHeader) {
+        Header header = new Header();
+        List<Element> elementList = element.getChildren();
+        if (elementList != null && elementList.size() != 0) {
+            for (Element children : elementList) {
+                if ("MessageHeader".equals(children.getName())) {
+                    header.setMessageHeader(messageHeader.getData(children));
+                }
+                if ("TraceHeaderList".equals(children.getName())) {
+                    header.setTraceHeaderList(TraceHeaderList.getData(children));
+                }
+                if ("Signature".equals(children.getName())) {
+                    header.setSignature(Signature.getData(children));
+                }
+            }
+
+        }
+        return header;
+    }
 }

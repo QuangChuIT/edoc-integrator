@@ -1,6 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.Strings;
+import org.jdom2.Element;
 
 public class Code {
     private String codeNumber;
@@ -42,4 +44,7 @@ public class Code {
         }
     }
 
+    public static Code getData(Element element) {
+        return new Code(EdxmlUtils.getString(element, "CodeNumber"), EdxmlUtils.getString(element, "CodeNotation"));
+    }
 }

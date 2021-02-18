@@ -1,6 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class StaffInfo {
 
@@ -74,6 +78,37 @@ public class StaffInfo {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public static StaffInfo fromNode(Element element) {
+        return new StaffInfo(EdxmlUtils.getString(element, "Department"),
+                EdxmlUtils.getString(element, "DepartmentId"),
+                EdxmlUtils.getString(element, "Staff"), EdxmlUtils.getString(element, "StaffId"),
+                EdxmlUtils.getString(element, "Email"), EdxmlUtils.getString(element, "Mobile"));
+    }
+
+    public static StaffInfo getData(Element paramElement) {
+        StaffInfo staffInfo = new StaffInfo();
+        List<Element> elementList = paramElement.getChildren();
+        if (elementList != null && elementList.size() != 0) {
+            for (Element element : elementList) {
+                if ("Department".equals(element.getName())) {
+                    staffInfo.setDepartment(element.getText());
+                } else if ("DepartmentId".equals(element.getName())) {
+                    staffInfo.setDepartmentId(element.getText());
+                } else if ("Staff".equals(element.getName())) {
+                    staffInfo.setStaff(element.getText());
+                } else if ("StaffId".equals(element.getName())) {
+                    staffInfo.setStaffId(element.getText());
+                } else if ("Email".equals(element.getName())) {
+                    staffInfo.setEmail(element.getText());
+                } else if ("Mobile".equals(element.getName())) {
+                    staffInfo.setMobile(element.getText());
+                }
+            }
+
+        }
+        return staffInfo;
     }
 
     @Override

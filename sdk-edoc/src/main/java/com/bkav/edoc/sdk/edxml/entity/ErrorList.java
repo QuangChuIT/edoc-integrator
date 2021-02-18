@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;

@@ -1,6 +1,7 @@
 package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.UserRoleDao;
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -39,14 +40,14 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
     }
 
     @Override
-    public UserRole getRoleByUserId(long userId) {
+    public UserRole getRoleByUser(User user) {
         Session currentSession = openCurrentSession();
         try {
             CriteriaBuilder builder = currentSession.getCriteriaBuilder();
             CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
             Root<UserRole> root = query.from(UserRole.class);
             query.select(root);
-            query.where(builder.equal(root.get("userId"), userId));
+            query.where(builder.equal(root.get("user"), user));
             Query<UserRole> q = currentSession.createQuery(query);
             return q.uniqueResult();
         } catch (Exception e) {
@@ -55,7 +56,6 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
         } finally {
             closeCurrentSession(currentSession);
         }
-
     }
 
     @Override
@@ -87,18 +87,18 @@ public class UserRoleDaoImpl extends RootDaoImpl<UserRole, Long> implements User
         }
     }
 
-    public UserRole getUserRoleByUserId(long userId) {
+    public UserRole getUserRoleByUser(User user) {
         Session currentSession = openCurrentSession();
         try {
             CriteriaBuilder builder = currentSession.getCriteriaBuilder();
             CriteriaQuery<UserRole> query = builder.createQuery(UserRole.class);
             Root<UserRole> root = query.from(UserRole.class);
             query.select(root);
-            query.where(builder.equal(root.get("userId"), userId));
+            query.where(builder.equal(root.get("user"), user));
             Query<UserRole> q = currentSession.createQuery(query);
             return q.uniqueResult();
         } catch (Exception e) {
-            LOGGER.error("Error get user role by user id " + userId);
+            LOGGER.error("Error get user role by user id " + user.getUserId());
             return null;
         } finally {
             closeCurrentSession(currentSession);

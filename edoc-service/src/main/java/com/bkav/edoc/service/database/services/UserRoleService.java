@@ -1,7 +1,9 @@
 package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.daoimpl.UserRoleDaoImpl;
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
+import com.bkav.edoc.service.database.util.UserServiceUtil;
 
 import java.util.List;
 
@@ -13,7 +15,8 @@ public class UserRoleService {
     }
 
     public UserRole getRoleByUserId(long userId) {
-        return userRoleDao.getRoleByUserId(userId);
+        User user = UserServiceUtil.findUserById(userId);
+        return userRoleDao.getRoleByUser(user);
     }
 
     public void createUserRole(UserRole userRole) {
@@ -24,8 +27,8 @@ public class UserRoleService {
         return userRoleDao.checkExistUserId(userId);
     }
 
-    public UserRole getUserRoleByUserId(long userId) {
-        return userRoleDao.getUserRoleByUserId(userId);
+    public UserRole getUserRoleByUser(User user) {
+        return userRoleDao.getUserRoleByUser(user);
     }
 
     public void updateUserRole(UserRole userRole) {

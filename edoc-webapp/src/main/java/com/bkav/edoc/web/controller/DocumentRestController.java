@@ -75,6 +75,7 @@ public class DocumentRestController {
 
     @RequestMapping(value = "/van-ban/-/document/create", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Response> createDocument(@RequestBody DocumentRequest documentRequest) {
+        LOGGER.error("-------------- Create document invoke -----------------------");
         List<String> errors = new ArrayList<>();
         try {
             String message = "";
@@ -218,6 +219,7 @@ public class DocumentRestController {
                     message = draft ? messageSourceUtil.getMessage("edoc.message.create.draft.success", null)
                             : messageSourceUtil.getMessage("edoc.message.create.document.success", null);
                 } else {
+                    LOGGER.error("Error create document error list " + errors.toString());
                     code = 400;
                     message = messageSourceUtil.getMessage("edoc.message.error.create.document", null);
                 }
@@ -225,6 +227,7 @@ public class DocumentRestController {
             Response response = new Response(code, errors, message);
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));
         } catch (Exception e) {
+            LOGGER.error("Error create document via web cause ", e);
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             Response response = new Response(500,
                     errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));

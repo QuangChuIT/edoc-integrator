@@ -38,32 +38,6 @@ public class BusinessDocumentInfo {
         this.receiverList = receiverList;
     }
 
-    public static BusinessDocumentInfo fromContent(Element elementNode) {
-        BusinessDocumentInfo businessDocumentInfo = new BusinessDocumentInfo();
-        List<Element> elementList = elementNode.getChildren();
-        if (elementList != null && elementList.size() != 0) {
-            for (Element element : elementList) {
-                if ("DocumentInfo".equals(element.getName())) {
-                    businessDocumentInfo.setDocumentInfo(element.getText());
-                }
-
-                if ("DocumentReceiver".equals(element.getName())) {
-                    businessDocumentInfo.setDocumentReceiver(element.getText());
-                }
-
-                if ("ReceiverList".equals(element.getName())) {
-                    businessDocumentInfo.setReceiverList(new ReceiverList().getData(element));
-                }
-            }
-
-        }
-        return businessDocumentInfo;
-    }
-
-    public void accumulate(Element element) {
-
-    }
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("DocumentInfo", this.documentInfo)

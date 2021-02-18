@@ -1,13 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.sdk.edxml.util.DateUtils;
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
 import java.util.Date;
-import java.util.List;
 
-public class MessageStatus extends CommonElement implements IElement<MessageStatus> {
+public class MessageStatus {
     private ResponseFor responseFor;
     private Organization from;
     private String statusCode;
@@ -80,44 +77,6 @@ public class MessageStatus extends CommonElement implements IElement<MessageStat
                 .add("From", this.from).add("StatusCode", this.statusCode)
                 .add("Description", this.description).add("Timestamp", this.timestamp)
                 .add("StaffInfo", this.staffInfo).toString();
-    }
-
-    @Override
-    public void createElement(Element rootElement) {
-        Element messageHeader = this.createElement(rootElement, "MessageHeader");
-        this.createElement(messageHeader, this.from, "From");
-        this.createElement(messageHeader, this.responseFor, (String) null);
-        this.createElement(messageHeader, this.staffInfo, (String) null);
-        this.createElement(messageHeader, "StatusCode", this.statusCode);
-        this.createElement(messageHeader, "Description", this.description);
-        this.createElement(messageHeader, "Timestamp", DateUtils.format(this.timestamp, DateUtils.DEFAULT_DATETIME_FORMAT));
-    }
-
-    @Override
-    public MessageStatus getData(Element element) {
-        MessageStatus messageStatus = new MessageStatus();
-        List<Element> elements = element.getChildren();
-        if (elements != null && elements.size() != 0) {
-            StaffInfo staffInfo = new StaffInfo();
-            Organization organization = new Organization();
-            ResponseFor responseFor = new ResponseFor();
-            for (Element childrenElement : elements) {
-                if ("ResponseFor".equals(childrenElement.getName())) {
-                    messageStatus.setResponseFor(responseFor.getData(childrenElement));
-                } else if ("From".equals(childrenElement.getName())) {
-                    messageStatus.setFrom(organization.getData(childrenElement));
-                } else if ("StatusCode".equals(childrenElement.getName())) {
-                    messageStatus.setStatusCode(childrenElement.getTextTrim());
-                } else if ("Description".equals(childrenElement.getName())) {
-                    messageStatus.setDescription(childrenElement.getText());
-                } else if ("Timestamp".equals(childrenElement.getName())) {
-                    messageStatus.setTimestamp(DateUtils.parse(childrenElement.getTextTrim(), DateUtils.DEFAULT_DATETIME_FORMAT));
-                } else if ("StaffInfo".equals(childrenElement.getName())) {
-                    messageStatus.setStaffInfo(staffInfo.getData(childrenElement));
-                }
-            }
-        }
-        return messageStatus;
     }
 
 }

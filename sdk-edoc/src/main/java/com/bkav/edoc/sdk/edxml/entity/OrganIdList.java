@@ -6,7 +6,7 @@ import org.jdom2.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrganIdList extends CommonElement implements IElement<OrganIdList> {
+public class OrganIdList {
     private List<String> organId;
 
     public OrganIdList() {
@@ -31,27 +31,5 @@ public class OrganIdList extends CommonElement implements IElement<OrganIdList> 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("OrganIdList", this.organId).toString();
-    }
-
-    @Override
-    public void createElement(Element element) {
-        for (String organId : this.organId) {
-            this.createElement(element, "OrganId", organId);
-        }
-    }
-
-    @Override
-    public OrganIdList getData(Element element) {
-        OrganIdList organIdList = new OrganIdList();
-        List<Element> localList = element.getChildren();
-        if (localList != null && localList.size() != 0) {
-            for (Element item : localList) {
-                if ("OrganId".equals(item.getName())) {
-                    organIdList.addOrganId(item.getText());
-                }
-            }
-
-        }
-        return organIdList;
     }
 }

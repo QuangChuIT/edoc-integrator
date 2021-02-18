@@ -1,11 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
-import java.util.List;
-
-public class Organization extends CommonElement implements IElement<Organization> {
+public class Organization {
 
     private String organId;
     private String organizationInCharge;
@@ -109,50 +106,5 @@ public class Organization extends CommonElement implements IElement<Organization
                 .add("Email", this.email).add("Telephone", this.telephone)
                 .add("Fax", this.fax).add("Website", this.website).toString();
     }
-
-    @Override
-    public void createElement(Element rootElement) {
-        this.createElement(rootElement, "OrganId", this.organId);
-        this.createElement(rootElement, "OrganizationInCharge", this.organizationInCharge);
-        this.createElement(rootElement, "OrganName", this.organName);
-        this.createElement(rootElement, "OrganAdd", this.organAdd);
-        this.createElement(rootElement, "Email", this.email);
-        this.createElement(rootElement, "Telephone", this.telephone);
-        this.createElement(rootElement, "Fax", this.fax);
-        this.createElement(rootElement, "Website", this.website);
-    }
-
-    @Override
-    public Organization getData(Element element) {
-        if (element == null) {
-            return null;
-        } else {
-            List<Element> elements = element.getChildren();
-            if (elements != null && elements.size() != 0) {
-                Organization organization = new Organization();
-                for (Element itemElement : elements) {
-                    if ("OrganId".equals(itemElement.getName())) {
-                        organization.setOrganId(itemElement.getTextTrim());
-                    } else if ("OrganizationInCharge".equals(itemElement.getName())) {
-                        organization.setOrganizationInCharge(itemElement.getTextTrim());
-                    } else if ("OrganName".equals(itemElement.getName())) {
-                        organization.setOrganName(itemElement.getTextTrim());
-                    } else if ("OrganAdd".equals(itemElement.getName())) {
-                        organization.setOrganAdd(itemElement.getTextTrim());
-                    } else if ("Email".equals(itemElement.getName())) {
-                        organization.setEmail(itemElement.getTextTrim());
-                    } else if ("Telephone".equals(itemElement.getName())) {
-                        organization.setTelephone(itemElement.getTextTrim());
-                    } else if ("Fax".equals(itemElement.getName())) {
-                        organization.setFax(itemElement.getTextTrim());
-                    } else if ("Website".equals(itemElement.getName())) {
-                        organization.setWebsite(itemElement.getTextTrim());
-                    }
-                }
-                return organization;
-            } else {
-                return null;
-            }
-        }
-    }
+    
 }

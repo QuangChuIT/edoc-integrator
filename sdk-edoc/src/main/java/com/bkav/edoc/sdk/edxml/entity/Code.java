@@ -1,10 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.Strings;
-import org.jdom2.Element;
 
-public class Code extends CommonElement implements IElement<Code> {
+public class Code {
     private String codeNumber;
     private String codeNotation;
 
@@ -44,15 +42,4 @@ public class Code extends CommonElement implements IElement<Code> {
         }
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element code = this.createElement(element, "Code");
-        this.createElement(code, "CodeNumber", this.codeNumber);
-        this.createElement(code, "CodeNotation", this.codeNotation);
-    }
-
-    @Override
-    public Code getData(Element element) {
-        return new Code(EdxmlUtils.getString(element, "CodeNumber"), EdxmlUtils.getString(element, "CodeNotation"));
-    }
 }

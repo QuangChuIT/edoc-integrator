@@ -5,7 +5,7 @@ import org.jdom2.Element;
 
 import java.util.List;
 
-public class BusinessDocumentInfo extends CommonElement implements IElement<BusinessDocumentInfo> {
+public class BusinessDocumentInfo {
 
     private String documentInfo;
     private String documentReceiver;
@@ -68,18 +68,5 @@ public class BusinessDocumentInfo extends CommonElement implements IElement<Busi
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("DocumentInfo", this.documentInfo)
                 .add("DocumentReceiver", this.documentReceiver).add("ReceiverList", this.receiverList).toString();
-    }
-
-    @Override
-    public void createElement(Element element) {
-        Element receiveElement = this.createElement(element, "BussinessDocumentInfo");
-        this.createElement(receiveElement, "DocumentInfo", this.documentInfo);
-        this.createElement(receiveElement, "DocumentReceiver", this.documentReceiver);
-        this.receiverList.createElement(receiveElement);
-    }
-
-    @Override
-    public BusinessDocumentInfo getData(Element element) {
-        return null;
     }
 }

@@ -23,7 +23,7 @@ public class ServiceTest {
             case 2:
                 // Lay danh sach van ban den hoac danh sach trang thai
                 JSONObject getPending = new JSONObject();
-                getPending.put("messageType", DocumentType.STATUS);
+                getPending.put("type", DocumentType.STATUS);
                 GetPendingDocIDsResp getPendingDocIDsResp = edocService.getPendingDocIds(getPending.toString());
                 System.out.println(getPendingDocIDsResp.getDocIDs().size());
                 break;
@@ -32,7 +32,7 @@ public class ServiceTest {
                 //String edXMLFileLocation = "D:\\IdeaProjects\\BkavEdocSdk\\src\\main\\resources\\edoc_new.edxml";
                 String edXMLFileLocation = "D:\\IdeaProjects\\BkavEdocSdk\\src\\main\\resources\\status_inbox_ 01.edxml";
                 JSONObject sendDocReq = new JSONObject();
-                sendDocReq.put("messageType", DocumentType.STATUS);
+                sendDocReq.put("type", DocumentType.STATUS);
                 SendDocResp sendDocResp = edocService.sendDocument(sendDocReq.toString(), edXMLFileLocation);
                 System.out.println(sendDocResp.getDocId());
                 System.out.println(sendDocResp.getCode());
@@ -42,7 +42,7 @@ public class ServiceTest {
                 // Lay 1 van ban hoac trang thai
                 JSONObject object = new JSONObject();
                 object.put("docId", "241075");
-                object.put("messageType", DocumentType.EDOC);
+                object.put("type", DocumentType.EDOC);
                 GetDocumentResp getDocumentResp = edocService.getDocument(object.toString());
                 System.out.println(getDocumentResp.toString());
                 break;

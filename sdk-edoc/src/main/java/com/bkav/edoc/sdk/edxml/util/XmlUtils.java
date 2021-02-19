@@ -694,23 +694,26 @@ public class XmlUtils {
             nodes.add(signedInfo);
         }
         // Create Signature Value
-        OMElement signatureValue = factoryOM.createOMElement("SignatureValue", null);
-        signatureValue.setText(signature.getSignatureValue());
-        nodes.add(signatureValue);
+        if (!Validator.isNullOrEmpty(signature.getSignatureValue())) {
+            OMElement signatureValue = factoryOM.createOMElement("SignatureValue", null);
+            signatureValue.setText(signature.getSignatureValue());
+            nodes.add(signatureValue);
+        }
+        if (signature.getKeyInfo() != null) {
+            // Create KeyInfo
+            OMElement keyInfo = factoryOM.createOMElement("KeyInfo", null);
+            OMElement x509Data = factoryOM.createOMElement("X509Data", null);
 
-        // Create KeyInfo
-        OMElement keyInfo = factoryOM.createOMElement("KeyInfo", null);
-        OMElement x509Data = factoryOM.createOMElement("X509Data", null);
+            OMElement x509SubjectName = factoryOM.createOMElement("X509SubjectName", null);
+            x509SubjectName.setText(signature.getKeyInfo().getX509Data().getX509SubjectName());
+            x509Data.addChild(x509SubjectName);
 
-        OMElement x509SubjectName = factoryOM.createOMElement("X509SubjectName", null);
-        x509SubjectName.setText(signature.getKeyInfo().getX509Data().getX509SubjectName());
-        x509Data.addChild(x509SubjectName);
-
-        OMElement x509Certificate = factoryOM.createOMElement("X509Certificate", null);
-        x509Certificate.setText(signature.getKeyInfo().getX509Data().getX509Certificate());
-        x509Data.addChild(x509Certificate);
-        keyInfo.addChild(x509Data);
-        nodes.add(keyInfo);
+            OMElement x509Certificate = factoryOM.createOMElement("X509Certificate", null);
+            x509Certificate.setText(signature.getKeyInfo().getX509Data().getX509Certificate());
+            x509Data.addChild(x509Certificate);
+            keyInfo.addChild(x509Data);
+            nodes.add(keyInfo);
+        }
         return nodes;
     }
 

@@ -18,7 +18,6 @@ import com.bkav.edoc.service.xml.base.parser.ParserException;
 import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.bkav.edoc.service.xml.ed.parser.EdXmlParser;
-import com.bkav.edoc.service.xml.status.Status;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.web.util.TokenUtil;
@@ -258,10 +257,8 @@ public class ServiceVPCP {
                                 //parse data from edxml
                                 File file = new File(getEdocResult.getFilePath());
                                 InputStream inputStream = new FileInputStream(file);
-                                Status ed = StatusXmlParser.parse(inputStream);
+                                MessageStatus messageStatus = StatusXmlParser.parse(inputStream);
                                 LOGGER.info("Parser success status from file " + getEdocResult.getFilePath());
-                                //Get message header
-                                MessageStatus messageStatus = (MessageStatus) ed.getHeader().getMessageHeader();
                                 LOGGER.info(messageStatus.toString());
                                 List<Error> errors = new ArrayList<>();
                                 EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);

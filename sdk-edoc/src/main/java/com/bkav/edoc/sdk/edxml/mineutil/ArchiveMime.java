@@ -1,8 +1,6 @@
 package com.bkav.edoc.sdk.edxml.mineutil;
 
-import com.bkav.edoc.sdk.edxml.entity.Attachment;
-import com.bkav.edoc.sdk.edxml.entity.Manifest;
-import com.bkav.edoc.sdk.edxml.entity.Reference;
+import com.bkav.edoc.sdk.edxml.entity.*;
 import com.bkav.edoc.sdk.edxml.entity.env.Envelop;
 import com.bkav.edoc.sdk.edxml.util.UUidUtils;
 import com.bkav.edoc.sdk.edxml.util.XmlUtils;
@@ -17,6 +15,7 @@ import org.w3c.dom.Document;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ArchiveMime {
@@ -24,6 +23,30 @@ public class ArchiveMime {
 
     public static ArchiveMime getInstance() {
         return INSTANCE;
+    }
+
+    public File createStatus(MessageStatus messageStatus, String fileName, String path) {
+        try {
+            Document document = XmlUtils.convertEntityToDocument(MessageStatus.class, messageStatus);
+            if (document != null) {
+                OMElement node = XMLUtils.toOM(document.getDocumentElement());
+                OMFactory factoryOM = OMAbstractFactory.getOMFactory();
+                OMNamespace ns = factoryOM.createOMNamespace(
+                        EdXmlConstant.EDXML_URI, EdXmlConstant.EDXML_PREFIX);
+                OMNamespace omNamespace = factoryOM.createOMNamespace(EdXmlConstant.EDXML_URI, "");
+                OMElement rootElement = factoryOM.createOMElement("edXML", omNamespace);
+                OMElement envelopElement = factoryOM.createOMElement("edXMLEnvelope", ns);
+                OMElement headerElement = factoryOM.createOMElement("edXMLHeader", ns);
+                headerElement.addChild(node);
+                envelopElement.addChild(headerElement);
+                rootElement.addChild(envelopElement);
+                Document status = XMLUtils.toDOM(rootElement).getOwnerDocument();
+                return XmlUtils.buildContent(status, fileName, path);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public File createMime(Envelop envelop, String fileName, String path) {
@@ -98,4 +121,37 @@ public class ArchiveMime {
         return null;
     }
 
+    public static void main(String[] args) {
+        MessageStatus msgStatus = new MessageStatus();
+
+        //set ResponseFor Tag
+        msgStatus.setResponseFor(new ResponseFor("000.00.00.G22", "7816/VPCP-TTĐT", new Date(), "000.00.00.G22,2015/09/30,7816/VPCP-TTĐT"));
+        //set from information (organization)
+        msgStatus.setFrom(new Organization(
+                "000.00.00.H41",
+                "UBND Tỉnh Nghệ An",
+                "UBND Tỉnh Nghệ An",
+                "Số 03, đường Trường Thi, Thành phố Vinh, Tỉnh Nghệ An, Việt Nam", "nghean@gov.vn", "0383 840418", "0383 843049", "www.nghean.vn"
+        ));
+
+        //set status code info
+        msgStatus.setStatusCode("01");
+        msgStatus.setDescription("Văn thư - Phòng Văn thư - Lưu trữ: Đã đến - Phần mềm QLVB đã nhận nhưng văn thư chưa xử lý");
+        msgStatus.setTimestamp(new Date());
+
+        //set staff details
+        StaffInfo staffInfo = new StaffInfo();
+        staffInfo.setDepartment("Văn thư văn phòng");
+        staffInfo.setStaff("Nguyễn Thị Ngọc Trâm");
+        staffInfo.setEmail("vanthuvanphong@gov.vn");
+        staffInfo.setMobile("84912000001");
+        msgStatus.setStaffInfo(staffInfo);
+        File file = ArchiveMime.getInstance().createStatus(msgStatus, "Status", "/home/quangcv/edoc");
+        if (file != null) {
+            System.out.println(file.getAbsolutePath());
+        } else {
+            System.out.println("Error");
+        }
+        ArchiveMime.getInstance().createStatus(msgStatus, "Test","/home/quangcv/edoc");
+    }
 }

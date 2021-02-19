@@ -1,18 +1,32 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.DateAdapter;
 import com.bkav.edoc.sdk.edxml.util.DateUtils;
+import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.List;
 
+@XmlRootElement(name = "Status", namespace = EdXmlConstant.EDXML_URI)
+@XmlType(name = "Status", propOrder = {"from", "responseFor", "staffInfo", "statusCode", "description", "timestamp"})
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MessageStatus {
+    @XmlElement(name = "ResponseFor")
     private ResponseFor responseFor;
+    @XmlElement(name = "From")
     private Organization from;
+    @XmlElement(name = "StatusCode")
     private String statusCode;
+    @XmlElement(name = "Description")
     private String description;
+    @XmlElement(name = "Timestamp")
+    @XmlJavaTypeAdapter(DateAdapter.class)
     private Date timestamp;
+    @XmlElement(name = "StaffInfo")
     private StaffInfo staffInfo;
 
     public MessageStatus() {

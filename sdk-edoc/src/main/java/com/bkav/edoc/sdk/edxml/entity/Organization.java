@@ -1,19 +1,32 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
+@XmlRootElement(name = "Organization", namespace = EdXmlConstant.EDXML_URI)
+@XmlType(name = "Organization", propOrder = {"organId", "organizationInCharge", "organName", "organAdd", "email", "telephone", "fax", "website"})
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Organization {
 
+    @XmlElement(name = "OrganId")
     private String organId;
+    @XmlElement(name = "OrganizationInCharge")
     private String organizationInCharge;
+    @XmlElement(name = "OrganName")
     private String organName;
+    @XmlElement(name = "OrganAdd")
     private String organAdd;
+    @XmlElement(name = "Email")
     private String email;
+    @XmlElement(name = "Telephone")
     private String telephone;
+    @XmlElement(name = "Fax")
     private String fax;
+    @XmlElement(name = "Website")
     private String website;
 
     public Organization() {

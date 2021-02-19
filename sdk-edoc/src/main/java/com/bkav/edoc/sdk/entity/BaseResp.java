@@ -1,5 +1,7 @@
 package com.bkav.edoc.sdk.entity;
 
+import com.bkav.edoc.sdk.edxml.entity.Error;
+
 import java.io.Serializable;
 import java.util.List;
 

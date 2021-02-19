@@ -1,27 +1,26 @@
 package com.bkav.edoc.sdk.edxml.util;
 
 import com.bkav.edoc.sdk.edxml.entity.*;
-import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.bkav.edoc.sdk.util.StringPool;
 import com.bkav.edoc.sdk.util.Validator;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import org.apache.axiom.om.*;
-import org.jdom2.Namespace;
 import org.jdom2.input.DOMBuilder;
 import org.w3c.dom.Document;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +28,28 @@ import java.util.List;
 import java.util.UUID;
 
 public class XmlUtils {
+
+    public static Document convertEntityToDocument(Class cls, Object obj) {
+        JAXBContext jc;
+        Document document;
+        StringWriter writer = new StringWriter();
+        Result result = new StreamResult(writer);
+        try {
+            jc = JAXBContext.newInstance(cls);
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(obj, result);
+            InputStream input = new ByteArrayInputStream(writer.toString()
+                    .getBytes(StandardCharsets.UTF_8));
+
+            document = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder().parse(input);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return document;
+    }
 
     public static File buildContent(Document document, String fileName, String path) {
         try {
@@ -54,25 +75,6 @@ public class XmlUtils {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static org.jdom2.Document convertFromDom(Document document) {
-        DOMBuilder builder = new DOMBuilder();
-        return builder
-                .build(document);
-    }
-
-    public static Namespace getEnvelopeNS(org.jdom2.Element rootElement) {
-        Namespace envNs = null;
-        List<Namespace> nss = rootElement.getNamespacesInScope();
-        for (Namespace item : nss) {
-            String uri = item.getURI();
-            if (uri.equals(EdXmlConstant.SOAP_URI)) {
-                envNs = item;
-                break;
-            }
-        }
-        return envNs;
     }
 
     public static OMElement getTraceHeaderDoc(TraceHeaderList traceHeaderList,
@@ -338,7 +340,7 @@ public class XmlUtils {
 
 
         OMElement fromOrganInCharge = factoryOM.createOMElement(
-                "OrganInCharge", ns);
+                "OrganizationInCharge", ns);
 
         fromOrganInCharge.setText(currentHeader.getFrom()
                 .getOrganizationInCharge());

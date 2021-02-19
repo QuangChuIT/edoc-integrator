@@ -7,7 +7,6 @@ import com.bkav.edoc.service.xml.base.Content;
 import com.bkav.edoc.service.xml.base.builder.BuildException;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
-import com.bkav.edoc.service.xml.status.Status;
 import com.bkav.edoc.service.xml.status.builder.StatusXmlBuilder;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.vpcp.services.KnobstickServiceImp;
@@ -50,15 +49,14 @@ public class ServiceVPCP {
         return this.knobstickServiceImp.sendEdoc(header.toString(), filePath);
     }
 
-    public SendEdocResult sendStatus(Status status, String path) {
+    public SendEdocResult sendStatus(MessageStatus status, String path) {
         SendEdocResult sendEdocResult = null;
         try {
             // build status edxml
             Content content = StatusXmlBuilder.build(status, path);
             String filePath = content.getContent().getPath();
-            MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
             JSONObject header = new JSONObject();
-            header.put("from", messageStatus.getFrom().getOrganId());
+            header.put("from", status.getFrom().getOrganId());
             header.put("servicetype", "eDoc");
             header.put("messagetype", MessageType.status);
             sendEdocResult = this.knobstickServiceImp.sendEdoc(header.toString(), filePath);

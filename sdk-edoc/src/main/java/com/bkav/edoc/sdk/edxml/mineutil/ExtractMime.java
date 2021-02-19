@@ -24,12 +24,11 @@ public class ExtractMime {
         return INSTANCE;
     }
 
-    public Envelop parser(InputStream inputStream) {
+    public Envelop parserDoc(InputStream inputStream) {
         Envelop envelop = null;
         try {
             Document document = XmlUtils.getDocument(inputStream);
             if (document != null) {
-                MessageHeader messageHeader = new MessageHeader();
                 Header header = new Header();
                 header.setMessageHeader(this.getMessageHeader(document));
                 header.setSignature(this.getSignature(document));
@@ -51,6 +50,25 @@ public class ExtractMime {
             }
         }
         return envelop;
+    }
+
+    public MessageStatus parseStatus(InputStream inputStream) {
+        MessageStatus status = null;
+        try {
+            Document document = XmlUtils.getDocument(inputStream);
+            if (document != null) {
+                status = this.getStatus(document);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return status;
     }
 
     public Body getBody(Document document) {
@@ -127,16 +145,12 @@ public class ExtractMime {
      * @throws Exception
      */
     public MessageStatus getStatus(Document document) throws Exception {
-
         Element rootElement = document.getRootElement();
-
-        Element headerNode = getSingerElement(rootElement, "Body", EdXmlConstant.EDXML_NS);
-
-        Element statusNode = headerNode.getChild("Status");
+        Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
+        Element singerElement = getSingerElement(envelope, "edXMLHeader", EdXmlConstant.EDXML_NS);
+        Element messageStatus = getSingerElement(singerElement, "Status", EdXmlConstant.EDXML_NS);
         MessageStatus status = new MessageStatus();
-
-        status = status.getData(statusNode);
-
+        status = status.getData(messageStatus);
         return status;
     }
 
@@ -145,8 +159,7 @@ public class ExtractMime {
         Element rootElement = document.getRootElement();
         Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
         Element singerElement = getSingerElement(envelope, "edXMLHeader", EdXmlConstant.EDXML_NS);
-        Element headerNode = getSingerElement(singerElement, "Signature", EdXmlConstant.EDXML_NS);
-
+        Element headerNode = getSingerElement(singerElement, "Signature", null);
         return Signature.getData(headerNode);
     }
 

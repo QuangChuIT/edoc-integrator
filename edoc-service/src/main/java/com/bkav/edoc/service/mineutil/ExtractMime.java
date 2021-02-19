@@ -159,7 +159,7 @@ public class ExtractMime {
      * @return
      * @throws Exception
      */
-    public MessageStatus getStatus(Document envelopDoc) throws Exception {
+    public MessageStatus getStatus(Document envelopDoc) {
         org.jdom2.Document domEnv = XmlUtil.convertFromDom(envelopDoc);
 
         Element rootElement = domEnv.getRootElement();
@@ -169,9 +169,9 @@ public class ExtractMime {
         Element headerNode = getSingerElement(rootElement, "Body", envNs);
 
         Element statusNode = headerNode.getChild("Status");
-        MessageStatus status = new MessageStatus();
+        MessageStatus status;
 
-        status = (MessageStatus) status.fromContent(statusNode);
+        status = MessageStatus.getData(statusNode);
 
         return status;
     }

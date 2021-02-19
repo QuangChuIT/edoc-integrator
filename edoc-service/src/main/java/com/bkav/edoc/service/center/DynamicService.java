@@ -23,7 +23,6 @@ import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
 import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
-import com.bkav.edoc.service.xml.status.Status;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.vpcp.services.model.SendEdocResult;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -390,9 +389,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     String edxmlDocumentId = responseFor.getDocumentId();
                     boolean existDocument = documentService.checkExistDocument(edxmlDocumentId);
                     if (existDocument) {
-                        Header header = new Header(status);
-                        Status statusToSend = new Status(header);
-                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(statusToSend, PropsUtil.get("edoc.edxml.file.location"));
+                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(status, PropsUtil.get("edoc.edxml.file.location"));
                         if (sendEdocResult != null) {
                             LOGGER.info("-------------------- Send status to VPCP status " + sendEdocResult.getStatus());
                             LOGGER.info("-------------------- Send status to VPCP Desc: " + sendEdocResult.getErrorDesc());

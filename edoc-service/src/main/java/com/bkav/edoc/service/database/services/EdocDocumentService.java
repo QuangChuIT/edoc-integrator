@@ -639,19 +639,24 @@ public class EdocDocumentService {
         for (Date date: dateList) {
             dailyCounterMap = new HashMap<>();
             LOGGER.info("Starting counter document in date: " + date);
-            List<EdocDocument> documents = documentDaoImpl.getDocumentByDate(date);
-            for (EdocDocument document: documents) {
-                String fromOrgan = document.getFromOrganDomain();
+            List<String> docCodes = documentDaoImpl.getDocCodeByCounterDate(date);
+            for (String docCode: docCodes) {
+                List<EdocDocument> documents = documentDaoImpl.getDocumentsByDocCode(docCode);
+                String fromOrgan = "";
+                for (EdocDocument document: documents) {
+                    LOGGER.info("Start count with document id: " + document.getDocumentId());
+                    fromOrgan = document.getFromOrganDomain();
+
+                    String toOrgans = document.getToOrganDomain();
+                    String[] toOrgansList = toOrgans.split("#");
+                    for (String toOrgan : toOrgansList) {
+                        if (checkAgencyOrgan(toOrgan)) {
+                            countReceived(toOrgan, dailyCounterMap, date);
+                        }
+                    }
+                }
                 if (checkAgencyOrgan(fromOrgan)) {
                     countSent(fromOrgan, dailyCounterMap, date);
-                }
-
-                String toOrgans = document.getToOrganDomain();
-                String[] toOrgansList = toOrgans.split("#");
-                for (String toOrgan : toOrgansList) {
-                    if (checkAgencyOrgan(toOrgan)) {
-                        countReceived(toOrgan, dailyCounterMap, date);
-                    }
                 }
             }
             //System.out.println(new Gson().toJson(dailyCounterMap));

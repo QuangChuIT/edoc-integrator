@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.util;
 
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.entity.UserRole;
 import com.bkav.edoc.service.database.services.UserRoleService;
 
@@ -24,8 +25,8 @@ public class UserRoleServiceUtil {
         return USER_ROLE_SERVICE.checkExistUserId(userId);
     }
 
-    public static UserRole getUserRoleByUserId(long userId) {
-        return USER_ROLE_SERVICE.getUserRoleByUserId(userId);
+    public static UserRole getUserRoleByUser(User user) {
+        return USER_ROLE_SERVICE.getUserRoleByUser(user);
     }
 
     public static void updateUserRole(UserRole userRole) {

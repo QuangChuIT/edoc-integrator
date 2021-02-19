@@ -1,4 +1,4 @@
-let ctx, yearTitle;
+let yearTitle, myBar, id;
 let edocChart = {
     appSetting: {
         host: "/chart",
@@ -12,10 +12,25 @@ let edocChart = {
         mode: "report"
     },
     drawChart: function() {
-        ctx = document.getElementById('canvas').getContext('2d');
+        if (myBar) {
+            $("#canvas").remove();
+            $("#chart-area").append('<canvas id="canvas"></canvas>');
+        }
+        let ctx = document.getElementById('canvas').getContext('2d');
         myBar = new Chart(ctx, {
             type: 'bar',
-            data: barChartData,
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                datasets: [{
+                    label: chart_message.chart_sent_document,
+                    backgroundColor: window.chartColors.red,
+                    data: null
+                }, {
+                    label: chart_message.chart_received_document,
+                    backgroundColor: window.chartColors.blue,
+                    data: null
+                }]
+            },
             options: {
                 title: {
                     display: true,
@@ -36,12 +51,19 @@ let edocChart = {
                 }
             }
         });
+        console.log(myBar.data.datasets);
     },
-    renderDetailStat: function () {
+    renderDetailStat: function (fromDate, toDate) {
         let instance = this;
+        let url = "/public/-/statistic/detail";
+        if (fromDate === null && toDate === null) {
+            url = url + "?userId=" + id;
+        } else {
+            url = url + "?fromDate=" + fromDate + "&toDate=" + toDate + "&userId=" + id;
+        }
         instance.dataTable = $('#dataTables-statistic').DataTable({
             ajax: {
-                url: "/public/-/statistic/detail",
+                url: url,
                 type: "POST",
                 dataSrc: ""
             },
@@ -86,21 +108,6 @@ let edocChart = {
         });
     }
 }
-
-let barChartData = {
-    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-    datasets: [{
-        label: chart_message.chart_sent_document,
-        backgroundColor: window.chartColors.red,
-        data: null
-    }, {
-        label: chart_message.chart_received_document,
-        backgroundColor: window.chartColors.blue,
-        data: null
-    }]
-};
-
-let id;
 
 $(document).ready(function() {
     $.datetimepicker.setLocale('vi');
@@ -151,7 +158,7 @@ $(document).ready(function() {
         } else {
             $.ajax({
                 url: "/public/-/dailycounter/converterer" + "?fromDate=" + fromDate + "&toDate=" + toDate,
-                type: "GET",
+                type: "POST",
                 beforeSend: function () {
                     $("#overlay-statistic").show();
                 },
@@ -203,8 +210,6 @@ $(document).ready(function() {
 
     $("#btnRunDrawChart").on('click', function(e) {
         e.preventDefault();
-        ctx.clearRect(0, 0, document.getElementById('canvas').width, document.getElementById('canvas').height)
-
         let val = document.getElementById("yearPicker");
         let year = val.options[val.selectedIndex].text;
         yearTitle = year;
@@ -230,8 +235,10 @@ function ajax_chart(year, userId) {
     } else {
         url = url + "?year=" + year;
     }
-    $.get(url, function(data, status) {
-        barChartData.datasets[0].data = data.sent;
-        barChartData.datasets[1].data = data.received;
+    $.get(url, function(response, status) {
+        myBar.reset();
+        myBar.data.datasets[0].data = response.sent;
+        myBar.data.datasets[1].data = response.received;
+        myBar.update();
     })
 }

@@ -6,8 +6,6 @@
 <%@ page import="com.bkav.edoc.service.database.util.UserRoleServiceUtil" %>
 <%@ page import="com.bkav.edoc.service.database.entity.User" %>
 <%@ page import="com.bkav.edoc.service.database.entity.UserRole" %>
-<%@ page import="com.bkav.edoc.service.database.entity.Role" %>
-<%@ page import="com.bkav.edoc.service.database.util.RoleServiceUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -15,13 +13,11 @@
     String userCookie = CookieUtil.getValue(request, OAuth2Constants.USER_LOGIN);
     String userLog = new String(Base64.decode(userCookie), StandardCharsets.UTF_8);
     User user = new Gson().fromJson(userLog, User.class);
-    UserRole userRole = UserRoleServiceUtil.getUserRoleByUserId(user.getUserId());
+    UserRole userRole = UserRoleServiceUtil.getUserRoleByUser(user);
     String roleKey = "USER";
-    /*if(userRole != null){
-        long roleId= userRole.getRoleId();
-        Role role = RoleServiceUtil.getRole(roleId);
-        roleKey = role.getRoleKey();
-    }*/
+    if(userRole != null){
+        roleKey = userRole.getRole().getRoleKey();
+    }
 %>
 <div class="edoc-action">
     <button class="btn btn-lg btn-create-edoc">

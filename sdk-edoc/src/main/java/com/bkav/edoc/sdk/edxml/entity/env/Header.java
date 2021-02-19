@@ -53,24 +53,4 @@ public class Header {
     public void setSignature(Signature signature) {
         this.signature = signature;
     }
-
-    public static Header fromContent(Element element, MessageHeader messageHeader) {
-        Header header = new Header();
-        List<Element> elementList = element.getChildren();
-        if (elementList != null && elementList.size() != 0) {
-            for (Element children : elementList) {
-                if ("MessageHeader".equals(children.getName())) {
-                    header.setMessageHeader(messageHeader.getData(children));
-                }
-                if ("TraceHeaderList".equals(children.getName())) {
-                    header.setTraceHeaderList(TraceHeaderList.getData(children));
-                }
-                if ("Signature".equals(children.getName())) {
-                    header.setSignature(Signature.getData(children));
-                }
-            }
-
-        }
-        return header;
-    }
 }

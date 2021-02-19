@@ -183,13 +183,10 @@ public class ValidateUtil {
                 colIndex++;
             } else if (colIndex == 5 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(6).getHeaderName())) {
                 colIndex++;
-                flag = true;
             } else if (colIndex == 6 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(7).getHeaderName())) {
                 colIndex++;
-                flag = true;
             } else if (colIndex == 7 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(8).getHeaderName())) {
                 colIndex++;
-                flag = true;
             } else if (colIndex == 8 && cell.getStringCellValue().equals(ExcelHeaderServiceUtil.getOrganHeaderById(9).getHeaderName())) {
                 flag = true;
             }

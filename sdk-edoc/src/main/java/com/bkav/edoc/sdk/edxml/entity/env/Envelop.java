@@ -17,6 +17,9 @@ public class Envelop {
         this.body = body;
     }
 
+    public Envelop() {
+    }
+
     public List<Attachment> getAttachments() {
         return attachments;
     }

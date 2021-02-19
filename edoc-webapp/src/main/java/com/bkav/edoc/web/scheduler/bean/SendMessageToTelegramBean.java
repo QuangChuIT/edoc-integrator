@@ -35,11 +35,14 @@ public class SendMessageToTelegramBean {
     public void runScheduleSendMessageToTelegram() {
         LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -15);
+            Date yesterday = cal.getTime();
             Date today = new Date();
             String warningMessage = "";
             int i = 1;
 
-            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend(today);
+            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend();
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
                 warningMessage += messageSourceUtil.getMessage("edoc.title.all.taken", new Object[]{SIMPLE_DATE_FORMAT.format(today)});

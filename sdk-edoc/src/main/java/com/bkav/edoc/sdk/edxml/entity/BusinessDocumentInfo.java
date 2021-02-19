@@ -3,6 +3,7 @@ package com.bkav.edoc.sdk.edxml.entity;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BusinessDocumentInfo {

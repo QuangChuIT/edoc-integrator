@@ -1,46 +1,60 @@
 package com.bkav.edoc.sdk.edxml.util;
 
 import com.bkav.edoc.sdk.edxml.entity.*;
-import com.bkav.edoc.sdk.edxml.mineutil.ExtractMime;
 import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.bkav.edoc.sdk.util.StringPool;
+import com.bkav.edoc.sdk.util.Validator;
+import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteStreams;
 import org.apache.axiom.om.*;
-import org.apache.axis2.util.XMLUtils;
-import org.jdom2.Attribute;
 import org.jdom2.Namespace;
 import org.jdom2.input.DOMBuilder;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
-public class XmlUtil {
+public class XmlUtils {
 
-    private static final ExtractMime extractMine = new ExtractMime();
-    private static final XpathUtil xpathUtil = new XpathUtil();
+    public static File buildContent(Document document, String fileName, String path) {
+        try {
+            File file = new File(path, fileName + "." + UUID.randomUUID().toString() + ".edxml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            // for output to file, console
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            // for pretty print
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            DOMSource source = new DOMSource(document);
 
-    public Document getDocumentFromFile(InputStream is)
-            throws ParserConfigurationException, SAXException, IOException {
+            // write to console or file
+            StreamResult console = new StreamResult(System.out);
+            StreamResult streamResult = new StreamResult(file);
 
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        return dBuilder.parse(is);
+            // write data
+            transformer.transform(source, streamResult);
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-
 
     public static org.jdom2.Document convertFromDom(Document document) {
         DOMBuilder builder = new DOMBuilder();
@@ -48,8 +62,21 @@ public class XmlUtil {
                 .build(document);
     }
 
-    public Document getTraceHeaderDoc(TraceHeaderList traceHeaderList,
-                                      OMNamespace ns) throws Exception {
+    public static Namespace getEnvelopeNS(org.jdom2.Element rootElement) {
+        Namespace envNs = null;
+        List<Namespace> nss = rootElement.getNamespacesInScope();
+        for (Namespace item : nss) {
+            String uri = item.getURI();
+            if (uri.equals(EdXmlConstant.SOAP_URI)) {
+                envNs = item;
+                break;
+            }
+        }
+        return envNs;
+    }
+
+    public static OMElement getTraceHeaderDoc(TraceHeaderList traceHeaderList,
+                                              OMNamespace ns) {
 
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
@@ -67,63 +94,43 @@ public class XmlUtil {
             }
             traceNodes.clear();
         }
-        return XMLUtils.toDOM(traceHeaderNode).getOwnerDocument();
+        return traceHeaderNode;
     }
 
-
-    /**
-     * @param manifest
-     * @param ns
-     * @return
-     * @throws Exception
-     */
-    public Document getBodyChildDoc(Manifest manifest, OMNamespace ns)
-            throws Exception {
+    public static OMElement getBodyChildDoc(Manifest manifest, OMNamespace ns) {
         if (manifest == null)
             return null;
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
-
-        OMElement manifestNode = factoryOM.createOMElement("Manifest", ns);
+        OMElement body = factoryOM.createOMElement(StringPool.EDXML_BODY_BLOCK, ns);
+        OMElement manifestNode = factoryOM.createOMElement(StringPool.EDXML_MANIFEST_BLOCK, ns);
+        OMAttribute version = factoryOM.createOMAttribute("version", ns, manifest.getVersion());
+        manifestNode.addAttribute(version);
         List<Reference> refs = manifest.getReferences();
-        OMNamespace attributeNS = factoryOM.createOMNamespace(
-                StringPool.XLINK_NAMESPACE, "xlink");
         for (Reference item : refs) {
             OMElement reference = factoryOM.createOMElement("Reference", ns);
-
+            OMElement contentId = factoryOM.createOMElement("ContentId", ns);
+            contentId.setText(item.getContentId());
+            OMElement contentType = factoryOM.createOMElement("ContentType", ns);
+            contentType.setText(item.getContentType());
             OMElement attachmentName = factoryOM.createOMElement(
                     "AttachmentName", ns);
             attachmentName.setText(item.getAttachmentName());
 
-            OMAttribute href = factoryOM.createOMAttribute("href", attributeNS,
-                    "xlink");
-            href.setAttributeValue(item.getContentId());
-
-            OMAttribute type = factoryOM.createOMAttribute("type", attributeNS,
-                    "xlink");
-            type.setAttributeValue(item.getContentType());
-
-            reference.addAttribute(href);
-            reference.addAttribute(type);
-
             OMElement description = factoryOM
                     .createOMElement("Description", ns);
             description.setText(item.getDescription());
-
+            reference.addChild(contentId);
+            reference.addChild(contentType);
             reference.addChild(attachmentName);
             reference.addChild(description);
-
             manifestNode.addChild(reference);
         }
-        return XMLUtils.toDOM(manifestNode).getOwnerDocument();
+        body.addChild(manifestNode);
+        return body;
     }
 
-    /**
-     * @param traceHeaderList
-     * @param ns
-     * @return
-     */
-    private List<OMNode> getTraceListChild(TraceHeaderList traceHeaderList,
-                                           OMNamespace ns) {
+    private static List<OMNode> getTraceListChild(TraceHeaderList traceHeaderList,
+                                                  OMNamespace ns) {
 
         List<OMNode> nodes = new ArrayList<>();
 
@@ -165,7 +172,7 @@ public class XmlUtil {
         return nodes;
     }
 
-    private OMElement getBusinessChild(TraceHeaderList traceHeaderList, OMNamespace ns) {
+    private static OMElement getBusinessChild(TraceHeaderList traceHeaderList, OMNamespace ns) {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         Business business = traceHeaderList.getBusiness();
@@ -187,7 +194,6 @@ public class XmlUtil {
         // staff info
         OMElement staffInfoNode = getStaffInfoNode(business.getStaffInfo(), ns);
         businessNode.addChild(staffInfoNode);
-        System.out.println("Business " + business.toString());
         // replacement info list
         if (business.getBusinessDocType() == BusinessDocType.REPLACE.ordinal()) {
             OMElement replacementInfoListNode = getReplacementInfoListNode(business.getReplacementInfoList(), ns);
@@ -200,7 +206,7 @@ public class XmlUtil {
         return businessNode;
     }
 
-    private OMElement getReplacementInfoListNode(ReplacementInfoList replacementInfoList, OMNamespace ns) {
+    private static OMElement getReplacementInfoListNode(ReplacementInfoList replacementInfoList, OMNamespace ns) {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         OMElement replacementInfoListNode = factoryOM.createOMElement("ReplacementInfoList", ns);
@@ -228,7 +234,7 @@ public class XmlUtil {
         return replacementInfoListNode;
     }
 
-    private OMElement getBusinessDocumentInfoNode(BusinessDocumentInfo businessDocumentInfo, OMNamespace ns) {
+    private static OMElement getBusinessDocumentInfoNode(BusinessDocumentInfo businessDocumentInfo, OMNamespace ns) {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         OMElement businessDocumentInfoNode = factoryOM.createOMElement("BusinessDocumentInfo", ns);
@@ -265,7 +271,7 @@ public class XmlUtil {
         return businessDocumentInfoNode;
     }
 
-    private OMElement getStaffInfoNode(StaffInfo staffInfo, OMNamespace ns) {
+    private static OMElement getStaffInfoNode(StaffInfo staffInfo, OMNamespace ns) {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
         OMElement staffInfoNode = factoryOM.createOMElement("StaffInfo", ns);
 
@@ -288,180 +294,7 @@ public class XmlUtil {
         return staffInfoNode;
     }
 
-    /**
-     * @param envelope
-     * @return
-     * @throws NumberFormatException
-     * @throws XMLStreamException
-     */
-    public String getOrganDomain(Document envelope)
-            throws NumberFormatException, XMLStreamException {
-        DOMSource source = new DOMSource(envelope);
-
-        XMLStreamReader reader = XMLInputFactory.newInstance()
-                .createXMLStreamReader(source);
-
-        if (reader == null) {
-            return StringPool.BLANK;
-        }
-
-        String organDomain = StringPool.BLANK;
-
-        while (reader.hasNext()) {
-
-            int type = reader.next();
-
-            if (type == XMLStreamReader.START_ELEMENT) {
-
-                if (reader.getLocalName().equalsIgnoreCase("organId")) {
-
-                    // move to content of element
-                    reader.next();
-
-                    String strId = reader.getText().trim();
-
-                    if (!strId.equals("\n")
-                            && !strId
-                            .equals(StringPool.SPACE)) {
-
-                        organDomain = strId;
-
-                        break;
-                    }
-                }
-            }
-        }
-        return organDomain;
-    }
-
-    /**
-     * @param reader
-     * @return
-     * @throws NumberFormatException
-     * @throws XMLStreamException
-     */
-    public long getDocumentId(XMLStreamReader reader)
-            throws NumberFormatException, XMLStreamException {
-        if (reader == null)
-            return 0L;
-        long documentId = 0L;
-        while (reader.hasNext()) {
-            int type = reader.next();
-            if (type == XMLStreamReader.START_ELEMENT) {
-                if (reader.getLocalName().equalsIgnoreCase("documentId")) {
-                    reader.next();
-                    String strId = reader.getText().trim();
-                    if (!strId.equals("\n") && !strId.equals(" ")) {
-                        documentId = Long.parseLong(strId);
-                        System.out.println("Get successfully documentId");
-                        break;
-                    }
-                }
-            }
-        }
-        return documentId;
-    }
-
-    /**
-     * @param document
-     * @param elementName
-     * @return
-     * @throws XMLStreamException
-     */
-    public String getElementData(Document document, String elementName)
-            throws XMLStreamException {
-        DOMSource source = new DOMSource(document);
-        XMLStreamReader reader = XMLInputFactory.newInstance()
-                .createXMLStreamReader(source);
-        if (reader == null) {
-            return null;
-        }
-        String data = "";
-        while (reader.hasNext()) {
-            int type = reader.next();
-            if (type == XMLStreamReader.START_ELEMENT) {
-                if (reader.getLocalName().equalsIgnoreCase(elementName)) {
-                    reader.next();
-                    String tmpData = reader.getText().trim();
-                    if (!tmpData.equals("\n") && !tmpData.equals(" ")) {
-                        data = tmpData;
-                        System.out.println("Get data success from " + elementName);
-                        break;
-                    }
-                }
-            }
-        }
-        return data;
-    }
-
-    public Namespace getEnvelopeNS(org.jdom2.Element rootElement) {
-        Namespace envNs = null;
-        List<Namespace> nss = rootElement.getNamespacesInScope();
-        for (Namespace item : nss) {
-            String uri = item.getURI();
-            if (uri.equals(EdXmlConstant.SOAP_URI)) {
-                envNs = item;
-                break;
-            }
-        }
-        return envNs;
-    }
-
-    public String getAttachmentName(Document envelope, String contentId)
-            throws XPathExpressionException {
-        String body = "//*[local-name()='Body'][1]//*[local-name()='Manifest'][1]";
-        XPathExpression expr0 = xpathUtil.getXpathExpression(body);
-        if (expr0 == null)
-            return StringPool.BLANK;
-        Node bodyNode = (Node) expr0.evaluate(envelope, XPathConstants.NODE);
-
-        String reference = String
-                .format("//*[local-name()='Reference'][@href='cid:%s']//*[local-name()='AttachmentName']",
-                        contentId);
-
-        XPathExpression expr = xpathUtil.getXpathExpression(reference);
-        if (expr == null)
-            return StringPool.BLANK;
-
-        return expr.evaluate(bodyNode);
-    }
-
-    public Map<String, String> getAttachmentIds(Document envelope) {
-        Map<String, String> result = new HashMap<>();
-
-        org.jdom2.Document doc = XmlUtil.convertFromDom(envelope);
-
-        org.jdom2.Element rootElement = doc.getRootElement();
-
-        Namespace envNs = getEnvelopeNS(rootElement);
-
-        org.jdom2.Element bodyNode = extractMine.getSingerElement(rootElement,
-                EdXmlConstant.BODY_TAG, envNs);
-
-        org.jdom2.Element maniNode = extractMine.getSingerElement(bodyNode,
-                EdXmlConstant.MANIFEST_TAG, EdXmlConstant.EDXML_NS);
-
-        List<org.jdom2.Element> referenceNodes = extractMine.getMultiElement(
-                maniNode, EdXmlConstant.REFERENCE_TAG, EdXmlConstant.EDXML_NS);
-
-        for (org.jdom2.Element item : referenceNodes) {
-            // Get contentId from href link
-            Attribute att = item.getAttribute(EdXmlConstant.HREF_ATTR);
-            String href = att.getValue();
-
-            // Get att name
-            String attName = item.getChildText(
-                    EdXmlConstant.ATTACHMENT_NAME_TAG, EdXmlConstant.EDXML_NS);
-
-            result.put(attName, href.substring(href.indexOf(":") + 1));
-        }
-
-        return result;
-    }
-
-
-    public Document getMessHeaderDoc(MessageHeader messageHeader, OMNamespace ns)
-            throws Exception {
+    public static OMElement getMessHeaderDoc(MessageHeader messageHeader, OMNamespace ns) {
         OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
         OMElement messageHeaderNode = factoryOM.createOMElement(
@@ -475,11 +308,11 @@ public class XmlUtil {
 
         nodes.clear();
 
-        return XMLUtils.toDOM(messageHeaderNode).getOwnerDocument();
+        return messageHeaderNode;
     }
 
-    private List<OMNode> getHeaderChild(MessageHeader currentHeader,
-                                        OMNamespace ns) {
+    private static List<OMNode> getHeaderChild(MessageHeader currentHeader,
+                                               OMNamespace ns) {
 
         List<OMNode> nodes = new ArrayList<>();
 
@@ -596,12 +429,12 @@ public class XmlUtil {
 
         }
 
-        // Tao <edXML:DocumentId>
+        // Create <edXML:DocumentId>
         OMElement documentId = factoryOM.createOMElement("DocumentId", ns);
         documentId.setText(currentHeader.getDocumentId());
         nodes.add(documentId);
 
-        // Tao Code
+        // Create Code
         OMElement code = factoryOM.createOMElement("Code", ns);
 
         OMElement codeNumber = factoryOM.createOMElement("CodeNumber",
@@ -616,7 +449,7 @@ public class XmlUtil {
 
         nodes.add(code);
 
-        // Tao PromulgationInfo
+        // Create PromulgationInfo
         OMElement promulgationInfo = factoryOM.createOMElement(
                 "PromulgationInfo", ns);
 
@@ -638,7 +471,7 @@ public class XmlUtil {
 
         nodes.add(promulgationInfo);
 
-        // Tao DocumentType
+        // Create DocumentType
         OMElement documentType = factoryOM.createOMElement("DocumentType",
                 ns);
 
@@ -656,15 +489,16 @@ public class XmlUtil {
 
         nodes.add(documentType);
 
-        // Tao Subject
+        // create Subject
         OMElement subject = factoryOM.createOMElement("Subject", ns);
         subject.setText(currentHeader.getSubject());
         nodes.add(subject);
 
-        // Tao Content
+        // create Content
         OMElement content = factoryOM.createOMElement("Content", ns);
         content.setText(currentHeader.getContent());
         nodes.add(content);
+
         // Create signerInfo
         OMElement singerInfo = factoryOM.createOMElement("SignerInfo", ns);
         OMElement signerFullName = factoryOM.createOMElement("FullName", ns);
@@ -683,7 +517,7 @@ public class XmlUtil {
         singerInfo.addChild(competence);
         nodes.add(singerInfo);
 
-        // Tao ResponseDate
+        // Create Due Date
         OMElement responseDate = factoryOM.createOMElement("DueDate", ns);
         //String dateStr = currentHeader.getResponseDate();
         Date dateStr = currentHeader.getDueDate();
@@ -694,7 +528,7 @@ public class XmlUtil {
         }
         nodes.add(responseDate);
 
-        // Tao ToPlaces
+        // Create ToPlaces
         OMElement toPlaces = factoryOM.createOMElement("ToPlaces", ns);
         for (String placeStr : currentHeader.getToPlaces()) {
             OMElement place = factoryOM.createOMElement("Place", ns);
@@ -705,7 +539,6 @@ public class XmlUtil {
 
         // Tao OtherInfo
         OMElement otherInfo = factoryOM.createOMElement("OtherInfo", ns);
-
 
         OMElement priority = factoryOM.createOMElement("Priority", ns);
         String priorityStr = String.valueOf(currentHeader
@@ -743,7 +576,14 @@ public class XmlUtil {
                 .setText(pageAmountStr.isEmpty() ? StringPool.DEAUlt_INTEGER
                         : pageAmountStr);
         otherInfo.addChild(pageAmount);
-
+        // Create Appendixes
+        OMElement appendixes = factoryOM.createOMElement("Appendixes", ns);
+        for (String appStr : currentHeader.getOtherInfo().getAppendixes()) {
+            OMElement appendix = factoryOM.createOMElement("Appendix", ns);
+            appendix.setText(appStr);
+            appendixes.addChild(appendix);
+        }
+        otherInfo.addChild(appendixes);
         nodes.add(otherInfo);
 
         // create SteeringType
@@ -774,14 +614,178 @@ public class XmlUtil {
                 promulgationDate.setText(DateUtils.format(item.getPromulgationDate()));
                 responseFor.addChild(promulgationDateResponseFor);
 
-
                 OMElement documentIdResponseFor = factoryOM.createOMElement("DocumentId", ns);
+
                 documentId.setText(item.getDocumentId());
                 responseFor.addChild(documentIdResponseFor);
                 nodes.add(responseFor);
             }
         }
+
+
         return nodes;
     }
 
+    public static OMElement getSignatureDoc(Signature signature) {
+        OMFactory factoryOM = OMAbstractFactory.getOMFactory();
+
+        OMElement signatureNode = factoryOM.createOMElement(
+                StringPool.EDXML_SIGNATURE_BLOCK, null);
+
+        List<OMNode> nodes = getSignatureChild(signature);
+
+        for (OMNode omNode : nodes) {
+            signatureNode.addChild(omNode);
+        }
+
+        nodes.clear();
+
+        return signatureNode;
+    }
+
+    private static List<OMNode> getSignatureChild(Signature signature) {
+        List<OMNode> nodes = new ArrayList<>();
+
+        OMFactory factoryOM = OMAbstractFactory.getOMFactory();
+
+        SignedInfo signedInfoValue = signature.getSignedInfo();
+        // Create SignedInfo
+        OMElement signedInfo = factoryOM.createOMElement("SignedInfo", null);
+        if (signedInfoValue != null) {
+
+            OMAttribute algorithm1 = factoryOM.createOMAttribute("Algorithm", null, signedInfoValue.getCanonicalizationMethod());
+
+            OMElement canonicalizationMethod = factoryOM.createOMElement("CanonicalizationMethod", null);
+            canonicalizationMethod.addAttribute(algorithm1);
+            signedInfo.addChild(canonicalizationMethod);
+
+            OMAttribute algorithm2 = factoryOM.createOMAttribute("Algorithm", null, signedInfoValue.getSignatureMethod());
+            OMElement signatureMethod = factoryOM.createOMElement("SignatureMethod", null);
+            signatureMethod.addAttribute(algorithm2);
+            signedInfo.addChild(signatureMethod);
+            if (signedInfoValue.getReference() != null && signedInfoValue.getReference().size() > 0) {
+                SignReference signReference = signedInfoValue.getReference().get(0);
+                OMElement reference = factoryOM.createOMElement("Reference", null);
+                String uriValue = "";
+                if (!Validator.isNullOrEmpty(signReference.getURI())) {
+                    uriValue = signReference.getURI();
+                }
+                OMAttribute uri = factoryOM.createOMAttribute("URI", null, uriValue);
+                reference.addAttribute(uri);
+                OMElement transforms = factoryOM.createOMElement("Transforms", null);
+                if (signReference.getTransforms() != null && signReference.getTransforms().size() > 0) {
+                    for (String transformStr : signReference.getTransforms()) {
+                        OMElement transform = factoryOM.createOMElement("Transform", null);
+                        OMAttribute algorithm = factoryOM.createOMAttribute("Algorithm", null, transformStr);
+                        transform.addAttribute(algorithm);
+                        transforms.addChild(transform);
+                    }
+                }
+                reference.addChild(transforms);
+                OMElement digestMethod = factoryOM.createOMElement("DigestMethod", null);
+                digestMethod.setText(signReference.getDigestMethod());
+                reference.addChild(digestMethod);
+
+                OMElement digestValue = factoryOM.createOMElement("DigestValue", null);
+                digestValue.setText(signReference.getDigestValue());
+                reference.addChild(digestValue);
+                signedInfo.addChild(reference);
+            }
+            nodes.add(signedInfo);
+        }
+        // Create Signature Value
+        OMElement signatureValue = factoryOM.createOMElement("SignatureValue", null);
+        signatureValue.setText(signature.getSignatureValue());
+        nodes.add(signatureValue);
+
+        // Create KeyInfo
+        OMElement keyInfo = factoryOM.createOMElement("KeyInfo", null);
+        OMElement x509Data = factoryOM.createOMElement("X509Data", null);
+
+        OMElement x509SubjectName = factoryOM.createOMElement("X509SubjectName", null);
+        x509SubjectName.setText(signature.getKeyInfo().getX509Data().getX509SubjectName());
+        x509Data.addChild(x509SubjectName);
+
+        OMElement x509Certificate = factoryOM.createOMElement("X509Certificate", null);
+        x509Certificate.setText(signature.getKeyInfo().getX509Data().getX509Certificate());
+        x509Data.addChild(x509Certificate);
+        keyInfo.addChild(x509Data);
+        nodes.add(keyInfo);
+        return nodes;
+    }
+
+    public static OMElement getAttachmentDoc(List<Attachment> attachments, OMNamespace ns, String path) throws IOException {
+        OMFactory factoryOM = OMAbstractFactory.getOMFactory();
+
+        OMElement attachmentNode = factoryOM.createOMElement(
+                StringPool.EDXML_ATTACHMENT_BLOCK, ns);
+        for (Attachment attachment : attachments) {
+            InputStream inputStream;
+            String contentType = attachment.getContentType();
+            if ("pdf".equals(attachment.getFormat().toLowerCase())) {
+                inputStream = attachment.getInputStreamFromFile();
+                contentType = "application/pdf";
+            } else if ("doc".equals(attachment.getFormat().toLowerCase())) {
+                contentType = "application/msword";
+                inputStream = attachment.getInputStreamFromFile();
+            } else if ("docx".equals(attachment.getFormat().toLowerCase())) {
+                contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                inputStream = attachment.getInputStreamFromFile();
+            } else if ("xls".equals(attachment.getFormat().toLowerCase())) {
+                contentType = "application/vnd.ms-excel";
+                inputStream = attachment.getInputStreamFromFile();
+            } else if ("xslx".equals(attachment.getFormat().toLowerCase())) {
+                contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                inputStream = attachment.getInputStreamFromFile();
+            } else if ("zip".equals(attachment.getFormat().toLowerCase())) {
+                contentType = "application/zip";
+                inputStream = attachment.getInputStreamFromFile();
+            } else {
+                contentType = "application/zip";
+                inputStream = new FileInputStream(ArchiveUtils.zip(attachment.getInputStreamFromFile(), attachment.getFormat(), path));
+            }
+            String contentId = attachment.getContentId();
+            String attName = attachment.getName();
+            String description = attachment.getDescription();
+            String contentTransferEncoded = BaseEncoding.base64().encode(ByteStreams.toByteArray(inputStream));
+            OMElement attachmentElement = factoryOM.createOMElement("Attachment", ns);
+
+            OMElement contentIdNode = factoryOM.createOMElement("ContentId", ns);
+            contentIdNode.setText(contentId);
+            attachmentElement.addChild(contentIdNode);
+
+            OMElement attachmentName = factoryOM.createOMElement("AttachmentName", ns);
+            attachmentName.setText(attName);
+            attachmentElement.addChild(attachmentName);
+
+            OMElement descriptionNode = factoryOM.createOMElement("Description", ns);
+            descriptionNode.setText(description);
+            attachmentElement.addChild(descriptionNode);
+
+            OMElement contentTypeNode = factoryOM.createOMElement("ContentType", ns);
+            contentTypeNode.setText(contentType);
+            attachmentElement.addChild(contentTypeNode);
+
+            OMElement contentTransferEncodedNode = factoryOM.createOMElement("ContentTransferEncoded", ns);
+
+            contentTransferEncodedNode.setText(contentTransferEncoded);
+            attachmentElement.addChild(contentTransferEncodedNode);
+            attachmentNode.addChild(attachmentElement);
+            inputStream.close();
+        }
+        return attachmentNode;
+    }
+
+    public static org.jdom2.Document getDocument(InputStream inputStream) {
+        try {
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
+            org.w3c.dom.Document document = documentBuilder.parse(inputStream);
+            DOMBuilder domBuilder = new DOMBuilder();
+            return domBuilder.build(document);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -25,7 +25,6 @@ public class MessageHeader {
     private OtherInfo otherInfo;
     private List<ResponseFor> responseFor;
     private int steeringType;
-    private String applicationType;
 
     public MessageHeader() {
     }
@@ -183,14 +182,6 @@ public class MessageHeader {
         this.steeringType = steeringType;
     }
 
-    public String getApplicationType() {
-        return applicationType;
-    }
-
-    public void setApplicationType(String applicationType) {
-        this.applicationType = applicationType;
-    }
-
     public void addToPlace(String toPlace) {
         if (this.toPlaces == null) {
             this.toPlaces = new ArrayList<>();
@@ -259,6 +250,6 @@ public class MessageHeader {
                 .add("Content", this.content).add("SignerInfo", this.signerInfo)
                 .add("DueDate", this.dueDate).add("ToPlaces", this.toPlaces)
                 .add("OtherInfo", this.otherInfo).add("ResponseFor", this.responseFor)
-                .add("SteeringType", this.steeringType).add("ApplicationType", this.applicationType).toString();
+                .add("SteeringType", this.steeringType).toString();
     }
 }

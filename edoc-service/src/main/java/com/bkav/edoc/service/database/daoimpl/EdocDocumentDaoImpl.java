@@ -215,6 +215,22 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         }
     }
 
+    public List<EdocDocument> getDocumentsByDocCode(String docCode) {
+        Session sessions = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ed from EdocDocument ed where ed.docCode = :docCode");
+            Query<EdocDocument> query = sessions.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("docCode", docCode);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(sessions);
+        }
+        return new ArrayList<>();
+    }
+
     @Override
     public boolean removeDocument(long documentId) {
         Session session = openCurrentSession();

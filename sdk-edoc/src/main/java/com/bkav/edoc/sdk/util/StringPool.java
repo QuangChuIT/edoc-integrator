@@ -29,90 +29,14 @@ public class StringPool {
     public static String TOKEN_ELEMENT_NAME = "Token";
     public static String ORGAN_ID_ELEMENT_NAME = "OrganId";
     public static String EDXML_MESSAGE_HEADER_BLOCK = "MessageHeader";
+    public static String EDXML_BODY_BLOCK = "edXMLBody";
+    public static String EDXML_HEADER_BLOCK = "edXMLHeader";
+    public static String EDXML_MANIFEST_BLOCK = "edXMLManifest";
+    public static String EDXML_ATTACHMENT_BLOCK = "AttachmentEncoded";
+    public static String EDXML_SIGNATURE_BLOCK = "Signature";
     public static String EDXML_TRACE_HEADER_BLOCK = "TraceHeaderList";
-    public static String DOCUMENTS = "Documents";
-
-    public static String SEND_DOCUMENT_RESPONSE_DOCID = "DocumentId";
-
-    public static final String TARGET_NAMESPACE = "http://www.e-doc.vn/Schema/";
 
     public static String XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";
-    public static String ATTR_HREF = "href";
-
-    public static String URL_REGEX = "^(http(?:s)?\\:\\/\\/[a-zA-Z0-9\\-]+(?:\\.[a-zA-Z0-9\\-]+)*\\.[a-zA-Z]{2,6}(?:\\/?|(?:\\/[\\w\\-]+)*)(?:\\/?|\\/\\w+\\.[a-zA-Z]{2,4}(?:\\?[\\w]+\\=[\\w\\-]+)?)?(?:\\&[\\w]+\\=[\\w\\-]+)*)$";
-
-    //TODO: Ten element name trong edXML
-    public static final String ATTACHMENT_NAME_ELEMENT = "AttachmentName";
-
-    //TODO: Phan danh sach the de check trong ham getDocument
-    public static String MESSAGE_HEADER_FROM = "MessageHeader-From";
-    public static String MESSAGE_HEADER_TO = "MessageHeader-To";
-    public static String MESSAGE_HEADER_DOCUMENT_ID = "MessageHeader-DocumentId";
-    public static String MESSAGE_HEADER_CODE = "MessageHeader-Code";
-    public static String MESSAGE_HEADER_PROMULGATION_INFO = "MessageHeader-PromulgationInfo";
-    public static String MESSAGE_HEADER_DOCUMENT_TYPE = "MessageHeader-DocumentType";
-    public static String MESSAGE_HEADER_SUBJECT = "MessageHeader-Subject";
-    public static String MESSAGE_HEADER_CONTENT = "MessageHeader-Content";
-    public static String MESSAGE_HEADER_AUTHOR = "MessageHeader-SignerInfo";
-    public static String MESSAGE_HEADER_RESPONSE_DATE = "MessageHeader-DueDate";
-    public static String MESSAGE_HEADER_TOPLACES = "MessageHeader-ToPlaces";
-    public static String MESSAGE_HEADER_OTHERINFO = "MessageHeader-OtherInfo";
-    public static String MESSAGE_HEADER_RESPONSE_FOR = "MessageHeader-ResponseFor";
-
-    public static String FROM_ORGAN_ID = "From-OrganId";
-    public static String FROM_ORGAN_NAME = "From-OrganName";
-    public static String FROM_ORGAN_IN_CHARGE = "From-OrganInCharge";
-    public static String FROM_ORGAN_ADD = "From-OrganAdd";
-    public static String FROM_EMAIL = "From-Email";
-    public static String FROM_TELEPHONE = "From-Telephone";
-    public static String FROM_FAX = "From-Fax";
-    public static String FROM_WEBSITE = "From-Website";
-
-    public static String TO_ORGAN_ID = "To-OrganId";
-    public static String TO_ORGAN_NAME = "To-OrganName";
-    public static String TO_ORGAN_ADD = "To-OrganAdd";
-    public static String TO_EMAIL = "To-Email";
-    public static String TO_TELEPHONE = "To-Telephone";
-    public static String TO_FAX = "To-Fax";
-    public static String TO_WEBSITE = "To-Website";
-    public static String TO_DUE_DATE = "To-DueDate";
-
-    public static String RESPONSE_FOR_ORGAN_ID = "ResponseFor-OrganId";
-    public static String RESPONSE_FOR_CODE = "ResponseFor-Code";
-    public static String RESPONSE_FOR_PROMULGATION_DATE = "ResponseFor-PromulgationDate";
-    public static String RESPONSE_FOR_DOCUMENT_ID = "ResponseFor-DocumentId";
-
-    public static String CODE_NUMBER = "Code-CodeNumber";
-    public static String CODE_NOTATION = "Code-CodeNotation";
-
-    public static String PROMULGATION_INFO_PLACE = "PromulgationInfo-Place";
-    public static String PROMULGATION_INFO_DATE = "PromulgationInfo-PromulgationDate";
-
-    public static String DOCUMENT_TYPE_TYPE = "DocumentType-Type";
-    public static String DOCUMENT_TYPE_TYPE_NAME = "DocumentType-TypeName";
-
-    public static String AUTHOR_COMPETENCE = "SignerInfo-Competence";
-    public static String AUTHOR_FUNCTION = "SignerInfo-Position";
-    public static String AUTHOR_FULLNAME = "SignerInfo-FullName";
-
-    public static String TOPLACES_PLACE = "ToPlaces-Place";
-
-    public static String APPENDIXES_APPENDIX = "Appendixes-Appendix";
-
-    public static String LICENSE_KEY = "License";
-    public static String CLIENT_EMAIL = "Email";
-    public static String CLIENT_NAME = "Name";
-
-    public static String OTHERINFO_PRIORITY = "OtherInfo-Priority";
-    public static String OTHERINFO_SPHERE_OF_PROMULGATION = "OtherInfo-SphereOfPromulgation";
-    public static String OTHERINFO_TYPER_NOTATION = "OtherInfo-TyperNotation";
-    public static String OTHERINFO_PROMULGATION_AMOUNT = "OtherInfo-PromulgationAmount";
-    public static String OTHERINFO_PAGE_AMOUNT = "OtherInfo-PageAmount";
-    public static String MESSAGE_HEADER_APPENDIXES = "OtherInfo-Appendixes";
-
-    public static final String CONTENT_TRANSFER_ENCODING_PREFIX = "Content-Transfer-Encoding";
-    public static final String CONTENT_TRANSFER_ENCODING_VALUE = "BASE64";
-
     public static final String AMPERSAND = "&";
 
     public static final String AMPERSAND_ENCODED = "&amp;";

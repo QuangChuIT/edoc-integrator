@@ -13,36 +13,36 @@
     <div class="row">
         <div class="boarder-all" id="dailycounterConvertContent">
             <div class="form-group">
-                <div class="col-md-2 col-sm-6 col-xs-12"></div>
-                <div class="col-md-2 col-sm-6 col-xs-12">
+                <div class="col-md-2 col-xs-2"></div>
+                <div class="col-md-2 col-xs-2">
                     <label class="control-label">Từ ngày</label>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="col-md-4 col-xs-4">
                     <input type="text" class="report-time form-control" readonly
                            id="fromStatisticDate" name="fromStatisticDate" value=""
                            placeholder="<spring:message code="edoc.search.from.date"/>">
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12"></div>
+                <div class="col-md-4 col-xs-4"></div>
             </div>
             <br>
             <div class="form-group">
-                <div class="col-md-2 col-sm-6 col-xs-12"></div>
-                <div class="col-md-2 col-sm-6 col-xs-12">
+                <div class="col-md-2 col-xs-2"></div>
+                <div class="col-md-2 col-xs-2">
                     <label class="control-label">
                         Đến ngày
                     </label>
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="col-md-4 col-xs-4">
                     <input type="text" class="report-time form-control"
                            readonly id="toStatisticDate" name="toStatisticDate" value=""
                            placeholder="<spring:message code="edoc.search.to.date"/>">
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-12"></div>
+                <div class="col-md-4 col-xs-4"></div>
             </div><br>
             <br>
             <div class="form-group">
-                <div class="col-md-4 col-sm-6 col-xs-12"></div>
-                <div class="col-md-8 col-sm-6 col-xs-12">
+                <div class="col-md-4 col-xs-4"></div>
+                <div class="col-md-8 col-xs-8">
                     <button class="btn btn-info btn-report-group" id="btnRunStatisticDetail">
                         <i class="fa fa-calculator fa-fw"></i>
                         <spring:message code="edoc.report.button"/>

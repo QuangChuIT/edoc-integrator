@@ -71,7 +71,7 @@ public class SignReference {
         signReference.setURI(EdxmlUtils.getAttributeWithPrefix(elementNode, "URI"));
         List<Element> elementList = elementNode.getChildren();
         if (elementList != null && elementList.size() != 0) {
-            Element element = null;
+            Element element;
             for (Element thisElement : elementList) {
                 element = thisElement;
                 if ("Transforms".equals(element.getName())) {

@@ -67,7 +67,7 @@ public class TraceHeaderList {
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass())
                 .add("TraceHeader", this.traceHeaders)
-                .add("Bussiness", this.business)
+                .add("Business", this.business)
                 .add("BusinessInfo", this.businessInfo).toString();
     }
 

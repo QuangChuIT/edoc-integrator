@@ -100,7 +100,7 @@ public class EdocDailyCounterService {
         return ePublicStats;
     }
 
-    public List<EdocStatisticDetail> getStatisticDetail(String fromDate, String toDate, String organDomain) {
+    public List<EdocStatisticDetail> getStatisticSentReceivedExtDetail(String fromDate, String toDate, String organDomain) {
         Map<String, EdocStatisticDetail> dailyCounterMap = new HashMap<>();
         List<EdocStatisticDetail> edocStatDetails = new ArrayList<>();
 
@@ -108,30 +108,32 @@ public class EdocDailyCounterService {
             EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(organDomain);
             if (contact.getAgency()) {
                 LOGGER.info("Start count with organ " + organDomain + "!!!!!!!!!!");
-                EdocStatisticDetail edocStatDetail = new EdocStatisticDetail();
+                EdocStatisticDetail edocStatisticDetail = new EdocStatisticDetail();
                 int receivedExt = edocDocumentService.countReceivedExtDocument(fromDate, toDate, true, organDomain);
-                edocStatDetail.setOrganDomain(organDomain);
-                edocStatDetail.setReceived_ext(receivedExt);
+                edocStatisticDetail.setOrganDomain(organDomain);
+                edocStatisticDetail.setReceived_ext(receivedExt);
 
                 int receivedInt = edocDocumentService.countReceivedExtDocument(fromDate, toDate, false, organDomain);
-                edocStatDetail.setReceived_int(receivedInt);
+                edocStatisticDetail.setReceived_int(receivedInt);
                 int totalRecived = receivedExt + receivedInt;
-                edocStatDetail.setTotal_received(totalRecived);
+                edocStatisticDetail.setTotal_received(totalRecived);
                 LOGGER.info("Total received: " + totalRecived);
 
                 List<Long> listDocCode = edocDocumentService.getDocCodeByOrganDomain(fromDate, toDate, organDomain);
                 LOGGER.info("Has " + listDocCode.size() + " documents!!!!");
-                for (long doc_code: listDocCode) {
+                /*for (long doc_code: listDocCode) {
                     LOGGER.info("Start at documentID " + doc_code);
                     if (edocAttachmentService.checkSignedAttachment(doc_code)) {
-                        int signed = edocStatDetail.getSigned() + 1;
-                        edocStatDetail.setSigned(signed);
+                        int signed = edocStatisticDetail.getSigned() + 1;
+                        edocStatisticDetail.setSigned(signed);
                     } else {
-                        int not_signed = edocStatDetail.getNot_signed() + 1;
-                        edocStatDetail.setNot_signed(not_signed);
+                        int not_signed = edocStatisticDetail.getNot_signed() + 1;
+                        edocStatisticDetail.setNot_signed(not_signed);
                     }
                 }
-                edocStatDetails.add(edocStatDetail);
+
+                 */
+                edocStatDetails.add(edocStatisticDetail);
             }
         } else {
             List<EdocDynamicContact> organs = EdocDynamicContactServiceUtil.getDynamicContactByAgency(true);
@@ -179,7 +181,7 @@ public class EdocDailyCounterService {
 
     public static void main(String[] args) {
         EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        System.out.println(new Gson().toJson(edocDailyCounterService.getStatisticDetail("2020-12-01", "2020-12-31", "000.01.01.H36")));
+        System.out.println(new Gson().toJson(edocDailyCounterService.getStatisticSentReceivedExtDetail("2020-12-01", "2020-12-31", null)));
     }
 
     public EPublic getStat() {
@@ -200,8 +202,6 @@ public class EdocDailyCounterService {
         map.put("received", received);
         return new Gson().toJson(map);
     }
-
-
 
     private final static Logger LOGGER = Logger.getLogger(EdocDocumentService.class);
 }

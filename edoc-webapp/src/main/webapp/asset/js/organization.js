@@ -83,7 +83,10 @@ let organManage = {
                 {
                     "name": "email",
                     "title": organ_message.table_header_email,
-                    "data": "email",
+                    "data": null,
+                    "render": function (data) {
+                        return $('#organEmailTemplate').tmpl(data).html();
+                    }
                 },
                 {
                     "name": "status",

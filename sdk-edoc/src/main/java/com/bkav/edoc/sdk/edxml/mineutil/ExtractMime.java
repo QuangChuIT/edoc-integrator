@@ -1,89 +1,136 @@
 package com.bkav.edoc.sdk.edxml.mineutil;
 
-import com.bkav.edoc.sdk.edxml.entity.Attachment;
-import com.bkav.edoc.sdk.edxml.entity.MessageHeader;
-import com.bkav.edoc.sdk.edxml.entity.MessageStatus;
-import com.bkav.edoc.sdk.edxml.entity.TraceHeaderList;
-import com.bkav.edoc.sdk.edxml.util.AttachmentGlobalUtils;
-import com.bkav.edoc.sdk.edxml.util.XmlUtil;
+import com.bkav.edoc.sdk.edxml.entity.*;
+import com.bkav.edoc.sdk.edxml.entity.env.Body;
+import com.bkav.edoc.sdk.edxml.entity.env.Envelop;
+import com.bkav.edoc.sdk.edxml.entity.env.Header;
+import com.bkav.edoc.sdk.edxml.util.XmlUtils;
 import com.bkav.edoc.sdk.resource.EdXmlConstant;
+import com.google.common.io.Files;
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.w3c.dom.Document;
 
-import javax.activation.DataHandler;
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExtractMime {
-    /**
-     * @param name
-     * @param input
-     * @return
-     */
-    public Attachment getAttachment(String name, DataHandler input) {
-        Attachment attachment = new Attachment(name);
-        String contentType = "";
-        if (input.getContentType() == null || input.getContentType().equals("")) {
-            contentType = AttachmentGlobalUtils.getContentType(attachment.getFormat());
-        } else {
-            contentType = input.getContentType();
-        }
-        attachment.setContentType(contentType);
-        String encoding = "base64";
-        attachment.setContentTransferEncoded(encoding);
-        InputStream inputStream;
-        attachment.setDescription(name);
-        try {
-            inputStream = input.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-            inputStream = new ByteArrayInputStream("".getBytes());
-        }
-        attachment.setInputStream(inputStream);
+    private static final ExtractMime INSTANCE = new ExtractMime();
 
-        return attachment;
+    public static ExtractMime getInstance() {
+        return INSTANCE;
+    }
+
+    public Envelop parser(InputStream inputStream) {
+        Envelop envelop = null;
+        try {
+            Document document = XmlUtils.getDocument(inputStream);
+            if (document != null) {
+                MessageHeader messageHeader = new MessageHeader();
+                Header header = new Header();
+                header.setMessageHeader(this.getMessageHeader(document));
+                header.setSignature(this.getSignature(document));
+                header.setTraceHeaderList(this.getTraceHeaderList(document));
+                Body body = getBody(document);
+                List<Attachment> attachments = this.getAttachments(document);
+                envelop = new Envelop();
+                envelop.setHeader(header);
+                envelop.setBody(body);
+                envelop.setAttachments(attachments);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return envelop;
+    }
+
+    public Body getBody(Document document) {
+        Element rootElement = document.getRootElement();
+
+        Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
+
+        Element bodyNode = getSingerElement(envelope,
+                "edXMLBody", EdXmlConstant.EDXML_NS);
+        return Body.getData(bodyNode);
     }
 
     /**
-     * @param envelopeDoc
+     * @param document
      * @return
      */
-    public TraceHeaderList getTraceHeaderList(Document envelopeDoc) {
+    public TraceHeaderList getTraceHeaderList(Document document) {
 
-        org.jdom2.Document domEnvDoc = XmlUtil.convertFromDom(envelopeDoc);
-
-        Element rootElement = domEnvDoc.getRootElement();
+        Element rootElement = document.getRootElement();
 
         TraceHeaderList traceHeaderList;
-
-        Namespace envNs = xmlUtil.getEnvelopeNS(rootElement);
-
-        Element parentNode = getSingerElement(rootElement, "Header", envNs);
-
-        Element traceHeaderListNode = getSingerElement(parentNode,
-                "TraceHeaderList", EdXmlConstant.EDXML_NS);
+        Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
+        Element singerElement = getSingerElement(envelope, "edXMLHeader", EdXmlConstant.EDXML_NS);
+        Element traceHeaderListNode = getSingerElement(singerElement, "TraceHeaderList", EdXmlConstant.EDXML_NS);
 
         traceHeaderList = TraceHeaderList.getData(traceHeaderListNode);
 
         return traceHeaderList;
     }
 
+    public List<Attachment> getAttachments(Document document) {
+        Element element = document.getRootElement();
+        if (element == null) {
+            return null;
+        } else {
+            List<Element> elementList = element.getChildren();
+            if (elementList != null && elementList.size() != 0) {
+                Element elementChildren = null;
+                for (Element elementEntry : elementList) {
+                    if ("AttachmentEncoded".equals((elementEntry.getName()))) {
+                        elementChildren = elementEntry;
+                    }
+                }
+                if (elementChildren != null && elementChildren.getChildren() != null && elementChildren.getChildren().size() != 0) {
+                    File fileTmp = Files.createTempDir();
+                    try {
+                        List<Element> elements = elementChildren.getChildren();
+                        Attachment attachment;
+                        List<Attachment> attachments = new ArrayList<>();
+                        for (Element value : elements) {
+                            attachment = Attachment.getData(value, fileTmp.getPath());
+                            if (attachment != null) {
+                                attachments.add(attachment);
+                            }
+                        }
+                        return attachments;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+
+    }
+
     /**
-     * @param envelopDoc
+     * @param document
      * @return
      * @throws Exception
      */
-    public MessageStatus getStatus(Document envelopDoc) throws Exception {
-        org.jdom2.Document domEnv = XmlUtil.convertFromDom(envelopDoc);
+    public MessageStatus getStatus(Document document) throws Exception {
 
-        Element rootElement = domEnv.getRootElement();
+        Element rootElement = document.getRootElement();
 
-        Namespace envNs = xmlUtil.getEnvelopeNS(rootElement);
-
-        Element headerNode = getSingerElement(rootElement, "Body", envNs);
+        Element headerNode = getSingerElement(rootElement, "Body", EdXmlConstant.EDXML_NS);
 
         Element statusNode = headerNode.getChild("Status");
         MessageStatus status = new MessageStatus();
@@ -94,24 +141,27 @@ public class ExtractMime {
     }
 
 
+    public Signature getSignature(Document document) {
+        Element rootElement = document.getRootElement();
+        Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
+        Element singerElement = getSingerElement(envelope, "edXMLHeader", EdXmlConstant.EDXML_NS);
+        Element headerNode = getSingerElement(singerElement, "Signature", EdXmlConstant.EDXML_NS);
+
+        return Signature.getData(headerNode);
+    }
+
     /**
-     * @param envelopeDoc
+     * @param document
      * @return
      * @throws Exception
      */
-    public MessageHeader getMessageHeader(Document envelopeDoc)
-            throws Exception {
+    public MessageHeader getMessageHeader(Document document) {
 
-        org.jdom2.Document domENV = XmlUtil.convertFromDom(envelopeDoc);
-
-        Element rootElement = domENV.getRootElement();
+        Element rootElement = document.getRootElement();
 
         MessageHeader messageHeader = new MessageHeader();
-
-        Namespace envNs = xmlUtil.getEnvelopeNS(rootElement);
-
-        Element headerNode = getSingerElement(rootElement, "Header", envNs);
-
+        Element envelope = getSingerElement(rootElement, "edXMLEnvelope", EdXmlConstant.EDXML_NS);
+        Element headerNode = getSingerElement(envelope, "edXMLHeader", EdXmlConstant.EDXML_NS);
         Element messageHeaderNode = getSingerElement(headerNode,
                 "MessageHeader", EdXmlConstant.EDXML_NS);
 
@@ -149,6 +199,4 @@ public class ExtractMime {
         }
         return list;
     }
-
-    private static final XmlUtil xmlUtil = new XmlUtil();
 }

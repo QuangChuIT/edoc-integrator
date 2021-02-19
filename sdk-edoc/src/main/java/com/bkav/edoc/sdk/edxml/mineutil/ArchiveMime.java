@@ -5,80 +5,60 @@ import com.bkav.edoc.sdk.edxml.entity.Manifest;
 import com.bkav.edoc.sdk.edxml.entity.Reference;
 import com.bkav.edoc.sdk.edxml.entity.env.Envelop;
 import com.bkav.edoc.sdk.edxml.util.UUidUtils;
-import com.bkav.edoc.sdk.edxml.util.XmlUtil;
-import com.bkav.edoc.sdk.util.StringPool;
-import com.google.common.io.BaseEncoding;
-import com.google.common.io.ByteStreams;
-import org.apache.axiom.attachments.Attachments;
+import com.bkav.edoc.sdk.edxml.util.XmlUtils;
+import com.bkav.edoc.sdk.resource.EdXmlConstant;
+import com.google.common.io.Files;
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.util.XMLUtils;
 import org.w3c.dom.Document;
 
-import javax.activation.DataHandler;
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ArchiveMime {
-    /**
-     * @param envelop
-     * @param attachmentsByEntity
-     * @return
-     * @throws Exception
-     */
-    public Map<String, Object> createMime(Envelop envelop,
-                                          List<Attachment> attachmentsByEntity) throws Exception {
-        Map<String, Object> map = new HashMap<>();
+    private static final ArchiveMime INSTANCE = new ArchiveMime();
 
-        org.w3c.dom.Document bodyChildDocument;
+    public static ArchiveMime getInstance() {
+        return INSTANCE;
+    }
 
-        org.w3c.dom.Document messageHeaderDocument;
+    public File createMime(Envelop envelop, String fileName, String path) {
+        File tmpFile = Files.createTempDir();
+        try {
+            OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
-        Document traceHeaderDocument;
-
-        Attachments attachments = null;
-
-        OMFactory factoryOM = OMAbstractFactory.getOMFactory();
-
-        OMNamespace ns = factoryOM.createOMNamespace(
-                StringPool.TARGET_NAMESPACE, StringPool.EDXML_PREFIX);
-
-        messageHeaderDocument = xmlUtil.getMessHeaderDoc(envelop.getHeader()
-                .getMessageHeader(), ns);
-        System.out.println("Success convert message header in create mine with attachment size " + attachmentsByEntity.size() + " !!!!!!!!!!!!!!!!!!!!!");
-        traceHeaderDocument = xmlUtil.getTraceHeaderDoc(envelop.getHeader()
-                .getTraceHeaderList(), ns);
-        System.out.println("Success convert trace header list in create mine with attachment size " + attachmentsByEntity.size() + " !!!!!!!!!!!!!!!!!!!!!!!!!");
-        List<Reference> references = new ArrayList<>();
-
-        long dataAttSize = 0L;
-
-        // Create attachment
-        if (attachmentsByEntity.size() > 0) {
-            attachments = new Attachments();
-            for (Attachment attachment : attachmentsByEntity) {
-                InputStream attStream = attachment.getInputStream();
-                if (attStream != null) {
+            OMNamespace ns = factoryOM.createOMNamespace(
+                    EdXmlConstant.EDXML_URI, EdXmlConstant.EDXML_PREFIX);
+            OMNamespace omNamespace = factoryOM.createOMNamespace(EdXmlConstant.EDXML_URI, "");
+            OMElement rootElement = factoryOM.createOMElement("edXML", omNamespace);
+            OMElement envelopElement = factoryOM.createOMElement("edXMLEnvelope", ns);
+            OMElement headerElement = factoryOM.createOMElement("edXMLHeader", ns);
+            // Create MessageHeader
+            OMElement messageHeader = XmlUtils.getMessHeaderDoc(envelop.getHeader()
+                    .getMessageHeader(), ns);
+            System.out.println("Success convert message header in create mine with attachment size " + envelop.getAttachments().size() + " !!!!!!!!!!!!!!!!!!!!!");
+            // Create TraceHeaderList
+            OMElement traceHeaderList = XmlUtils.getTraceHeaderDoc(envelop.getHeader()
+                    .getTraceHeaderList(), ns);
+            System.out.println("Success convert trace header list in create mine with attachment size " + envelop.getAttachments().size() + " !!!!!!!!!!!!!!!!!!!!!!!!!");
+            // Create Signature
+            OMElement signature = XmlUtils.getSignatureDoc(envelop.getHeader().getSignature());
+            headerElement.addChild(messageHeader);
+            headerElement.addChild(traceHeaderList);
+            headerElement.addChild(signature);
+            envelopElement.addChild(headerElement);
+            List<Reference> references = new ArrayList<>();
+            List<Attachment> attachments = new ArrayList<>();
+            // Create body
+            if (envelop.getAttachments().size() > 0) {
+                for (Attachment attachment : envelop.getAttachments()) {
                     // create content id for attachment
                     String contentId = UUidUtils.generate();
-
                     String contentType = attachment.getContentType();
-
-                    File attachFile = attachment.getContent();
-
-                    // TODO: Encode file
-                    String contentTransferEncoded = BaseEncoding.base64().encode(ByteStreams.toByteArray(attStream));
-                    attStream.close();
-                    DataHandler data = new DataHandler(contentTransferEncoded, contentType);
-
-                    attachments.addDataHandler(contentId, data);
-
-                    dataAttSize += attachFile.length();
-
                     // Create reference on body
                     Reference reference = new Reference();
                     reference.setContentId("cid:" + contentId);
@@ -86,36 +66,36 @@ public class ArchiveMime {
                     reference.setContentType(contentType);
                     reference.setDescription(attachment.getDescription());
                     references.add(reference);
-
-                } else {
-                    if (attachment.getName().length() > 0) {
-                        System.out.println("Can't read attachment, input stream of attachment null of attachment with name: "
-                                + attachment.getName());
-                    }
+                    attachment.setContentId(contentId);
+                    attachments.add(attachment);
                 }
-
             }
+
+            Manifest manifest = new Manifest();
+
+            manifest.setReferences(references);
+
+            OMElement body = XmlUtils.getBodyChildDoc(manifest, ns);
+            envelopElement.addChild(body);
+            // Create Attachment
+            OMElement attachmentEncoded = XmlUtils.getAttachmentDoc(attachments, ns, tmpFile.getAbsolutePath());
+            rootElement.addChild(envelopElement);
+            rootElement.addChild(attachmentEncoded);
+            Document document = XMLUtils.toDOM(rootElement).getOwnerDocument();
+            return XmlUtils.buildContent(document, fileName, path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            File[] files = tmpFile.listFiles();
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+
+            tmpFile.delete();
         }
-
-        Manifest manifest = new Manifest();
-
-        manifest.setReferences(references);
-
-        bodyChildDocument = xmlUtil.getBodyChildDoc(manifest, ns);
-
-        map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
-
-        map.put(StringPool.MESSAGE_HEADER_KEY, messageHeaderDocument);
-
-        map.put(StringPool.TRACE_HEADER_KEY, traceHeaderDocument);
-
-        map.put(StringPool.ATTACHMENT_KEY, attachments);
-
-        map.put(StringPool.ATTACHMENT_SIZE_KEY, dataAttSize);
-
-        return map;
-
+        return null;
     }
 
-    private final XmlUtil xmlUtil = new XmlUtil();
 }

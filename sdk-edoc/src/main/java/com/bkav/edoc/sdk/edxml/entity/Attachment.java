@@ -184,7 +184,7 @@ public class Attachment {
             InputStream inputStream = new FileInputStream(file);
             attachment.setInputStream(inputStream);
         } catch (Exception e) {
-            throw new IOException("Error when parse content file of attachment with id " + attachment.getContentId());
+            throw new IOException("Error parse content file of attachment with id " + attachment.getContentId());
         }
     }
 

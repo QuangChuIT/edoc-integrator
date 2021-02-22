@@ -1,12 +1,11 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReplacementInfoList extends CommonElement implements IElement<ReplacementInfoList> {
+public class ReplacementInfoList {
     private List<ReplacementInfo> replacementInfo;
 
     public ReplacementInfoList() {
@@ -32,28 +31,4 @@ public class ReplacementInfoList extends CommonElement implements IElement<Repla
         return MoreObjects.toStringHelper(super.getClass()).add("ReplacementInfo", this.replacementInfo).toString();
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element replacementInfoList = this.createElement(element, "ReplacementInfoList");
-        if (this.replacementInfo != null && !this.replacementInfo.isEmpty()) {
-            for (ReplacementInfo replacementInfo : this.replacementInfo) {
-                replacementInfo.createElement(replacementInfoList);
-            }
-
-        }
-    }
-
-    @Override
-    public ReplacementInfoList getData(Element element) {
-        ReplacementInfoList replacementInfoList = new ReplacementInfoList();
-        List<Element> childrenElement = element.getChildren();
-        if (childrenElement != null && childrenElement.size() != 0) {
-            for (Element children : childrenElement) {
-                if ("ReplacementInfo".equals(children.getName())) {
-                    replacementInfoList.addReplacementInfo(new ReplacementInfo().getData(children));
-                }
-            }
-        }
-        return replacementInfoList;
-    }
 }

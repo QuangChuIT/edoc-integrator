@@ -47,6 +47,7 @@
                 <button class="btn btn-primary import-excel-button" id="importOrganFromExcel">
                     <i class="fa fa-arrow-circle-up fa-fw"></i>
                     <spring:message code="edoc.import.report"/>
+                </button>
                 <button class="btn btn-primary btn-report-group" id="exportOrganToExcel">
                     <i class="fa fa-arrow-circle-down fa-fw"></i>
                     <spring:message code="edoc.export.report"/>
@@ -57,6 +58,18 @@
                 </button>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-organ">
+            </table>
+        </div>
+    </div>
+    <div class="edoc-table-not-taken">
+        <div class="table-responsive">
+            <div class="row user-import" id="warning-document-not-taken">
+                <button class="btn btn-primary import-excel-button" id="put-to-telegram">
+                    <i class="fa fa-arrow-circle-up fa-fw"></i>
+                    <spring:message code="edoc.not.taken.warning.telegram"/>
+                </button>
+            </div>
+            <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-notTaken">
             </table>
         </div>
     </div>
@@ -109,5 +122,11 @@
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-statistic">
             </table>
         </div>
+    </div>
+</div>
+<div id="overlay-edoc-not-taken">
+    <div class="cv-spinner">
+        <span class="loading-spinner"></span>
+        <span>&nbsp;Đang xử lý</span>
     </div>
 </div>

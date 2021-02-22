@@ -1,13 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.sdk.edxml.util.DateUtils;
-import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
 import java.util.Date;
 
-public class ResponseFor extends CommonElement implements IElement<ResponseFor> {
+public class ResponseFor {
 
     private String organId;
     private String code;
@@ -69,20 +66,4 @@ public class ResponseFor extends CommonElement implements IElement<ResponseFor> 
                 this.documentId).add("PromulgationDate", this.promulgationDate).toString();
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element responseFor = this.createElement(element, "ResponseFor");
-        this.createElement(responseFor, "OrganId", this.organId);
-        this.createElement(responseFor, "Code", this.code);
-        this.createElement(responseFor, "DocumentId", this.documentId);
-        this.createElement(responseFor, "PromulgationDate", DateUtils.format(this.promulgationDate));
-    }
-
-    @Override
-    public ResponseFor getData(Element element) {
-        return new ResponseFor(EdxmlUtils.getString(element, "OrganId"),
-                EdxmlUtils.getString(element, "Code"),
-                DateUtils.parse(EdxmlUtils.getString(element, "PromulgationDate"), DateUtils.DEFAULT_DATE_FORMAT),
-                EdxmlUtils.getString(element, "DocumentId"));
-    }
 }

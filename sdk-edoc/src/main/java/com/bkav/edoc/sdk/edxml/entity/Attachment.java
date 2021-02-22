@@ -1,9 +1,9 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.ArchiveUtils;
 import com.bkav.edoc.sdk.edxml.util.AttachmentGlobalUtils;
 import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.bkav.edoc.sdk.resource.EdXmlConstant;
-import com.bkav.edoc.sdk.util.CompressUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
@@ -148,7 +148,7 @@ public class Attachment {
             inputStream = this.getInputStreamFromFile();
         } else {
             this.contentType = "application/zip";
-            inputStream = new FileInputStream(CompressUtils.zip(this.getInputStreamFromFile(), this.getFormat(), fileName));
+            inputStream = new FileInputStream(ArchiveUtils.zip(this.getInputStreamFromFile(), this.getFormat(), fileName));
         }
 
         this.accumulateWithoutPrefix(attachment, "ContentType", this.contentType);
@@ -217,7 +217,7 @@ public class Attachment {
             File file = new File(filePath, UUID.randomUUID().toString() + "." + attachment.getFormat());
             Files.write(Base64.decodeBase64(attachment.getContentTransferEncoded()), file);
             if ("application/zip".equals(attachment.getContentType()) && !"zip".equals(attachment.getFormat())) {
-                file = CompressUtils.unzip(file);
+                file = ArchiveUtils.unzip(file);
                 attachment.setContent(file);
             }
             InputStream inputStream = new FileInputStream(file);

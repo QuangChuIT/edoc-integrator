@@ -92,8 +92,13 @@
                             code="menu.system.management.organ"/></a>
                 </li>
                 <li>
-                    <a href="javascript:void(0)" class="email-template-menu" data-mode="draft" id="email-template-menu">
+                    <a href="javascript:void(0)" data-mode="email-template" id="email-template-menu">
                         <spring:message code="menu.email.template.manage"/>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" data-mode="not-taken-edoc" id="edoc-not-taken-menu">
+                        <spring:message code="menu.documents.not.taken"/>
                     </a>
                 </li>
             </ul>

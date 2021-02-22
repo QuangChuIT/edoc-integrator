@@ -1,13 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class OtherInfo extends CommonElement implements IElement<OtherInfo> {
+public class OtherInfo {
     private int priority;
     private String sphereOfPromulgation;
     private String typerNotation;
@@ -122,51 +119,4 @@ public class OtherInfo extends CommonElement implements IElement<OtherInfo> {
                 .add("ReferenceCodes", this.referenceCodes).add("Appendixes", this.appendixes).toString();
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element otherElement = this.createElement(element, "OtherInfo");
-        this.createElement(otherElement, "Priority", this.priority);
-        this.createElement(otherElement, "SphereOfPromulgation", this.sphereOfPromulgation);
-        this.createElement(otherElement, "TyperNotation", this.typerNotation);
-        this.createElement(otherElement, "PromulgationAmount", this.promulgationAmount);
-        this.createElement(otherElement, "PageAmount", this.pageAmount);
-        this.createElement(otherElement, "ReplyFors", this.replyFors);
-        this.createElement(otherElement, "Direction", String.valueOf(this.direction));
-        this.createElement(otherElement, "ReferenceCodes", this.referenceCodes);
-        if (this.appendixes != null && !this.appendixes.isEmpty()) {
-            Element appendixes = this.createElement(otherElement, "Appendixes");
-            for (String str : this.appendixes) {
-                this.createElement(appendixes, "Appendix", str);
-            }
-        }
-    }
-
-    @Override
-    public OtherInfo getData(Element otherInfoElement) {
-        OtherInfo otherInfo = new OtherInfo(EdxmlUtils.getInt(otherInfoElement, "Priority", 0),
-                EdxmlUtils.getString(otherInfoElement, "SphereOfPromulgation"),
-                EdxmlUtils.getString(otherInfoElement, "TyperNotation"),
-                EdxmlUtils.getInt(otherInfoElement, "PromulgationAmount", 1),
-                EdxmlUtils.getInt(otherInfoElement, "PageAmount", 1),
-                EdxmlUtils.getString(otherInfoElement, "ReplyFors"),
-                EdxmlUtils.getString(otherInfoElement, "ReferenceCodes"),
-                EdxmlUtils.getBoolean(otherInfoElement, "Direction", false));
-        List<Element> elementList = otherInfoElement.getChildren();
-        if (elementList != null && elementList.size() != 0) {
-            for (Element element : elementList) {
-                if ("Appendixes".equals(element.getName())) {
-                    List<String> appendixes = new ArrayList<>();
-                    List<Element> elements = element.getChildren();
-                    for (Element item : elements) {
-                        if ("Appendix".equals(item.getName())) {
-                            appendixes.add(item.getText());
-                        }
-                    }
-                    otherInfo.setAppendixes(appendixes);
-                    return otherInfo;
-                }
-            }
-        }
-        return otherInfo;
-    }
 }

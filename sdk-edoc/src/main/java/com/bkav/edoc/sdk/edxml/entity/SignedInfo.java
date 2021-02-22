@@ -1,13 +1,11 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
-import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignedInfo extends CommonElement implements IElement<SignedInfo> {
+public class SignedInfo {
     private String canonicalizationMethod = "http://www.w3.org/2001/10/xml-exc-c14n#";
     private String signatureMethod = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
     private List<SignReference> reference;
@@ -53,15 +51,6 @@ public class SignedInfo extends CommonElement implements IElement<SignedInfo> {
         this.reference.add(signReference);
     }
 
-    private void accumulateWithoutPrefix(Element element, CommonElement commonElement) {
-        if (commonElement != null) {
-            if (!Strings.isNullOrEmpty("Reference")) {
-                element = this.createWithoutPrefix(element, "Reference");
-            }
-
-            commonElement.createElement(element);
-        }
-    }
 
     @Override
     public String toString() {
@@ -70,37 +59,4 @@ public class SignedInfo extends CommonElement implements IElement<SignedInfo> {
                 this.signatureMethod).add("Reference", this.reference).toString();
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element signedInfo = this.createElement(element, "SignedInfo");
-        Element canonicalizationMethod = this.createWithoutPrefix(signedInfo, "CanonicalizationMethod");
-        this.createAttWithoutPrefix(canonicalizationMethod, "Algorithm", this.canonicalizationMethod);
-        Element signatureMethod = this.createWithoutPrefix(signedInfo, "SignatureMethod");
-        this.createAttWithoutPrefix(signatureMethod, "Algorithm", this.signatureMethod);
-        for (SignReference signReference : this.reference) {
-            this.accumulateWithoutPrefix(signedInfo, signReference);
-        }
-    }
-
-    @Override
-    public SignedInfo getData(Element element) {
-        SignedInfo signedInfo = new SignedInfo();
-        List<Element> childrenElement = element.getChildren();
-        if (childrenElement != null && childrenElement.size() != 0) {
-            for (Element children : childrenElement) {
-                if ("CanonicalizationMethod".equals(children.getName())) {
-                    signedInfo.setCanonicalizationMethod(this.getAttributeWithPrefix(children, "Algorithm"));
-                }
-
-                if ("SignatureMethod".equals(children.getName())) {
-                    signedInfo.setSignatureMethod(getAttributeWithPrefix(children, "Algorithm"));
-                }
-
-                if ("Reference".equals(children.getName())) {
-                    signedInfo.addReference(new SignReference().getData(children));
-                }
-            }
-        }
-        return signedInfo;
-    }
 }

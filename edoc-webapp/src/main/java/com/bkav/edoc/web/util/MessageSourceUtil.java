@@ -20,7 +20,6 @@ public class MessageSourceUtil {
         this.messageSource = messageSource;
     }
 
-
     public String getMessage(String key, @Nullable Object[] args) {
         return messageSource.getMessage(key, args, locale);
     }

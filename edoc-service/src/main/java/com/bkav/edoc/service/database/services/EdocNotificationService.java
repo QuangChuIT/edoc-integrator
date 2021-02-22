@@ -188,16 +188,19 @@ public class EdocNotificationService {
                         telegramMessage.setCreateDate(createDate);
                         telegramMessages.add(telegramMessage);
                     }*/
+                        Date now = new Date();
+                        int diffMin = DateUtil.getMinuteBetween(createDate, now);
+                        if (diffMin >= 30) {
+                            LOGGER.info("------------------------- Modified Date " + createDate +
+                                    " ------------------ organ " + notification.getReceiverId());
 
-                        LOGGER.info("------------------------- Modified Date " + createDate +
-                                " ------------------ organ " + notification.getReceiverId());
-
-                        TelegramMessage telegramMessage = new TelegramMessage();
-                        telegramMessage.setReceiverId(notification.getReceiverId());
-                        telegramMessage.setReceiverName(contact.getName());
-                        telegramMessage.setDocument(notification.getDocument());
-                        telegramMessage.setCreateDate(createDate);
-                        telegramMessages.add(telegramMessage);
+                            TelegramMessage telegramMessage = new TelegramMessage();
+                            telegramMessage.setReceiverId(notification.getReceiverId());
+                            telegramMessage.setReceiverName(contact.getName());
+                            telegramMessage.setDocument(notification.getDocument());
+                            telegramMessage.setCreateDate(createDate);
+                            telegramMessages.add(telegramMessage);
+                        }
                     }
                 }
             }
@@ -209,35 +212,47 @@ public class EdocNotificationService {
         }
     }
 
-    /*public Map<String, Object> getAllDocumentNotTaken(PaginationCriteria paginationCriteria) {
+    public Map<String, Object> getAllDocumentNotTaken(PaginationCriteria paginationCriteria) {
         int totalRecords = 0;
         List<EdocDocument> documents = new ArrayList<>();
         Session session = notificationDaoImpl.openCurrentSession();
         Map<String, Object> map = null;
+        LOGGER.info("Get all documents not taken invoke !!!!!!!!!!!!!!!");
         try {
-            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetOrganizations", EdocDynamicContact.class);
+            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetAllDocumentsNotTaken", EdocDocument.class);
             storedProcedureQuery.registerStoredProcedureParameter("orderBy", String.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("keyword", String.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("pageIdx", Integer.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("pageSize", Integer.class, ParameterMode.IN);
+            //storedProcedureQuery.registerStoredProcedureParameter("fromDate", java.sql.Date.class, ParameterMode.IN);
+            //storedProcedureQuery.registerStoredProcedureParameter("toDate", java.sql.Date.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
             storedProcedureQuery.setParameter("orderBy", paginationCriteria.getOrderBy());
             storedProcedureQuery.setParameter("keyword", paginationCriteria.getSearch());
             storedProcedureQuery.setParameter("pageIdx", paginationCriteria.getPageNumber());
             storedProcedureQuery.setParameter("pageSize", paginationCriteria.getPageSize());
+
+            /*if(fromDate == null || toDate == null){
+                java.sql.Date date = null;
+                storedProcedureQuery.setParameter("fromDate", date);
+                storedProcedureQuery.setParameter("toDate", date);
+            } else {
+                storedProcedureQuery.setParameter("fromDate", fromDate);
+                storedProcedureQuery.setParameter("toDate", toDate);
+            }*/
             totalRecords = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
 
             List list = storedProcedureQuery.getResultList();
 
             if (list != null && list.size() > 0) {
                 for (Object object : list) {
-                    EdocDynamicContact contact = (EdocDynamicContact) object;
-                    OrganizationCacheEntry cacheEntry = MapperUtil.modelToOrganCache(contact);
-                    contacts.add(cacheEntry);
+                    EdocDocument document = (EdocDocument) object;
+                    documents.add(document);
                 }
                 map = new HashMap<>();
-                map.put("contacts", contacts);
-                map.put("totalContacts", totalRecords);
+                LOGGER.info("Has " + documents.size() + " not taken !!!!!!!!!!!");
+                map.put("documents", documents);
+                map.put("totalDocuments", totalRecords);
                 return map;
             }
             return null;
@@ -245,10 +260,9 @@ public class EdocNotificationService {
             LOGGER.error("Error get contacts cause " + e.getMessage());
             return map;
         } finally {
-            dynamicContactDaoImpl.closeCurrentSession(session);
+            notificationDaoImpl.closeCurrentSession(session);
         }
-    }*/
-
+    }
 
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance();

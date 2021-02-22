@@ -1,10 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
-import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
-public class DocumentType extends CommonElement implements IElement<DocumentType> {
+public class DocumentType {
     private int type;
     private int typeDetail;
     private String typeName;
@@ -55,18 +53,4 @@ public class DocumentType extends CommonElement implements IElement<DocumentType
                 this.typeDetail).add("TypeName", this.typeName).toString();
     }
 
-    @Override
-    public void createElement(Element element) {
-        Element documentType = this.createElement(element, "DocumentType");
-        this.createElement(documentType, "Type", this.type);
-        this.createElement(documentType, "TypeDetail", this.typeDetail);
-        this.createElement(documentType, "TypeName", this.typeName);
-    }
-
-    @Override
-    public DocumentType getData(Element element) {
-        return new DocumentType(EdxmlUtils.getInt(element, "Type", 2),
-                EdxmlUtils.getInt(element, "TypeDetail", -1),
-                EdxmlUtils.getString(element, "TypeName"));
-    }
 }

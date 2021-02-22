@@ -580,10 +580,6 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                     return map;
                 }
-                CheckPermission checkPermission = new CheckPermission();
-                checkPermission.setToken(signature.getKeyInfo().getToken());
-                checkPermission.setOrganId(signature.getKeyInfo().getOrganId());
-                updateReceivedNotify(report, checkPermission);
                 //check message
                 report = checker.checkMessageHeader(messageHeader);
 

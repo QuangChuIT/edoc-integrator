@@ -4,56 +4,56 @@
     <edXML:edXMLHeader>
       <edXML:MessageHeader>
         <edXML:From>
-          <edXML:OrganId>000.00.00.G14</edXML:OrganId>
-          <edXML:OrganizationInCharge>UBND xã Hòa Tiến - UBND huyện Hòa Vang - Thành phố Đà Nẵng</edXML:OrganizationInCharge>
-          <edXML:OrganName>UBND xã Hòa Tiến - UBND huyện Hòa Vang - Thành phố Đà Nẵng</edXML:OrganName>
-          <edXML:OrganAdd>Số 1 Hoàng Hoa Thám, Quận Ba Đình, Hà Nội</edXML:OrganAdd>
-          <edXML:Email>vpcp@gov.vn</edXML:Email>
-          <edXML:Telephone>8043100</edXML:Telephone>
-          <edXML:Fax>048989898789</edXML:Fax>
-          <edXML:Website>vpcp.vn</edXML:Website>
+          <edXML:OrganId>000.00.11.H53</edXML:OrganId>
+          <edXML:OrganizationInCharge>Tỉnh Tây Ninh</edXML:OrganizationInCharge>
+          <edXML:OrganName>Sở Tính</edXML:OrganName>
+          <edXML:OrganAdd/>
+          <edXML:Email>stc@tayninh.gov.vn</edXML:Email>
+          <edXML:Telephone/>
+          <edXML:Fax/>
+          <edXML:Website/>
         </edXML:From>
         <edXML:To>
-          <edXML:OrganId>000.00.13.H53</edXML:OrganId>
-          <edXML:OrganizationInCharge>So 4t</edXML:OrganizationInCharge>
-          <edXML:OrganName>UBND xã Hòa Sơn - UBND huyện Hòa Vang - Thành phố Đà Nẵng</edXML:OrganName>
-          <edXML:OrganAdd>số 62 - Võ Thị Sáu - Ngô Quyền - Hải Phòng</edXML:OrganAdd>
-          <edXML:Email>bxd@moc.gov.vn</edXML:Email>
-          <edXML:Telephone>(84-4) 3821 5137</edXML:Telephone>
-          <edXML:Fax>(023)37366617</edXML:Fax>
-          <edXML:Website>www.haiphong.gov.vn</edXML:Website>
+          <edXML:OrganId>000.00.01.A53</edXML:OrganId>
+          <edXML:OrganizationInCharge>Tỉnh Tây Ninh</edXML:OrganizationInCharge>
+          <edXML:OrganName>Văn phòng tỉnh ủy</edXML:OrganName>
+          <edXML:OrganAdd>Tỉnh Tây Ninh</edXML:OrganAdd>
+          <edXML:Email>vptu@tayninh.gov.vn</edXML:Email>
+          <edXML:Telephone/>
+          <edXML:Fax/>
+          <edXML:Website/>
         </edXML:To>
-        <edXML:DocumentId>000.00.00.G22,2015/09/30,7816/VPCP-TTĐT</edXML:DocumentId>
+        <edXML:DocumentId>000.00.11.H53,2020/10/30,2491/STC-BCTC</edXML:DocumentId>
         <edXML:Code>
-          <edXML:CodeNumber>74fass22</edXML:CodeNumber>
-          <edXML:CodeNotation>VPCP-TTĐT</edXML:CodeNotation>
+          <edXML:CodeNumber>2491</edXML:CodeNumber>
+          <edXML:CodeNotation>STC-BCTC</edXML:CodeNotation>
         </edXML:Code>
         <edXML:PromulgationInfo>
-          <edXML:Place>Hà Nội</edXML:Place>
-          <edXML:PromulgationDate>16/09/2020</edXML:PromulgationDate>
+          <edXML:Place>Tây Ninh</edXML:Place>
+          <edXML:PromulgationDate>30/10/2020</edXML:PromulgationDate>
         </edXML:PromulgationInfo>
         <edXML:DocumentType>
           <edXML:Type>1</edXML:Type>
           <edXML:TypeDetail>0</edXML:TypeDetail>
           <edXML:TypeName>Công văn</edXML:TypeName>
         </edXML:DocumentType>
-        <edXML:Subject>V/v kết nối, liên thông phần mềm quản lý văn bản</edXML:Subject>
-        <edXML:Content>V/v kết nối, liên thông phần mềm quản lý văn bản</edXML:Content>
+        <edXML:Subject>Báo cáo tài chính tỉnh</edXML:Subject>
+        <edXML:Content>Báo cáo tài chính tỉnh</edXML:Content>
         <edXML:SignerInfo>
-          <edXML:Competence>TL. BO TRUONG</edXML:Competence>
-          <edXML:Position>Cuc truong cuc ung dung cong nghe thong tin</edXML:Position>
-          <edXML:FullName>Nguyen Thanh Phuc</edXML:FullName>
+          <edXML:Competence></edXML:Competence>
+          <edXML:Position></edXML:Position>
+          <edXML:FullName></edXML:FullName>
         </edXML:SignerInfo>
         <edXML:DueDate></edXML:DueDate>
         <edXML:OtherInfo>
           <edXML:Priority>0</edXML:Priority>
-          <edXML:SphereOfPromulgation>Liên thông văn bản quốc gia</edXML:SphereOfPromulgation>
-          <edXML:TyperNotation>TVC</edXML:TyperNotation>
+          <edXML:SphereOfPromulgation>Liên thông văn bản</edXML:SphereOfPromulgation>
+          <edXML:TyperNotation></edXML:TyperNotation>
           <edXML:PromulgationAmount>2</edXML:PromulgationAmount>
           <edXML:PageAmount>22</edXML:PageAmount>
           <edXML:Direction>false</edXML:Direction>
           <edXML:Appendixes>
-            <edXML:Appendix>Công văn về việc kết nối, liên thông phần mềm quản lý văn bản</edXML:Appendix>
+            <edXML:Appendix/>
           </edXML:Appendixes>
         </edXML:OtherInfo>
         <edXML:SteeringType>1</edXML:SteeringType>

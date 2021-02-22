@@ -182,6 +182,86 @@ let edocDocument = {
             })
         }
     },
+    renderNotTakenDatatable: function () {
+        let instance = this;
+        instance.appSetting.dataTable = $('#dataTables-edoc-notTaken').DataTable({
+            /*serverSide: true,
+            processing: true,
+            pageLength: 25,
+            ajax: {
+                url: "/documents/-/not/taken",
+                type: "POST",
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function () {
+                    $.notify("Error", "error");
+                }
+            },
+            drawCallback: function () {
+                $(this).contextMenu({
+                    selector: 'tbody tr td',
+                    callback: function (key, options) {
+                        let id = options.$trigger[0].parentElement.id;
+                        instance.deleteDocument(id);
+                    },
+                    items: {
+                        /!*"edit": {name: "Edit", icon: "edit"},
+                        /!*"cut": {name: "Cut", icon: "cut"},
+                        copy: {name: "Copy", icon: "copy"},
+                        "paste": {name: "Paste", icon: "paste"},*!/
+                        "delete": {name: app_message.edoc_remove_document, icon: "delete"}
+                        /!*"sep1": "---------",*!/
+                        /!*"quit": {name: "Quit", icon: function(){
+                                return 'context-menu-icon context-menu-icon-quit';
+                            }}*!/
+                    }
+                });
+            },
+            rowId: "documentId",
+            responsive: true,
+            autoWidth: false,
+            ordering: true,
+            bDestroy: true,
+            searching: true,
+            lengthChange: false,
+            paging: true,
+            info: false,*/
+            columns: [
+                {
+                    "title": app_message.edoc_table_header_subject,
+                    "data": null
+                },
+                {
+                    "title": app_message.edoc_table_header_fromOrgan,
+                    "data": null
+                },
+                {
+                    "title": app_message.edoc_table_header_toOrgan,
+                    "data": null
+                },
+                {
+                    "title": app_message.table_header_code,
+                    "data": null
+                },
+                {
+                    "title": app_message.table_header_createDate,
+                    "data": null
+                }
+            ],
+            language: app_message.language,
+            /*order: [[3, 'desc']],
+            createdRow: function (row, data) {
+                // Set the data-status attribute, and add a class
+                if (data["visited"] === false) {
+                    $(row).addClass("not-visited");
+                } else {
+                    $(row).addClass("visited");
+                }
+            }*/
+        });
+    },
+
     getCookie: function (key, defaultValue) {
         let keyEQ = key + "=";
         let cookies = document.cookie.split(';');
@@ -492,6 +572,10 @@ $(document).ready(function () {
                 $("#organ-import-excel").show();
                 organManage.renderOrganDatatable();
                 $(".edoc-table-organ").show();
+            } else if (dataMode === "not-taken-edoc") {
+                $("#put-to-telegram").show();
+                edocDocument.renderNotTakenDatatable();
+                $(".edoc-table-not-taken").show();
             } else {
                 edocDocument.renderDatatable();
                 $(".edoc-table").show();
@@ -528,6 +612,17 @@ $(document).ready(function () {
     $("#detail-report").on("click", function (e) {
         e.preventDefault();
     });
+
+    $("#put-to-telegram").on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/send/telegram",
+            cache: false,
+            beforeSend: () => $("#overlay-edoc-not-taken").show(),
+            success: () => $.notify(app_message.edoc_message_send_telegram_success, "success")
+        }).done(() => $("#overlay-edoc-not-taken").hide())
+    })
 });
 
 $(document).on("contextmenu", "#dataTables-edoc>tbody>tr", function (event) {

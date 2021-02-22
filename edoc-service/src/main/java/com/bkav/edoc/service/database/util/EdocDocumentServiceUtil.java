@@ -116,4 +116,12 @@ public class EdocDocumentServiceUtil {
     public static List<String> getDocCodeByCounterDate (Date _counterDate) {
         return DOCUMENT_SERVICE.getDocCodeByCounterDate(_counterDate);
     }
+
+    public static List<DocumentCacheEntry> getDocumentsNotTaken(PaginationCriteria paginationCriteria) {
+        return DOCUMENT_SERVICE.getDocumentNotTaken(paginationCriteria);
+    }
+
+    public static int countDocumentsNotTaken(PaginationCriteria paginationCriteria) {
+        return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);
+    }
 }

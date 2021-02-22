@@ -1,11 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
-import org.jdom2.Element;
 
-import java.util.List;
-
-public class StaffInfo extends CommonElement implements IElement<StaffInfo> {
+public class StaffInfo {
 
     private String department;
     private String departmentId;
@@ -85,40 +82,5 @@ public class StaffInfo extends CommonElement implements IElement<StaffInfo> {
                 .add("DepartmentId", this.departmentId)
                 .add("StaffId", this.staffId).add("Staff", this.staff)
                 .add("Email", this.email).add("Mobile", this.mobile).toString();
-    }
-
-    @Override
-    public void createElement(Element element) {
-        Element staffInfo = this.createElement(element, "StaffInfo");
-        this.createElement(staffInfo, "Department", this.department);
-        this.createElement(staffInfo, "DepartmentId", this.departmentId);
-        this.createElement(staffInfo, "Staff", this.staff);
-        this.createElement(staffInfo, "StaffId", this.staffId);
-        this.createElement(staffInfo, "Email", this.email);
-        this.createElement(staffInfo, "Mobile", this.mobile);
-    }
-
-    @Override
-    public StaffInfo getData(Element element) {
-        StaffInfo staffInfo = new StaffInfo();
-        List<Element> elementList = element.getChildren();
-        if (elementList != null && elementList.size() != 0) {
-            for (Element item : elementList) {
-                if ("Department".equals(item.getName())) {
-                    staffInfo.setDepartment(item.getText());
-                } else if ("DepartmentId".equals(item.getName())) {
-                    staffInfo.setDepartmentId(item.getText());
-                } else if ("Staff".equals(item.getName())) {
-                    staffInfo.setStaff(item.getText());
-                } else if ("StaffId".equals(item.getName())) {
-                    staffInfo.setStaffId(item.getText());
-                } else if ("Email".equals(item.getName())) {
-                    staffInfo.setEmail(item.getText());
-                } else if ("Mobile".equals(item.getName())) {
-                    staffInfo.setMobile(item.getText());
-                }
-            }
-        }
-        return staffInfo;
     }
 }

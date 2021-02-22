@@ -1,10 +1,10 @@
-package com.bkav.edoc.sdk.edxml.entity;
+package com.bkav.edoc.sdk.edxml.entity.env;
 
-import org.jdom2.Element;
+import com.bkav.edoc.sdk.edxml.entity.MessageHeader;
+import com.bkav.edoc.sdk.edxml.entity.Signature;
+import com.bkav.edoc.sdk.edxml.entity.TraceHeaderList;
 
-import java.util.List;
-
-public class Header extends CommonElement implements IElement<Header> {
+public class Header {
     private MessageHeader messageHeader;
     private TraceHeaderList traceHeaderList;
     private Signature signature;
@@ -51,29 +51,4 @@ public class Header extends CommonElement implements IElement<Header> {
         this.signature = signature;
     }
 
-    @Override
-    public void createElement(Element rootElement) {
-
-    }
-
-    @Override
-    public Header getData(Element element) {
-        Header header = new Header();
-        List<Element> elementList = element.getChildren();
-        if (elementList != null && elementList.size() != 0) {
-            for (Element children : elementList) {
-                if ("MessageHeader".equals(children.getName())) {
-                    header.setMessageHeader(new MessageHeader().getData(children));
-                }
-                if ("TraceHeaderList".equals(children.getName())) {
-                    header.setTraceHeaderList(new TraceHeaderList().getData(children));
-                }
-                if ("Signature".equals(children.getName())) {
-                    header.setSignature(new Signature().getData(children));
-                }
-            }
-
-        }
-        return header;
-    }
 }

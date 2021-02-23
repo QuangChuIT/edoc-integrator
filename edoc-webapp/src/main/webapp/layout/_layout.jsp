@@ -1844,6 +1844,7 @@
 <script src="<c:url value="/asset/js/user.js"/>"></script>
 <script src="<c:url value="/asset/js/organization.js"/>"></script>
 <script src="<c:url value="/asset/js/statistic.js"/>"></script>
+<script src="<c:url value="/asset/js/trace.js"/>"></script>
 <!-- Page-Level Demo Scripts - Tables - Use for reference -->
 <script src="<c:url value="/asset/js/attachment.js"/>"></script>
 </body>

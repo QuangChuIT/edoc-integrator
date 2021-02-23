@@ -241,15 +241,6 @@ public class DocumentRestController {
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-        /*int draw = Integer.parseInt(request.getParameter("draw"));
-        String searchValue = request.getParameter("search[value]");
-        String sortColumn = request.getParameter("order[0][column]");
-        //Sorting Direction
-        String sortDirection = request.getParameter("order[0][dir]");
-        System.out.println("draw " + draw);
-        System.out.println("search value " + searchValue);
-        System.out.println("sortColumn " + sortColumn);
-        System.out.println("sort direction " + sortDirection);*/
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
@@ -316,8 +307,13 @@ public class DocumentRestController {
 
     @RequestMapping(value = "/send/telegram")
     public HttpStatus sendNotTakenToTelegram() {
-        sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
-        return HttpStatus.OK;
+        try {
+            sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);

@@ -95,6 +95,10 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocumentByCode(docCode);
     }
 
+    public static List<EdocDocument> getDocumentsByDocCode(String docCode) {
+        return DOCUMENT_SERVICE.getDocumentsByDocCode(docCode);
+    }
+
     public static EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
                                            StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
         return DOCUMENT_SERVICE.addDocument(messageHeader, traces, attachments, outDocumentId, edocAttachmentCacheEntries, errors);

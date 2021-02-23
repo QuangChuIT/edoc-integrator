@@ -185,36 +185,32 @@ let edocDocument = {
     renderNotTakenDatatable: function () {
         let instance = this;
         instance.appSetting.dataTable = $('#dataTables-edoc-notTaken').DataTable({
-            /*serverSide: true,
+            serverSide: true,
             processing: true,
             pageLength: 25,
             ajax: {
                 url: "/documents/-/not/taken",
                 type: "POST",
-                success: function(data) {
-                    console.log(data);
-                },
-                error: function () {
-                    $.notify("Error", "error");
-                }
+                success: (data) => console.log(data),
+                error: () => $.notify("Error", "error")
             },
-            drawCallback: function () {
+            drawCallback: () => {
                 $(this).contextMenu({
                     selector: 'tbody tr td',
-                    callback: function (key, options) {
+                    callback: (key, options) => {
                         let id = options.$trigger[0].parentElement.id;
                         instance.deleteDocument(id);
                     },
                     items: {
-                        /!*"edit": {name: "Edit", icon: "edit"},
-                        /!*"cut": {name: "Cut", icon: "cut"},
+                        /*"edit": {name: "Edit", icon: "edit"},
+                        "cut": {name: "Cut", icon: "cut"},
                         copy: {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},*!/
+                        "paste": {name: "Paste", icon: "paste"},*/
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
-                        /!*"sep1": "---------",*!/
-                        /!*"quit": {name: "Quit", icon: function(){
+                        /*"sep1": "---------",
+                        "quit": {name: "Quit", icon: function(){
                                 return 'context-menu-icon context-menu-icon-quit';
-                            }}*!/
+                        }}*/
                     }
                 });
             },
@@ -226,31 +222,45 @@ let edocDocument = {
             searching: true,
             lengthChange: false,
             paging: true,
-            info: false,*/
+            info: false,
             columns: [
                 {
+                    "name": "ed.subject",
                     "title": app_message.edoc_table_header_subject,
-                    "data": null
+                    "data": null,
+                    "render": function (data) {
+                        return $('#edocSubjectTemplate').tmpl(data).html();
+                    }
                 },
                 {
+                    "name": "ed.from_organ_domain",
                     "title": app_message.edoc_table_header_fromOrgan,
-                    "data": null
+                    "data": "fromOrgan.name"
                 },
                 {
+                    "name": "ed.to_organ_domain",
                     "title": app_message.edoc_table_header_toOrgan,
-                    "data": null
+                    "data": "toOrgan.name"
                 },
                 {
+                    "name": "ed.doc_code",
                     "title": app_message.table_header_code,
-                    "data": null
+                    "data": null,
+                    "render": function (data) {
+                        return data.codeNumber + "/" + data.codeNotation;
+                    }
                 },
                 {
+                    "name": "ed.create_date",
                     "title": app_message.table_header_createDate,
-                    "data": null
+                    "data": null,
+                    "render": function (data) {
+                        return convertToDate(data.createDate).formatDate();
+                    }
                 }
             ],
             language: app_message.language,
-            /*order: [[3, 'desc']],
+            order: [[4, 'desc']],
             createdRow: function (row, data) {
                 // Set the data-status attribute, and add a class
                 if (data["visited"] === false) {
@@ -258,7 +268,7 @@ let edocDocument = {
                 } else {
                     $(row).addClass("visited");
                 }
-            }*/
+            }
         });
     },
 

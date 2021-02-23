@@ -141,6 +141,7 @@ public class DatatableColumnSpecs {
         columns = new ArrayList<>();
         columns.add("ed.subject");
         columns.add("ed.fromOrganDomain");
+        columns.add("ed.toOrganDomain");
         columns.add("ed.docCode");
         columns.add("ed.documentTypeName");
         columns.add("ed.createDate");

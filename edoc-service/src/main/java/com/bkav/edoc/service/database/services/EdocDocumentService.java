@@ -682,6 +682,10 @@ public class EdocDocumentService {
         return documentDaoImpl.getDocumentByDate(date);
     }
 
+    public List<EdocDocument> getDocumentsByDocCode(String docCode) {
+        return documentDaoImpl.getDocumentsByDocCode(docCode);
+    }
+
     public void getDailycounterDocument(Date fromDate, Date toDate) {
         Map<String, EdocDailyCounter> dailyCounterMap = null;
         List<Date> dateList = documentDaoImpl.getDateInRange(fromDate, toDate);
@@ -708,8 +712,8 @@ public class EdocDocumentService {
                     countSent(fromOrgan, dailyCounterMap, date);
                 }
             }
-            //System.out.println(new Gson().toJson(dailyCounterMap));
-            submitDatabase(dailyCounterMap);
+            System.out.println(new Gson().toJson(dailyCounterMap));
+            //submitDatabase(dailyCounterMap);
         }
     }
 

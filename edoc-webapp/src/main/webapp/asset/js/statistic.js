@@ -11,7 +11,7 @@ let edocChart = {
         dataTable: null,
         mode: "report"
     },
-    drawChart: function() {
+    drawChart: () => {
         if (myBar) {
             $("#canvas").remove();
             $("#chart-area").append('<canvas id="canvas"></canvas>');
@@ -51,9 +51,8 @@ let edocChart = {
                 }
             }
         });
-        console.log(myBar.data.datasets);
     },
-    renderDetailStat: function (fromDate, toDate) {
+    renderDetailStat: (fromDate, toDate) => {
         let instance = this;
         let url = "/public/-/statistic/detail";
         if (fromDate === null && toDate === null) {
@@ -146,8 +145,9 @@ $(document).ready(function() {
         format: 'd/m/Y'
     });
 
-    $("#btnRunStatisticDetail").on('click', function (e){
+    $("#btnRunStatisticDetail").on('click',  function (e) {
         e.preventDefault();
+        console.log("Click");
         let fromDate = $("#fromStatisticDate").val();
         let toDate = $("#toStatisticDate").val();
         let fromDateValue = new Date(fromDate);
@@ -156,27 +156,20 @@ $(document).ready(function() {
         if (fromDateValue > toDateValue) {
             $.notify(app_message.edoc_message_error_report_date, "error");
         } else {
+            console.log("Call ajax !!");
             $.ajax({
-                url: "/public/-/dailycounter/converterer" + "?fromDate=" + fromDate + "&toDate=" + toDate,
+                url: "/public/-/dailycounter/converter" + "?fromDate=" + fromDate + "&toDate=" + toDate,
                 type: "POST",
-                beforeSend: function () {
-                    $("#overlay-statistic").show();
-                },
+                beforeSend: () => $("#overlay-statistic").show(),
                 statusCode: {
-                    200: function () {
-                        $.notify("Success", "success");
-                    },
-                    400: function (response) {
-                        $.notify("Error", "error");
-                    }
+                    200: () => $.notify("Success", "success"),
+                    400: () => $.notify("Error", "error")
                 }
-            }).done(function () {
-                $("#overlay-statistic").hide();
-            });
+            }).done( () => $("#overlay-statistic").hide());
         }
     })
 
-    $("#report-menu.nav a:not(.not-click)").on("click", function (e) {
+    $("#report-menu.nav a:not(.not-click)").on("click",  function (e) {
         e.preventDefault();
         let dataMode = $(this).attr("data-mode");
         let userId = $(this).attr("data-id");
@@ -208,7 +201,7 @@ $(document).ready(function() {
         }
     });
 
-    $("#btnRunDrawChart").on('click', function(e) {
+    $("#btnRunDrawChart").on('click', function (e) {
         e.preventDefault();
         let val = document.getElementById("yearPicker");
         let year = val.options[val.selectedIndex].text;
@@ -228,14 +221,14 @@ $(document).ready(function() {
     })
 })
 
-function ajax_chart(year, userId) {
+let ajax_chart = (year, userId) => {
     let url = "/public/-/statistic/chart";
     if (userId !== "") {
         url = url + "?year=" + year + "&userId=" + userId;
     } else {
         url = url + "?year=" + year;
     }
-    $.get(url, function(response, status) {
+    $.get(url, (response, status) => {
         myBar.reset();
         myBar.data.datasets[0].data = response.sent;
         myBar.data.datasets[1].data = response.received;

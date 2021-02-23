@@ -4,7 +4,7 @@ import com.bkav.edoc.sdk.edxml.entity.*;
 import com.bkav.edoc.sdk.edxml.entity.env.Body;
 import com.bkav.edoc.sdk.edxml.entity.env.Envelop;
 import com.bkav.edoc.sdk.edxml.entity.env.Header;
-import com.bkav.edoc.sdk.edxml.util.XmlUtils;
+import com.bkav.edoc.sdk.edxml.util.XmlUtil;
 import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.google.common.io.Files;
 import org.jdom2.Document;
@@ -27,7 +27,7 @@ public class ExtractMime {
     public Envelop parserDoc(InputStream inputStream) {
         Envelop envelop = null;
         try {
-            Document document = XmlUtils.getDocument(inputStream);
+            Document document = XmlUtil.getDocument(inputStream);
             if (document != null) {
                 Header header = new Header();
                 header.setMessageHeader(this.getMessageHeader(document));
@@ -55,7 +55,7 @@ public class ExtractMime {
     public MessageStatus parseStatus(InputStream inputStream) {
         MessageStatus status = null;
         try {
-            Document document = XmlUtils.getDocument(inputStream);
+            Document document = XmlUtil.getDocument(inputStream);
             if (document != null) {
                 status = this.getStatus(document);
             }

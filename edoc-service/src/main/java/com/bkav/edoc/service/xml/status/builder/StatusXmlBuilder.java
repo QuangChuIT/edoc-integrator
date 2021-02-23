@@ -25,6 +25,7 @@ public class StatusXmlBuilder {
             Element headerElement = new Element("edXMLHeader", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
             edXMLEnvelope.addContent(headerElement);
             rootElement.addContent(edXMLEnvelope);
+
             messageStatus.accumulate(headerElement);
             return document;
         } catch (Exception e) {

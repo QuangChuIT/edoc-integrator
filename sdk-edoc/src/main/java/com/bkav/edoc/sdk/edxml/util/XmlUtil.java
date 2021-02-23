@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class XmlUtils {
+public class XmlUtil {
 
     public static Document convertEntityToDocument(Class cls, Object obj) {
         JAXBContext jc;
@@ -726,7 +726,7 @@ public class XmlUtils {
                 StringPool.EDXML_ATTACHMENT_BLOCK, ns);
         for (Attachment attachment : attachments) {
             InputStream inputStream;
-            String contentType = attachment.getContentType();
+            String contentType;
             if ("pdf".equals(attachment.getFormat().toLowerCase())) {
                 inputStream = attachment.getInputStreamFromFile();
                 contentType = "application/pdf";

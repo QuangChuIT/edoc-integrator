@@ -81,14 +81,14 @@ public class EdocController {
         SendDocResp sendDocResp = new SendDocResp();
         try {
             String organId = headers.get(EdocServiceConstant.ORGAN_ID);
-            String hashFile = headers.get("hash-edoc");
+            /*String hashFile = headers.get("hash-edoc");
             if (Validator.isNullOrEmpty(hashFile)) {
                 errors.add(new Error("BadRequest", "Bad Request"));
                 sendDocResp.setStatus("Fail");
                 sendDocResp.setCode("9999");
                 sendDocResp.setErrors(errors);
                 return gson.toJson(sendDocResp);
-            }
+            }*/
             String messageType = headers.get(EdocServiceConstant.MESSAGE_TYPE);
             if (Validator.isNullOrEmpty(messageType) || !EdocServiceConstant.MESSAGE_TYPES.contains(messageType)) {
                 errors.add(new Error("BadRequest", "Bad Request"));
@@ -129,8 +129,8 @@ public class EdocController {
             LOGGER.info("Save edoc file success with size " + size);
             File file = new File(specPath);
             InputStream fileInputStream = new FileInputStream(file);
-            String hash = ShaUtil.generateSHA256(specPath);
-            /*if (hash.equals(hashFile)) {
+            /*String hash = ShaUtil.generateSHA256(inputStream);
+            if (hash.equals(hashFile)) {
                 errors.add(new Error("EdocHash", "Edoc file hash not match"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");

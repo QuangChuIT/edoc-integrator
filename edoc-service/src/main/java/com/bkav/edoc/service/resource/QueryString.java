@@ -32,9 +32,11 @@ public class QueryString {
     public static String QUERY_COUNT_DOCUMENT_DRAFT_TMP = "select count(ed.document_id) from edoc_document ed " +
             "where ed.from_organ_domain = :organDomain and ed.is_draft=true #WHERE_CLAUSE# #ORDER_CLASUE#";
 
-    public static String BASE_QUERY_DOCUMENT_NOT_TAKEN_TMP = "select ed.* from edoc_document as ed, edoc_notification as en " +
-            "where ed.document_id = en.document_id and ed.to_organ_domain like concat('%', en.receiver_id, '%') and en.taken = 0 #WHERE_CLAUSE# #ORDER_CLASUE#";
+    public static String BASE_QUERY_DOCUMENT_NOT_TAKEN_TMP = "select en.* from edoc_notification as en, edoc_document as ed, edoc_dynamiccontact as co " +
+            "where ed.document_id = en.document_id and ed.to_organ_domain like concat('%', en.receiver_id, '%') " +
+            "and en.receiver_id = co.domain and co.receive_notify = 1 and en.taken = 0 #WHERE_CLAUSE# #ORDER_CLASUE#";
 
-    public static String QUERY_COUNT_DOCUMENT_NOT_TAKEN_TMP = "select count(1) from edoc_document as ed, edoc_notification as en " +
-            "where ed.document_id = en.document_id and ed.to_organ_domain like concat('%', en.receiver_id, '%') and en.taken = 0 #WHERE_CLAUSE#";
+    public static String QUERY_COUNT_DOCUMENT_NOT_TAKEN_TMP = "select count(1) from edoc_document as ed, edoc_notification as en, edoc_dynamiccontact as co " +
+            "where ed.document_id = en.document_id and ed.to_organ_domain like concat('%', en.receiver_id, '%') " +
+            "and en.receiver_id = co.domain and co.receive_notify = 1 and en.taken = 0 #WHERE_CLAUSE# #ORDER_CLASUE#";
 }

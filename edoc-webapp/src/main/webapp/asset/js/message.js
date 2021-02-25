@@ -63,6 +63,7 @@ let app_message = {
     "edoc_message_error_report_date": "Ngày bắt đầu không được lớn hơn ngày kết thúc !",
     "edoc_message_error_export": "Lỗi xuất tệp excel",
     "edoc_message_send_telegram_success": "Cảnh báo lên Telegram thành công !",
+    "edoc_message_send_email_success": "Cảnh báo lên Email thành công !",
     //Datatable setting
     "language": {
         "decimal": "",

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class EdocDocument implements Serializable {
+public class EdocDocument implements Serializable, Cloneable {
 
     private Long documentId;
     private String edXMLDocId;
@@ -274,5 +274,39 @@ public class EdocDocument implements Serializable {
 
     public void setDocCode(String docCode) {
         this.docCode = docCode;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        Object clone = super.clone();
+        EdocDocument obj = new EdocDocument();
+        obj.setDocumentId(this.documentId);
+        obj.setSubject(this.subject);
+        obj.setCreateDate(this.createDate);
+        obj.setDocCode(this.docCode);
+        obj.setDocumentDetail(this.documentDetail);
+        obj.setAttachments(this.attachments);
+        obj.setCodeNotation(this.codeNotation);
+        obj.setCodeNumber(this.codeNumber);
+        obj.setDocumentExtId(this.documentExtId);
+        obj.setDocumentType(this.documentType);
+        obj.setDocumentTypeDetail(this.documentTypeDetail);
+        obj.setDocumentTypeName(this.documentTypeName);
+        obj.setDraft(this.draft);
+        obj.setFromOrganDomain(this.fromOrganDomain);
+        obj.setEdXMLDocId(this.edXMLDocId);
+        obj.setModifiedDate(this.modifiedDate);
+        obj.setNotifications(this.notifications);
+        obj.setPriority(this.priority);
+        obj.setPromulgationDate(this.promulgationDate);
+        obj.setPromulgationPlace(this.promulgationPlace);
+        obj.setReceivedExt(this.receivedExt);
+        obj.setSendExt(this.sendExt);
+        obj.setSentDate(this.sentDate);
+        obj.setToOrganDomain(this.toOrganDomain);
+        obj.setTraceHeaderList(this.traceHeaderList);
+        obj.setTraces(this.traces);
+        obj.setVisible(this.visible);
+        obj.setVisited(this.visited);
+        return obj;
     }
 }

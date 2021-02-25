@@ -64,8 +64,8 @@ public class DailyCounterConvert {
                         countSent(fromOrgan, dailyCounterMap);
                     }
                 }*/
-                System.out.println(new Gson().toJson(dailyCounterMap));
-                //submitDatabase(dailyCounterMap);
+                //System.out.println(new Gson().toJson(dailyCounterMap));
+                submitDatabase(dailyCounterMap);
                 LOGGER.info("Counter document in date " + _counterDate + " successfully!!");
             }
         } catch (SQLException throwable) {

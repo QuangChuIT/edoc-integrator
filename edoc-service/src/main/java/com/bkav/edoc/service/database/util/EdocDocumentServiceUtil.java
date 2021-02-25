@@ -14,6 +14,7 @@ import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 
+import javax.print.Doc;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -124,6 +125,10 @@ public class EdocDocumentServiceUtil {
     public static List<DocumentCacheEntry> getDocumentsNotTaken(PaginationCriteria paginationCriteria) {
         return DOCUMENT_SERVICE.getDocumentNotTaken(paginationCriteria);
     }
+
+    /*public static List<DocumentCacheEntry> getAlldocumentNotTaken() {
+        return DOCUMENT_SERVICE.getAllDocumentNotTaken();
+    }*/
 
     public static int countDocumentsNotTaken(PaginationCriteria paginationCriteria) {
         return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);

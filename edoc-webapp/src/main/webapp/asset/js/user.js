@@ -16,7 +16,8 @@ let userManage = {
             ajax: {
                 url: "/public/-/users",
                 type: "GET",
-                dataSrc: ""
+                dataSrc: "",
+                //success: (data) => console.log(data),
             },
             drawCallback: function () {
                 $(this).contextMenu({

@@ -120,7 +120,7 @@ let edocDocument = {
     },
     renderDaftTable: function () {
         let instance = this;
-        instance.appSetting.dataTable = $('#dataTablesDraftDoc').DataTable({
+        instance.dataTable = $('#dataTablesDraftDoc').DataTable({
             ajax: {
                 url: "/documents/" + instance.appSetting.mode,
                 dataSrc: ""
@@ -168,49 +168,37 @@ let edocDocument = {
                 url: "/document/delete/" + documentId,
                 type: "DELETE",
                 statusCode: {
-                    200: function (response) {
+                    200: () => {
                         $("#" + documentId).remove();
                         $.notify(app_message.edoc_delete_document_success, "success");
                     },
-                    400: function (response) {
-                        $.notify(app_message.edoc_delete_document_false, "error");
-                    },
-                    500: function (response) {
-                        $.notify(app_message.edoc_delete_document_error, "error");
-                    }
+                    400: () => $.notify(app_message.edoc_delete_document_false, "error"),
+                    500: () => $.notify(app_message.edoc_delete_document_error, "error")
                 }
             })
         }
     },
-    renderNotTakenDatatable: function () {
+    renderNotTakenDatatable: () => {
         let instance = this;
-        instance.appSetting.dataTable = $('#dataTables-edoc-notTaken').DataTable({
+        instance.dataTable = $('#dataTables-edoc-notTaken').DataTable({
             serverSide: true,
             processing: true,
-            pageLength: 25,
+            pageLength: 15,
             ajax: {
                 url: "/documents/-/not/taken",
                 type: "POST",
-                success: (data) => console.log(data),
-                error: () => $.notify("Error", "error")
+                /*success: (data) => console.log(data),
+                error: () => $.notify("Error", "error")*/
             },
-            drawCallback: () => {
+            drawCallback: function() {
                 $(this).contextMenu({
-                    selector: 'tbody tr td',
+                    selector: 'tr',
                     callback: (key, options) => {
                         let id = options.$trigger[0].parentElement.id;
                         instance.deleteDocument(id);
                     },
                     items: {
-                        /*"edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
-                        copy: {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},*/
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
-                        /*"sep1": "---------",
-                        "quit": {name: "Quit", icon: function(){
-                                return 'context-menu-icon context-menu-icon-quit';
-                        }}*/
                     }
                 });
             },
@@ -222,7 +210,7 @@ let edocDocument = {
             searching: true,
             lengthChange: false,
             paging: true,
-            info: false,
+            info: true,
             columns: [
                 {
                     "name": "ed.subject",
@@ -240,7 +228,7 @@ let edocDocument = {
                 {
                     "name": "ed.to_organ_domain",
                     "title": app_message.edoc_table_header_toOrgan,
-                    "data": "toOrgan.name"
+                    "data": "toOrgan[0].name"
                 },
                 {
                     "name": "ed.doc_code",
@@ -251,17 +239,17 @@ let edocDocument = {
                     }
                 },
                 {
-                    "name": "ed.create_date",
+                    "name": "en.create_date",
                     "title": app_message.table_header_createDate,
                     "data": null,
                     "render": function (data) {
-                        return convertToDate(data.createDate).formatDate();
+                        return $('#edocCreateDateTemplate').tmpl(data).html();
                     }
                 }
             ],
             language: app_message.language,
             order: [[4, 'desc']],
-            createdRow: function (row, data) {
+            createdRow: (row, data) => {
                 // Set the data-status attribute, and add a class
                 if (data["visited"] === false) {
                     $(row).addClass("not-visited");
@@ -462,7 +450,7 @@ $(document).ready(function () {
     $("#toOrgan").select2({
         tags: true
     });
-    $("#dataTables-edoc").on('click', 'tbody>tr', function () {
+    $("#dataTables-edoc, #dataTables-edoc-notTaken").on('click', 'tbody>tr', function () {
         let documentId = $(this).attr("id");
         $.get("/document/" + documentId, function (data) {
             data.attachments.forEach(function (key, index) {
@@ -547,9 +535,15 @@ $(document).ready(function () {
             organManage.organSetting.dataTable.search(
                 keyword,
             ).draw();
-            /*$('#dataTables-organ').DataTable().search(
-                $('#search-edoc').val(),
-            ).draw();*/
+        } else if (edocDocument.appSetting.mode === "not-taken-edoc") {
+            if (keyword.length === 0) {
+                edocDocument.appSetting.dataTable.page.len(pageLength);
+                pageLength = 0;
+            } else if (pageLength === 0) {
+                pageLength = edocDocument.appSetting.dataTable.page.len();
+                edocDocument.appSetting.dataTable.page.len(1000);
+            }
+            $('#dataTables-edoc-notTaken').DataTable().search(keyword).draw();
         } else {
             if (keyword.length === 0) {
                 edocDocument.appSetting.dataTable.page.len(pageLength);
@@ -583,7 +577,7 @@ $(document).ready(function () {
                 organManage.renderOrganDatatable();
                 $(".edoc-table-organ").show();
             } else if (dataMode === "not-taken-edoc") {
-                $("#put-to-telegram").show();
+                $("#warning-document-not-taken").show();
                 edocDocument.renderNotTakenDatatable();
                 $(".edoc-table-not-taken").show();
             } else {
@@ -631,6 +625,16 @@ $(document).ready(function () {
             cache: false,
             beforeSend: () => $("#overlay-edoc-not-taken").show(),
             success: () => $.notify(app_message.edoc_message_send_telegram_success, "success")
+        }).done(() => $("#overlay-edoc-not-taken").hide())
+    })
+    $("#put-to-email").on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/send/email",
+            cache: false,
+            beforeSend: () => $("#overlay-edoc-not-taken").show(),
+            success: () => $.notify(app_message.edoc_message_send_email_success, "success")
         }).done(() => $("#overlay-edoc-not-taken").hide())
     })
 });

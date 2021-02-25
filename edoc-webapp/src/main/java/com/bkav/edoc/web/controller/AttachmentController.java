@@ -1,9 +1,12 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.entity.EdocAttachment;
+import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
+import com.bkav.edoc.service.kernel.util.Base64;
 import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.web.auth.CookieUtil;
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
@@ -67,6 +70,10 @@ public class AttachmentController {
         HttpHeaders responseHeader = new HttpHeaders();
         try {
             String organDomain = CookieUtil.getValue(request, "Organization");
+            String userLogin = CookieUtil.getValue(request, "userLogin");
+            String userLog = new String(Base64.decode(userLogin), StandardCharsets.UTF_8);
+            User user = new Gson().fromJson(userLog, User.class);
+            String admin = user.getUsername();
             if (organDomain == null) {
                 return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
             }
@@ -79,6 +86,9 @@ public class AttachmentController {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
 
+                if (admin.equals(PropsUtil.get("admin.username"))) {
+                    organDomain = attachment.getOrganDomain();
+                }
                 String fromOrgan = attachment.getOrganDomain();
                 String toOrgan = attachment.getToOrganDomain();
                 if (fromOrgan.equals(organDomain) || toOrgan.contains(organDomain)) {

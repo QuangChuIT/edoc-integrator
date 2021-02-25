@@ -816,6 +816,20 @@
     </div>
 
 </script>
+
+<script id="edocCreateDateTemplate" type="text/x-jquery-tmpl">
+    <div>
+        <a href="javascript:void(0)" title="${createDate}" data-id="${documentId}"
+            class="edoc-notTaken">
+            <span>${convertToDate(createDate).formatDate()}</span>
+        </a>
+        <br>
+        <a href="javascript:void(0)" title="${createDate}" data-id="${documentId}"
+            class="edoc-notTaken">
+            <span>(${convertToDate(createDate).formatTime()})</span>
+        </a>
+    </div>
+</script>
 <script id="userFullNameTemplate" type="text/x-jquery-tmpl">
     <div>
         <a href="javascript:void(0)" title="${displayName}" data-id="${userId}"

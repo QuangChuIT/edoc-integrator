@@ -1,6 +1,9 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class Business {
     private String documentId;
@@ -95,4 +98,37 @@ public class Business {
                 this.businessDocumentInfo).add("ReplacementInfoList",
                 this.replacementInfoList).add("StaffInfo", this.staffInfo).toString();
     }
+
+    public static Business getData(Element businessElement) {
+        Business business = new Business();
+        List<Element> elementList = businessElement.getChildren();
+        if (elementList != null && elementList.size() != 0) {
+            for (Element childElement : elementList) {
+                if ("DocumentId".equals(childElement.getName())) {
+                    business.setDocumentId(childElement.getText());
+                }
+                if ("BusinessDocType".equals(childElement.getName()) || "BussinessDocType".equals(childElement.getName())) {
+                    business.setBusinessDocType(Long.parseLong(childElement.getText()));
+                }
+                if ("Paper".equals(childElement.getName())) {
+                    business.setPaper(Integer.parseInt(childElement.getText()));
+                }
+                if ("BusinessDocReason".equals(childElement.getName()) || "BussinessDocReason".equals(childElement.getName())) {
+                    business.setBusinessDocReason(childElement.getText());
+                }
+                if ("StaffInfo".equals(childElement.getName())) {
+                    business.setStaffInfo(StaffInfo.getData(childElement));
+                }
+                if ("BussinessDocumentInfo".equals(childElement.getName()) || "BusinessDocumentInfo".equals(childElement.getName())) {
+                    business.setBusinessDocumentInfo(BusinessDocumentInfo.getData(childElement));
+                }
+                if ("ReplacementInfoList".equals(childElement.getName())) {
+                    business.setReplacementInfoList(ReplacementInfoList.getData(childElement));
+                }
+            }
+        }
+        return business;
+    }
+
+
 }

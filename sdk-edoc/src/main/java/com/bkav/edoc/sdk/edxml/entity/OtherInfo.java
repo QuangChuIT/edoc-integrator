@@ -1,7 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OtherInfo {
@@ -109,6 +112,37 @@ public class OtherInfo {
         this.direction = direction;
     }
 
+    public static OtherInfo getData(Element otherInfoElement) {
+        OtherInfo otherInfo = new OtherInfo(EdxmlUtils.getInt(otherInfoElement, "Priority", 0),
+                EdxmlUtils.getString(otherInfoElement, "SphereOfPromulgation"),
+                EdxmlUtils.getString(otherInfoElement, "TyperNotation"),
+                EdxmlUtils.getInt(otherInfoElement, "PromulgationAmount", 1),
+                EdxmlUtils.getInt(otherInfoElement, "PageAmount", 1),
+                EdxmlUtils.getString(otherInfoElement, "ReplyFors"),
+                EdxmlUtils.getString(otherInfoElement, "ReferenceCodes"),
+                EdxmlUtils.getBoolean(otherInfoElement, "Direction", false));
+        List<Element> elementList = otherInfoElement.getChildren();
+        if (elementList != null && elementList.size() != 0) {
+            Element element = null;
+            for (Element thisEle : elementList) {
+                element = thisEle;
+                if ("Appendixes".equals(element.getName())) {
+                    List<String> appendixes = new ArrayList<>();
+                    List<Element> elements = element.getChildren();
+
+                    for (Element thatEle : elements) {
+                        element = thatEle;
+                        if ("Appendix".equals(element.getName())) {
+                            appendixes.add(element.getText());
+                        }
+                    }
+                    otherInfo.setAppendixes(appendixes);
+                    return otherInfo;
+                }
+            }
+        }
+        return otherInfo;
+    }
 
     @Override
     public String toString() {

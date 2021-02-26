@@ -1,6 +1,7 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,23 @@ public class Manifest {
         }
 
         this.references.add(reference);
+    }
+
+    public static Manifest getData(Element element) {
+        Manifest manifest = new Manifest();
+        List<Element> elementList = element.getChildren();
+        if (elementList != null && elementList.size() != 0) {
+            for (Element childrenElement : elementList) {
+                if ("Reference".equals(childrenElement.getName())) {
+                    Reference reference = Reference.getData(childrenElement);
+                    if (reference != null) {
+                        manifest.addReference(reference);
+                    }
+                }
+            }
+
+        }
+        return manifest;
     }
 
     @Override

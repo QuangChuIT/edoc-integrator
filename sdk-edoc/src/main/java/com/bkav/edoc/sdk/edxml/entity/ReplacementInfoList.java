@@ -1,6 +1,7 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,19 @@ public class ReplacementInfoList {
             this.replacementInfo = new ArrayList<>();
         }
         this.replacementInfo.add(replacementInfo);
+    }
+
+    public static ReplacementInfoList getData(Element element) {
+        ReplacementInfoList replacementInfoList = new ReplacementInfoList();
+        List<Element> childrenElement = element.getChildren();
+        if (childrenElement != null && childrenElement.size() != 0) {
+            for (Element children : childrenElement) {
+                if ("ReplacementInfo".equals(children.getName())) {
+                    replacementInfoList.addReplacementInfo(ReplacementInfo.getData(children));
+                }
+            }
+        }
+        return replacementInfoList;
     }
 
     @Override

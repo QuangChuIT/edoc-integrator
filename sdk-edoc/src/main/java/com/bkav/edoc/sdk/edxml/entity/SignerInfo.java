@@ -1,6 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 public class SignerInfo {
     private String competence;
@@ -40,6 +42,11 @@ public class SignerInfo {
         this.fullName = fullName;
     }
 
+    public static SignerInfo getData(Element element) {
+        return new SignerInfo(EdxmlUtils.getString(element, "Competence"),
+                EdxmlUtils.getString(element, "Position"),
+                EdxmlUtils.getString(element, "FullName"));
+    }
 
     @Override
     public String toString() {

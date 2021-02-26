@@ -28,6 +28,21 @@ public class OrganIdList {
         this.organId.add(organId);
     }
 
+    public static OrganIdList getData(Element fromElement) {
+        OrganIdList organIdList = new OrganIdList();
+        List<Element> localList = fromElement.getChildren();
+        if (localList != null && localList.size() != 0) {
+
+            for (Element element : localList) {
+                if ("OrganId".equals(element.getName())) {
+                    organIdList.addOrganId(element.getText());
+                }
+            }
+
+        }
+        return organIdList;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(super.getClass()).add("OrganIdList", this.organId).toString();

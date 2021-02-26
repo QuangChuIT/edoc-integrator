@@ -94,7 +94,8 @@ public class EdocService {
                 Object kv = jsonObject.get(k);
                 this.headers.put(k, String.valueOf(kv));
             });
-            String hashFile = ShaUtils.generateSHA256(edocFilePath);
+            FileInputStream fileInputStream = new FileInputStream(edocFilePath);
+            String hashFile = ShaUtils.generateSHA256(fileInputStream);
             this.headers.put("hash-edoc", hashFile);
             FileInputStream inputStream = new FileInputStream(edocFilePath);
             String content = this.http.sendPostMultiplePart(url, null, this.getListHeader(), inputStream);

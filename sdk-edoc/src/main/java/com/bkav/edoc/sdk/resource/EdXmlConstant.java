@@ -10,7 +10,7 @@ import java.io.File;
 public class EdXmlConstant {
 
     public static final String EDXML_PREFIX = "edXML";
-    public static final Namespace EDXML_NS = Namespace.getNamespace("http://www.e-doc.vn/Schema/");
+    public static final Namespace EDXML_NS = Namespace.getNamespace("http://www.mic.gov.vn/TBT/QCVN_102_2016");
     public static final Namespace XLINK_NS = Namespace.getNamespace("http://www.w3.org/1999/xlink");
     public static final String EDXML_URI = "http://www.mic.gov.vn/TBT/QCVN_102_2016";
     public static final String SOAP_URI = "http://schemas.xmlsoap.org/soap/envelope/";

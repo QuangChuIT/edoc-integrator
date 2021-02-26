@@ -1,6 +1,8 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 public class DocumentType {
     private int type;
@@ -45,6 +47,11 @@ public class DocumentType {
         this.typeName = typeName;
     }
 
+    public static DocumentType getData(Element element) {
+        return new DocumentType(EdxmlUtils.getInt(element, "Type", 2),
+                EdxmlUtils.getInt(element, "TypeDetail", -1),
+                EdxmlUtils.getString(element, "TypeName"));
+    }
 
     @Override
     public String toString() {

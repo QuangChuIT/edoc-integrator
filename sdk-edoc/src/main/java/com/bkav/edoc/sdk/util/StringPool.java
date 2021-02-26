@@ -3,7 +3,40 @@ package com.bkav.edoc.sdk.util;
 import java.nio.charset.Charset;
 
 public class StringPool {
+    public static String SEND_DOCUMENT = "SendDocument";
+    public static String GET_DOCUMENT = "GetDocument";
+    public static String GET_PENDING = "GetPendingDocumentIds";
+    public static String GET_ORGANIZATION = "GetOrganizations";
+    public static String CHECK_PERMISSION = "CheckPermission";
+    public static String CONFIRM_RECEIVED = "ConfirmReceived";
+    public static String GET_TRACES = "GetTraces";
+    public static String UPDATE_TRACES = "UpdateTraces";
 
+    public static String DEFAULT_STRING = "";//"Undefined";
+    public static String DEAUlt_INTEGER = "0";
+    public static String DEFAULT_DATE = "01/01/1900";
+
+    public static final String CHILD_BODY_KEY = "ChildBodyKey";
+    public static final String SEND_DOCUMENT_RESPONSE_ID_KEY = "ChildBodyKey_DocumentId";
+    public static final String ENVELOPE_SAVED_KEY = "EnvelopeSavedKey";
+    public static final String MESSAGE_HEADER_KEY = "MessageHeaderKey";
+    public static final String TRACE_HEADER_KEY = "TraceHeaderKey";
+    public static final String ATTACHMENT_KEY = "AttachmentKeys";
+    public static final String ATTACHMENT_SIZE_KEY = "AttachmentSizeLength";
+
+    public static String ENVELOPE = "envelope";
+    public static String EDXML_PREFIX = "edXML";
+    public static String TOKEN_ELEMENT_NAME = "Token";
+    public static String ORGAN_ID_ELEMENT_NAME = "OrganId";
+    public static String EDXML_MESSAGE_HEADER_BLOCK = "MessageHeader";
+    public static String EDXML_BODY_BLOCK = "edXMLBody";
+    public static String EDXML_HEADER_BLOCK = "edXMLHeader";
+    public static String EDXML_MANIFEST_BLOCK = "edXMLManifest";
+    public static String EDXML_ATTACHMENT_BLOCK = "AttachmentEncoded";
+    public static String EDXML_SIGNATURE_BLOCK = "Signature";
+    public static String EDXML_TRACE_HEADER_BLOCK = "TraceHeaderList";
+
+    public static String XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";
     public static final String AMPERSAND = "&";
 
     public static final String AMPERSAND_ENCODED = "&amp;";

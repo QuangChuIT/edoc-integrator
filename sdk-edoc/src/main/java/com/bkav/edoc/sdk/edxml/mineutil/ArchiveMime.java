@@ -2,60 +2,124 @@ package com.bkav.edoc.sdk.edxml.mineutil;
 
 import com.bkav.edoc.sdk.edxml.entity.Attachment;
 import com.bkav.edoc.sdk.edxml.entity.Manifest;
-import com.bkav.edoc.sdk.edxml.entity.Organization;
+import com.bkav.edoc.sdk.edxml.entity.MessageStatus;
 import com.bkav.edoc.sdk.edxml.entity.Reference;
 import com.bkav.edoc.sdk.edxml.entity.env.Envelop;
+import com.bkav.edoc.sdk.edxml.util.UUidUtils;
+import com.bkav.edoc.sdk.edxml.util.XmlUtil;
 import com.bkav.edoc.sdk.resource.EdXmlConstant;
-import com.google.common.base.Strings;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import com.google.common.io.Files;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.util.XMLUtils;
+import org.w3c.dom.Document;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ArchiveMime {
-    public String createMime(Envelop envelop, List<Attachment> attachments) throws Exception {
+    private static final ArchiveMime INSTANCE = new ArchiveMime();
+
+    public static ArchiveMime getInstance() {
+        return INSTANCE;
+    }
+
+    public File createStatus(MessageStatus messageStatus, String fileName, String path) {
         try {
-            Element rootElement = new Element(EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
-            Document doc = new Document(rootElement);
-            Element envelopElement = new Element("edXMLEnvelope", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
-            rootElement.addContent(envelopElement);
-            // Create Header
-            Element headerElement = new Element("edXMLHeader", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
-            envelopElement.addContent(headerElement);
-            // Create message header
-            Element messageHeaderElement = new Element("MessageHeader", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
-            headerElement.addContent(messageHeaderElement);
+            Document document = XmlUtil.convertEntityToDocument(MessageStatus.class, messageStatus);
+            if (document != null) {
+                OMElement node = XMLUtils.toOM(document.getDocumentElement());
+                OMFactory factoryOM = OMAbstractFactory.getOMFactory();
+                OMNamespace ns = factoryOM.createOMNamespace(
+                        EdXmlConstant.EDXML_URI, EdXmlConstant.EDXML_PREFIX);
+                OMNamespace omNamespace = factoryOM.createOMNamespace(EdXmlConstant.EDXML_URI, "");
+                OMElement rootElement = factoryOM.createOMElement("edXML", omNamespace);
+                OMElement envelopElement = factoryOM.createOMElement("edXMLEnvelope", ns);
+                OMElement headerElement = factoryOM.createOMElement("edXMLHeader", ns);
+                headerElement.addChild(node);
+                envelopElement.addChild(headerElement);
+                rootElement.addChild(envelopElement);
+                Document status = XMLUtils.toDOM(rootElement).getOwnerDocument();
+                return XmlUtil.buildContent(status, fileName, path);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-            Element fromElement = new Element("From", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
+    public File createMime(Envelop envelop, String fileName, String path) {
+        File tmpFile = Files.createTempDir();
+        try {
+            OMFactory factoryOM = OMAbstractFactory.getOMFactory();
 
-            Organization fromOrgan = envelop.getHeader().getMessageHeader().getFrom();
-
-            Element fromOrganId = new Element("OrganId", EdXmlConstant.EDXML_PREFIX, EdXmlConstant.EDXML_URI);
-            Manifest manifest = new Manifest();
-            if (attachments != null && attachments.size() > 0) {
-                for (Attachment attachment : attachments) {
-                    String contentId = attachment.getContentId();
-                    if (Strings.isNullOrEmpty(contentId)) {
-                        contentId = UUID.randomUUID().toString();
-                    }
+            OMNamespace ns = factoryOM.createOMNamespace(
+                    EdXmlConstant.EDXML_URI, EdXmlConstant.EDXML_PREFIX);
+            OMNamespace omNamespace = factoryOM.createOMNamespace(EdXmlConstant.EDXML_URI, "");
+            OMElement rootElement = factoryOM.createOMElement("edXML", omNamespace);
+            OMElement envelopElement = factoryOM.createOMElement("edXMLEnvelope", ns);
+            OMElement headerElement = factoryOM.createOMElement("edXMLHeader", ns);
+            // Create MessageHeader
+            OMElement messageHeader = XmlUtil.getMessHeaderDoc(envelop.getHeader()
+                    .getMessageHeader(), ns);
+            System.out.println("Success convert message header in create mine with attachment size " + envelop.getAttachments().size() + " !!!!!!!!!!!!!!!!!!!!!");
+            // Create TraceHeaderList
+            OMElement traceHeaderList = XmlUtil.getTraceHeaderDoc(envelop.getHeader()
+                    .getTraceHeaderList(), ns);
+            System.out.println("Success convert trace header list in create mine with attachment size " + envelop.getAttachments().size() + " !!!!!!!!!!!!!!!!!!!!!!!!!");
+            // Create Signature
+            OMElement signature = XmlUtil.getSignatureDoc(envelop.getHeader().getSignature());
+            headerElement.addChild(messageHeader);
+            headerElement.addChild(traceHeaderList);
+            headerElement.addChild(signature);
+            envelopElement.addChild(headerElement);
+            List<Reference> references = new ArrayList<>();
+            List<Attachment> attachments = new ArrayList<>();
+            // Create body
+            if (envelop.getAttachments().size() > 0) {
+                for (Attachment attachment : envelop.getAttachments()) {
+                    // create content id for attachment
+                    String contentId = UUidUtils.generate();
+                    String contentType = attachment.getContentType();
+                    // Create reference on body
                     Reference reference = new Reference();
-                    reference.setContentId(contentId);
+                    reference.setContentId("cid:" + contentId);
                     reference.setAttachmentName(attachment.getName());
-                    reference.setContentType(attachment.getContentType());
+                    reference.setContentType(contentType);
                     reference.setDescription(attachment.getDescription());
-                    manifest.addReference(reference);
+                    references.add(reference);
+                    attachment.setContentId(contentId);
+                    attachments.add(attachment);
                 }
             }
 
-            /*base.setBody(new Body(manifest));
-            base.getBody().accumulate(envelopElement);
-            Element attachmentEncoded = new Element("AttachmentEncoded", EdXmlConstant.EDXML_URI);
-            rootElement.addContent(attachmentEncoded);
-            buildAttachments(attachmentEncoded, base.getAttachments(), fileName);*/
-            return "";
+            Manifest manifest = new Manifest();
+
+            manifest.setReferences(references);
+
+            OMElement body = XmlUtil.getBodyChildDoc(manifest, ns);
+            envelopElement.addChild(body);
+            // Create Attachment
+            OMElement attachmentEncoded = XmlUtil.getAttachmentDoc(attachments, ns, tmpFile.getAbsolutePath());
+            rootElement.addChild(envelopElement);
+            rootElement.addChild(attachmentEncoded);
+            Document document = XMLUtils.toDOM(rootElement).getOwnerDocument();
+            return XmlUtil.buildContent(document, fileName, path);
         } catch (Exception e) {
-            throw new Exception("Error occurs during building edXML", e);
+            e.printStackTrace();
+        } finally {
+            File[] files = tmpFile.listFiles();
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+
+            tmpFile.delete();
         }
+        return null;
     }
 }

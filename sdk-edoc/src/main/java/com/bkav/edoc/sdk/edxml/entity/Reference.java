@@ -1,6 +1,10 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class Reference {
     private String contentId;
@@ -48,6 +52,33 @@ public class Reference {
 
     public void setDescription(String paramString) {
         this.description = paramString;
+    }
+
+    public static Reference getData(Element element) {
+        Reference localReference = new Reference();
+        List<Element> elements = element.getChildren();
+        if (elements != null && elements.size() != 0) {
+            for (Element thisElement : elements) {
+                if ("Description".equals(thisElement.getName())) {
+                    localReference.setDescription(thisElement.getText());
+                }
+
+                if ("AttachmentName".equals(thisElement.getName())) {
+                    localReference.setAttachmentName(thisElement.getText());
+                }
+
+                if ("ContentId".equals(thisElement.getName())) {
+                    localReference.setContentId(EdxmlUtils.getContentId(thisElement.getText()));
+                }
+
+                if ("ContentType".equals(thisElement.getName())) {
+                    localReference.setContentType(thisElement.getText());
+                }
+            }
+            return localReference;
+        } else {
+            return null;
+        }
     }
 
     @Override

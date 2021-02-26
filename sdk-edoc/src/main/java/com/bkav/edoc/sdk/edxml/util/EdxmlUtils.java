@@ -1,6 +1,7 @@
 package com.bkav.edoc.sdk.edxml.util;
 
 import com.bkav.edoc.sdk.util.GetterUtil;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import java.util.List;
@@ -46,5 +47,10 @@ public class EdxmlUtils {
             }
         }
         return null;
+    }
+
+    public static String getAttributeWithPrefix(Element element, String attributeName) {
+        Attribute attribute = element.getAttribute(attributeName);
+        return attribute == null ? null : attribute.getValue();
     }
 }

@@ -1,7 +1,9 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.edxml.util.DateUtils;
 import com.bkav.edoc.sdk.edxml.util.UUidUtils;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +25,6 @@ public class MessageHeader {
     private OtherInfo otherInfo;
     private List<ResponseFor> responseFor;
     private int steeringType;
-    private String applicationType;
 
     public MessageHeader() {
     }
@@ -181,20 +182,63 @@ public class MessageHeader {
         this.steeringType = steeringType;
     }
 
-    public String getApplicationType() {
-        return applicationType;
-    }
-
-    public void setApplicationType(String applicationType) {
-        this.applicationType = applicationType;
-    }
-
     public void addToPlace(String toPlace) {
         if (this.toPlaces == null) {
             this.toPlaces = new ArrayList<>();
         }
 
         this.toPlaces.add(toPlace);
+    }
+
+    public MessageHeader getData(Element element) {
+        MessageHeader messageHeader = new MessageHeader();
+
+        List<Element> elementList = element.getChildren();
+
+        if (elementList != null && elementList.size() > 0) {
+            for (Element elementItem : elementList) {
+                if ("From".equals(elementItem.getName())) {
+                    messageHeader.setFrom(Organization.getData(elementItem));
+                } else if ("To".equals(elementItem.getName())) {
+                    messageHeader.addTo(Organization.getData(elementItem));
+                } else if ("DocumentId".equals(elementItem.getName())) {
+                    messageHeader.setDocumentId(elementItem.getText());
+                } else if ("Code".equals(elementItem.getName())) {
+                    messageHeader.setCode(Code.getData(elementItem));
+                } else if ("PromulgationInfo".equals(elementItem.getName())) {
+                    messageHeader.setPromulgationInfo(PromulgationInfo.getData(elementItem));
+                } else if ("DocumentType".equals(elementItem.getName())) {
+                    messageHeader.setDocumentType(DocumentType.getData(elementItem));
+                } else if ("Subject".equals(elementItem.getName())) {
+                    messageHeader.setSubject(elementItem.getText());
+                } else if ("Content".equals(elementItem.getName())) {
+                    messageHeader.setContent(elementItem.getText());
+                } else if ("SignerInfo".equals(elementItem.getName())) {
+                    messageHeader.setSignerInfo(SignerInfo.getData(elementItem));
+                } else if ("DueDate".equals(elementItem.getName())) {
+                    messageHeader.setDueDate(DateUtils.parse(elementItem.getText(), DateUtils.DEFAULT_DATE_FORMAT));
+                } else {
+                    if ("ToPlaces".equals(elementItem.getName())) {
+                        List<Element> childrenElements = elementItem.getChildren();
+                        if (childrenElements != null && childrenElements.size() != 0) {
+                            for (Element children : childrenElements) {
+                                if ("Place".equals(children.getName())) {
+                                    messageHeader.addToPlace(children.getText());
+                                }
+                            }
+                        }
+                    }
+                    if ("OtherInfo".equals(elementItem.getName())) {
+                        messageHeader.setOtherInfo(OtherInfo.getData(elementItem));
+                    } else if ("ResponseFor".equals(elementItem.getName())) {
+                        messageHeader.addResponseFor(ResponseFor.getData(elementItem));
+                    } else if ("SteeringType".equals(elementItem.getName())) {
+                        messageHeader.setSteeringType(Integer.parseInt(elementItem.getText()));
+                    }
+                }
+            }
+        }
+        return messageHeader;
     }
 
     @Override
@@ -206,6 +250,6 @@ public class MessageHeader {
                 .add("Content", this.content).add("SignerInfo", this.signerInfo)
                 .add("DueDate", this.dueDate).add("ToPlaces", this.toPlaces)
                 .add("OtherInfo", this.otherInfo).add("ResponseFor", this.responseFor)
-                .add("SteeringType", this.steeringType).add("ApplicationType", this.applicationType).toString();
+                .add("SteeringType", this.steeringType).toString();
     }
 }

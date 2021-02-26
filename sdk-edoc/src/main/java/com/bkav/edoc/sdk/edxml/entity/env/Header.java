@@ -3,6 +3,9 @@ package com.bkav.edoc.sdk.edxml.entity.env;
 import com.bkav.edoc.sdk.edxml.entity.MessageHeader;
 import com.bkav.edoc.sdk.edxml.entity.Signature;
 import com.bkav.edoc.sdk.edxml.entity.TraceHeaderList;
+import org.jdom2.Element;
+
+import java.util.List;
 
 public class Header {
     private MessageHeader messageHeader;
@@ -50,5 +53,4 @@ public class Header {
     public void setSignature(Signature signature) {
         this.signature = signature;
     }
-
 }

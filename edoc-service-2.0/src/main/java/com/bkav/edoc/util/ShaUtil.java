@@ -2,22 +2,21 @@ package com.bkav.edoc.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 
 public class ShaUtil {
     
-    public static String generateSHA256(String filePath) {
-        FileInputStream fileInputStream = null;
+    public static String generateSHA256(InputStream inputStream) {
         try {
             //Use SHA-1 algorithm
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            fileInputStream = new FileInputStream(filePath);
             //Create byte array to read data in chunks
             byte[] byteArray = new byte[1024];
             int bytesCount = 0;
 
             //Read file data and update in message digest
-            while ((bytesCount = fileInputStream.read(byteArray)) != -1) {
+            while ((bytesCount = inputStream.read(byteArray)) != -1) {
                 digest.update(byteArray, 0, bytesCount);
             }
             //Get the hash's bytes
@@ -45,8 +44,8 @@ public class ShaUtil {
             return "";
         } finally {
             try {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

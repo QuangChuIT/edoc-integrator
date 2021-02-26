@@ -638,13 +638,12 @@ public class EdXmlBuild {
         staffInfo.setEmail("vanthuvanphong@gov.vn");
         staffInfo.setMobile("84912000001");
         msgStatus.setStaffInfo(staffInfo);
-        header.setMessageHeader(msgStatus);
 
         // build status edxml
 
         Content content = null;
         try {
-            content = StatusXmlBuilder.build(new Status(header), "");
+            content = StatusXmlBuilder.build(msgStatus, "");
         } catch (BuildException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

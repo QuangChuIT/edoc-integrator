@@ -56,7 +56,6 @@ public class XmlUtil {
         Result result = new StreamResult(writer);
         try {
             jc = JAXBContext.newInstance(cls);
-
             Marshaller marshaller = jc.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(obj, result);

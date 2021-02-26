@@ -29,7 +29,6 @@ import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.builder.EdXmlBuilder;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.bkav.edoc.service.xml.ed.parser.EdXmlParser;
-import com.bkav.edoc.service.xml.status.Status;
 import com.bkav.edoc.service.xml.status.builder.StatusXmlBuilder;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
@@ -82,14 +81,14 @@ public class EdocController {
         SendDocResp sendDocResp = new SendDocResp();
         try {
             String organId = headers.get(EdocServiceConstant.ORGAN_ID);
-            String hashFile = headers.get("hash-edoc");
+            /*String hashFile = headers.get("hash-edoc");
             if (Validator.isNullOrEmpty(hashFile)) {
                 errors.add(new Error("BadRequest", "Bad Request"));
                 sendDocResp.setStatus("Fail");
                 sendDocResp.setCode("9999");
                 sendDocResp.setErrors(errors);
                 return gson.toJson(sendDocResp);
-            }
+            }*/
             String messageType = headers.get(EdocServiceConstant.MESSAGE_TYPE);
             if (Validator.isNullOrEmpty(messageType) || !EdocServiceConstant.MESSAGE_TYPES.contains(messageType)) {
                 errors.add(new Error("BadRequest", "Bad Request"));
@@ -130,14 +129,14 @@ public class EdocController {
             LOGGER.info("Save edoc file success with size " + size);
             File file = new File(specPath);
             InputStream fileInputStream = new FileInputStream(file);
-            String hash = ShaUtil.generateSHA256(specPath);
-            if (hash.equals(hashFile)) {
+            /*String hash = ShaUtil.generateSHA256(inputStream);*/
+            /*if (hash.equals(hashFile)) {
                 errors.add(new Error("EdocHash", "Edoc file hash not match"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");
                 sendDocResp.setDocId(0L);
                 return gson.toJson(sendDocResp);
-            }
+            }*/
             // process add edoc
             if (messageType.equals(MessageType.EDOC.name())) {
                 Ed ed = EdXmlParser.getInstance().parse(fileInputStream);
@@ -192,18 +191,16 @@ public class EdocController {
                 }
             } else {
                 // Process add status
-                Status status = StatusXmlParser.parse(fileInputStream);
+                MessageStatus status = StatusXmlParser.parse(fileInputStream);
                 LOGGER.info("Parser success status from file " + specPath);
-                //Get message header
-                MessageStatus messageStatus = (MessageStatus) status.getHeader().getMessageHeader();
-                Report report = CHECKER.checkMessageStatus(messageStatus);
+                Report report = CHECKER.checkMessageStatus(status);
                 if (!report.isIsSuccess()) {
                     errors.addAll(report.getErrorList().getErrors());
                     sendDocResp.setStatus("Fail");
                     sendDocResp.setCode("9999");
                     sendDocResp.setDocId(0L);
                 } else {
-                    EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);
+                    EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(status, errors);
                     if (edocTrace != null) {
                         sendDocResp.setStatus("Success");
                         sendDocResp.setCode("0");
@@ -338,9 +335,7 @@ public class EdocController {
                             traces.add(edocTrace);
                             List<MessageStatus> messageStatuses = mapper.traceInfoToStatusEntity(traces);
                             MessageStatus messageStatus = messageStatuses.get(0);
-                            Header header = new Header(messageStatus);
-                            Status status = new Status(header);
-                            Content content = StatusXmlBuilder.build(status, eDocPath);
+                            Content content = StatusXmlBuilder.build(messageStatus, eDocPath);
                             if ((content != null ? content.getContent() : null) != null) {
                                 byte[] encode = Base64.encodeBase64(FileUtils.readFileToByteArray(content.getContent()));
                                 String data = new String(encode, StandardCharsets.UTF_8);

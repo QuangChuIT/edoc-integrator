@@ -3,11 +3,8 @@ package com.bkav.edoc.sdk.edxml.entity;
 import com.bkav.edoc.sdk.edxml.util.ArchiveUtils;
 import com.bkav.edoc.sdk.edxml.util.AttachmentGlobalUtils;
 import com.bkav.edoc.sdk.edxml.util.EdxmlUtils;
-import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.io.BaseEncoding;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom2.Element;
@@ -29,6 +26,11 @@ public class Attachment {
     public Attachment() {
     }
 
+    public Attachment(String fileName) {
+        this.format = AttachmentGlobalUtils.getFileExtension(fileName);
+        this.name = fileName;
+    }
+
     public Attachment(String contentId, String fileName, File content) {
         this.format = AttachmentGlobalUtils.getFileExtension(fileName);
         this.name = fileName;
@@ -44,40 +46,40 @@ public class Attachment {
         this.contentId = contentId;
     }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
     public String getContentType() {
-        return this.contentType;
+        return contentType;
     }
 
-    public void setContentType(String paramString) {
-        this.contentType = paramString;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public String getContentTransferEncoded() {
-        return this.contentTransferEncoded;
+        return contentTransferEncoded;
     }
 
-    public void setContentTransferEncoded(String paramString) {
-        this.contentTransferEncoded = paramString;
+    public void setContentTransferEncoded(String contentTransferEncoded) {
+        this.contentTransferEncoded = contentTransferEncoded;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
-    public void setName(String paramString) {
-        this.name = paramString;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public File getContent() {
-        return this.content;
+        return content;
     }
 
-    public void setContent(File paramFile) {
-        this.content = paramFile;
+    public void setContent(File content) {
+        this.content = content;
+    }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     public InputStream getInputStreamFromFile() throws IOException {
@@ -118,46 +120,7 @@ public class Attachment {
         this.description = paramString;
     }
 
-    public void createAttachment(Element element, String fileName) throws IOException {
-        Element attachment = this.createWithoutPrefix(element, "Attachment");
-        if (this.contentId == null) {
-            this.contentId = UUID.randomUUID().toString();
-        }
-        String str = "cid:" + this.contentId;
-        this.accumulateWithoutPrefix(attachment, "ContentId", str);
-        this.accumulateWithoutPrefix(attachment, "AttachmentName", this.name);
-        this.accumulateWithoutPrefix(attachment, "Description", this.description);
-        InputStream inputStream;
-        if ("pdf".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/pdf";
-            inputStream = this.getInputStreamFromFile();
-        } else if ("doc".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/msword";
-            inputStream = this.getInputStreamFromFile();
-        } else if ("docx".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            inputStream = this.getInputStreamFromFile();
-        } else if ("xls".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/vnd.ms-excel";
-            inputStream = this.getInputStreamFromFile();
-        } else if ("xslx".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            inputStream = this.getInputStreamFromFile();
-        } else if ("zip".equals(this.getFormat().toLowerCase())) {
-            this.contentType = "application/zip";
-            inputStream = this.getInputStreamFromFile();
-        } else {
-            this.contentType = "application/zip";
-            inputStream = new FileInputStream(ArchiveUtils.zip(this.getInputStreamFromFile(), this.getFormat(), fileName));
-        }
-
-        this.accumulateWithoutPrefix(attachment, "ContentType", this.contentType);
-        this.contentTransferEncoded = BaseEncoding.base64().encode(ByteStreams.toByteArray(inputStream));
-        this.createElement(attachment, "ContentTransferEncoded", this.contentTransferEncoded);
-        inputStream.close();
-    }
-
-    public static Attachment fromContent(Element element, String filePath) throws IOException {
+    public static Attachment getData(Element element, String filePath) throws IOException {
         Attachment attachment = new Attachment();
         List<Element> elementList = element.getChildren();
         if (elementList != null && elementList.size() != 0) {
@@ -186,12 +149,10 @@ public class Attachment {
                     attachment.setFormat(children.getText());
                 }
             }
-
             String attachmentFormat = attachment.getFormat();
             if (Strings.isNullOrEmpty(attachmentFormat) || "unk".equals(attachmentFormat)) {
                 attachment.setFormat(getFormat(attachment.getName()));
             }
-
             parseContentFile(attachment, filePath);
             return attachment;
         } else {
@@ -223,7 +184,7 @@ public class Attachment {
             InputStream inputStream = new FileInputStream(file);
             attachment.setInputStream(inputStream);
         } catch (Exception e) {
-            throw new IOException("Error when parse content file of attachment with id " + attachment.getContentId());
+            throw new IOException("Error parse content file of attachment with id " + attachment.getContentId());
         }
     }
 
@@ -255,34 +216,6 @@ public class Attachment {
                     .add("description", this.description)
                     .add("content", this.content)
                     .toString();
-        }
-    }
-
-    public Element accumulateWithoutPrefix(Element element, String elementName, String value) {
-        if (Strings.isNullOrEmpty(value)) {
-            return null;
-        } else {
-            Element newElement = new Element(elementName, EdXmlConstant.EDXML_URI);
-            newElement.setText(value);
-            element.addContent(newElement);
-            return newElement;
-        }
-    }
-
-    public Element createWithoutPrefix(Element element, String attrName) {
-        Element newElement = new Element(attrName, EdXmlConstant.EDXML_URI);
-        element.addContent(newElement);
-        return newElement;
-    }
-
-    public Element createElement(Element element, String elementName, String value) {
-        if (Strings.isNullOrEmpty(value)) {
-            return null;
-        } else {
-            Element newElement = new Element(elementName, "edXML", EdXmlConstant.EDXML_URI);
-            newElement.setText(value);
-            element.addContent(newElement);
-            return newElement;
         }
     }
 }

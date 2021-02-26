@@ -603,7 +603,7 @@ public class Checker {
                 .append("From").append("OrganizationInCharge").toString();
         List<Error> errorList = new ArrayList<>();
 
-        if (checkLength(organName, 200)) {
+        if (checkLength(organName, 500)) {
 
             errorList.add(new Error(String.format("R.%s", lastOfErrorCode),
                     "OrganizationInCharge is out of range."));
@@ -639,7 +639,7 @@ public class Checker {
         List<Error> errorList = new ArrayList<>();
         String lastOfErrorCode = new StringBuilder("MessageHeader")
                 .append(isFrom ? "From" : "To").append("OrganAdd").toString();
-        if (checkLength(organAdd, 250)) {
+        if (checkLength(organAdd, 500)) {
 
             errorList.add(new Error(String.format("R.%", lastOfErrorCode),
                     "OrganAdd is out of range."));

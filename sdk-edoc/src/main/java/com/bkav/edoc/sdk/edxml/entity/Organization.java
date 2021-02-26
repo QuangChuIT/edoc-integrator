@@ -1,16 +1,32 @@
 package com.bkav.edoc.sdk.edxml.entity;
 
+import com.bkav.edoc.sdk.resource.EdXmlConstant;
 import com.google.common.base.MoreObjects;
+import org.jdom2.Element;
 
+import javax.xml.bind.annotation.*;
+import java.util.List;
+
+@XmlRootElement(name = "Organization", namespace = EdXmlConstant.EDXML_URI)
+@XmlType(name = "Organization", propOrder = {"organId", "organizationInCharge", "organName", "organAdd", "email", "telephone", "fax", "website"})
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Organization {
 
+    @XmlElement(name = "OrganId")
     private String organId;
+    @XmlElement(name = "OrganizationInCharge")
     private String organizationInCharge;
+    @XmlElement(name = "OrganName")
     private String organName;
+    @XmlElement(name = "OrganAdd")
     private String organAdd;
+    @XmlElement(name = "Email")
     private String email;
+    @XmlElement(name = "Telephone")
     private String telephone;
+    @XmlElement(name = "Fax")
     private String fax;
+    @XmlElement(name = "Website")
     private String website;
 
     public Organization() {
@@ -106,5 +122,38 @@ public class Organization {
                 .add("Email", this.email).add("Telephone", this.telephone)
                 .add("Fax", this.fax).add("Website", this.website).toString();
     }
-    
+
+    public static Organization getData(Element element) {
+        if (element == null) {
+            return null;
+        } else {
+            List<Element> elements = element.getChildren();
+            if (elements != null && elements.size() != 0) {
+                Organization organization = new Organization();
+                for (Element itemElement : elements) {
+                    if ("OrganId".equals(itemElement.getName())) {
+                        organization.setOrganId(itemElement.getTextTrim());
+                    } else if ("OrganizationInCharge".equals(itemElement.getName())) {
+                        organization.setOrganizationInCharge(itemElement.getTextTrim());
+                    } else if ("OrganName".equals(itemElement.getName())) {
+                        organization.setOrganName(itemElement.getTextTrim());
+                    } else if ("OrganAdd".equals(itemElement.getName())) {
+                        organization.setOrganAdd(itemElement.getTextTrim());
+                    } else if ("Email".equals(itemElement.getName())) {
+                        organization.setEmail(itemElement.getTextTrim());
+                    } else if ("Telephone".equals(itemElement.getName())) {
+                        organization.setTelephone(itemElement.getTextTrim());
+                    } else if ("Fax".equals(itemElement.getName())) {
+                        organization.setFax(itemElement.getTextTrim());
+                    } else if ("Website".equals(itemElement.getName())) {
+                        organization.setWebsite(itemElement.getTextTrim());
+                    }
+                }
+                return organization;
+            } else {
+                return null;
+            }
+        }
+    }
+
 }

@@ -8,6 +8,9 @@ public class TelegramMessage {
     private EdocDocument document;
     private Date createDate;
 
+    public TelegramMessage() {
+    }
+
     public String getReceiverId() {
         return receiverId;
     }

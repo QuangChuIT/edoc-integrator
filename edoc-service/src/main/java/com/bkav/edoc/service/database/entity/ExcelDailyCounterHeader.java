@@ -6,6 +6,9 @@ public class ExcelDailyCounterHeader implements Serializable {
     private long id;
     private String headerName;
 
+    public ExcelDailyCounterHeader() {
+    }
+
     public long getId() {
         return id;
     }

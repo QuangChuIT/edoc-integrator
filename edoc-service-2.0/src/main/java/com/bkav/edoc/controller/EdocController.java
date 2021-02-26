@@ -129,8 +129,8 @@ public class EdocController {
             LOGGER.info("Save edoc file success with size " + size);
             File file = new File(specPath);
             InputStream fileInputStream = new FileInputStream(file);
-            /*String hash = ShaUtil.generateSHA256(inputStream);
-            if (hash.equals(hashFile)) {
+            /*String hash = ShaUtil.generateSHA256(inputStream);*/
+            /*if (hash.equals(hashFile)) {
                 errors.add(new Error("EdocHash", "Edoc file hash not match"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");

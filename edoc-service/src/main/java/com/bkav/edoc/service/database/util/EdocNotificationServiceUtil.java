@@ -3,10 +3,12 @@ package com.bkav.edoc.service.database.util;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.entity.TelegramMessage;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.services.EdocNotificationService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class EdocNotificationServiceUtil {
 
@@ -35,4 +37,11 @@ public class EdocNotificationServiceUtil {
         NOTIFICATION_SERVICE.removePendingDocId(organId, docId);
     }
 
+    /*public static Map<String, Object> getAllDocumentNotTaken(PaginationCriteria paginationCriteria, Date fromDate, Date toDate) {
+        return NOTIFICATION_SERVICE.getAllDocumentNotTaken(paginationCriteria, fromDate, toDate);
+    }*/
+
+    public static Map<String, Object> getAllDocumentNotTaken(PaginationCriteria paginationCriteria) {
+        return NOTIFICATION_SERVICE.getAllDocumentNotTaken(paginationCriteria);
+    }
 }

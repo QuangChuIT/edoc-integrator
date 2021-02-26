@@ -4,8 +4,8 @@
 <%@ page import="com.bkav.edoc.service.kernel.util.Base64" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
-    <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%

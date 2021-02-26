@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -47,10 +48,12 @@ public class SendMessageToTelegramBean {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
                 warningMessage += messageSourceUtil.getMessage("edoc.title.all.taken", new Object[]{SIMPLE_DATE_FORMAT.format(today)});
                 sendTelegramMessage(warningMessage);
+                //System.out.println(warningMessage);
             } else {
                 warningMessage += messageSourceUtil.getMessage("edoc.title.telegram",
                         new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
                 sendTelegramMessage(warningMessage);
+                //System.out.println(warningMessage);
 
                 String detailMessageOrgan = "";
                 for (TelegramMessage telegramMessage : messageObject) {
@@ -71,6 +74,7 @@ public class SendMessageToTelegramBean {
                         detailMessageOrgan += msg;
                         if (detailMessageOrgan.length() > 3500) {
                             sendTelegramMessage(detailMessageOrgan);
+                            //System.out.println(detailMessageOrgan);
                             detailMessageOrgan = "";
                         }
                         TimeUnit.SECONDS.sleep(2);
@@ -78,6 +82,7 @@ public class SendMessageToTelegramBean {
                     //}
                 }
                 sendTelegramMessage(detailMessageOrgan);
+                //System.out.println(detailMessageOrgan);
 
                 LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }

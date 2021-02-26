@@ -14,6 +14,7 @@ let app_message = {
     "message_no_data": "Không có dữ liệu",
     "edoc_table_header_subject": "Trích yếu",
     "edoc_table_header_fromOrgan": "Đơn vị gửi",
+    "edoc_table_header_toOrgan": "Đơn vị nhận",
     "edoc_organ_process": "Đơn vị xử lý",
     "edoc_table_header_toOrgan": "Đơn vị nhận",
     "edoc_table_header_code": "Số kí hiệu",
@@ -61,6 +62,7 @@ let app_message = {
     "edoc_message_error_report": "Nhập ngày bắt đầu và ngày kết thúc để thống kê!",
     "edoc_message_error_report_date": "Ngày bắt đầu không được lớn hơn ngày kết thúc !",
     "edoc_message_error_export": "Lỗi xuất tệp excel",
+    "edoc_message_send_telegram_success": "Cảnh báo lên Telegram thành công !",
     //Datatable setting
     "language": {
         "decimal": "",

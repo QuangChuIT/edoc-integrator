@@ -11,6 +11,7 @@ import com.bkav.edoc.web.OAuth2Constants;
 import com.bkav.edoc.web.auth.CookieUtil;
 import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
+import com.bkav.edoc.web.scheduler.bean.SendMessageToTelegramBean;
 import com.bkav.edoc.web.util.CommonUtils;
 import com.bkav.edoc.web.util.MessageSourceUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
@@ -22,20 +23,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class DocumentRestController {
 
     private final MessageSourceUtil messageSourceUtil;
 
+    private final SendMessageToTelegramBean sendMessageToTelegramBean;
+
     private final ValidateUtil validateUtil;
 
-    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil) {
+    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil, SendMessageToTelegramBean sendMessageToTelegramBean) {
         this.messageSourceUtil = messageSourceUtil;
         this.validateUtil = validateUtil;
+        this.sendMessageToTelegramBean = sendMessageToTelegramBean;
     }
 
     @RequestMapping(value = "/document/{documentId}", //
@@ -271,6 +273,51 @@ public class DocumentRestController {
                 return HttpStatus.INTERNAL_SERVER_ERROR;
             }
         }
+    }
+
+    @RequestMapping(value = "/documents/-/not/taken", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String getAllDocumentNotTaken(HttpServletRequest request) {
+        /*DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        Map<String, Object> map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination);
+        if (fromDate != null && toDate != null) {
+            Date fromDateValue = DateUtils.parse(fromDate);
+            Date toDateValue = DateUtils.parse(toDate);
+            map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination, fromDateValue, toDateValue);
+        } else {
+            map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination, null, null);
+        }
+
+        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
+        int count = 0;
+        List<DocumentCacheEntry> documents = new ArrayList<>();
+        if (map != null) {
+            LOGGER.info("Get documents not taken success!!!!");
+            count = (int) map.get("totalDocuments");
+            documents = (List<DocumentCacheEntry>) map.get("documents");
+        }
+        dataTableResult.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(documents);
+        dataTableResult.setRecordsTotal(count);
+        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, documents, count, datatableRequest);
+        return new Gson().toJson(dataTableResult);*/
+
+        DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        int totalCount = EdocDocumentServiceUtil.countDocumentsNotTaken(pagination);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotTaken(pagination);
+        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
+        dataTableResult.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(entries);
+        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
+        return new Gson().toJson(dataTableResult);
+    }
+
+    @RequestMapping(value = "/send/telegram")
+    public HttpStatus sendNotTakenToTelegram() {
+        sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
+        return HttpStatus.OK;
     }
 
     private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);

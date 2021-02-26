@@ -1874,6 +1874,14 @@ a:focus {
     left: 20px;
     display: none;
 }
+#overlay-edoc-not-taken {
+    position: fixed;
+    height: 40px;
+    z-index: 10000000000;
+    bottom: 40px;
+    left: 20px;
+    display: none;
+}
 
 .cv-spinner {
     height: 100%;
@@ -1977,5 +1985,9 @@ input:checked + .slider:before {
 }
 
 #statistic-detail {
+    display: none;
+}
+
+#put-to-telegram {
     display: none;
 }

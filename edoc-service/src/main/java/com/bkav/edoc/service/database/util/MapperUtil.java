@@ -75,7 +75,9 @@ public class MapperUtil {
             List<OrganizationCacheEntry> toContacts = new ArrayList<>();
             for (String toDomain : toOrgans) {
                 OrganizationCacheEntry toOrganCache = EDOC_DYNAMIC_CONTACT_SERVICE.getOrganizationCache(toDomain);
-                toContacts.add(toOrganCache);
+                if (toOrganCache.getId() != null) {
+                    toContacts.add(toOrganCache);
+                }
             }
             EdocPriority priority = EDOC_PRIORITY_SERVICE.findById(document.getPriority());
             documentCacheEntry.setPriority(priority);

@@ -162,22 +162,6 @@ let edocDocument = {
             "order": [[1, "desc"]],
         });
     },
-    deleteDocument: function (documentId) {
-        if (documentId !== null && documentId !== "") {
-            $.ajax({
-                url: "/document/delete/" + documentId,
-                type: "DELETE",
-                statusCode: {
-                    200: () => {
-                        $("#" + documentId).remove();
-                        $.notify(app_message.edoc_delete_document_success, "success");
-                    },
-                    400: () => $.notify(app_message.edoc_delete_document_false, "error"),
-                    500: () => $.notify(app_message.edoc_delete_document_error, "error")
-                }
-            })
-        }
-    },
     renderNotTakenDatatable: () => {
         let instance = this;
         instance.dataTable = $('#dataTables-edoc-notTaken').DataTable({
@@ -192,10 +176,10 @@ let edocDocument = {
             },
             drawCallback: function() {
                 $(this).contextMenu({
-                    selector: 'tr',
+                    selector: 'tbody tr td',
                     callback: (key, options) => {
                         let id = options.$trigger[0].parentElement.id;
-                        instance.deleteDocument(id);
+                        edocDocument.deleteDocument(id);
                     },
                     items: {
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
@@ -376,6 +360,22 @@ let edocDocument = {
                     $.notify(error.responseText, "error");
                 }
             });
+        }
+    },
+    deleteDocument: function (documentId) {
+        if (documentId !== null && documentId !== "") {
+            $.ajax({
+                url: "/document/delete/" + documentId,
+                type: "DELETE",
+                statusCode: {
+                    200: () => {
+                        $("#" + documentId).remove();
+                        $.notify(app_message.edoc_delete_document_success, "success");
+                    },
+                    400: () => $.notify(app_message.edoc_delete_document_false, "error"),
+                    500: () => $.notify(app_message.edoc_delete_document_error, "error")
+                }
+            })
         }
     }
 };
@@ -637,6 +637,15 @@ $(document).ready(function () {
             success: () => $.notify(app_message.edoc_message_send_email_success, "success")
         }).done(() => $("#overlay-edoc-not-taken").hide())
     })
+
+    // search filter event
+    $("#search-filter").on('click', function() {
+        $("#searchFilter").toggle();
+    })
+    $('#searchFilter').modalPopover({
+        target: '#search-filter',
+        placement: 'bottom'
+    });
 });
 
 $(document).on("contextmenu", "#dataTables-edoc>tbody>tr", function (event) {

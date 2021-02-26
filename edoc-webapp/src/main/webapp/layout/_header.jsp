@@ -21,8 +21,29 @@
         </a>
     </div>
     <div class="search-container">
-        <input class="search-input" id="search-edoc" type="text" placeholder="<spring:message code="edoc.search"/>">
+        <input class="search-input" id="search-edoc" type="search" placeholder="<spring:message code="edoc.search"/>">
+        <a href="javascript:void(0)" type="button" data-toggle="modal-popover" data-placement="bottom" id="search-filter">
+            <i class="fa fa-filter fa-lg" title="<spring:message code="edoc.search.filter"/>"></i>
+        </a>
     </div>
+    <%--<div class="popover" id="searchFilter">
+        <div class="arrow"></div>
+        <div class="popover-content">
+            <form class="form-horizontal" id="" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div class="col-md-2 col-sm-6 col-xs-12">
+                        <label class="control-label" for="fromOrganSearch">
+                            <spring:message code="edoc.search.fromOrgan"/>
+                        </label>
+                    </div>
+                    <div class="col-md-10 col-sm-6 col-xs-12">
+                        <input type="text" id="fromOrganSearch" value="">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>--%>
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>

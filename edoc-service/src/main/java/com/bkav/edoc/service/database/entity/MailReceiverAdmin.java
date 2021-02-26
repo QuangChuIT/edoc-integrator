@@ -11,6 +11,9 @@ public class MailReceiverAdmin implements Serializable {
     private Date modifiedDate;
     private boolean status;
 
+    public MailReceiverAdmin() {
+    }
+
     public int getId() {
         return id;
     }

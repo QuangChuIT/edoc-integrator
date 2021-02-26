@@ -2,13 +2,11 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
-import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
-import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.kernel.util.DateUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
@@ -16,14 +14,12 @@ import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.util.CommonUtil;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component("statDocumentBean")
 public class StatDocumentBean {
@@ -24,11 +25,26 @@ public class StatDocumentBean {
             LOGGER.info("Counter date prepare stat " + _counterDate);
             if (!EdocDailyCounterServiceUtil.checkExistCounter(_counterDate)) {
                 LOGGER.info("Prepare stat document with counter date " + _counterDate);
-//                List<String> docCodes = EdocDocumentServiceUtil.getDocCodeByCounterDate(_counterDate);
-//                for (String docCode : docCodes) {
-//                    List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
-//                }
-                List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
+                /*List<String> docCodes = EdocDocumentServiceUtil.getDocCodeByCounterDate(_counterDate);
+                for (String docCode : docCodes) {
+                    List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
+                }*/
+                List<String> docCodes = EdocDocumentServiceUtil.getDocCodeByCounterDate(_counterDate);
+                docCodes.forEach(docCode -> {
+                    List<EdocDocument> documents = EdocDocumentServiceUtil.getDocumentsByDocCode(docCode);
+                    AtomicReference<String> fromOrgan = new AtomicReference<>("");
+                    documents.forEach(document -> {
+                        fromOrgan.set(document.getFromOrganDomain());
+
+                        String toOrgans = document.getToOrganDomain();
+                        List<String> toOrganList = Arrays.asList(toOrgans.split("#"));
+                        toOrganList.stream().filter(toOrgan -> checkOrganToStat(toOrgan))
+                                .forEach(toOrgan -> countReceived(toOrgan, dailyCounterMap));
+                    });
+                    if (checkOrganToStat(fromOrgan.get()))
+                        countSent(fromOrgan.get(), dailyCounterMap);
+                });
+                /*List<EdocDocument> documents = EdocDocumentServiceUtil.selectForDailyCounter(_counterDate);
                 LOGGER.info("List document to stat " + documents.size());
                 for (EdocDocument document : documents) {
                     String fromOrgan = document.getFromOrganDomain();
@@ -43,8 +59,9 @@ public class StatDocumentBean {
                             countReceived(toOrgan, dailyCounterMap);
                         }
                     }
-                }
+                }*/
                 submitDatabase(dailyCounterMap);
+                LOGGER.info("Counter document in date " + _counterDate + " successfully!!");
             }
         } catch (Exception e) {
             LOGGER.error("Error when run Scheduler Stat Document " + e);

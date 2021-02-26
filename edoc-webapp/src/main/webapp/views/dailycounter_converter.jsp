@@ -13,8 +13,8 @@
     <div class="row">
         <div class="boarder-all" id="dailycounterConvertContent">
             <div class="form-group">
-                <div class="col-md-2 col-xs-2"></div>
-                <div class="col-md-2 col-xs-2">
+                <div class="col-md-3 col-xs-2"></div>
+                <div class="col-md-1 col-xs-2">
                     <label class="control-label">Từ ngày</label>
                 </div>
                 <div class="col-md-4 col-xs-4">
@@ -26,8 +26,8 @@
             </div>
             <br>
             <div class="form-group">
-                <div class="col-md-2 col-xs-2"></div>
-                <div class="col-md-2 col-xs-2">
+                <div class="col-md-3 col-xs-2"></div>
+                <div class="col-md-1 col-xs-2">
                     <label class="control-label">
                         Đến ngày
                     </label>

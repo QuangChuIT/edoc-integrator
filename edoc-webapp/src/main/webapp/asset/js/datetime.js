@@ -10,8 +10,9 @@ Date.prototype.formatDate = function () {
 Date.prototype.formatTime = function () {
     let hh = this.getHours();
     let mm = this.getMinutes();
+    let ss = this.getSeconds();
 
-    return [(hh > 9 ? '' : '0') + hh, (mm > 9 ? '' : '0') + mm].join(":");
+    return [(hh > 9 ? '' : '0') + hh, (mm > 9 ? '' : '0') + mm, (ss > 9 ? '' : '0') + ss].join(":");
 };
 
 function convertToDate(dateValue) {

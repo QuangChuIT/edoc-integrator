@@ -3,7 +3,7 @@ package com.bkav.edoc.service.database.daoimpl;
 import com.bkav.edoc.service.database.dao.EdocNotificationDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
-import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
+import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -165,14 +165,6 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
         }
     }
 
-    public static void main(String[] args) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -30);
-        Date now = new Date();
-        Date yesterday = cal.getTime();
-        new EdocNotificationDaoImpl().getEdocNotifyNotTaken();
-    }
-
     public List<EdocDocument> getDocumentNotTakenByReceiverId(String receiverId) {
         Session session = openCurrentSession();
         try {
@@ -212,6 +204,50 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
        }
        return false;
     }
+
+    /*public List<EdocNotification> getEdocNotificationNotTaken(PaginationCriteria paginationCriteria) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select en from EdocNotification en, EdocDynamicContact ed where" +
+                    " en.receiverId = ed.domain and ed.receiveNotify = 1 and en.taken = :taken order by :order");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("taken", false);
+            query.setParameter("order", paginationCriteria.getOrderBy());
+            int pageNumber = paginationCriteria.getPageNumber();
+            int pageSize = paginationCriteria.getPageSize();
+            query.setFirstResult(pageNumber);
+            query.setMaxResults(pageSize);
+            List<EdocNotification> edocNotification = query.getResultList();
+            if (edocNotification.size() > 0)
+                return edocNotification;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
+    public Long countEdocNotificationNotTaken() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select count(1) from EdocNotification en where en.taken = :taken");
+            Query<Long> query = session.createQuery(sql.toString(), Long.class);
+            query.setParameter("taken", false);
+            return query.getSingleResult();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return 0L;
+    }*/
+
+    /*public static void main(String[] args) {
+        System.out.println(new EdocNotificationDaoImpl().countEdocNotificationNotTaken());
+    }*/
 
     private static final Logger LOGGER = Logger.getLogger(EdocNotificationDaoImpl.class);
 }

@@ -11,6 +11,7 @@ import com.bkav.edoc.web.OAuth2Constants;
 import com.bkav.edoc.web.auth.CookieUtil;
 import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
+import com.bkav.edoc.web.scheduler.bean.EmailSenderBean;
 import com.bkav.edoc.web.scheduler.bean.SendMessageToTelegramBean;
 import com.bkav.edoc.web.util.CommonUtils;
 import com.bkav.edoc.web.util.MessageSourceUtil;
@@ -32,12 +33,15 @@ public class DocumentRestController {
 
     private final SendMessageToTelegramBean sendMessageToTelegramBean;
 
+    private final EmailSenderBean sendEmailBean;
+
     private final ValidateUtil validateUtil;
 
-    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil, SendMessageToTelegramBean sendMessageToTelegramBean) {
+    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil, SendMessageToTelegramBean sendMessageToTelegramBean, EmailSenderBean sendEmailBean) {
         this.messageSourceUtil = messageSourceUtil;
         this.validateUtil = validateUtil;
         this.sendMessageToTelegramBean = sendMessageToTelegramBean;
+        this.sendEmailBean = sendEmailBean;
     }
 
     @RequestMapping(value = "/document/{documentId}", //
@@ -241,15 +245,6 @@ public class DocumentRestController {
     @ResponseBody
     public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
-        /*int draw = Integer.parseInt(request.getParameter("draw"));
-        String searchValue = request.getParameter("search[value]");
-        String sortColumn = request.getParameter("order[0][column]");
-        //Sorting Direction
-        String sortDirection = request.getParameter("order[0][dir]");
-        System.out.println("draw " + draw);
-        System.out.println("search value " + searchValue);
-        System.out.println("sortColumn " + sortColumn);
-        System.out.println("sort direction " + sortDirection);*/
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode);
@@ -275,34 +270,9 @@ public class DocumentRestController {
         }
     }
 
-    @RequestMapping(value = "/documents/-/not/taken", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/documents/-/not/taken",method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getAllDocumentNotTaken(HttpServletRequest request) {
-        /*DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
-        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        Map<String, Object> map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination);
-        if (fromDate != null && toDate != null) {
-            Date fromDateValue = DateUtils.parse(fromDate);
-            Date toDateValue = DateUtils.parse(toDate);
-            map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination, fromDateValue, toDateValue);
-        } else {
-            map = EdocNotificationServiceUtil.getAllDocumentNotTaken(pagination, null, null);
-        }
-
-        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
-        int count = 0;
-        List<DocumentCacheEntry> documents = new ArrayList<>();
-        if (map != null) {
-            LOGGER.info("Get documents not taken success!!!!");
-            count = (int) map.get("totalDocuments");
-            documents = (List<DocumentCacheEntry>) map.get("documents");
-        }
-        dataTableResult.setDraw(datatableRequest.getDraw());
-        dataTableResult.setListOfDataObjects(documents);
-        dataTableResult.setRecordsTotal(count);
-        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, documents, count, datatableRequest);
-        return new Gson().toJson(dataTableResult);*/
-
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         int totalCount = EdocDocumentServiceUtil.countDocumentsNotTaken(pagination);
@@ -312,12 +282,48 @@ public class DocumentRestController {
         dataTableResult.setListOfDataObjects(entries);
         dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
         return new Gson().toJson(dataTableResult);
+
+        /*try {
+            List<DocumentCacheEntry> documents = EdocDocumentServiceUtil.getAlldocumentNotTaken();
+            if (documents != null) {
+                return new ResponseEntity<>(documents, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
+    }
+
+    @RequestMapping(value = "/edoc/search/advance", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String getDocumentBySearchAdvance(HttpServletRequest request, @RequestParam(value = "fromOrgan", required = false) String fromOrgan,
+                                             @RequestParam(value = "toOrgan", required = false) String toOrgan,
+                                             @RequestParam(value = "docCode", required = true) String docCode) {
+
+
+        return null;
     }
 
     @RequestMapping(value = "/send/telegram")
     public HttpStatus sendNotTakenToTelegram() {
-        sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
-        return HttpStatus.OK;
+        try {
+            sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return HttpStatus.BAD_REQUEST;
+        }
+    }
+
+    @RequestMapping(value = "/send/email")
+    public HttpStatus sendNotTakenToEmail() {
+        try {
+            sendEmailBean.runScheduleSendEmail();
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(DocumentRestController.class);

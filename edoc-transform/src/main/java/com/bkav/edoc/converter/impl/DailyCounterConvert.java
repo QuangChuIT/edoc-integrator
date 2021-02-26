@@ -8,11 +8,13 @@ import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DailyCounterConvert {
     private static final Logger LOGGER = Logger.getLogger(DailyCounterConvert.class);
@@ -29,7 +31,21 @@ public class DailyCounterConvert {
                 _counterDate = rs.getDate(1);
                 LOGGER.info("Starting counter document in date: " + _counterDate);
                 List<String> docCodes = DatabaseUtil.getDocCodeByCounterDate(connection, _counterDate);
-                for (String docCode: docCodes) {
+                docCodes.forEach(docCode -> {
+                    List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate, docCode);
+                    AtomicReference<String> fromOrgan = new AtomicReference<>("");
+                    documents.forEach(document -> {
+                        fromOrgan.set(document.getFromOrganDomain());
+
+                        String toOrgans = document.getToOrganDomain();
+                        List<String> toOrganList = Arrays.asList(toOrgans.split("#"));
+                        toOrganList.stream().filter(toOrgan -> checkCurrentOrgan(toOrgan))
+                                .forEach(toOrgan -> countReceived(toOrgan, dailyCounterMap));
+                    });
+                    if (checkCurrentOrgan(fromOrgan.get()))
+                        countSent(fromOrgan.get(), dailyCounterMap);
+                });
+                /*for (String docCode: docCodes) {
                     List<EdocDocument> documents = DatabaseUtil.getDocumentByCounterDate(connection, _counterDate, docCode);
                     String fromOrgan = "";
                     for (EdocDocument document : documents) {
@@ -47,7 +63,8 @@ public class DailyCounterConvert {
                     if (checkCurrentOrgan(fromOrgan)) {
                         countSent(fromOrgan, dailyCounterMap);
                     }
-                }
+                }*/
+                //System.out.println(new Gson().toJson(dailyCounterMap));
                 submitDatabase(dailyCounterMap);
                 LOGGER.info("Counter document in date " + _counterDate + " successfully!!");
             }

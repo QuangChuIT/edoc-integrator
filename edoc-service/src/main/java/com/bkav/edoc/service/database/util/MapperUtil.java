@@ -322,6 +322,8 @@ public class MapperUtil {
             organizationCacheEntry.setToken(contact.getToken());
             organizationCacheEntry.setParent(contact.getParent());
             organizationCacheEntry.setStatus(contact.getStatus());
+            organizationCacheEntry.setAgency(contact.getAgency());
+            organizationCacheEntry.setReceivedNotify(contact.getReceiveNotify());
         } catch (Exception e) {
             LOGGER.error("Error when convert dynamic contact to cached entry cause " + e);
         }

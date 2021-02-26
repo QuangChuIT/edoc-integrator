@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.daoimpl;
 
+import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.dao.EdocDocumentDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.HibernateUtil;
@@ -356,6 +357,23 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return new ArrayList<>();
     }
 
+    public List<EdocDocument> getAllDocumentNotTaken() {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ed from EdocDocument ed, EdocNotification en, EdocDynamicContact co " +
+                    "where ed.documentId = en.document.documentId and ed.toOrganDomain like concat('%', en.receiverId, '%') " +
+                    "and en.receiverId = co.domain and co.receiveNotify = 1 and co.agency = 1 and en.taken = 0");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
     public static void main(String[] args) {
         String yesterday = "2021-01-26";
         java.sql.Date yes = java.sql.Date.valueOf(yesterday);
@@ -363,7 +381,8 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         java.sql.Date no = java.sql.Date.valueOf(now);
 
         EdocDocumentDaoImpl edocDocumentDao = new EdocDocumentDaoImpl();
-        System.out.println(edocDocumentDao.getDateInRange(yes, no));
+        //System.out.println(edocDocumentDao.getDateInRange(yes, no));
+        System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentDaoImpl.class);

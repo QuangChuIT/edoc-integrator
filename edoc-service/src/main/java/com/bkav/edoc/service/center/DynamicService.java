@@ -373,6 +373,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             updateReceivedNotify(report, checkPermission);
             List<Error> errors = new ArrayList<>();
             // update trace
+            LOGGER.info(status.toString());
             if (traceService.updateTrace(status, errors) != null) {
 
                 errorList.add(new Error("M.updateTrace",

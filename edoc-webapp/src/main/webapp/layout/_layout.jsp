@@ -71,6 +71,7 @@
 <div class="main-content" id="main-content">
     <tiles:insertAttribute name="body"/>
 </div>
+
 <!-- AJAX response must be wrapped in the modal's root class. -->
 <div class="modal fade" id="edocDetail" role="dialog">
     <div class="modal-dialog">
@@ -1852,6 +1853,7 @@
 <script src="<c:url value="/asset/js/dataTables/dataTables.bootstrap.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/dataTables.responsive.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>
+<script src="<c:url value="/asset/js/lib/bootstrap.modalOver.js"/>"></script>
 <!-- Custom Theme JavaScript -->
 <script src="<c:url value="/asset/js/startmin.js"/>"></script>
 <script src="<c:url value="/asset/js/document.js"/>"></script>

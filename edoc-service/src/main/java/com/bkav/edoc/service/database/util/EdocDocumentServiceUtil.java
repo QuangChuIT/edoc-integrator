@@ -27,12 +27,12 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocuments(organId, start, size);
     }
 
-    public static List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
-        return DOCUMENT_SERVICE.getDocumentsFilter(paginationCriteria, organId, mode);
+    public static List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
+        return DOCUMENT_SERVICE.getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
     }
 
-    public static int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
-        return DOCUMENT_SERVICE.countDocumentsFilter(paginationCriteria, organId, mode);
+    public static int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
+        return DOCUMENT_SERVICE.countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
     }
 
     public static boolean deleteDocument(long documentId) {

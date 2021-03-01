@@ -1684,6 +1684,13 @@ a:focus {
     color: #ffffff;
 }
 
+#search-filter {
+    position: absolute;
+    width: 20%;
+    top: 19px;
+    left: 580px;
+}
+
 #header-nav [class^="col"] {
     margin: 0 !important;
     padding: 0 !important;

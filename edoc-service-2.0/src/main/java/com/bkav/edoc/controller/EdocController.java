@@ -35,7 +35,6 @@ import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.util.EdocServiceConstant;
 import com.bkav.edoc.util.EdocUtil;
 import com.bkav.edoc.util.MessageType;
-import com.bkav.edoc.util.ShaUtil;
 import com.google.gson.Gson;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -71,6 +70,12 @@ public class EdocController {
 
     @Value("${edoc.edxml.file.location}")
     private String eDocPath;
+
+    @RequestMapping(value = "/sendDocument", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    @ResponseBody
+    public String checkPermission(HttpServletRequest request) {
+        return "";
+    }
 
     @RequestMapping(value = "/sendDocument", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseBody

@@ -374,12 +374,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             List<Error> errors = new ArrayList<>();
             // update trace
             LOGGER.info(status.toString());
-            if (traceService.updateTrace(status, errors) != null) {
-
-                errorList.add(new Error("M.updateTrace",
-                        "Error process update trace cause not found document with trace or save error!"));
-
-                report = new Report(false, new ErrorList(errorList));
+            EdocTrace trace = traceService.updateTrace(status, errors);
+            if (errors.size() > 0) {
+                report = new Report(false, new ErrorList(errors));
 
             } else {
                 ResponseFor responseFor = checker.checkSendToVPCP(status.getResponseFor());

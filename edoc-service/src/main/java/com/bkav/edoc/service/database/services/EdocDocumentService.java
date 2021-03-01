@@ -63,7 +63,7 @@ public class EdocDocumentService {
         return documentDaoImpl.findAll();
     }
 
-    public int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
+    public int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
         Session session = documentDaoImpl.openCurrentSession();
         int result = 0;
         try {
@@ -88,6 +88,9 @@ public class EdocDocumentService {
             }
             Query query = session.createNativeQuery(queryDocument);
             query.setParameter("organDomain", organId);
+            query.setParameter("toOrgan", toOrgan);
+            query.setParameter("fromOrgan", fromOrgan);
+            query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
         } catch (Exception e) {
@@ -127,7 +130,7 @@ public class EdocDocumentService {
         }
     }
 
-    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode) {
+    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
         List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
         try {
@@ -151,6 +154,9 @@ public class EdocDocumentService {
             }
             Query<EdocDocument> query = session.createNativeQuery(queryDocument, EdocDocument.class);
             query.setParameter("organDomain", organId);
+            query.setParameter("toOrgan", toOrgan);
+            query.setParameter("fromOrgan", fromOrgan);
+            query.setParameter("docCode", docCode);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
             query.setFirstResult(pageNumber);
@@ -173,6 +179,8 @@ public class EdocDocumentService {
         }
         return entries;
     }
+
+
 
     public List<DocumentCacheEntry> getDocumentNotTaken(PaginationCriteria paginationCriteria) {
         List<DocumentCacheEntry> entries = new ArrayList<>();

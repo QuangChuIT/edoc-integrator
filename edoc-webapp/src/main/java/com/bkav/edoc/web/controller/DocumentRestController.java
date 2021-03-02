@@ -241,11 +241,12 @@ public class DocumentRestController {
         }
     }
 
-    @RequestMapping(value = "/documents/{mode}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/documents", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
-        //String toOrgan = null, fromOrgan = "000.00.33.H36", docCode = null;
-        String toOrgan = null, fromOrgan = null, docCode = null;
+    public String getDocuments(@RequestParam(value = "mode") String mode, HttpServletRequest request,
+                               @RequestParam(value = "fromOrgan", required = false) String fromOrgan,
+                               @RequestParam(value = "toOrgan", required = false) String toOrgan,
+                               @RequestParam(value = "docCode", required = false) String docCode) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
@@ -295,16 +296,6 @@ public class DocumentRestController {
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
     }
-
-    /*@RequestMapping(value = "/edoc/search/advance", produces = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public String getDocumentBySearchAdvance(HttpServletRequest request,
-                                             @RequestParam(value = "fromOrgan", required = false) String fromOrgan,
-                                             @RequestParam(value = "toOrgan", required = false) String toOrgan,
-                                             @RequestParam(value = "docCode", required = false) String docCode) {
-
-        return null;
-    }*/
 
     @RequestMapping(value = "/send/telegram")
     public HttpStatus sendNotTakenToTelegram() {

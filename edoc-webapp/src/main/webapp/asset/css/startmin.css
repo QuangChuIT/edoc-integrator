@@ -1690,6 +1690,24 @@ a:focus {
     top: 19px;
     left: 580px;
 }
+#searchFilter {
+    width: auto;
+    height: auto;
+    top: 42px;
+    left: 550px;
+    position: absolute;
+}
+.form-input {
+    margin-bottom: 15px;
+}
+.form-input input {
+    width: 100% !important;
+}
+
+#btn-search-filter {
+    margin-left: 35px;
+    width: 100% !important;
+}
 
 #header-nav [class^="col"] {
     margin: 0 !important;

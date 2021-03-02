@@ -208,5 +208,25 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         return contacts;
     }
 
+    public List<EdocDynamicContact> getAllChildrenContact (String regexParent) {
+        Session session = openCurrentSession();
+        List<EdocDynamicContact> childOrgans;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select edc from EdocDynamicContact edc where edc.domain like concat('%', :regexParent, '%') and edc.agency = :agency");
+            Query<EdocDynamicContact> query = session.createQuery(sql.toString(), EdocDynamicContact.class);
+            query.setParameter("regexParent", regexParent);
+            query.setParameter("agency", true);
+            childOrgans = query.getResultList();
+            if (childOrgans != null)
+                return childOrgans;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return new ArrayList<>();
+    }
+
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);
 }

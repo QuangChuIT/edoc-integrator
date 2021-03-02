@@ -68,6 +68,15 @@ let organManage = {
             info: false,
             columns: [
                 {
+                    "data": null,
+                    "orderable": false,
+                    "render": (data, type, row) => {
+                        if (type === 'display')
+                            return $('#organSelect').tmpl(data).html();
+                        return data;
+                    }
+                },
+                {
                     "name": "name",
                     "title": organ_message.table_header_name,
                     "data": null,
@@ -102,7 +111,7 @@ let organManage = {
                 }
             ],
             language: app_message.language,
-            order: [[0, "asc"]]
+            order: [[4, "desc"]]
         });
     },
     reGenerateToken: function (organId) {
@@ -236,17 +245,28 @@ let organManage = {
     }
 }
 $(document).ready(function () {
-    $("#dataTables-organ").on('click', 'tbody>tr', function () {
+    $("#dataTables-organ").on('click', 'tbody>tr', function (e) {
         let organId = $(this).attr("id");
-        $.get("/contact/-/document/contacts/" + organId, function (data) {
-            $('#organ-detail').empty();
-            $('#organDetailTemplate').tmpl(data).appendTo('#organ-detail');
-        });
-        $('#organDetail').modal({
-            backdrop: 'static',
-            keyboard: false
-        });
+        let $cell = $(e.target).closest('td');
+        if ($cell.index() > 0) {
+            $.get("/contact/-/document/contacts/" + organId, function (data) {
+                $('#organ-detail').empty();
+                $('#organDetailTemplate').tmpl(data).appendTo('#organ-detail');
+            });
+            $('#organDetail').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
     });
+
+    $("#deleteOrgans").on('click', function() {
+        /*$.each($("input[name='checkBox[]']:checked").closest("td").next("td"), function () {
+            values.push($(this).text());
+        });*/
+        let data = organManage.organSetting.dataTable.columns.checkboxes.selected();
+        console.log(data);
+    })
 
     $("#addOrgan").on('click', function (e) {
         e.preventDefault();

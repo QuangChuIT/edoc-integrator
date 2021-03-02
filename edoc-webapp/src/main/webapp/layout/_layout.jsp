@@ -1132,6 +1132,11 @@
     </form>
 </script>
 
+<script id="organSelect" type="application/x-jquery-tmpl">
+<div>
+    <input type="checkbox" class="organ-active" data-id="${id}">
+</div>
+</script>
 <script id="organNameTemplate" type="text/x-jquery-tmpl">
 <div>
     <a href=javascript:void(0)" title="${name}" data-id="${id}"
@@ -1233,12 +1238,12 @@
             </div>
             <div class="form-group">
                 <div class="col-md-3 col-sm-6 col-xs-12">
-                    <label class="control-label" for="telephone">
+                    <label class="control-label" for="modifiedDate">
                         ${organ_message.table_header_modified_date}
                     </label>
                 </div>
                 <div class="col-md-9 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" readonly id="telephone" value="{{if modifiedDate}}${convertToDate(modifiedDate).formatDate()}{{else}}${app_message.no_data}{{/if}}">
+                    <input type="text" class="form-control" readonly id="modifiedDate" value="{{if modifiedDate}}${convertToDate(modifiedDate).formatDate()}{{else}}${app_message.no_data}{{/if}}">
                 </div>
             </div>
              <div class="form-group">

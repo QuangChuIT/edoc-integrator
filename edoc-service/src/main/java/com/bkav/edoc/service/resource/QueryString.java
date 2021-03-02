@@ -34,7 +34,7 @@ public class QueryString {
             "where ed.to_organ_domain like concat('%',:organDomain,'%') and ed.is_draft=false " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
-            "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE#";
+            "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_OUTBOX_TMP = "select count(ed.document_id) from edoc_document ed " +
             "where from_organ_domain = :organDomain and is_draft=false " +

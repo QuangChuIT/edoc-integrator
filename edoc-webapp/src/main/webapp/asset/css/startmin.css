@@ -1700,13 +1700,17 @@ a:focus {
 .form-input {
     margin-bottom: 15px;
 }
-.form-input input {
+#docCodeSearch {
     width: 100% !important;
+    height: 32px;
+    border-radius: 0;
+    border: 1px solid #aaa;
 }
 
 #btn-search-filter {
-    margin-left: 35px;
-    width: 100% !important;
+    margin: auto;
+    width: 40% !important;
+    /*float: right;*/
 }
 
 #header-nav [class^="col"] {

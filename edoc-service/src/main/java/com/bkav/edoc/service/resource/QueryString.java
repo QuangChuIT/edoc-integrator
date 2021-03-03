@@ -1,61 +1,61 @@
 package com.bkav.edoc.service.resource;
 
 public class QueryString {
-    public static String BASE_QUERY_DOCUMENT_INBOX_TMP = "select * from edoc_document ed where ed.to_organ_domain like" +
-            " :organDomain and ed.is_draft=false and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
+    public static String BASE_QUERY_DOCUMENT_INBOX_TMP = "select * from edoc_document ed where (:organDomain is null or" +
+            " ed.to_organ_domain like concat('%',:organDomain,'%')) and ed.is_draft=false and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
             " and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan)" +
             " and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String BASE_QUERY_DOCUMENT_OUTBOX_TMP = "select * from edoc_document " +
-            "ed where ed.from_organ_domain = :organDomain and ed.is_draft=false " +
+            "ed where (:organDomain is null or ed.from_organ_domain = :organDomain) and ed.is_draft=false " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
             "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String BASE_QUERY_DOCUMENT_DRAFT_TMP = "select * from edoc_document ed " +
-            "where ed.from_organ_domain = :organDomain and ed.is_draft=true " +
+            "where (:organDomain is null or ed.from_organ_domain = :organDomain) and ed.is_draft=true " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
             "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String BASE_QUERY_DOCUMENT_INBOX_NOT_RECEIVER_TMP = "select * from edoc_document ed inner join edoc_notification n on ed.document_id = n.document_id " +
-            "where n.taken = 0 and n.receiver_id = :organDomain and ed.is_draft=false " +
+            "where n.taken = 0 and (:organDomain is null or n.receiver_id = :organDomain) and ed.is_draft=false " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
             "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String BASE_QUERY_DOCUMENT_INBOX_RECEIVER_TMP = "select * from edoc_document ed INNER JOIN edoc_notification n on ed.document_id = n.document_id" +
-            " where n.taken = 1 and n.receiver_id = :organDomain and ed.is_draft=false" +
+            " where n.taken = 1 and (:organDomain is null or n.receiver_id = :organDomain) and ed.is_draft=false" +
             " and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
             " and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan)" +
             " and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_INBOX_TMP = "select count(1) from edoc_document ed " +
-            "where ed.to_organ_domain like concat('%',:organDomain,'%') and ed.is_draft=false " +
+            "where (:organDomain is null or ed.to_organ_domain like concat('%',:organDomain,'%')) and ed.is_draft=false " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
             "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_OUTBOX_TMP = "select count(ed.document_id) from edoc_document ed " +
-            "where from_organ_domain = :organDomain and is_draft=false " +
+            "where (:organDomain is null or from_organ_domain = :organDomain) and is_draft=false " +
             "and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%')) " +
             "and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan) " +
             "and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_INBOX_NOT_RECEIVER_TMP = "select count(ed.document_id) from edoc_document ed inner join edoc_notification n " +
-            "on ed.document_id = n.document_id where n.taken = 0 and n.receiver_id = :organDomain and ed.is_draft=false" +
+            "on ed.document_id = n.document_id where n.taken = 0 and (:organDomain is null or n.receiver_id = :organDomain) and ed.is_draft=false" +
             " and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
             " and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan)" +
             " and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_INBOX_RECEIVER_TMP = "select count(ed.document_id) from edoc_document ed inner join edoc_notification n " +
-            "on ed.document_id = n.document_id where n.taken = 1 and n.receiver_id = :organDomain and ed.is_draft=false" +
+            "on ed.document_id = n.document_id where n.taken = 1 and (:organDomain is null or n.receiver_id = :organDomain) and ed.is_draft=false" +
             " and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
             " and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan)" +
             " and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";
 
     public static String QUERY_COUNT_DOCUMENT_DRAFT_TMP = "select count(ed.document_id) from edoc_document ed " +
-            "where ed.from_organ_domain = :organDomain and ed.is_draft=true" +
+            "where (:organDomain is null or ed.from_organ_domain = :organDomain) and ed.is_draft=true" +
             " and (:toOrgan is null or ed.to_organ_domain like concat('%',:toOrgan,'%'))" +
             " and (:fromOrgan is null or ed.from_organ_domain = :fromOrgan)" +
             " and (:docCode is null or ed.doc_code = :docCode) #WHERE_CLAUSE# #ORDER_CLASUE#";

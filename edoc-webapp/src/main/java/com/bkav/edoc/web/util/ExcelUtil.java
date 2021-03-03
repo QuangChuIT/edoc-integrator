@@ -41,7 +41,7 @@ public class ExcelUtil {
         excelService.ExportSampleOrganExcelFile(response);
     }
 
-    public static long pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public static Map<String, Long> pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         return excelService.pushExcelDataToSSO(users);
     }
 

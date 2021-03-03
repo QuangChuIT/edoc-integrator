@@ -56,10 +56,10 @@
                     <i class="glyphicon glyphicon-plus"></i>
                     <spring:message code="edoc.button.add.organ"/>
                 </button>
-                <button class="btn btn-danger deleteorgan-button" id="deleteOrgans">
+                <%--<button class="btn btn-danger deleteorgan-button" id="deleteOrgans">
                     <i class="glyphicon glyphicon-remove"></i>
                     <spring:message code="edoc.button.delete.organs"/>
-                </button>
+                </button>--%>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-organ">
             </table>

@@ -67,7 +67,7 @@ let organManage = {
             paging: true,
             info: false,
             columns: [
-                {
+                /*{
                     "data": null,
                     "orderable": false,
                     "render": (data, type, row) => {
@@ -75,7 +75,7 @@ let organManage = {
                             return $('#organSelect').tmpl(data).html();
                         return data;
                     }
-                },
+                },*/
                 {
                     "name": "name",
                     "title": organ_message.table_header_name,
@@ -111,7 +111,7 @@ let organManage = {
                 }
             ],
             language: app_message.language,
-            order: [[4, "desc"]]
+            order: [[3, "desc"]]
         });
     },
     reGenerateToken: function (organId) {
@@ -172,7 +172,7 @@ let organManage = {
                     }
                 },
                 error: function (error) {
-                    $.notify(error.responseText, "error");
+                    $.notify(error.responseJSON.errors, "error");
                 }
             });
         }

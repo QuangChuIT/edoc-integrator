@@ -69,12 +69,12 @@
             <hr>
             <div class="form-input">
                 <div class="form-group" id="btn-search-filter">
-                    <button class="btn btn-danger" id="btn-searchFilter-reset">
-                        <spring:message code="edoc.button.search.reset"/>
-                    </button>
-                    <button class="btn btn-success" id="btn-searchFilter-confirm">
-                        <spring:message code="edoc.button.confirm"/>
-                    </button>
+                    <a href="javascript:void(0)" class="btn btn-info" id="btn-searchFilter-reset">
+                        <span class="glyphicon glyphicon-erase"></span>
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-success" id="btn-searchFilter-confirm">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </a>
                 </div>
             </div>
         </div>

@@ -228,23 +228,30 @@ public class DynamicRestContactController {
                     boolean agency = contactRequest.getAgency();
                     boolean receiveNotify = contactRequest.getReceiveNotify();
 
-                    EdocDynamicContact organ = new EdocDynamicContact();
-                    organ.setName(name);
-                    organ.setDomain(domain);
-                    organ.setInCharge(inChart);
-                    organ.setAddress(address);
-                    organ.setEmail(email);
-                    organ.setTelephone(telephone);
-                    organ.setStatus(true);
-                    organ.setAgency(agency);
-                    organ.setReceiveNotify(receiveNotify);
-                    String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
-                    organ.setToken(newToken);
-                    organ.setCreateDate(new Date());
-                    organ.setModifiedDate(new Date());
+                    EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(domain);
+                    if (contact != null) {
+                        errors.add(messageSourceUtil.getMessage("organ.add.error.duplicate", null));
+                        code = 400;
+                        message = messageSourceUtil.getMessage("organ.message.create.fail", null);
+                    } else {
+                        EdocDynamicContact organ = new EdocDynamicContact();
+                        organ.setName(name);
+                        organ.setDomain(domain);
+                        organ.setInCharge(inChart);
+                        organ.setAddress(address);
+                        organ.setEmail(email);
+                        organ.setTelephone(telephone);
+                        organ.setStatus(true);
+                        organ.setAgency(agency);
+                        organ.setReceiveNotify(receiveNotify);
+                        String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
+                        organ.setToken(newToken);
+                        organ.setCreateDate(new Date());
+                        organ.setModifiedDate(new Date());
 
-                    EdocDynamicContactServiceUtil.createContact(organ);
-                    message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                        EdocDynamicContactServiceUtil.createContact(organ);
+                        message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                    }
                 } else {
                     code = 400;
                     message = messageSourceUtil.getMessage("organ.message.create.fail", null);

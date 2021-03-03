@@ -1855,6 +1855,7 @@
 <script src="<c:url value="/asset/js/metisMenu.min.js"/>"></script>
 <!-- DataTables JavaScript -->
 <script src="<c:url value="/asset/js/dataTables/jquery.dataTables.min.js"/>"></script>
+<script src="<c:url value="/asset/js/dataTables/dataTables.select.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/dataTables.bootstrap.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/dataTables.responsive.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>

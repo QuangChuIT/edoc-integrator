@@ -255,7 +255,6 @@ public class EdocDynamicContactService {
         if (parentOrganSplit[0].equals("000")) {
             if (parentOrganSplit[1].equals("00")) {
                 if (parentOrganSplit[2].equals("00")) {
-                    System.out.println("This is root !!!!!");
                     index = 3;
                 } else
                     index = 2;

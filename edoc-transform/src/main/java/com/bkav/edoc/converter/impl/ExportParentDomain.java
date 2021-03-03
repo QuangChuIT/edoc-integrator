@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -29,25 +28,38 @@ public class ExportParentDomain {
             stm = connection.createStatement();
             ResultSet rs = stm.executeQuery(StringQuery.GET_DOMAIN);
 
-            List<ParentDynamiccontact> list = new ArrayList<>();
+            //List<ParentDynamiccontact> list = new ArrayList<>();
 
             while (rs.next()) {
                 String domain = rs.getString(1);
                 String parentDomain = getParentDomain(domain);
-                System.out.println(domain + ": " + parentDomain);
+                LOGGER.info("Find parent of organ with domain " + domain + " : " + parentDomain);
+
                 EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(domain);
-                String name = "";
+                if (parentDomain.equals("Root")) {
+                    contact.setParent(contact.getId());
+                    EdocDynamicContactServiceUtil.updateContact(contact);
+                } else {
+                    EdocDynamicContact parentContact = EdocDynamicContactServiceUtil.findContactByDomain(parentDomain);
+                    if (parentContact != null) {
+                        contact.setParent(parentContact.getId());
+                        EdocDynamicContactServiceUtil.updateContact(contact);
+                    }
+                }
+                LOGGER.info("Updated organ with domain " + domain);
+
+                /*String name = "";
                 if (contact != null) {
-                    name = contact.getName();
+                    //name = contact.getName();
                     ParentDynamiccontact parentDynamiccontact = new ParentDynamiccontact();
                     parentDynamiccontact.setName(name);
                     parentDynamiccontact.setDomain(domain);
                     parentDynamiccontact.setParentDomain(parentDomain);
                     list.add(parentDynamiccontact);
-                }
+                }*/
             }
-            exportToExcel(list);
-        } catch (SQLException | IOException throwable) {
+            //exportToExcel(list);
+        } catch (SQLException throwable) {
             LOGGER.error(throwable);
         }
     }
@@ -60,7 +72,7 @@ public class ExportParentDomain {
             if (subDomain[1].equals("00")) {
                 if (subDomain[2].equals("00")){
                     if (subDomain[3].equals("H53"))
-                        System.out.println("This is root !!!!!!!!!");
+                        return "Root";
                 } else {
                     subDomain[2] = "00";
                 }

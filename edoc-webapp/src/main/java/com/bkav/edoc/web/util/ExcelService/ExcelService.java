@@ -5,6 +5,8 @@ import com.bkav.edoc.service.database.util.*;
 import com.bkav.edoc.web.payload.ImportExcelError;
 import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.TokenUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -18,6 +20,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ExcelService {
 
@@ -382,21 +385,24 @@ public class ExcelService {
         LOGGER.info("Write a sample file for organs to Excel END!!!!!!!!!");
     }
 
-    public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public Map<String, Long> pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        Map<String, Long> results = new HashMap<>();
+
         String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
         String is_password = PropsUtil.get(ConfigParams.IS_PASSWORD);
         String is_post_url = PropsUtil.get(ConfigParams.IS_POST_URL);
 
         // Count number of user push to sso successfully
-        long count = 0;
+        long success = 0, duplicate = 0, fail = 0;
         /* Push each user to SSO:*/
         for (User user : users) {
-            User checkExist = UserServiceUtil.finUserByUsername(user.getUsername());
-            if (checkExist == null) {
+            String out = "";
+            User checkExistUSer = UserServiceUtil.finUserByUsername(user.getUsername());
+            if (checkExistUSer == null) {
                 //Convert user object to json
                 //Then, push json to sso
                 String json = PostUserToSSO.createJson(user);
-                String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
+                out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
                 if (!out.equals("")) {
                     // Set SSO field to true
                     user.setSso(true);
@@ -411,15 +417,28 @@ public class ExcelService {
                 }
             } else {
                 LOGGER.info("Duplicate user with username " + user.getUsername());
-                if (!checkExist.isSso()) {
-                    String json = PostUserToSSO.createJson(checkExist);
-                    String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
+                if (!checkExistUSer.isSso()) {
+                    String json = PostUserToSSO.createJson(checkExistUSer);
+                    out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
                     LOGGER.info(out);
                 }
             }
-            count++;
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> map = mapper.readValue(out, Map.class);
+
+            String status = map.get("status");
+            if (status.equals("201"))
+                success++;
+            else if (status.equals("409"))
+                duplicate++;
+            else
+                fail++;
         }
-        return count;
+        results.put("Success", success);
+        results.put("Duplicate", duplicate);
+        results.put("Fail", fail);
+
+        return results;
     }
 
     public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {

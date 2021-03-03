@@ -178,7 +178,8 @@ let userManage = {
                     }
                 },
                 error: function (error) {
-                    $.notify(error.responseText, "error");
+                    console.log(error);
+                    $.notify(error.responseJSON.errors, "error");
                 }
             });
         }
@@ -312,6 +313,20 @@ $(document).ready(function () {
     $("#email-template-menu").on('click', function (e) {
         e.preventDefault();
     });
+
+    $("#syncUserSSO").on('click', function () {
+        $.ajax({
+            url: "/user/push/toSSO",
+            type: "POST",
+            success: function (response) {
+                console.log(response);
+                $.notify(response.message, "success");
+            },
+            error: function (error) {
+                $.notify(error.errors, "error");
+            }
+        })
+    })
 });
 
 // Call ajax to import users from excel file

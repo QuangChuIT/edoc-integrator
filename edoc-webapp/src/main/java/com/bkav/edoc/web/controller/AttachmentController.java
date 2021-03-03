@@ -86,7 +86,7 @@ public class AttachmentController {
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
 
-                if (admin.equals(PropsUtil.get("admin.username"))) {
+                if (admin.equals(com.bkav.edoc.web.util.PropsUtil.get("user.admin.username"))) {
                     organDomain = attachment.getOrganDomain();
                 }
                 String fromOrgan = attachment.getOrganDomain();

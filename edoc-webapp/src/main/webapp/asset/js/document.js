@@ -479,6 +479,7 @@ $(document).ready(function () {
             });
             let toOrganNames = [];
             data.toOrgan.forEach(function (organ, index) {
+
                 toOrganNames.push(organ["name"]);
             });
             data.toOrganName = toOrganNames.join(", ");

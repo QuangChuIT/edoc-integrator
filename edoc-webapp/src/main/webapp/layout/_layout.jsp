@@ -365,6 +365,20 @@
                     </div>
                     <br>
                     <div class="form-group">
+                        <div class="col-md-5 col-sm-6 col-xs-12">
+                            <label class="control-label">
+                                <spring:message code="organ.add.send.vpcp"/>
+                            </label>
+                        </div>
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                            <label class="switch">
+                                <input type="checkbox" id="sendToVPCP"/>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
                         <div class="col-md-3 col-sm-6 col-xs-12">
                         </div>
                         <div class="col-md-9 col-sm-6 col-xs-12">
@@ -1077,7 +1091,7 @@
         <br>
         <div class="form-group">
             <div class="col-md-5 col-sm-6 col-xs-12">
-                <label class="control-label" for="editAddress">
+                <label class="control-label" for="agencySelectedEdit">
                     ${organ_message.organ_table_header_agency}
                 </label>
             </div>
@@ -1098,7 +1112,7 @@
         <br>
         <div class="form-group">
             <div class="col-md-5 col-sm-6 col-xs-12">
-                <label class="control-label" for="editAddress">
+                <label class="control-label" for="receiveNotifySelectedEdit">
                     ${organ_message.organ_table_header_receive_notify}
                 </label>
             </div>
@@ -1111,6 +1125,27 @@
                 {{else receiveNotify == false}}
                 <label class="switch">
                     <input type="checkbox" id="receiveNotifySelectedEdit"/>
+                    <span class="slider round"></span>
+                </label>
+                {{/if}}
+            </div>
+        </div>
+        <br>
+        <div class="form-group">
+            <div class="col-md-5 col-sm-6 col-xs-12">
+                <label class="control-label" for="sendToVPCPEdit">
+                    ${organ_message.organ_table_header_send_vpcp}
+                </label>
+            </div>
+            <div class="col-md-7 col-sm-6 col-xs-12">
+                {{if sendToVPCP == true}}
+                <label class="switch">
+                    <input type="checkbox" id="sendToVPCPEdit" checked/>
+                    <span class="slider round"></span>
+                </label>
+                {{else sendToVPCP == false}}
+                <label class="switch">
+                    <input type="checkbox" id="sendToVPCPEdit"/>
                     <span class="slider round"></span>
                 </label>
                 {{/if}}

@@ -41,8 +41,12 @@ public class ExcelUtil {
         excelService.ExportSampleOrganExcelFile(response);
     }
 
-    public static Map<String, Long> pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public static Map<String, Long> pushUsersToSSO(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, InterruptedException {
         return excelService.pushExcelDataToSSO(users);
+    }
+
+    public static Map<String, Long> syncUserToSSo(List<User> users) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, InterruptedException {
+        return excelService.syncUserToSSO(users);
     }
 
     public static void exportExcelDailyCounter(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {

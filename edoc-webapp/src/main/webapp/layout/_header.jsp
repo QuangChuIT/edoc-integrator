@@ -64,7 +64,7 @@
                 <label class="control-label" for="docCodeSearch">
                     <spring:message code="edoc.search.docCode"/>
                 </label>
-                <input type="text" id="docCodeSearch" value="">
+                <input class="form-control" type="text" id="docCodeSearch" value="">
             </div>
             <hr>
             <div class="form-input">

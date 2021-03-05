@@ -35,7 +35,7 @@ let edocTrace = {
                 $('#edocPublicTraceTmpl').tmpl(data).appendTo('#publicTraceContent');
             });
         } else {
-            console.log("lol");
+            //console.log("lol");
         }
     }
 }

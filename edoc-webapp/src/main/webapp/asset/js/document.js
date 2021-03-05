@@ -478,9 +478,17 @@ $(document).ready(function () {
                 console.log(key.fileType + " " + index);
             });
             let toOrganNames = [];
+            let takenOrgan = "";
             data.toOrgan.forEach(function (organ, index) {
-
-                toOrganNames.push(organ["name"]);
+                data.notifications.forEach(function (notification, index) {
+                    if (notification.toOrganization["domain"] === organ["domain"]) {
+                        if (notification["taken"])
+                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_taken + ")";
+                        else
+                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_not_taken + ")";
+                    }
+                })
+                toOrganNames.push(takenOrgan);
             });
             data.toOrganName = toOrganNames.join(", ");
             data.code = data.codeNumber + "/" + data.codeNotation;
@@ -671,6 +679,7 @@ $(document).ready(function () {
         docCode = ($("#docCodeSearch").val() === "" ? null : $("#docCodeSearch").val());
 
         $("#searchFilter").toggle();
+        edocDocument.appSetting.dataTable.clear();
         edocDocument.renderDatatable(fromOrgan, toOrgan, docCode);
         fromOrgan = null, toOrgan = null, docCode = null;
     })
@@ -679,6 +688,15 @@ $(document).ready(function () {
         $('#fromOrganSearch, #toOrganSearch').val(null).trigger('change');
         $("#docCodeSearch").val("");
     })
+
+    /*$(document).mouseup(function(e) {
+        var searchFill = $("#searchFilter");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!searchFill.is(e.target) && searchFill.has(e.target).length === 0) {
+            searchFill.hide();
+        }
+    });*/
 
     $("#fromOrganSearch").select2({
         tags: true,

@@ -291,12 +291,11 @@ public class UserRestController {
                 } else
                     numberUserDuplicate.getAndIncrement();
             });
-            Map<String, Long> resultsToSSOSuccess = ExcelUtil.pushUsersToSSO(userNotInSSO);
+            Map<String, Long> resultsToSSOSuccess = ExcelUtil.syncUserToSSo(userNotInSSO);
             long success = resultsToSSOSuccess.get("Success");
-            long duplicate = resultsToSSOSuccess.get("Duplicate");
             long fail = resultsToSSOSuccess.get("Fail");
 
-            Response response = new Response(code, errors, messageSourceUtil.getMessage("user.message.push.to.sso", new Object[]{success, duplicate, fail}));
+            Response response = new Response(code, errors, messageSourceUtil.getMessage("user.message.push.to.sso", new Object[]{success, numberUserDuplicate, fail}));
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));

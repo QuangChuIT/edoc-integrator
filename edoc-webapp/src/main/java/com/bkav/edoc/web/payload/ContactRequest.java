@@ -12,6 +12,7 @@ public class ContactRequest implements Serializable {
     private String telephone;
     private boolean agency;
     private boolean receiveNotify;
+    private boolean sendToVPCP;
 
     public long getId() {
         return id;
@@ -83,5 +84,13 @@ public class ContactRequest implements Serializable {
 
     public void setReceiveNotify(boolean receiveNotify) {
         this.receiveNotify = receiveNotify;
+    }
+
+    public boolean getSendToVPCP() {
+        return sendToVPCP;
+    }
+
+    public void setSendToVPCP(boolean sendToVPCP) {
+        this.sendToVPCP = sendToVPCP;
     }
 }

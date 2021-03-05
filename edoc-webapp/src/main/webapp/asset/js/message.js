@@ -64,6 +64,8 @@ let app_message = {
     "edoc_message_error_export": "Lỗi xuất tệp excel",
     "edoc_message_send_telegram_success": "Cảnh báo lên Telegram thành công !",
     "edoc_message_send_email_success": "Cảnh báo lên Email thành công !",
+    "edoc_organ_taken": "Đã nhận",
+    "edoc_organ_not_taken": "Chưa nhận",
     //Datatable setting
     "language": {
         "decimal": "",
@@ -167,6 +169,7 @@ let organ_message = {
     "organ_table_header_phonenumber": "Số điện thoại",
     "organ_table_header_agency": "Nội tỉnh",
     "organ_table_header_receive_notify": "Nhận thông báo",
+    "organ_table_header_send_vpcp": "Liên thông VPCP",
     "organ_token": "Token",
     "organ_status": "Trạng thái",
     "organ_parent": "Đơn vị cha",

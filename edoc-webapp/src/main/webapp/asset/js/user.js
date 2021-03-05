@@ -151,7 +151,7 @@ let userManage = {
         let addEmailAddress = $("#addEmailAddress").val();
 
         if (validateAddUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
-            e.preventDefault();
+            //e.preventDefault();
             //console.log(app_message.edoc_validate_document_request_fail);
         } else {
             let addUserRequest = {
@@ -318,6 +318,9 @@ $(document).ready(function () {
         $.ajax({
             url: "/user/push/toSSO",
             type: "POST",
+            beforeSend: function () {
+                $("#overlay").show();
+            },
             success: function (response) {
                 console.log(response);
                 $.notify(response.message, "success");
@@ -325,7 +328,9 @@ $(document).ready(function () {
             error: function (error) {
                 $.notify(error.errors, "error");
             }
-        })
+        }).done(function () {
+            $("#overlay").hide();
+        });
     })
 });
 

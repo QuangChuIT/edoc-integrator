@@ -140,10 +140,11 @@ let organManage = {
         let telephone = $("#telephone").val();
         let agency = checkAgencySelected();
         let receiveNotify = checkReceivedNotify();
+        let sendToVPCP = checkSendToVPCP();
 
         if (validateOrgan(name, domain, inCharge, address, email)) {
             //console.log(app_message.edoc_validate_document_request_fail);
-            e.preventDefault();
+            //e.preventDefault();
         } else {
             let contactRequest = {
                 "name": name,
@@ -153,7 +154,8 @@ let organManage = {
                 "inCharge": inCharge,
                 "telephone": telephone,
                 "agency": agency,
-                "receiveNotify": receiveNotify
+                "receiveNotify": receiveNotify,
+                "sendToVPCP": sendToVPCP
             };
             $.ajax({
                 type: "POST",
@@ -187,8 +189,9 @@ let organManage = {
         let email = $("#editEmail").val();
         let inCharge = $("#editInCharge").val();
         let telephone = $("#editTelephone").val();
-        let agency = checkAgencySelectedEdit();
-        let receiveNotify = checkReceivedNotifyEdit();
+        let agency = checkAgencySelected();
+        let receiveNotify = checkReceivedNotify();
+        let sendToVPCP = checkSendToVPCP();
 
         let contactRequest = {
             "id": id,
@@ -199,7 +202,8 @@ let organManage = {
             "inCharge": inCharge,
             "telephone": telephone,
             "agency": agency,
-            "receiveNotify": receiveNotify
+            "receiveNotify": receiveNotify,
+            "sendToVPCP": sendToVPCP
         };
         $.ajax({
             type: "PUT",
@@ -247,8 +251,8 @@ let organManage = {
 $(document).ready(function () {
     $("#dataTables-organ").on('click', 'tbody>tr', function (e) {
         let organId = $(this).attr("id");
-        let $cell = $(e.target).closest('td');
-        if ($cell.index() > 0) {
+        /*let $cell = $(e.target).closest('td');
+        if ($cell.index() > 0) {*/
             $.get("/contact/-/document/contacts/" + organId, function (data) {
                 $('#organ-detail').empty();
                 $('#organDetailTemplate').tmpl(data).appendTo('#organ-detail');
@@ -257,7 +261,7 @@ $(document).ready(function () {
                 backdrop: 'static',
                 keyboard: false
             });
-        }
+        //}
     });
 
     $("#deleteOrgans").on('click', function() {
@@ -338,7 +342,7 @@ $(document).on("click", "#importOrganFromExcel", function (e) {
                 willOpen: function () {
                     $("#overlay").show();
                 },
-                success: function(response) {
+                success: (response) => {
                     let successOptions = {
                         autoHideDelay: 200000,
                         showAnimation: "fadeIn",
@@ -427,14 +431,8 @@ $(document).on('click', '#btn-edit-organ-cancel', function (e) {
 })
 
 function checkAgencySelected() {
-    if ($("#agencySelected").is(":checked")) {
-        return true;
-    } else {
-        return false;
-    }
-}
-function checkAgencySelectedEdit() {
-    if ($("#agencySelectedEdit").is(":checked")) {
+    if ($("#agencySelected").is(":checked") ||
+        $("#agencySelectedEdit").is(":checked")) {
         return true;
     } else {
         return false;
@@ -442,14 +440,17 @@ function checkAgencySelectedEdit() {
 }
 
 function checkReceivedNotify() {
-    if ($("#receiveNotifySelected").is(":checked")) {
+    if ($("#receiveNotifySelected").is(":checked") ||
+        $("#receiveNotifySelectedEdit").is(":checked")) {
         return true;
     } else {
         return false;
     }
 }
-function checkReceivedNotifyEdit() {
-    if ($("#receiveNotifySelectedEdit").is(":checked")) {
+
+function checkSendToVPCP() {
+    if ($("#sendToVPCP").is(":checked") ||
+        $("#sendToVPCPEdit").is(":checked")) {
         return true;
     } else {
         return false;

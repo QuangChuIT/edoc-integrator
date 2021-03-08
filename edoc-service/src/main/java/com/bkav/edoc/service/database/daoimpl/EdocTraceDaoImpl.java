@@ -18,14 +18,14 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
 
     public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
         Session currentSession = openCurrentSession();
-        try{
+        try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:responseForOrganId and et.enable=:enable order by et.timeStamp DESC");
             Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
             query.setParameter("responseForOrganId", responseForOrganId);
             query.setParameter("enable", true);
             return query.list();
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error(e);
             return new ArrayList<>();
         } finally {
@@ -40,6 +40,30 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         } catch (Exception e) {
             LOGGER.error("Error when disable trace " + Arrays.toString(e.getStackTrace()));
         }
+    }
+
+    @Override
+    public boolean exists(String fromOrgan, String toOrgan, String code, int statusCode) {
+        Session currentSession = openCurrentSession();
+        boolean exists = false;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:toOrgan and et.fromOrganDomain=:fromOrgan and et.code=:code and et.statusCode=:statusCode");
+            Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+            query.setParameter("toOrgan", toOrgan);
+            query.setParameter("fromOrgan", fromOrgan);
+            query.setParameter("code", code);
+            query.setParameter("statusCode", statusCode);
+            List<EdocTrace> result = query.getResultList();
+            if (result != null && result.size() > 0) {
+                exists = true;
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+        return exists;
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocTraceDaoImpl.class);

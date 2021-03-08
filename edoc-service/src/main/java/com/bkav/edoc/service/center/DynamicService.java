@@ -7,6 +7,7 @@ import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.*;
+import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.mineutil.*;
@@ -374,10 +375,27 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             List<Error> errors = new ArrayList<>();
             // update trace
             LOGGER.info(status.toString());
+            boolean isExists = traceService.exists(status.getFrom().getOrganId(),
+                    status.getResponseFor().getOrganId(), status.getResponseFor().getCode(), GetterUtil.getInteger(status.getStatusCode(), 1));
+            if (isExists) {
+                LOGGER.warn("Exist trace on esb with code " + status.getResponseFor().getCode() + " from_organ_domain "
+                        + status.getFrom().getOrganId() + " to_organ_domain "
+                        + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode());
+                errorList.add(new Error("M.UpdateTraces", "Exist trace on esb with code "
+                        + status.getResponseFor().getCode() + " from_organ_domain "
+                        + status.getFrom().getOrganId() + " to_organ_domain "
+                        + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode()));
+
+                report = new Report(false, new ErrorList(errorList));
+
+                bodyChildDocument = xmlUtil.convertEntityToDocument(
+                        Report.class, report);
+                map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
+                return map;
+            }
             EdocTrace trace = traceService.updateTrace(status, errors);
             if (errors.size() > 0) {
                 report = new Report(false, new ErrorList(errors));
-
             } else {
                 ResponseFor responseFor = checker.checkSendToVPCP(status.getResponseFor());
                 if (responseFor != null) {

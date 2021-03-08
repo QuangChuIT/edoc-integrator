@@ -118,6 +118,10 @@ public class EdocTraceService {
         }
     }
 
+    public boolean exists(String fromOrgan, String toOrgan, String code, int statusCode) {
+        return traceDaoImpl.exists(fromOrgan, toOrgan, code, statusCode);
+    }
+
     private void saveEdocTraceCache(EdocTrace trace, String responseForOrganId) {
         // TODO: Cache
         List obj = RedisUtil.getInstance().get(RedisKey.getKey(responseForOrganId, RedisKey.GET_TRACE_KEY), List.class);

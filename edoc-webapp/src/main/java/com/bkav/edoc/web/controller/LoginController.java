@@ -76,13 +76,8 @@ public class LoginController {
 
         String idToken = CookieUtil.getValue(request, OAuth2Constants.SSO_ID_TOKEN);
         String redirectUri = "";
-        if (session != null) {
-            redirectUri = (String) session.getAttribute(OAuth2Constants.CALL_BACK_URL);
-        }
 
-        if (redirectUri != null && redirectUri.equals("")) {
-            redirectUri = PropsUtil.get("callBackUrl");
-        }
+        redirectUri = PropsUtil.get("callBackUrl");
 
         if (session_state != null && idToken != null) {
             StringBuilder logoutUrl = new StringBuilder();

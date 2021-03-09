@@ -77,6 +77,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             document = this.findById(documentId);
             if (document == null) {
                 LOGGER.error("Not found document with document id " + documentId);
+
             }
             session.getTransaction().commit();
         } catch (Exception e) {

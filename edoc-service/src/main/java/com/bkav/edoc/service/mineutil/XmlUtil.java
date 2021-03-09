@@ -90,7 +90,7 @@ public class XmlUtil {
     private Document getDocument(SOAPEnvelope envelope, DocumentBuilderFactory factory) {
         try {
             String str = envelope.toString();
-            //LOGGER.info(str);
+            /*LOGGER.info(str);*/
             InputStream is = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(is);
@@ -233,8 +233,11 @@ public class XmlUtil {
             }
 
             OMElement timestamp = factoryOM.createOMElement("Timestamp", ns);
-
-            timestamp.setText(sdf.format(item.getTimestamp()));
+            Date timeDate = item.getTimestamp();
+            if (timeDate == null) {
+                timeDate = new Date();
+            }
+            timestamp.setText(sdf.format(timeDate));
 
             traceHeader.addChild(timestamp);
 

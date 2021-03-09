@@ -497,6 +497,7 @@ $(document).ready(function () {
                 toOrganNames.push(takenOrgan);
             });
             data.toOrganName = toOrganNames.join(", ");
+            data.notifications.foreach
             data.code = data.codeNumber + "/" + data.codeNotation;
             let documentEle = $("#" + documentId);
             if (documentEle.hasClass("not-visited")) {

@@ -62,6 +62,8 @@ public class EdocTraceService {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
                 errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));
                 return null;
+            } else {
+                LOGGER.info("Q.UpdateTrace found document with from organ " + toOrganDomain + " and code " + code);
             }
             // set info to edoc trace
             EdocTrace edocTrace = new EdocTrace();
@@ -90,6 +92,7 @@ public class EdocTraceService {
             // insert trace to db
             currentSession.beginTransaction();
             currentSession.persist(edocTrace);
+            LOGGER.info("Q.UpdateTrace. Save successfully !");
             String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
             DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
             if (documentCacheUpdate != null) {
@@ -101,6 +104,7 @@ public class EdocTraceService {
                 MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
             }
             currentSession.getTransaction().commit();
+            LOGGER.info("Q.UpdateTrace. Commit successfully !");
             return edocTrace;
         } catch (Exception e) {
             LOGGER.error("Error update trace with status " + status.toString() + " cause " + Arrays.toString(e.getStackTrace()));
@@ -112,6 +116,10 @@ public class EdocTraceService {
         } finally {
             traceDaoImpl.closeCurrentSession(currentSession);
         }
+    }
+
+    public boolean exists(String fromOrgan, String toOrgan, String code, int statusCode) {
+        return traceDaoImpl.exists(fromOrgan, toOrgan, code, statusCode);
     }
 
     private void saveEdocTraceCache(EdocTrace trace, String responseForOrganId) {

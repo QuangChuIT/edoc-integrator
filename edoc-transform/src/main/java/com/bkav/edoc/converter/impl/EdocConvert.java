@@ -94,7 +94,7 @@ public class EdocConvert {
     public static boolean checkSendToVPCP(String toOrganId) {
         boolean result = false;
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            String organIdExcept = PropsUtil.get("");
             List<String> stringList = Arrays.asList(organIdExcept.split("#"));
             String[] toDomains = toOrganId.split("#");
             for (String toOrgan : toDomains) {
@@ -113,7 +113,7 @@ public class EdocConvert {
     public static boolean checkReceiverExt(String fromOrganDomain) {
         boolean result = false;
         try {
-            String organIdExcept = PropsUtil.get("edoc.except.organId");
+            String organIdExcept = "";
             List<String> stringList = Arrays.asList(organIdExcept.split("#"));
             String organId = fromOrganDomain.substring(10, 13);
             if (!stringList.contains(organId)) {

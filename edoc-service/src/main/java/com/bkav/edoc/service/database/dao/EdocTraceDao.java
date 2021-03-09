@@ -9,4 +9,6 @@ public interface EdocTraceDao {
     List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId);
 
     void disableEdocTrace(EdocTrace trace);
+
+    boolean exists(String fromOrgan, String toOrgan, String code, int statusCode);
 }

@@ -509,12 +509,12 @@ public class ExcelService {
         return results;
     }
 
-    public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {
+    public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate, String keyword) throws IOException {
         List<EPublicStat> eStats;
         if (fromDate == null || toDate == null)
-            eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null);
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null, null);
         else
-            eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate);
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate, keyword);
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Thống kê văn bản điện tử");

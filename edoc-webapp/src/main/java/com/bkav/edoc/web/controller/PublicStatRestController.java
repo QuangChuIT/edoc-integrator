@@ -38,13 +38,21 @@ public class PublicStatRestController {
 
     @RequestMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
-                                           @RequestParam(value = "toDate", required = false) String toDate) {
-        if (fromDate == null || toDate == null) {
-            return EdocDailyCounterServiceUtil.getStatsDetail(null, null);
+                                           @RequestParam(value = "toDate", required = false) String toDate,
+                                           @RequestParam(value = "keyword", required = false) String keyword) {
+        //keyword = "000.00.20.H36";
+        if (fromDate == null || toDate == null || keyword == null) {
+            if (keyword == null)
+                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, null);
+            else
+                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword);
         } else {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);
-            return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue);
+            if (keyword == null)
+                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, null);
+            else
+                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, keyword);
         }
     }
 
@@ -190,22 +198,24 @@ public class PublicStatRestController {
     }
 
     @RequestMapping(value = "/public/-/stat/export/excel", method = RequestMethod.GET)
-    public void exportToExcel(HttpServletResponse response, @RequestParam(value = "fromDate", required = false) String fromDate,
-                              @RequestParam(value = "toDate", required = false) String toDate) throws IOException {
+    public void exportToExcel(HttpServletResponse response,
+                              @RequestParam(value = "fromDate", required = false) String fromDate,
+                              @RequestParam(value = "toDate", required = false) String toDate,
+                              @RequestParam(value = "keyword", required = false) String keyword) throws IOException {
         response.setContentType("application/octet-stream");
         String headerKey = "Content-Disposition";
 
         if (fromDate == null || toDate == null) {
             String headerValue = "attachment; filename=ThongKeVanBan.xlsx";
             response.setHeader(headerKey, headerValue);
-            ExcelUtil.exportExcelDailyCounter(response, null, null);
+            ExcelUtil.exportExcelDailyCounter(response, null, null, null);
         } else {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);
             String headerValue = "attachment; filename=ThongKeVanBan_" + DateUtils.format(fromDateValue, DateUtils.VN_DATE_FORMAT_D)
                     + "-" + DateUtils.format(toDateValue, DateUtils.VN_DATE_FORMAT_D) + ".xlsx";
             response.setHeader(headerKey, headerValue);
-            ExcelUtil.exportExcelDailyCounter(response, fromDateValue, toDateValue);
+            ExcelUtil.exportExcelDailyCounter(response, fromDateValue, toDateValue, keyword);
         }
     }
 

@@ -482,10 +482,16 @@ $(document).ready(function () {
             data.toOrgan.forEach(function (organ, index) {
                 data.notifications.forEach(function (notification, index) {
                     if (notification.toOrganization["domain"] === organ["domain"]) {
-                        if (notification["taken"])
-                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_taken + ")";
-                        else
-                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_not_taken + ")";
+                        if (notification["taken"]) {
+                            let status = app_message.edoc_organ_taken;
+                            //let takenStatus = status.fontcolor("blue");
+                            takenOrgan = organ["name"] + " (" + status + ")";
+                        }
+                        else {
+                            let status = app_message.edoc_organ_not_taken;
+                            //let notTakenStatus = status.fontcolor("red");
+                            takenOrgan = organ["name"] + " (" + status + ")";
+                        }
                     }
                 })
                 toOrganNames.push(takenOrgan);

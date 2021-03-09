@@ -19,7 +19,7 @@ public class StringQuery {
 
     public static final String GET_DATE_COUNTER = "Select distinct Date(sentDate) from edoc_document where year(sentDate)= 2020";
 
-    public static final String GET_DATE = "SELECT distinct Date(create_date) FROM edoc_document where Date(create_date) >= \"2021-01-01\"";
+    public static final String GET_DATE = "SELECT distinct Date(create_date) FROM edoc_document where Date(create_date) > \"2021-02-28\"";
 
     /*public static final String GET_DATE_COUNTER = "Select distinct Date(sent_date) from edoc_document where year(sent_date) = 2020";*/
 

@@ -9,6 +9,7 @@ import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import org.apache.log4j.Logger;
+import org.aspectj.weaver.ast.Or;
 import org.hibernate.Session;
 
 import javax.persistence.ParameterMode;
@@ -153,7 +154,12 @@ public class EdocDynamicContactService {
             storedProcedureQuery.registerStoredProcedureParameter("pageSize", Integer.class, ParameterMode.IN);
             storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
             storedProcedureQuery.setParameter("orderBy", paginationCriteria.getOrderBy());
-            storedProcedureQuery.setParameter("keyword", paginationCriteria.getSearch());
+            if (paginationCriteria.getSearch().equals(""))
+                storedProcedureQuery.setParameter("keyword", paginationCriteria.getSearch());
+            else {
+                String keyword = "\"" + paginationCriteria.getSearch() + "\"";
+                storedProcedureQuery.setParameter("keyword", keyword);
+            }
             storedProcedureQuery.setParameter("pageIdx", paginationCriteria.getPageNumber());
             storedProcedureQuery.setParameter("pageSize", paginationCriteria.getPageSize());
             totalRecords = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
@@ -179,6 +185,46 @@ public class EdocDynamicContactService {
             dynamicContactDaoImpl.closeCurrentSession(session);
         }
 
+    }
+
+    public List<OrganizationCacheEntry> getLevel3Contact() {
+        List<OrganizationCacheEntry> organizationCacheEntries;
+        String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_BY_KEY);
+        MemcachedUtil.getInstance().delete(cacheKey);
+        organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
+
+        if (organizationCacheEntries == null) {
+            organizationCacheEntries = new ArrayList<>();
+            List<EdocDynamicContact> contacts = dynamicContactDaoImpl.getAllChildrenContact("000.00.");
+
+            for (EdocDynamicContact contact : contacts) {
+                OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
+                organizationCacheEntries.add(organizationCacheEntry);
+            }
+
+            MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
+
+        }
+
+        return organizationCacheEntries;
+    }
+
+    public List<OrganizationCacheEntry> getOrganByKeyword(String keyword) {
+        List<OrganizationCacheEntry> organizationCacheEntries;
+        String cacheKey = MemcachedKey.getKey("", RedisKey.GET_LIST_CONTACT_BY_KEY);
+        MemcachedUtil.getInstance().delete(cacheKey);
+        organizationCacheEntries = (List<OrganizationCacheEntry>) MemcachedUtil.getInstance().read(cacheKey);
+        if (organizationCacheEntries == null) {
+            organizationCacheEntries = new ArrayList<>();
+            List<EdocDynamicContact> contacts = dynamicContactDaoImpl.getAllChildrenContact(keyword);
+            for (EdocDynamicContact contact : contacts) {
+                OrganizationCacheEntry organizationCacheEntry = MapperUtil.modelToOrganCache(contact);
+                organizationCacheEntries.add(organizationCacheEntry);
+            }
+            MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, organizationCacheEntries);
+        }
+
+        return organizationCacheEntries;
     }
 
     public Long countOrgan(boolean agency) {
@@ -271,7 +317,6 @@ public class EdocDynamicContactService {
                 break;
             regexParent += ".";
         }
-        System.out.println(regexParent);
         childOrgans = dynamicContactDaoImpl.getAllChildrenContact(regexParent);
         return childOrgans;
     }

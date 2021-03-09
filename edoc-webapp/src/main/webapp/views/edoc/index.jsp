@@ -72,10 +72,10 @@
                     <i class="fa fa-telegram"></i>
                     <spring:message code="edoc.not.taken.warning.telegram"/>
                 </button>
-                <button class="btn btn-primary import-excel-button" id="put-to-email">
+                <%--<button class="btn btn-primary import-excel-button" id="put-to-email">
                     <i class="fa fa-envelope"></i>
                     <spring:message code="edoc.not.taken.warning.email"/>
-                </button>
+                </button>--%>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-notTaken">
             </table>

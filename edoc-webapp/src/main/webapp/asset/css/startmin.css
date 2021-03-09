@@ -1748,12 +1748,11 @@ a:focus {
     width: 2em;
     overflow: auto;
     margin: 100px auto;
-    top: 0;
+    top: 100px;
     left: 250px;
     bottom: 0;
     right: 0;
 }
-
 /* :not(:required) hides these rules from IE9 and below */
 #loadingDiv:not(:required) {
     /* hide "loading..." text */
@@ -2019,4 +2018,11 @@ input:checked + .slider:before {
 
 #warning-document-not-taken {
     display: none;
+}
+
+.edoc-taken {
+    color: #004CFF;
+}
+.edoc-notTken {
+    color: #ac2925;
 }

@@ -16,6 +16,8 @@ import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.*;
 import com.bkav.edoc.web.vpcp.ServiceVPCP;
 import com.google.gson.Gson;
+import com.vpcp.services.model.DeleteAgencyResult;
+import com.vpcp.services.model.RegisterAgencyResult;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -123,7 +125,8 @@ public class DynamicRestContactController {
 
                     if (!contactRequest.getSendToVPCP()) {
                         String jsonHeader = "{\"AgencyCode\":\"" + contactRequest.getDomain() + "\"}";
-                        ServiceVPCP.getInstance().DeleteAgencyRegister(jsonHeader);
+                        DeleteAgencyResult deleteResult = ServiceVPCP.getInstance().DeleteAgencyRegister(jsonHeader);
+                        message = messageSourceUtil.getMessage("organ.delete.vpcp", new Object[]{deleteResult.getStatus()});
                     } else {
                         AgencyRegisterRequetVPCP agencyRegister = new AgencyRegisterRequetVPCP();
                         agencyRegister.setName(contactRequest.getName());
@@ -132,9 +135,10 @@ public class DynamicRestContactController {
                         agencyRegister.setMobile(contactRequest.getTelephone());
                         agencyRegister.setMail(contactRequest.getEmail());
                         agencyRegister.setFax("");
-                        ServiceVPCP.getInstance().AgencyRegister(new Gson().toJson(agencyRegister));
+                        RegisterAgencyResult registerResult = ServiceVPCP.getInstance().AgencyRegister(new Gson().toJson(agencyRegister));
+                        message = messageSourceUtil.getMessage("organ.register.to.vpcp", new Object[]{registerResult.getStatus()});
                     }
-                    message = messageSourceUtil.getMessage("organ.message.edit.success", null);
+                    //message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {
                     code = 400;
                     message = messageSourceUtil.getMessage("organ.message.edit.fail", null);
@@ -281,9 +285,10 @@ public class DynamicRestContactController {
                             agencyRegister.setMobile(telephone);
                             agencyRegister.setFax("");
                             String data = new Gson().toJson(agencyRegister);
-                            ServiceVPCP.getInstance().AgencyRegister(data);
+                            RegisterAgencyResult registerResult = ServiceVPCP.getInstance().AgencyRegister(data);
+                            message = messageSourceUtil.getMessage("organ.register.to.vpcp", new Object[]{registerResult.getStatus()});
                         }
-                        message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                        //message = messageSourceUtil.getMessage("organ.message.create.success", null);
                     }
                 } else {
                     code = 400;

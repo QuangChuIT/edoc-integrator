@@ -44,6 +44,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -398,12 +399,13 @@ public class EdocController {
     @RequestMapping(value = "/getOrganizations", method = RequestMethod.GET,
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public String getOrganizations(HttpServletRequest request) {
+    public String getOrganizations(HttpServletRequest request,
+                                   @RequestParam(value = "organId") String organId) {
         LOGGER.info("----------------------- Get Organizations Invoke --------------------");
         GetOrganizationResp organizationResp = new GetOrganizationResp();
         List<Error> errors = new ArrayList<>();
         try {
-            List<EdocDynamicContact> contacts = EdocDynamicContactServiceUtil.getAllDynamicContacts();
+            List<EdocDynamicContact> contacts = EdocDynamicContactServiceUtil.getAllChildOrgan(organId);
             List<Organization> organizations = new ArrayList<>();
             contacts.forEach(contact -> {
                 Organization organization = new Organization(contact.getDomain(), contact.getInCharge(), contact.getName(),

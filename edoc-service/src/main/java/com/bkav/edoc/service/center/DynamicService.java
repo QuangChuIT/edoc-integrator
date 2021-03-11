@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DynamicService extends AbstractMediator implements ManagedLifecycle {
@@ -281,6 +282,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     }
 
     private Map<String, Object> confirmReceived(Document envelop) {
+        LOGGER.info("Confirm Received Invoker at " + SIMPLE_DATE_FORMAT.format(new Date()));
         Map<String, Object> map = new HashMap<>();
 
         Report report;
@@ -839,7 +841,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     public void destroy() {
 
     }
-
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private static final XmlChecker xmlChecker = new XmlChecker();
     private static final ExtractMime extractMime = new ExtractMime();
     private static final Checker checker = new Checker();

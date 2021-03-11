@@ -7,11 +7,14 @@ import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.web.payload.AgencyRegisterRequetVPCP;
 import com.bkav.edoc.web.payload.ContactRequest;
 import com.bkav.edoc.web.payload.ImportExcelError;
 import com.bkav.edoc.web.payload.Response;
 import com.bkav.edoc.web.util.*;
+import com.bkav.edoc.web.vpcp.ServiceVPCP;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -110,11 +113,27 @@ public class DynamicRestContactController {
                     organ.setInCharge(contactRequest.getInCharge());
                     organ.setAgency(contactRequest.getAgency());
                     organ.setReceiveNotify(contactRequest.getReceiveNotify());
+                    organ.setSendToVPCP(contactRequest.getSendToVPCP());
                     organ.setModifiedDate(new Date());
+                    organ.setSendToVPCP(contactRequest.getSendToVPCP());
                     if (!contactRequest.getTelephone().equals(""))
                         organ.setTelephone(contactRequest.getTelephone());
 
                     EdocDynamicContactServiceUtil.updateContact(organ);
+
+                    if (!contactRequest.getSendToVPCP()) {
+                        String jsonHeader = "{\"AgencyCode\":\"" + contactRequest.getDomain() + "\"}";
+                        ServiceVPCP.getInstance().DeleteAgencyRegister(jsonHeader);
+                    } else {
+                        AgencyRegisterRequetVPCP agencyRegister = new AgencyRegisterRequetVPCP();
+                        agencyRegister.setName(contactRequest.getName());
+                        agencyRegister.setCode(contactRequest.getDomain());
+                        agencyRegister.setPcode(PropsUtil.get("VPCP.systemId"));
+                        agencyRegister.setMobile(contactRequest.getTelephone());
+                        agencyRegister.setMail(contactRequest.getEmail());
+                        agencyRegister.setFax("");
+                        ServiceVPCP.getInstance().AgencyRegister(new Gson().toJson(agencyRegister));
+                    }
                     message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {
                     code = 400;
@@ -227,24 +246,45 @@ public class DynamicRestContactController {
                     String telephone = contactRequest.getTelephone();
                     boolean agency = contactRequest.getAgency();
                     boolean receiveNotify = contactRequest.getReceiveNotify();
+                    boolean sendToVPCP = contactRequest.getSendToVPCP();
 
-                    EdocDynamicContact organ = new EdocDynamicContact();
-                    organ.setName(name);
-                    organ.setDomain(domain);
-                    organ.setInCharge(inChart);
-                    organ.setAddress(address);
-                    organ.setEmail(email);
-                    organ.setTelephone(telephone);
-                    organ.setStatus(true);
-                    organ.setAgency(agency);
-                    organ.setReceiveNotify(receiveNotify);
-                    String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
-                    organ.setToken(newToken);
-                    organ.setCreateDate(new Date());
-                    organ.setModifiedDate(new Date());
+                    EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(domain);
+                    if (contact != null) {
+                        errors.add(messageSourceUtil.getMessage("organ.add.error.duplicate", null));
+                        code = 400;
+                        message = messageSourceUtil.getMessage("organ.message.create.fail", null);
+                    } else {
+                        EdocDynamicContact organ = new EdocDynamicContact();
+                        organ.setName(name);
+                        organ.setDomain(domain);
+                        organ.setInCharge(inChart);
+                        organ.setAddress(address);
+                        organ.setEmail(email);
+                        organ.setTelephone(telephone);
+                        organ.setStatus(true);
+                        organ.setAgency(agency);
+                        organ.setReceiveNotify(receiveNotify);
+                        organ.setSendToVPCP(sendToVPCP);
+                        String newToken = TokenUtil.getRandomNumber(organ.getDomain(), organ.getName());
+                        organ.setToken(newToken);
+                        organ.setCreateDate(new Date());
+                        organ.setModifiedDate(new Date());
 
-                    EdocDynamicContactServiceUtil.createContact(organ);
-                    message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                        EdocDynamicContactServiceUtil.createContact(organ);
+                        if (sendToVPCP) {
+                            logger.info("Start register to vpcp with organ domain " + contactRequest.getDomain());
+                            AgencyRegisterRequetVPCP agencyRegister = new AgencyRegisterRequetVPCP();
+                            agencyRegister.setCode(domain);
+                            agencyRegister.setName(name);
+                            agencyRegister.setPcode(PropsUtil.get("VPCP.systemId"));
+                            agencyRegister.setMail(email);
+                            agencyRegister.setMobile(telephone);
+                            agencyRegister.setFax("");
+                            String data = new Gson().toJson(agencyRegister);
+                            ServiceVPCP.getInstance().AgencyRegister(data);
+                        }
+                        message = messageSourceUtil.getMessage("organ.message.create.success", null);
+                    }
                 } else {
                     code = 400;
                     message = messageSourceUtil.getMessage("organ.message.create.fail", null);

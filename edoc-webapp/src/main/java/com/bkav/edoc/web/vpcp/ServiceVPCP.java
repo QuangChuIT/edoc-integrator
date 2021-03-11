@@ -21,6 +21,8 @@ import com.bkav.edoc.service.xml.ed.parser.EdXmlParser;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.web.util.TokenUtil;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.vpcp.services.AgencyServiceImp;
 import com.vpcp.services.KnobstickServiceImp;
 import com.vpcp.services.VnptProperties;
@@ -32,9 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ServiceVPCP {
@@ -105,6 +105,39 @@ public class ServiceVPCP {
         }
     }
 
+    // Register for organ to VPCP
+    public RegisterAgencyResult AgencyRegister(String data) {
+        LOGGER.info("----------------------------------Register Agency to VPCP Invoke----------------------");
+        RegisterAgencyResult registerAgencyResult = this.agencyService.registerAgency("{}", data);
+        try {
+            if (registerAgencyResult != null) {
+                LOGGER.info("-----------------------------------" + "status:" + registerAgencyResult.getStatus());
+                LOGGER.info("-----------------------------------" + "Desc:" + registerAgencyResult.getErrorDesc());
+                LOGGER.info("-----------------------------------" + "error code:" + registerAgencyResult.getErrorCode());
+            } else {
+                LOGGER.warn("Register agency to VPCP not process !!!!!!");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error to register agency to VPCP cause " + e);
+        }
+        return registerAgencyResult;
+    }
+
+    // Delete register organ to VPCP
+    public DeleteAgencyResult DeleteAgencyRegister(String jsonHeader) {
+        LOGGER.info("----------------------------------Delete register for agency to VPCP Invoke----------------------");
+        DeleteAgencyResult deleteAgencyResult = this.agencyService.deleteAgency(jsonHeader);
+        try {
+            if (deleteAgencyResult != null) {
+                LOGGER.info("-----------------------------------" + "status:" + deleteAgencyResult.getStatus());
+                LOGGER.info("-----------------------------------" + "Desc:" + deleteAgencyResult.getErrorDesc());
+                LOGGER.info("-----------------------------------" + "error code:" + deleteAgencyResult.getErrorCode());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error to delete register agency cause " + e);
+        }
+        return deleteAgencyResult;
+    }
 
     public GetChangeStatusResult updateStatus(String statusCode, String documentId) {
         JSONObject header = new JSONObject();

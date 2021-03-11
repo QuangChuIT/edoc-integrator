@@ -9,7 +9,7 @@
             <generator class="identity"/>
         </id>
         <property name="address" type="string" column="address"/>
-        <property name="parent" type="string" column="parent"/>
+        <property name="parent" type="java.lang.Long" column="parent"/>
         <property name="domain" type="string" column="domain"/>
         <property name="email" type="string" column="email"/>
         <property name="name" type="string" column="name"/>
@@ -25,6 +25,7 @@
         <property name="createDate" type="timestamp" column="create_date"/>
         <property name="modifiedDate" type="timestamp" column="modified_date"/>
         <property name="receiveNotify" type="boolean" column="receive_notify"/>
+        <property name="sendToVPCP" type="boolean" column="send_vpcp"/>
         <set name="users" table="user_" cascade="all"
              inverse="true" lazy="true" fetch="select">
             <key>

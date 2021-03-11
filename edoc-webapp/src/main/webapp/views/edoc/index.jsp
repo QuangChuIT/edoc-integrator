@@ -56,6 +56,10 @@
                     <i class="glyphicon glyphicon-plus"></i>
                     <spring:message code="edoc.button.add.organ"/>
                 </button>
+                <%--<button class="btn btn-danger deleteorgan-button" id="deleteOrgans">
+                    <i class="glyphicon glyphicon-remove"></i>
+                    <spring:message code="edoc.button.delete.organs"/>
+                </button>--%>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-organ">
             </table>
@@ -68,10 +72,10 @@
                     <i class="fa fa-telegram"></i>
                     <spring:message code="edoc.not.taken.warning.telegram"/>
                 </button>
-                <%--<button class="btn btn-primary import-excel-button" id="put-to-email">
+                <button class="btn btn-primary import-excel-button" id="put-to-email">
                     <i class="fa fa-envelope"></i>
                     <spring:message code="edoc.not.taken.warning.email"/>
-                </button>--%>
+                </button>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-notTaken">
             </table>

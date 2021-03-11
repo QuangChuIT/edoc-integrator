@@ -364,6 +364,10 @@ public class ExcelService {
             cell = row.createCell(8);
             cell.setCellValue(organ.getWebsite());
             cell.setCellStyle(style);
+
+            cell = row.createCell(9);
+            cell.setCellValue(organ.getToken());
+            cell.setCellStyle(style);
             numRow++;
         }
         ServletOutputStream outputStream = response.getOutputStream();
@@ -382,22 +386,27 @@ public class ExcelService {
         LOGGER.info("Write a sample file for organs to Excel END!!!!!!!!!");
     }
 
-    public long pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public Map<String, Long> pushExcelDataToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException, InterruptedException {
+        Map<String, Long> results = new HashMap<>();
+
         String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
         String is_password = PropsUtil.get(ConfigParams.IS_PASSWORD);
         String is_post_url = PropsUtil.get(ConfigParams.IS_POST_URL);
 
+        String base64encode = PostUserToSSO.getBase64Encode(is_username, is_password);
+
         // Count number of user push to sso successfully
-        long count = 0;
+        long success = 0, duplicate = 0, fail = 0;
         /* Push each user to SSO:*/
         for (User user : users) {
-            User checkExist = UserServiceUtil.finUserByUsername(user.getUsername());
-            if (checkExist == null) {
+            int out = -1;
+            User checkExistUSer = UserServiceUtil.finUserByUsername(user.getUsername());
+            if (checkExistUSer == null) {
                 //Convert user object to json
                 //Then, push json to sso
                 String json = PostUserToSSO.createJson(user);
-                String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
-                if (!out.equals("")) {
+                out = PostUserToSSO.postUser(base64encode, is_post_url, json);
+                if (out > 0) {
                     // Set SSO field to true
                     user.setSso(true);
                     UserServiceUtil.createUser(user);
@@ -411,15 +420,93 @@ public class ExcelService {
                 }
             } else {
                 LOGGER.info("Duplicate user with username " + user.getUsername());
-                if (!checkExist.isSso()) {
-                    String json = PostUserToSSO.createJson(checkExist);
-                    String out = PostUserToSSO.postUser(is_username, is_password, is_post_url, json);
+                if (!checkExistUSer.isSso()) {
+                    String json = PostUserToSSO.createJson(checkExistUSer);
+                    out = PostUserToSSO.postUser(base64encode, is_post_url, json);
                     LOGGER.info(out);
                 }
             }
-            count++;
+
+            if (out == 201) {
+                user.setSso(true);
+                UserServiceUtil.updateUser(user);
+                success++;
+            } else if (out == 409) {
+                user.setSso(true);
+                UserServiceUtil.updateUser(user);
+                duplicate++;
+            } else
+                fail++;
+
+            /*ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> map = mapper.readValue(out, Map.class);
+
+            String username = map.get("userName");
+            if (username != null)
+                success++;
+            else {
+                String status = map.get("status");
+                if (status.equals("409"))
+                    duplicate++;
+                else
+                    fail++;
+            }*/
         }
-        return count;
+        LOGGER.info("Push success " + success + " users !!!!!!");
+        results.put("Success", success);
+        results.put("Duplicate", duplicate);
+        results.put("Fail", fail);
+
+        return results;
+    }
+
+    public Map<String, Long> syncUserToSSO(List<User> users) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException, InterruptedException {
+        Map<String, Long> results = new HashMap<>();
+
+        String is_username = PropsUtil.get(ConfigParams.IS_USERNAME);
+        String is_password = PropsUtil.get(ConfigParams.IS_PASSWORD);
+        String is_post_url = PropsUtil.get(ConfigParams.IS_POST_URL);
+
+        String base64encode = PostUserToSSO.getBase64Encode(is_username, is_password);
+
+        // Count number of user push to sso successfully
+        long success = 0, duplicate = 0, fail = 0;
+        /* Push each user to SSO:*/
+        for (User user : users) {
+            LOGGER.info("Sync user success with username " + user.getUsername());
+            String json = PostUserToSSO.createJson(user);
+            int out = PostUserToSSO.postUser(base64encode, is_post_url, json);
+            LOGGER.info(out);
+
+            if (out == 201) {
+                user.setSso(true);
+                UserServiceUtil.updateUser(user);
+                success++;
+            } else if (out == 409) {
+                duplicate++;
+            } else
+                fail++;
+
+            /*ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> map = mapper.readValue(out, Map.class);
+
+            String username = map.get("userName");
+            if (username != null)
+                success++;
+            else {
+                String status = map.get("status");
+                if (status.equals("409"))
+                    duplicate++;
+                else
+                    fail++;
+            }*/
+        }
+        LOGGER.info("Sync success " + success + " users !!!!!!");
+        results.put("Success", success);
+        results.put("Duplicate", duplicate);
+        results.put("Fail", fail);
+
+        return results;
     }
 
     public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {
@@ -506,6 +593,7 @@ public class ExcelService {
         sheet.setColumnWidth(6, 4000);
         sheet.setColumnWidth(7, 4000);
         sheet.setColumnWidth(8, 4000);
+        sheet.setColumnWidth(9, 8000);
 
         sheet.setDefaultRowHeight((short) 450);
 
@@ -516,7 +604,7 @@ public class ExcelService {
         Cell headerCell;
 
         // Write header row to excel file for organization
-        for (int i = 0, j = 1; i < 9; i++, j++) {
+        for (int i = 0, j = 1; i < 10; i++, j++) {
             headerCell = header.createCell(i);
             headerCell.setCellValue(ExcelHeaderServiceUtil.getOrganHeaderById(j).getHeaderName());
             headerCell.setCellStyle(headerStyle);

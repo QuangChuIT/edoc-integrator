@@ -1686,9 +1686,31 @@ a:focus {
 
 #search-filter {
     position: absolute;
-    width: 20%;
+    /*width: 20%;*/
     top: 19px;
     left: 580px;
+}
+#searchFilter {
+    width: 100% !important;
+    height: auto;
+    top: 42px;
+    left: 550px;
+    position: absolute;
+}
+.form-input {
+    margin-bottom: 15px;
+}
+#docCodeSearch {
+    width: 100% !important;
+    height: 32px;
+    border-radius: 0;
+    border: 1px solid #aaa;
+}
+
+#btn-search-filter {
+    margin: auto;
+    width: 40% !important;
+    /*float: right;*/
 }
 
 #header-nav [class^="col"] {

@@ -45,12 +45,14 @@ public class EdocService {
         this.http = new HttpImpl(this.edocProperties);
     }
 
-    public GetOrganizationResp getOrganization() {
+    public GetOrganizationResp getOrganization(String organId) {
         String url = this.endpoint + "/getOrganizations";
         this.headers.put("Content-Type", ContentTypes.APPLICATION_JSON);
         GetOrganizationResp getOrganizationResp = null;
+        Map<String, String> params = new HashMap<>();
+        params.put("organId", organId);
         try {
-            String json = this.http.sendGet(url, null, this.getListHeader());
+            String json = this.http.sendGet(url, params, this.getListHeader());
             getOrganizationResp = gson.fromJson(json, GetOrganizationResp.class);
         } catch (Exception e) {
             e.printStackTrace();

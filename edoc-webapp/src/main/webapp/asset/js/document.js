@@ -1,4 +1,5 @@
 let appSettings;
+let fromOrgan = null, toOrgan = null, docCode = null;
 let edocDocument = {
     appSetting: {
         host: "/documents",
@@ -19,7 +20,7 @@ let edocDocument = {
             edocDocument.log("Can not load jQuery environment");
             return;
         }
-        instance.renderDatatable();
+        instance.renderDatatable(fromOrgan, toOrgan, docCode);
     },
     addExtCSS: function (name) {
         let instance = this;
@@ -28,15 +29,35 @@ let edocDocument = {
 
         appSettings.root.append(css);
     },
-    renderDatatable: function () {
+    renderDatatable: function (fromOrgan, toOrgan, docCode) {
         let instance = this;
+        let url = "/documents?mode=" + instance.appSetting.mode;
+
+        // need to optimize.....
+        if (fromOrgan !== null || toOrgan !== null || docCode !== null) {
+            if (fromOrgan !== null && toOrgan === null && docCode === null) {
+                url = url + "&fromOrgan=" + fromOrgan;
+            } else if (fromOrgan === null && toOrgan !== null && docCode === null) {
+                url = url + "&toOrgan=" + toOrgan;
+            } else if (fromOrgan === null && toOrgan === null && docCode !== null) {
+                url = url + "&docCode=" + docCode;
+            } else if (fromOrgan !== null && toOrgan !== null && docCode === null) {
+                url = url + "&fromOrgan=" + fromOrgan + "&toOrgan=" + toOrgan;
+            } else if (fromOrgan !== null && toOrgan === null && docCode !== null) {
+                url = url + "&fromOrgan=" + fromOrgan + "&docCode=" + docCode;
+            } else if (fromOrgan === null && toOrgan !== null && docCode !== null) {
+                url = url + "&toOrgan=" + toOrgan + "&docCode=" + docCode;
+            } else {
+                url = url + "&fromOrgan=" + fromOrgan + "&toOrgan=" + toOrgan + "&docCode=" + docCode;
+            }
+        }
         instance.appSetting.dataTable = $('#dataTables-edoc').DataTable({
             serverSide: true,
             processing: true,
             pageLength: 25,
             ajax: {
-                url: "/documents/" + instance.appSetting.mode,
-                type: "GET"
+                url: url,
+                type: "POST"
             },
             drawCallback: function () {
                 $(this).contextMenu({
@@ -122,8 +143,8 @@ let edocDocument = {
         let instance = this;
         instance.dataTable = $('#dataTablesDraftDoc').DataTable({
             ajax: {
-                url: "/documents/" + instance.appSetting.mode,
-                dataSrc: ""
+                url: "/documents?mode=" + instance.appSetting.mode,
+                type: "POST"
             },
             rowId: "documentId",
             responsive: true,
@@ -457,8 +478,17 @@ $(document).ready(function () {
                 console.log(key.fileType + " " + index);
             });
             let toOrganNames = [];
+            let takenOrgan = "";
             data.toOrgan.forEach(function (organ, index) {
-                toOrganNames.push(organ["name"]);
+                data.notifications.forEach(function (notification, index) {
+                    if (notification.toOrganization["domain"] === organ["domain"]) {
+                        if (notification["taken"])
+                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_taken + ")";
+                        else
+                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_not_taken + ")";
+                    }
+                })
+                toOrganNames.push(takenOrgan);
             });
             data.toOrganName = toOrganNames.join(", ");
             data.notifications.foreach
@@ -582,7 +612,7 @@ $(document).ready(function () {
                 edocDocument.renderNotTakenDatatable();
                 $(".edoc-table-not-taken").show();
             } else {
-                edocDocument.renderDatatable();
+                edocDocument.renderDatatable(fromOrgan, toOrgan, docCode);
                 $(".edoc-table").show();
             }
             $("#side-menu.nav a").removeClass("active");
@@ -643,10 +673,40 @@ $(document).ready(function () {
     $("#search-filter").on('click', function() {
         $("#searchFilter").toggle();
     })
-    $('#searchFilter').modalPopover({
-        target: '#search-filter',
-        placement: 'bottom'
+
+    $("#btn-searchFilter-confirm").on('click', function(e) {
+        fromOrgan = ($("#fromOrganSearch").val() === "" ? null : $("#fromOrganSearch").val());
+        toOrgan = ($("#toOrganSearch").val() === "" ? null : $("#toOrganSearch").val());
+        docCode = ($("#docCodeSearch").val() === "" ? null : $("#docCodeSearch").val());
+
+        $("#searchFilter").toggle();
+        edocDocument.appSetting.dataTable.clear();
+        edocDocument.renderDatatable(fromOrgan, toOrgan, docCode);
+        fromOrgan = null, toOrgan = null, docCode = null;
+    })
+
+    $("#btn-searchFilter-reset").on('click', function() {
+        $('#fromOrganSearch, #toOrganSearch').val(null).trigger('change');
+        $("#docCodeSearch").val("");
+    })
+
+    /*$(document).mouseup(function(e) {
+        var searchFill = $("#searchFilter");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!searchFill.is(e.target) && searchFill.has(e.target).length === 0) {
+            searchFill.hide();
+        }
+    });*/
+
+    $("#fromOrganSearch").select2({
+        tags: true,
+        maximumSelectionLength: 1,
+        width: "auto"
     });
+    $("#toOrganSearch").select2({
+        tag: true,
+    })
 });
 
 $(document).on("contextmenu", "#dataTables-edoc>tbody>tr", function (event) {

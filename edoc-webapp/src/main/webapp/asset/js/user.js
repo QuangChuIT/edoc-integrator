@@ -151,7 +151,7 @@ let userManage = {
         let addEmailAddress = $("#addEmailAddress").val();
 
         if (validateAddUser(addDisplayName, addUserName, addOrganDomain, password, addEmailAddress)) {
-            e.preventDefault();
+            //e.preventDefault();
             //console.log(app_message.edoc_validate_document_request_fail);
         } else {
             let addUserRequest = {
@@ -178,7 +178,8 @@ let userManage = {
                     }
                 },
                 error: function (error) {
-                    $.notify(error.responseText, "error");
+                    console.log(error);
+                    $.notify(error.responseJSON.errors, "error");
                 }
             });
         }
@@ -312,6 +313,25 @@ $(document).ready(function () {
     $("#email-template-menu").on('click', function (e) {
         e.preventDefault();
     });
+
+    $("#syncUserSSO").on('click', function () {
+        $.ajax({
+            url: "/user/push/toSSO",
+            type: "POST",
+            beforeSend: function () {
+                $("#overlay").show();
+            },
+            success: function (response) {
+                console.log(response);
+                $.notify(response.message, "success");
+            },
+            error: function (error) {
+                $.notify(error.errors, "error");
+            }
+        }).done(function () {
+            $("#overlay").hide();
+        });
+    })
 });
 
 // Call ajax to import users from excel file

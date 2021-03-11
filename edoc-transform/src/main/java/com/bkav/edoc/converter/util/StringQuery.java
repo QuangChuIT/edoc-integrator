@@ -14,6 +14,7 @@ public class StringQuery {
     public static final String GET_DYNAMIC_CONTACT_BY_ORG_ID = "select * from edoc_dynamiccontact where organizationId= ?";
     public static final String COUNT_DOCUMENTS = "Select count(*) from edoc_document";
     public static final String GET_DYNAMIC_CONTACT = "Select Id, Name, InCharge, Domain, Email, Address, Telephone, Fax, Website, Type, Version from edoc_dynamiccontact";
+    public static final String GET_DOMAIN = "Select domain from edoc_dynamiccontact where agency = 1";
     public static final String GET_USER = "Select userId, screenName, emailAddress, CONCAT(firstName,' ', middleName,' ', lastName), password_, status, createDate, modifiedDate, lastLoginDate, lastLoginIP from user_";
 
     public static final String GET_DATE_COUNTER = "Select distinct Date(sentDate) from edoc_document where year(sentDate)= 2020";

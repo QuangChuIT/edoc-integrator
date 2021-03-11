@@ -29,6 +29,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 public class PostUserToSSO {
     private static final Logger LOGGER = Logger.getLogger(PostUserToSSO.class);
@@ -39,11 +40,11 @@ public class PostUserToSSO {
         return Base64.getEncoder().encodeToString(str.getBytes());
     }
 
-    public static String postUser(String userName, String password, String url, String json)
-            throws IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    public static int postUser(String base64Encode, String url, String json)
+            throws IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException, InterruptedException {
 
-        String strBase64 = PostUserToSSO.getBase64Encode(userName, password);
-        String result = "";
+        //String strBase64 = PostUserToSSO.getBase64Encode(userName, password);
+        int result = -1;
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
         SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
@@ -54,18 +55,23 @@ public class PostUserToSSO {
             HttpPost httpPost = new HttpPost(url);
             StringEntity entity = new StringEntity(json);
             httpPost.setEntity(entity);
-            httpPost.setHeader("Authorization", "Basic " + strBase64);
-            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setHeader("Authorization", "Basic " + base64Encode);
+            httpPost.setHeader("Content-Type", "application/scim+json");
             SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(new KeyManager[0], new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
             SSLContext.setDefault(ctx);
+            TimeUnit.SECONDS.sleep(1);
             CloseableHttpResponse response = httpclient.execute(httpPost);
             try {
-                HttpEntity httpEntity = response.getEntity();
+                result = response.getStatusLine().getStatusCode();
+
+                LOGGER.info("Successfully post user to sso server " + result);
+
+                /*HttpEntity httpEntity = response.getEntity();
+
                 if (httpEntity != null) {
                     result = EntityUtils.toString(httpEntity);
-                    LOGGER.info("Successfully post user to sso server " + result);
-                }
+                }*/
             } catch (Exception e) {
                 LOGGER.error("Error post user to sso server cause " + Arrays.toString(e.getStackTrace()));
             } finally {
@@ -122,7 +128,7 @@ public class PostUserToSSO {
         dynamicContact.setDomain("000.00.01.H36");
         user.setDynamicContact(dynamicContact);
         String json = createJson(user);
-        String out = postUser("admin", "123abc@A", "https://iam.lamdong.gov.vn/scim2/Users", json);
-        System.out.println(out);
+        //String out = postUser("admin", "123abc@A", "https://iam.lamdong.gov.vn/scim2/Users", json);
+        //System.out.println(out);
     }
 }

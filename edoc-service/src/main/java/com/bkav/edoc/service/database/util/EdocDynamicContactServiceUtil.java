@@ -40,6 +40,10 @@ public class EdocDynamicContactServiceUtil {
         return DYNAMIC_CONTACT_SERVICE.getAllDynamicContact();
     }
 
+    public static List<EdocDynamicContact> getAllChildOrgan(String parentDomain) {
+        return DYNAMIC_CONTACT_SERVICE.getAllChildOrgan(parentDomain);
+    }
+
     public static OrganizationCacheEntry findById(long organId) {
         return DYNAMIC_CONTACT_SERVICE.findById(organId);
     }

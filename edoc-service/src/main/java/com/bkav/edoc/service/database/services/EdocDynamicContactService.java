@@ -13,10 +13,7 @@ import org.hibernate.Session;
 
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EdocDynamicContactService {
     private static final EdocDynamicContactDaoImpl dynamicContactDaoImpl = new EdocDynamicContactDaoImpl();
@@ -184,7 +181,6 @@ public class EdocDynamicContactService {
 
     }
 
-
     public Long countOrgan(boolean agency) {
 
         return dynamicContactDaoImpl.countOrgan(agency);
@@ -249,6 +245,51 @@ public class EdocDynamicContactService {
 
     public List<String> getAllDomain() {
         return dynamicContactDaoImpl.getAllDomain();
+    }
+
+    public List<EdocDynamicContact> getAllChildOrgan (String parentDomain) {
+        List<EdocDynamicContact> childOrgans;
+        int index = 0;
+
+        String[] parentOrganSplit = parentDomain.split("\\.");
+        if (parentOrganSplit[0].equals("000")) {
+            if (parentOrganSplit[1].equals("00")) {
+                if (parentOrganSplit[2].equals("00")) {
+                    index = 3;
+                } else
+                    index = 2;
+            } else
+                index = 1;
+        } else {
+            return null;
+        }
+
+        String regexParent = "";
+        for (int i = index; i < parentOrganSplit.length; i++) {
+            regexParent += parentOrganSplit[i];
+            if (i == 3)
+                break;
+            regexParent += ".";
+        }
+        System.out.println(regexParent);
+        childOrgans = dynamicContactDaoImpl.getAllChildrenContact(regexParent);
+        return childOrgans;
+    }
+
+    public static void main(String[] args) {
+        String parent = "000.00.33.A53";
+        EdocDynamicContactService edocDynamicContactService = new EdocDynamicContactService();
+        List<EdocDynamicContact> childrent =  edocDynamicContactService.getAllChildOrgan(parent);
+        if (childrent != null) {
+            System.out.println("List childrent: ");
+            for (EdocDynamicContact contact: childrent) {
+                if (!contact.getDomain().equals(parent)) {
+                    System.out.println(contact.getDomain());
+                }
+            }
+        } else {
+            System.out.println("No child !!!!!");
+        }
     }
 
     private final static Logger LOGGER = Logger.getLogger(EdocDynamicContactService.class);

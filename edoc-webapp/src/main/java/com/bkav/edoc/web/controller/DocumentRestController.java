@@ -6,6 +6,7 @@ import com.bkav.edoc.service.database.entity.pagination.DataTableResult;
 import com.bkav.edoc.service.database.entity.pagination.DatatableRequest;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.*;
+import com.bkav.edoc.service.kernel.util.Base64;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.OAuth2Constants;
 import com.bkav.edoc.web.auth.CookieUtil;
@@ -15,6 +16,7 @@ import com.bkav.edoc.web.scheduler.bean.EmailSenderBean;
 import com.bkav.edoc.web.scheduler.bean.SendMessageToTelegramBean;
 import com.bkav.edoc.web.util.CommonUtils;
 import com.bkav.edoc.web.util.MessageSourceUtil;
+import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
@@ -241,16 +244,31 @@ public class DocumentRestController {
         }
     }
 
-    @RequestMapping(value = "/documents/{mode}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @RequestMapping(value = "/documents", produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public String getDocuments(@PathVariable("mode") String mode, HttpServletRequest request) {
-        //String toOrgan = null, fromOrgan = "000.00.33.H36", docCode = null;
-        String toOrgan = null, fromOrgan = null, docCode = null;
+    public String getDocuments(@RequestParam(value = "mode") String mode, HttpServletRequest request,
+                               @RequestParam(value = "fromOrgan", required = false) String fromOrgan,
+                               @RequestParam(value = "toOrgan", required = false) String toOrgan,
+                               @RequestParam(value = "docCode", required = false) String docCode) {
         String organDomain = CookieUtil.getValue(request, OAuth2Constants.ORGANIZATION);
+        String userLogin = CookieUtil.getValue(request, "userLogin");
+        String userLog = new String(Base64.decode(userLogin), StandardCharsets.UTF_8);
+        User user = new Gson().fromJson(userLog, User.class);
+        String admin = user.getUsername();
+
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        int totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode, toOrgan, fromOrgan, docCode);
-        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode, toOrgan, fromOrgan, docCode);
+        int totalCount;
+        List<DocumentCacheEntry> entries;
+
+        if (admin.equals(PropsUtil.get("user.admin.username"))) {
+            totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, null, mode, toOrgan, fromOrgan, docCode);
+            entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, null, mode, toOrgan, fromOrgan, docCode);
+        } else {
+            totalCount = EdocDocumentServiceUtil.countDocumentsFilter(pagination, organDomain, mode, toOrgan, fromOrgan, docCode);
+            entries = EdocDocumentServiceUtil.getDocumentsFilter(pagination, organDomain, mode, toOrgan, fromOrgan, docCode);
+        }
+
         DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);
@@ -295,16 +313,6 @@ public class DocumentRestController {
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);*/
     }
-
-    /*@RequestMapping(value = "/edoc/search/advance", produces = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public String getDocumentBySearchAdvance(HttpServletRequest request,
-                                             @RequestParam(value = "fromOrgan", required = false) String fromOrgan,
-                                             @RequestParam(value = "toOrgan", required = false) String toOrgan,
-                                             @RequestParam(value = "docCode", required = false) String docCode) {
-
-        return null;
-    }*/
 
     @RequestMapping(value = "/send/telegram")
     public HttpStatus sendNotTakenToTelegram() {

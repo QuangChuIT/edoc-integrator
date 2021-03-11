@@ -1,6 +1,10 @@
 package com.bkav.edoc.web.util;
 
+import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.ExcelHeaderServiceUtil;
+import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.web.payload.AddUserRequest;
 import com.bkav.edoc.web.payload.ContactRequest;
@@ -69,6 +73,12 @@ public class ValidateUtil {
 
     public List<String> validateAddUser(AddUserRequest addUserRequest) {
         List<String> errors = new ArrayList<>();
+
+        User user = UserServiceUtil.finUserByUsername(addUserRequest.getUserName());
+        if (user != null) {
+            errors.add(messageSourceUtil.getMessage("user.add.error.dumplicate", null));
+        }
+
         if (addUserRequest.getDisplayName().equals("")) {
             errors.add(messageSourceUtil.getMessage("user.error.displayName", null));
         }
@@ -90,6 +100,7 @@ public class ValidateUtil {
 
     public List<String> validateAddOrgan(ContactRequest contactRequest) {
         List<String> errors = new ArrayList<>();
+
         if (contactRequest.getName().equals("")) {
             errors.add(messageSourceUtil.getMessage("organ.add.error.name", null));
         }

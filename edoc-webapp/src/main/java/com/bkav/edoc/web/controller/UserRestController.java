@@ -3,10 +3,8 @@ package com.bkav.edoc.web.controller;
 import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.User;
-import com.bkav.edoc.service.database.entity.UserRole;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
-import com.bkav.edoc.service.database.util.UserRoleServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.payload.*;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class UserRestController {
@@ -170,7 +169,7 @@ public class UserRestController {
                     } else {
                         List<User> users = (List<User>) map.get("users");
                         LOGGER.info("Convert user data from excel success with user size " + users.size() + " !!!!!!!!!!!!!!!!!!!!!");
-                        long numOfUser = ExcelUtil.pushUsersToSSO(users);
+                        Map<String, Long> numOfUser = ExcelUtil.pushUsersToSSO(users);
                         String readFileSuccess = messageSourceUtil.getMessage("edoc.message.read.file.success", null);
                         response = new Response(200, new ArrayList<>(), readFileSuccess);
                     }
@@ -238,7 +237,7 @@ public class UserRestController {
 
 //                    UserServiceUtil.createUser(newUser);
                     users.add(newUser);
-                    long numUserSuccess = ExcelUtil.pushUsersToSSO(users);
+                    Map<String, Long> numUserSuccess = ExcelUtil.pushUsersToSSO(users);
                     message = messageSourceUtil.getMessage("user.message.create.success", null);
                 } else {
                     code = 400;
@@ -276,6 +275,33 @@ public class UserRestController {
         String headerValue = "attachment; filename=Don_vi-(File_mau).xlsx";
         response.setHeader(headerKey, headerValue);
         ExcelUtil.exportSampleUserExcelFile(response);
+    }
+
+    @RequestMapping(value = "/user/push/toSSO", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> syncUserToSSO() {
+        List<String> errors = new ArrayList<>();
+        List<User> userNotInSSO = new ArrayList<>();
+        List<User> users = UserServiceUtil.getUser();
+        try {
+            int code = 200;
+            AtomicInteger numberUserDuplicate = new AtomicInteger();
+            users.forEach(user -> {
+                if (!user.isSso()) {
+                    userNotInSSO.add(user);
+                } else
+                    numberUserDuplicate.getAndIncrement();
+            });
+            Map<String, Long> resultsToSSOSuccess = ExcelUtil.syncUserToSSo(userNotInSSO);
+            long success = resultsToSSOSuccess.get("Success");
+            long fail = resultsToSSOSuccess.get("Fail");
+
+            Response response = new Response(code, errors, messageSourceUtil.getMessage("user.message.push.to.sso", new Object[]{success, numberUserDuplicate, fail}));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(com.bkav.edoc.web.controller.UserRestController.class);

@@ -5,6 +5,9 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+<%@ page import="com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil" %>
+<%@ page import="com.bkav.edoc.service.database.cache.OrganizationCacheEntry" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -12,6 +15,7 @@
     String userLoginCookie = CookieUtil.getValue(request, OAuth2Constants.USER_LOGIN);
     String userLogin = new String(Base64.decode(userLoginCookie), StandardCharsets.UTF_8);
     UserCacheEntry user = new Gson().fromJson(userLogin, UserCacheEntry.class);
+    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByAgency(true);
 %>
 <nav class="navbar navbar-default nav-top-header" id="header-nav">
     <div class="navbar-header edoc-header">
@@ -26,24 +30,55 @@
             <i class="fa fa-filter fa-lg" title="<spring:message code="edoc.search.filter"/>"></i>
         </a>
     </div>
-    <%--<div class="popover" id="searchFilter">
-        <div class="arrow"></div>
+    <div class="popover" id="searchFilter">
         <div class="popover-content">
-            <form class="form-horizontal" id="" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <div class="col-md-2 col-sm-6 col-xs-12">
-                        <label class="control-label" for="fromOrganSearch">
-                            <spring:message code="edoc.search.fromOrgan"/>
-                        </label>
-                    </div>
-                    <div class="col-md-10 col-sm-6 col-xs-12">
-                        <input type="text" id="fromOrganSearch" value="">
-                    </div>
+            <div class="form-input">
+                <label class="control-label" for="fromOrganSearch">
+                    <spring:message code="edoc.search.fromOrgan"/>
+                </label>
+                <select class="form-control" multiple="multiple" id="fromOrganSearch">
+                    <%
+                        for (OrganizationCacheEntry organization: organizationCacheEntries) {
+                    %>
+                    <option value="<%=organization.getDomain()%>"><%=organization.getName()%></option>
+                    <%
+                        }
+                    %>
+                </select>
+            </div>
+            <div class="form-input">
+                <label class="control-label" for="toOrganSearch">
+                    <spring:message code="edoc.search.toOrgan"/>
+                </label>
+                <select class="form-control" multiple="multiple" id="toOrganSearch">
+                    <%
+                        for (OrganizationCacheEntry organization: organizationCacheEntries) {
+                    %>
+                    <option value="<%=organization.getDomain()%>"><%=organization.getName()%></option>
+                    <%
+                        }
+                    %>
+                </select>
+            </div>
+            <div class="form-input">
+                <label class="control-label" for="docCodeSearch">
+                    <spring:message code="edoc.search.docCode"/>
+                </label>
+                <input class="form-control" type="text" id="docCodeSearch" value="">
+            </div>
+            <hr>
+            <div class="form-input">
+                <div class="form-group" id="btn-search-filter">
+                    <a href="javascript:void(0)" class="btn btn-info" id="btn-searchFilter-reset">
+                        <span class="glyphicon glyphicon-erase"></span>
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-success" id="btn-searchFilter-confirm">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </a>
                 </div>
-
-            </form>
+            </div>
         </div>
-    </div>--%>
+    </div>
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>

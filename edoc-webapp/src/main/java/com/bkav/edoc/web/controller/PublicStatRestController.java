@@ -38,21 +38,13 @@ public class PublicStatRestController {
 
     @RequestMapping(value = "/public/-/stat/detail", produces = {MediaType.APPLICATION_JSON_VALUE})
     public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
-                                           @RequestParam(value = "toDate", required = false) String toDate,
-                                           @RequestParam(value = "keyword", required = false) String keyword) {
-        //keyword = "000.00.20.H36";
-        if (fromDate == null || toDate == null || keyword == null) {
-            if (keyword == null)
-                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, null);
-            else
-                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword);
+                                           @RequestParam(value = "toDate", required = false) String toDate) {
+        if (fromDate == null || toDate == null) {
+            return EdocDailyCounterServiceUtil.getStatsDetail(null, null);
         } else {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);
-            if (keyword == null)
-                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, null);
-            else
-                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, keyword);
+            return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue);
         }
     }
 

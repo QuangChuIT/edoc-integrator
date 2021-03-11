@@ -10,7 +10,7 @@
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.bkav.edoc.web.util.PropsUtil" %>
+<%@ page import="com.bkav.edoc.service.database.cache.UserCacheEntry" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
@@ -29,6 +29,10 @@
     OrganizationCacheEntry organizationCacheEntry = new Gson().fromJson(userLogin, OrganizationCacheEntry.class);
     //remove this organ login from list
     organizationCacheEntries.remove(organizationCacheEntry);
+
+    String userLoginCookie = CookieUtil.getValue(request, OAuth2Constants.USER_LOGIN);
+    String loginUser = new String(Base64.decode(userLoginCookie), StandardCharsets.UTF_8);
+    UserCacheEntry user = new Gson().fromJson(loginUser, UserCacheEntry.class);
 %>
 <html>
 <head>
@@ -488,6 +492,121 @@
     </div>
 </div>
 
+<div class="modal fade" id="formChangePassword" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                    <i class="fa fa-key fa-fw"></i>
+                    <spring:message code="edoc.change.password"/>
+                </span>
+            </div>
+            <div class="modal-body user-detail" id="edoc-change-password">
+                <form class="form-horizontal" id="changePassword" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
+                            <label class="control-label" for="oldPassword">
+                                <spring:message code="user.old.password"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-8 col-sm-6 col-xs-12">
+                            <input class="form-control" required id="oldPassword" type="password">
+                            <span toggle="#oldPassword" class="fa fa-fw fa-eye-slash field-icon toggle-old-password"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
+                            <label class="control-label" for="newPassword">
+                                <spring:message code="user.new.password"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-8 col-sm-6 col-xs-12">
+                            <input type="password" autocomplete="off" class="form-control" required id="newPassword" value="">
+                            <span toggle="#newPassword" class="fa fa-fw fa-eye-slash field-icon toggle-new-password"></span>
+                            <progress max="100" value="0" id="meter"></progress>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4 col-sm-6 col-xs-12">
+                            <label class="control-label" for="retypeNewPassword">
+                                <spring:message code="user.retyping.new.password"/>
+                            </label>
+                            <span class="required">*</span>
+                        </div>
+                        <div class="col-md-8 col-sm-6 col-xs-12">
+                            <input id="retypeNewPassword" type="password" class="form-control" value="">
+                            <span toggle="#retypeNewPassword" class="fa fa-fw fa-eye-slash field-icon toggle-renew-password"></span>
+                        </div>
+                    </div><br>
+                    <div class="form-group">
+                        <div class="col-md-5 col-sm-6 col-xs-12">
+                        </div>
+                        <div class="col-md-7 col-sm-6 col-xs-12">
+                            <button class="btn btn-success" id="btn-changePassword-confirm" value="<%=user.getUsername()%>">
+                                <spring:message code="edoc.button.confirm"/>
+                            </button>
+                            <button class="btn btn-danger" id="btn-changePassword-cancel">
+                                <spring:message code="edoc.button.cancel"/>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="resendDocument" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <span class="close-modal"><i class="fa fa-close fa-fw"></i></span>
+                </button>
+                <span class="modal-title">
+                        <i class="fa fa-users fa-fw"></i>
+                        <spring:message code="edoc.resend.document"/>
+                </span>
+            </div>
+            <div class="modal-body edoc-resend" id="edoc-resend">
+            </div>
+        </div>
+    </div>
+</div>
+<script id="resendDocumentTemplate" type="text/x-jquery-tmpl">
+    <form class="form-horizontal" action="javascript:void(0)">
+        <span class="resend-header">Chọn (các) đơn vị để gửi lại văn bản...</span>
+        <br><br>
+        <div class="form-group">
+        {{each toOrgan}}
+            <div class="col-md-10 col-sm-10 col-xs-12">
+                <span class="toOrgan-name">${name}</span>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-12">
+                <input type="checkbox" value="${domain}"/><br/>
+            </div>
+        {{/each}}
+        </div>
+        <br><hr>
+        <div class="form-group">
+            <div class="col-md-8 col-sm-6 col-xs-12">
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <button class="btn btn-success" data-id="${id}" id="btn-resend-confirm">
+                    ${app_message.edoc_resend_submit}
+                </button>
+                <button class="btn btn-danger" data-id="${id}" id="btn-resend-cancel">
+                    ${app_message.edoc_resend_cancel}
+                </button>
+            </div>
+        </div>
+    </form>
+</script>
 <script id="displayNamePermissionTemplate" type="text/x-jquery-tmpl">
     <div class="col-md-4 col-sm-6 col-xs-12">
         <span class="permission-role">${displayName}</span>
@@ -496,10 +615,10 @@
     <div class="col-md-7 col-sm-6 col-xs-12">
         <div class="row">
             <div class="col-md-6 col-sm-6 col-xs-12">
-                <input type="checkbox" id="adminRoleSelected" value="1"/><br/>
+                <input type="checkbox" name="user-permission" id="adminRoleSelected" value="1"/><br/>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12">
-                <input type="checkbox" id="userRoleSelected" value="2"/><br/>
+                <input type="checkbox" name="user-permission" id="userRoleSelected" value="2"/><br/>
             </div>
         </div>
     </div>

@@ -33,10 +33,10 @@ let edocReport = {
     renderReportTable: function (fromDate, toDate, keyword) {
         let instance = this;
         let url = "/public/-/stat/detail";
-        if (keyword !== null)
-            url = url + "?keyword=" + keyword;
+        /*if (keyword !== null)
+            url = url + "?keyword=" + keyword;*/
         if (fromDate !== "" && toDate !== "")
-            url = url + "&fromDate=" + fromDate + "&toDate=" + toDate;
+            url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
 
         instance.appSetting.dataTable = $('#edocReportTable').DataTable({
             ajax: {

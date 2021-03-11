@@ -30,7 +30,78 @@ public class EdocDailyCounterService {
         edocDailyCounterDao.createDailyCounter(dailyCounter);
     }
 
-    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
+    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate) {
+        List<EPublicStat> ePublicStats = new ArrayList<>();
+        int vpubnd_sent = 0;
+        int vpubnd_received = 0;
+        String vpubndName = "";
+
+        Session session = edocDailyCounterDao.openCurrentSession();
+        try {
+            List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
+            for (OrganizationCacheEntry contact : contacts) {
+                String organId = contact.getDomain();
+                StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
+                storedProcedureQuery.registerStoredProcedureParameter("fromDate", java.sql.Date.class, ParameterMode.IN);
+                storedProcedureQuery.registerStoredProcedureParameter("toDate", java.sql.Date.class, ParameterMode.IN);
+                storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
+                storedProcedureQuery.registerStoredProcedureParameter("totalSent", Integer.class, ParameterMode.OUT);
+                storedProcedureQuery.registerStoredProcedureParameter("totalReceived", Integer.class, ParameterMode.OUT);
+                if(fromDate == null || toDate == null){
+                    java.sql.Date date = null;
+                    storedProcedureQuery.setParameter("fromDate", date);
+                    storedProcedureQuery.setParameter("toDate", date);
+                } else {
+                    storedProcedureQuery.setParameter("fromDate", fromDate);
+                    storedProcedureQuery.setParameter("toDate", toDate);
+                }
+
+                storedProcedureQuery.setParameter("organId", organId);
+                int sent = 0;
+                int received = 0;
+                if(storedProcedureQuery.getOutputParameterValue("totalSent") != null){
+                    sent = (Integer) storedProcedureQuery.getOutputParameterValue("totalSent");
+                }
+                if( storedProcedureQuery.getOutputParameterValue("totalReceived") != null){
+                    received = (Integer) storedProcedureQuery.getOutputParameterValue("totalReceived");
+                }
+                if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.0")) ||
+                        contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
+                    if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1")))  {
+                        vpubndName += contact.getName();
+                    }
+                    vpubnd_sent += sent;
+                    vpubnd_received += received;
+                } else {
+                    EPublicStat ePublicStat = new EPublicStat();
+                    ePublicStat.setLastUpdate(new Date());
+                    ePublicStat.setOrganDomain(organId);
+                    ePublicStat.setOrganName(contact.getName());
+                    ePublicStat.setSent(sent);
+                    ePublicStat.setReceived(received);
+                    long total = sent + received;
+                    ePublicStat.setTotal(total);
+                    ePublicStats.add(ePublicStat);
+                }
+            }
+            EPublicStat ePublicStat = new EPublicStat();
+            ePublicStat.setLastUpdate(new Date());
+            ePublicStat.setOrganDomain(PropsUtil.get("edoc.domain.vpubnd.1"));
+            ePublicStat.setOrganName(vpubndName);
+            ePublicStat.setSent(vpubnd_sent);
+            ePublicStat.setReceived(vpubnd_received);
+            long total = vpubnd_sent + vpubnd_received;
+            ePublicStat.setTotal(total);
+            ePublicStats.add(ePublicStat);
+        } catch (Exception e) {
+            LOGGER.error("Error get stat document detail cause " + e);
+        } finally {
+            edocDailyCounterDao.closeCurrentSession(session);
+        }
+        return ePublicStats;
+    }
+
+    /*public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
         int vpubnd_sent = 0;
         int vpubnd_received = 0;
@@ -111,7 +182,7 @@ public class EdocDailyCounterService {
             edocDailyCounterDao.closeCurrentSession(session);
         }
         return ePublicStats;
-    }
+    }*/
 
     /*public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
         List<EPublicStat> ePublicStats = new ArrayList<>();

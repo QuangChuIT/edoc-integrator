@@ -36,6 +36,7 @@ let app_message = {
     "edoc_received_message": "Đã nhận về hệ thống",
     "edoc_not_received_message": "Chưa nhận về hệ thống",
     "edoc_delete_document": "Xoá file đính kèm",
+    "edoc_resend_document": "Gửi lại văn bản",
     "edoc_remove_document" : "Kết thúc văn bản",
     "edoc_download_all_attachment": "Tải xuống tất cả",
     "edoc_document_type": "Loại văn bản",
@@ -99,6 +100,8 @@ let app_message = {
     "edoc_publish_document_error": "Phát hành văn bản thất bại !!!",
     "edoc_export_file_name": "Thống kê gửi nhận chi tiết",
     "edoc_validate_document_request_fail": "Dữ liệu văn bản không hợp lệ !",
+    "edoc_resend_submit": "Gửi lại",
+    "edoc_resend_cancel": "Hủy",
     // public stat
     "edoc_before_content": "Đến tháng {0} đã trao đổi",
     "edoc_after_first_content": "văn bản qua mạng",
@@ -148,7 +151,8 @@ let user_message = {
     "user_delete_success": "Xóa người dùng thành công",
     "user_delete_fail": "Xóa người dùng thất bại",
     "user_edit_success": "Cập nhật người dùng thành công",
-    "user_edit_fail": "Cập nhật người dùng thất bại"
+    "user_edit_fail": "Cập nhật người dùng thất bại",
+    "user_change_password_fail": "Thay đổi mật khẩu thất bại !"
 };
 
 let organ_message = {

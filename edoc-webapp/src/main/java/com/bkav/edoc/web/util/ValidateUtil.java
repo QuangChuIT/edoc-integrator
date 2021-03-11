@@ -124,6 +124,16 @@ public class ValidateUtil {
         return errors;
     }
 
+    public List<String> validatePasswordByRegex(String password) {
+        List<String> errors = new ArrayList<>();
+
+        String regex = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*])).{8,30}$";
+        if (!password.matches(regex)) {
+            errors.add(messageSourceUtil.getMessage("user.password.regex", null));
+        }
+        return errors;
+    }
+
     public boolean checkExtensionFile(MultipartFile file) {
         String extension = AttachmentGlobalUtil.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
         return extension.equals("xlsx") || extension.equals("xls");

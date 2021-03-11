@@ -173,17 +173,6 @@ public class EdocNotificationService {
                     if (contact.getReceiveNotify()) {
                         // check if document not taken after 30m to notification
                         Date createDate = notification.getModifiedDate();
-                    /*int diffMin = DateUtil.getMinuteBetween(createDate, date);
-                    LOGGER.info("------------------------- Modified Date " + createDate +
-                            " ---------------------- " + diffMin + " ------- organ " + notification.getReceiverId());
-                    if (diffMin >= 30) {
-                        TelegramMessage telegramMessage = new TelegramMessage();
-                        telegramMessage.setReceiverId(notification.getReceiverId());
-                        telegramMessage.setReceiverName(contact.getName());
-                        telegramMessage.setDocument(notification.getDocument());
-                        telegramMessage.setCreateDate(createDate);
-                        telegramMessages.add(telegramMessage);
-                    }*/
                         Date now = new Date();
                         int diffMin = DateUtil.getMinuteBetween(createDate, now);
                         if (diffMin >= 30) {

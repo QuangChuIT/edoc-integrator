@@ -151,6 +151,14 @@ table.dataTable thead .sorting:after {
         width: 550px !important;
     }
 
+    #formChangePassword .modal-dialog {
+        width: 550px !important;
+    }
+
+    #resendDocument .modal-dialog {
+        width: 650px !important;
+    }
+
     #delete-confirm-modal .modal-dialog {
         margin-top: 250px;
         width: 350px !important;
@@ -543,7 +551,9 @@ ul.nav a.active {
 #formPermission .modal-content,
 #formAddUser .modal-content,
 #formEditUser .modal-content,
-#formEditOrgan .modal-content {
+#formEditOrgan .modal-content,
+#resendDocument .modal-content,
+#formChangePassword .modal-content {
     top: 150px;
     border-radius: 0 !important;
     border: 0 !important;
@@ -566,6 +576,15 @@ ul.nav a.active {
     margin-top: -25px;
     position: relative;
     z-index: 2;
+}
+
+.edoc-resend {
+    height: 170px;
+}
+.edoc-resend .form-group {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 4px !important;
 }
 
 /*style for modal detail*/
@@ -693,7 +712,9 @@ ul.nav a.active {
 .permission-role {
     font-weight: 600;
 }
-
+.toOrgan-name {
+    font-weight: 600;
+}
 
 .modal-body {
     padding: 16px 30px !important;
@@ -2025,4 +2046,8 @@ input:checked + .slider:before {
 }
 .edoc-notTken {
     color: #ac2925;
+}
+
+#meter {
+    width: 100%;
 }

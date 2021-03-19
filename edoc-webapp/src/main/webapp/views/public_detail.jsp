@@ -43,6 +43,9 @@
                            placeholder="<spring:message code="edoc.search.to.date"/>">
                 </div>
             </div>
+            <%--<div class="col-md-2 col-sm-6 col-xs-12">
+                <input class="form-control" type="search" id="statDetailSearch" value="" placeholder="Nhập từ khóa...">
+            </div>--%>
             <ul class="nav navbar-top-links report-action">
                 <li>
                     <button class="btn btn-info btn-report-group" id="btnSearchReport">

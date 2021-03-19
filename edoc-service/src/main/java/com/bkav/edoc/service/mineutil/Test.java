@@ -23,12 +23,12 @@ public class Test {
             list.add(th);
         }
 
-        for (Thread thread : list) {
+       /* for (Thread thread : list) {
             try {
                 thread.join();
             } catch (InterruptedException ex) {
             }
-        }
+        }*/
 
         System.out.println("count: " + count);
     }

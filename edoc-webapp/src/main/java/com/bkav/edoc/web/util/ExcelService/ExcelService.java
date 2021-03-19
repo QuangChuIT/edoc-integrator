@@ -509,7 +509,7 @@ public class ExcelService {
         return results;
     }
 
-    public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate) throws IOException {
+    public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate, String keyword) throws IOException {
         List<EPublicStat> eStats;
         if (fromDate == null || toDate == null)
             eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null);

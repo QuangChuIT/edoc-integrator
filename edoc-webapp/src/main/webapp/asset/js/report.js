@@ -1,3 +1,4 @@
+let keyword = null;
 let edocReport = {
     appSetting: {
         host: "/van-ban/-/",
@@ -19,7 +20,7 @@ let edocReport = {
             return;
         }
         instance.renderStat();
-        instance.renderReportTable("", "");
+        instance.renderReportTable("", "", keyword);
     },
     renderStat: function () {
         let instance = this;
@@ -29,31 +30,36 @@ let edocReport = {
             $("#totalReport").text(data.total);
         });
     },
-    renderReportTable: function (fromDate, toDate) {
+    renderReportTable: function (fromDate, toDate, keyword) {
         let instance = this;
         let url = "/public/-/stat/detail";
-        if (fromDate !== "" && toDate !== "") {
+        /*if (keyword !== null)
+            url = url + "?keyword=" + keyword;*/
+        if (fromDate !== "" && toDate !== "")
             url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
-        }
+
         instance.appSetting.dataTable = $('#edocReportTable').DataTable({
             ajax: {
                 url: url,
                 type: "POST",
-                dataSrc: ""
+                dataSrc: "",
             },
             pageLength: 25,
             responsive: true,
-            autoWidth: false,
+            autoWidth: true,
             ordering: true,
             bDestroy: true,
-            searching: false,
-            lengthChange: false,
+            searching: true,
             paging: true,
+            processing: true,
             info: false,
             columns: [
                 {
                     "title": app_message.edoc_organ_name,
                     "data": "organName",
+                    /*"render": function (data) {
+                        return $('#statOrganNameTemplate').tmpl(data).html()
+                    }*/
                 },
                 {
                     "title": app_message.edoc_organ_sent,
@@ -77,7 +83,6 @@ let edocReport = {
             $("#toDate").val("");
         } else {
             let beginDate = new Date(new Date().getFullYear() + 1, 0, 1).formatDate();
-            console.log(new Date().getFullYear());
             let currentDate = new Date().formatDate();
             $("#filterLabel").html(app_message.edoc_report_filter + "<span class='time-filter'>" + beginDate + " - " + currentDate + "</span>");
         }
@@ -151,6 +156,7 @@ $(document).ready(function () {
         event.preventDefault();
         let fromDate = $("#fromDate").val();
         let toDate = $("#toDate").val();
+        keyword = ($("#statDetailSearch").val() === "" ? null : $("#statDetailSearch").val());
         let fromDateValue = new Date(fromDate);
         let toDateValue = new Date(toDate);
         if (fromDateValue > toDateValue) {
@@ -160,7 +166,7 @@ $(document).ready(function () {
             localStorage.removeItem("toDateReport");
             localStorage.setItem("fromDateReport", fromDate);
             localStorage.setItem("toDateReport", toDate);
-            edocReport.renderReportTable(fromDate, toDate);
+            edocReport.renderReportTable(fromDate, toDate, keyword);
         }
     });
 

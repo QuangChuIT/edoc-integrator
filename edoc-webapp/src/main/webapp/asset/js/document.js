@@ -64,13 +64,22 @@ let edocDocument = {
                     selector: 'tbody tr td',
                     callback: function (key, options) {
                         let id = options.$trigger[0].parentElement.id;
-                        instance.deleteDocument(id);
+                        switch (key) {
+                            case "resend":
+                                console.log(id);
+                                //reSendDocument(id);
+                                break;
+                            case "delete":
+                                instance.deleteDocument(id);
+                                break;
+                        }
                     },
                     items: {
                         /*"edit": {name: "Edit", icon: "edit"},
                         /*"cut": {name: "Cut", icon: "cut"},
                         copy: {name: "Copy", icon: "copy"},
                         "paste": {name: "Paste", icon: "paste"},*/
+                        "resend": {name: app_message.edoc_resend_document, icon: "fa-repeat"},
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
                         /*"sep1": "---------",*/
                         /*"quit": {name: "Quit", icon: function(){
@@ -482,10 +491,16 @@ $(document).ready(function () {
             data.toOrgan.forEach(function (organ, index) {
                 data.notifications.forEach(function (notification, index) {
                     if (notification.toOrganization["domain"] === organ["domain"]) {
-                        if (notification["taken"])
-                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_taken + ")";
-                        else
-                            takenOrgan = organ["name"] + " (" + app_message.edoc_organ_not_taken + ")";
+                        if (notification["taken"]) {
+                            let status = app_message.edoc_organ_taken;
+                            //let takenStatus = status.fontcolor("blue");
+                            takenOrgan = organ["name"] + " (" + status + ")";
+                        }
+                        else {
+                            let status = app_message.edoc_organ_not_taken;
+                            //let notTakenStatus = status.fontcolor("red");
+                            takenOrgan = organ["name"] + " (" + status + ")";
+                        }
                     }
                 })
                 toOrganNames.push(takenOrgan);
@@ -747,6 +762,27 @@ $(document).on("click", "#btn-confirm", function (event) {
     draftDocument.deleteDraftDocument(draftDocument.getDraftDocumentId());
     $("#delete-confirm-modal").modal('toggle');
 })
+
+$(document).on('click', '#btn-resend-submit', function(e) {
+    e.preventDefault();
+
+    $("#resendDocument").modal('toggle');
+})
+$(document).on('click', '#btn-resend-cancel', function(e) {
+    e.preventDefault();
+    $("#resendDocument").modal('toggle');
+})
+
+function reSendDocument (documentId) {
+    $.get("/document/" + documentId, function(data) {
+        $('#edoc-resend').empty();
+        $('#resendDocumentTemplate').tmpl(data).appendTo('#edoc-resend');
+        $("#resendDocument").modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+}
 
 function validateDocument(subject, toOrgan, codeNation, codeNumber, staffName, promulgationDate, fromOrgan, signerFullName, attachments) {
     let result = false;

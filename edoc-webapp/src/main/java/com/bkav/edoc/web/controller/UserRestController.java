@@ -10,6 +10,7 @@ import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.payload.*;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.MessageSourceUtil;
+import com.bkav.edoc.web.util.PropsUtil;
 import com.bkav.edoc.web.util.ValidateUtil;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -297,6 +298,36 @@ public class UserRestController {
 
             Response response = new Response(code, errors, messageSourceUtil.getMessage("user.message.push.to.sso", new Object[]{success, numberUserDuplicate, fail}));
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/user/change/password", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> changeUserPassword(HttpServletRequest request,
+                                                       @RequestParam("userName") String userName,
+                                                       @RequestParam("oldPassword") String oldPassword,
+                                                       @RequestParam("newPassword") String newPassword) {
+        String url = PropsUtil.get("user.change.password.api");
+        List<String> errors = validateUtil.validatePasswordByRegex(newPassword);
+        try {
+            if (errors.size() > 0) {
+                Response response = new Response(404, errors, messageSourceUtil.getMessage("user.password.regex.not.match", null));
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                int code = UserServiceUtil.changeUserPassword(userName, oldPassword, newPassword, url);
+                if (code == 200) {
+                    Response response = new Response(code, errors, messageSourceUtil.getMessage("user.change.password.success", null));
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                } else if (code == 401) {
+                    Response response = new Response(code, errors, messageSourceUtil.getMessage("user.change.wrong.password", null));
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                }
+            }
+            Response response = new Response(404, errors, messageSourceUtil.getMessage("user.change.password.fail", null));
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));

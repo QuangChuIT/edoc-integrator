@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 public class EPublicStat implements Serializable {
 

@@ -4,6 +4,10 @@ import com.bkav.edoc.service.database.cache.UserCacheEntry;
 import com.bkav.edoc.service.database.entity.User;
 import com.bkav.edoc.service.database.services.UserService;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class UserServiceUtil {
@@ -47,5 +51,10 @@ public class UserServiceUtil {
 
     public static boolean checkExistUserByUserName(String username) {
         return USER_SERVICE.checkExist(username);
+    }
+
+    public static int changeUserPassword(String userName, String oldPassword, String newPassword, String url)
+            throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        return USER_SERVICE.changeUserPassword(userName, oldPassword, newPassword, url);
     }
 }

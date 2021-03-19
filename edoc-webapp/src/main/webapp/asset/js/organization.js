@@ -166,6 +166,7 @@ let organManage = {
                 success: function (response) {
                     if (response.code === 200) {
                         $.notify(organ_message.organ_add_new_success, "success");
+                        $.notify(response.message, "success");
                         $('#addNewOrgan').trigger("reset");
                         $('#formAddOrgan').modal('toggle');
                         organManage.renderOrganDatatable();
@@ -214,6 +215,7 @@ let organManage = {
             success: function (response) {
                 if (response.code === 200) {
                     $.notify(organ_message.organ_edit_success, "success");
+                    $.notify(response.message, "success");
                 } else {
                     $.notify(organ_message.organ_edit_fail, "error");
                 }

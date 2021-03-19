@@ -255,6 +255,9 @@ let userManage = {
     }
 }
 
+let code = document.getElementById("newPassword");
+let strengthbar = document.getElementById("meter");
+
 $(document).ready(function () {
     // Show detail of user-login info
     $(".user-info").on('click', function () {
@@ -310,6 +313,7 @@ $(document).ready(function () {
     // $.get("/public/-/role/" + role_message.role_super_administrator, function (data) {
     //     SuperAdministratorId = data.roleId;
     // });
+    $('#')
     $("#email-template-menu").on('click', function (e) {
         e.preventDefault();
     });
@@ -331,6 +335,23 @@ $(document).ready(function () {
         }).done(function () {
             $("#overlay").hide();
         });
+    })
+
+    $('#change-password').on('click', function () {
+        $('#formChangePassword').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    })
+    $('#newPassword').on('keyup', function () {
+        checkPasswordStrength(code.value);
+    })
+    $('#retypeNewPassword').on('keyup', function (e) {
+        e.preventDefault();
+        if ($('#newPassword').val() === $('#retypeNewPassword').val()) {
+            $('#retypeNewPassword').css('borderColor', 'green');
+        } else
+            $('#retypeNewPassword').css('borderColor', 'red');
     })
 });
 
@@ -437,7 +458,7 @@ $(document).on('click', '#exportUserToExcel', function (e) {
     });
 })
 
-$(".toggle-password").click(function () {
+$(".toggle-password, .toggle-old-password, .toggle-new-password, .toggle-renew-password").click(function () {
     $(this).toggleClass("fa-eye fa-eye-slash");
     let input = $($(this).attr("toggle"));
     if (input.attr("type") === "password") {
@@ -477,6 +498,35 @@ $(document).on("click", "#btn-editUser-confirm", function (event) {
 $(document).on("click", "#btn-editUser-cancel", function (event) {
     event.preventDefault();
     $("#formEditUser").modal('toggle');
+});
+
+// Buttons in change password form
+$(document).on("click", "#btn-changePassword-confirm", function (event) {
+    event.preventDefault();
+    let username = $(this).val();
+    let oldPassword = $('#oldPassword').val();
+    let newPassword = $('#newPassword').val();
+    let confirmNewPassword = $('#retypeNewPassword').val();
+    if (confirmPassword(newPassword, confirmNewPassword)) {
+    } else {
+        let url = "/user/change/password";
+        $("#overlay").show();
+        $.post(url, {userName: username, oldPassword: oldPassword, newPassword: newPassword},
+            function (response) {
+                if (response.code === 200) {
+                    changePasswordSubmit();
+                    //$.notify(response.message, "success");
+                } else if (response.code === 401)
+                    $('#oldPassword').notify(response.message, {position: "right"});
+            }).fail(function() {
+            $.notify(user_message.user_change_password_fail, "error");
+        })
+    }
+    $("#overlay").hide();
+});
+$(document).on("click", "#btn-changePassword-cancel", function (event) {
+    event.preventDefault();
+    $("#formChangePassword").modal('toggle');
 });
 
 function validateAddUser(displayName, userName, organDomain, password, emailAddress) {
@@ -611,4 +661,77 @@ function progressHandler(event) {
 
 function completeHandler(event) {
     _("status").innerHTML = event.target.responseText;
+}
+
+function changePasswordSubmit() {
+    swal.fire({
+        title: "Đổi mật khẩu thành công!",
+        text: " Nhấn Xác nhận để đăng xuất",
+        icon: "warning",
+        confirmButtonText: 'Xác nhận',
+    }).then(() => {
+        $('#formChangePassword').empty();
+        $('#formChangePassword').modal("toggle");
+        let href = $('.logout').attr('href');
+        window.location.href = href;
+    });
+}
+
+function confirmPassword (newPassword, confirmPassword) {
+    let result = false;
+    let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})/;
+    if (!passwordRegex.test(newPassword)) {
+        $('#newPassword').notify(
+            "Mật khẩu ít nhất 8 kí tự, phải chứa ít nhất 1 chữ cái viết hoa,\n 1 chữ cái viết thường, 1 chữ số và 1 ký tự đặc biệt !",
+            {position: "right"}
+        )
+        result = true;
+        return result;
+    }
+    if (newPassword !== confirmPassword) {
+        $("#retypeNewPassword").notify(
+            "Mật khẩu không khớp !",
+            {position: "right"}
+        );
+        result = true;
+        return result;
+    }
+}
+
+function checkPasswordStrength(password) {
+    let strength = 0;
+    if (password.match(/[a-z]+/)) {
+        strength += 1;
+    }
+    if (password.match(/[A-Z]+/)) {
+        strength += 1;
+    }
+    if (password.match(/[0-9]+/)) {
+        strength += 1;
+    }
+    if (password.match(/[$@#&!]+/)) {
+        strength += 1;
+    }
+
+    switch (strength) {
+        case 0:
+            strengthbar.value = 0;
+            break;
+
+        case 1:
+            strengthbar.value = 25;
+            break;
+
+        case 2:
+            strengthbar.value = 50;
+            break;
+
+        case 3:
+            strengthbar.value = 75;
+            break;
+
+        case 4:
+            strengthbar.value = 100;
+            break;
+    }
 }

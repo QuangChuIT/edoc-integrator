@@ -1,5 +1,7 @@
 package com.bkav.edoc.service.database.entity;
 
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -12,6 +14,7 @@ public class EPublicStat implements Serializable {
     private long sent;
     private long received;
     private long total;
+    private Set<EPublicStat> childOrgan;
 
     public EPublicStat() {
     }
@@ -62,5 +65,13 @@ public class EPublicStat implements Serializable {
 
     public void setTotal(long total) {
         this.total = total;
+    }
+
+    public Set<EPublicStat> getChildOrgan() {
+        return childOrgan;
+    }
+
+    public void setChildOrgan(Set<EPublicStat> childOrgan) {
+        this.childOrgan = childOrgan;
     }
 }

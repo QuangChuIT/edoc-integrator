@@ -33,49 +33,49 @@ let edocReport = {
     renderReportTable: function (fromDate, toDate, keyword) {
         let instance = this;
         let url = "/public/-/stat/detail";
-        /*if (keyword !== null)
-            url = url + "?keyword=" + keyword;*/
-        if (fromDate !== "" && toDate !== "")
-            url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
+        if (keyword !== null) {
+            url = url + "?keyword=" + keyword;
+            if (fromDate !== "" && toDate !== "")
+                url = url + "&fromDate=" + fromDate + "&toDate=" + toDate;
+        } else {
+            if (fromDate !== "" && toDate !== "")
+                url = url + "?fromDate=" + fromDate + "&toDate=" + toDate;
+        }
 
-        instance.appSetting.dataTable = $('#edocReportTable').DataTable({
-            ajax: {
-                url: url,
-                type: "POST",
-                dataSrc: "",
+        let jsonData = null;
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataSrc: "",
+            async: false,
+            success: function (data) {
+                jsonData = data;
+            }
+        });
+
+        console.log(jsonData);
+
+        instance.appSetting.dataTable = $('#edocReportTable').ejTreeGrid({
+            dataSource: jsonData,
+            treeColumnIndex: 0,
+            isResponsive: true,
+            allowSorting: true,
+            allowMultiSorting:true,
+            allowPaging: true,
+            pageSettings: {
+                pageCount: 5,
+                pageSizeMode: "all",
+                pageSize: "25",
             },
-            pageLength: 25,
-            responsive: true,
-            autoWidth: true,
-            ordering: true,
-            bDestroy: true,
-            searching: true,
-            paging: true,
-            processing: true,
-            info: false,
+            allowColumnResize: true,
+            //enableCollapseAll: true,
+            childMapping: "childOrgan",
             columns: [
-                {
-                    "title": app_message.edoc_organ_name,
-                    "data": "organName",
-                    /*"render": function (data) {
-                        return $('#statOrganNameTemplate').tmpl(data).html()
-                    }*/
-                },
-                {
-                    "title": app_message.edoc_organ_sent,
-                    "data": "sent",
-                },
-                {
-                    "title": app_message.edoc_organ_received,
-                    "data": "received",
-                },
-                {
-                    "title": app_message.edoc_organ_total,
-                    "data": "total",
-                }
+                { field: "organName", headerText: app_message.edoc_organ_name, width: "550px" },
+                { field: "sent", headerText: app_message.edoc_organ_sent },
+                { field: "received", headerText: app_message.edoc_organ_received },
+                { field: "total", headerText: app_message.edoc_organ_total }
             ],
-            language: app_message.language,
-            "order": [[3, "desc"]],
         });
         if (fromDate !== "" && toDate !== "") {
             $("#filterLabel").html(app_message.edoc_report_filter + "<span class='time-filter'>" + fromDate + " - " + toDate + "</span>");
@@ -164,8 +164,11 @@ $(document).ready(function () {
         } else {
             localStorage.removeItem("fromDateReport");
             localStorage.removeItem("toDateReport");
+            localStorage.removeItem("keyword");
             localStorage.setItem("fromDateReport", fromDate);
             localStorage.setItem("toDateReport", toDate);
+            localStorage.setItem("keyword", keyword);
+            //edocReport.appSetting.dataTable.clear();
             edocReport.renderReportTable(fromDate, toDate, keyword);
         }
     });
@@ -176,6 +179,9 @@ $(document).ready(function () {
         let toDate = localStorage.getItem("toDateReport");
         edocReport.exportExcel(fromDate, toDate);
     })
+
+    $("#edocReportTable_ConfirmDialog_wrapper").remove();
+    $(".xdsoft_datetimepicker").remove();
 });
 
 String.format = function () {

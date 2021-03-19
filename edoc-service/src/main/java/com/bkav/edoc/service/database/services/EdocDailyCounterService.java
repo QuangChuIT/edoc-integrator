@@ -19,8 +19,8 @@ public class EdocDailyCounterService {
     private final EdocDynamicContactService edocDynamicContactService = new EdocDynamicContactService();
     private final EdocDocumentService edocDocumentService = new EdocDocumentService();
 
-    /*private int vpubnd_sent = 0, vpubnd_received = 0;
-    private String vpubndName = "";*/
+    private int vpubnd_sent = 0, vpubnd_received = 0;
+    private String vpubndName = "";
 
     public boolean checkExistCounter(Date date) {
         return edocDailyCounterDao.checkExistCounter(date);
@@ -30,18 +30,50 @@ public class EdocDailyCounterService {
         edocDailyCounterDao.createDailyCounter(dailyCounter);
     }
 
-    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate) {
+    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
-        int vpubnd_sent = 0;
+        /*int vpubnd_sent = 0;
         int vpubnd_received = 0;
-        String vpubndName = "";
+        String vpubndName = "";*/
+        boolean hasKeyword = false;
+        List<OrganizationCacheEntry> contacts;
 
         Session session = edocDailyCounterDao.openCurrentSession();
         try {
-            List<OrganizationCacheEntry> contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
+            if (keyword == null) {
+                contacts = edocDynamicContactService.getLevel3Contact();
+                //contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
+            }
+            else {
+                hasKeyword = true;
+                contacts = edocDynamicContactService.getOrganByKeyword(keyword);
+            }
+
             for (OrganizationCacheEntry contact : contacts) {
                 String organId = contact.getDomain();
-                StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
+
+                EPublicStat parentOrgan = callStatStoredProcedure(fromDate, toDate, session, contact);
+                //Set<OrganizationCacheEntry>
+
+                String regex = "." + organId.split("\\.")[2] +
+                        "." + organId.split("\\.")[3];
+
+                List<OrganizationCacheEntry> childOrgan = edocDynamicContactService.getOrganByKeyword(regex);
+
+                Set<EPublicStat> childOrganStatSet = new HashSet<>();
+
+                for (OrganizationCacheEntry child : childOrgan) {
+                    String childDomain = child.getDomain();
+                    if (!childDomain.equals(organId)) {
+                        EPublicStat childOrganStat = callStatStoredProcedure(fromDate, toDate, session, child);
+                        childOrganStatSet.add(childOrganStat);
+                    }
+                }
+
+                parentOrgan.setChildOrgan(childOrganStatSet);
+                ePublicStats.add(parentOrgan);
+
+                /*StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
                 storedProcedureQuery.registerStoredProcedureParameter("fromDate", java.sql.Date.class, ParameterMode.IN);
                 storedProcedureQuery.registerStoredProcedureParameter("toDate", java.sql.Date.class, ParameterMode.IN);
                 storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
@@ -82,17 +114,19 @@ public class EdocDailyCounterService {
                     long total = sent + received;
                     ePublicStat.setTotal(total);
                     ePublicStats.add(ePublicStat);
-                }
+                }*/
             }
-            EPublicStat ePublicStat = new EPublicStat();
-            ePublicStat.setLastUpdate(new Date());
-            ePublicStat.setOrganDomain(PropsUtil.get("edoc.domain.vpubnd.1"));
-            ePublicStat.setOrganName(vpubndName);
-            ePublicStat.setSent(vpubnd_sent);
-            ePublicStat.setReceived(vpubnd_received);
-            long total = vpubnd_sent + vpubnd_received;
-            ePublicStat.setTotal(total);
-            ePublicStats.add(ePublicStat);
+            if (!hasKeyword || keyword.equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
+                EPublicStat ePublicStat = new EPublicStat();
+                ePublicStat.setLastUpdate(new Date());
+                ePublicStat.setOrganDomain(PropsUtil.get("edoc.domain.vpubnd.1"));
+                ePublicStat.setOrganName(vpubndName);
+                ePublicStat.setSent(vpubnd_sent);
+                ePublicStat.setReceived(vpubnd_received);
+                long total = vpubnd_sent + vpubnd_received;
+                ePublicStat.setTotal(total);
+                ePublicStats.add(ePublicStat);
+            }
         } catch (Exception e) {
             LOGGER.error("Error get stat document detail cause " + e);
         } finally {
@@ -184,77 +218,7 @@ public class EdocDailyCounterService {
         return ePublicStats;
     }*/
 
-    /*public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
-        List<EPublicStat> ePublicStats = new ArrayList<>();
-        boolean hasKeyword = false;
-
-        Session session = edocDailyCounterDao.openCurrentSession();
-        List<OrganizationCacheEntry> contacts;
-        try {
-            if (keyword == null) {
-                //contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
-                contacts = edocDynamicContactService.getLevel3Contact();
-            } else {
-                contacts = edocDynamicContactService.getOrganByKeyword(keyword);
-                hasKeyword = true;
-            }
-
-            Iterator<OrganizationCacheEntry> i = contacts.iterator();
-            while (i.hasNext()) {
-                OrganizationCacheEntry s = i.next();
-                EPublicStat ePublicStat = callStatStoredProcedure(fromDate, toDate, session, s);
-                LOGGER.info("Stat success with organ domain " + ePublicStat.getOrganDomain());
-                String regex = "." + ePublicStat.getOrganDomain().split("\\.")[2] +
-                        "." + ePublicStat.getOrganDomain().split("\\.")[3];
-                List<OrganizationCacheEntry> childOrgans = edocDynamicContactService.getOrganByKeyword(regex);
-                LOGGER.info(ePublicStat.getOrganDomain() + " has " + childOrgans.size() + " child !!!!");
-                if (childOrgans != null) {
-                    childOrgans.forEach(childOrgan -> {
-                        if (contacts.contains(childOrgan)) {
-                            EPublicStat childPublicStat = callStatStoredProcedure(fromDate, toDate, session, childOrgan);
-                            ePublicStats.add(childPublicStat);
-                            contacts.remove(childOrgan);
-                        }
-                    });
-                }
-            }
-
-            *//*contacts.forEach(contact -> {
-                EPublicStat ePublicStat = callStatStoredProcedure(fromDate, toDate, session, contact);
-                LOGGER.info("Stat success with organ domain " + ePublicStat.getOrganDomain());
-                String regex = "." + ePublicStat.getOrganDomain().split("\\.")[2] +
-                        "." + ePublicStat.getOrganDomain().split("\\.")[3];
-                List<OrganizationCacheEntry> childOrgans = edocDynamicContactService.getOrganByKeyword(regex);
-                LOGGER.info(ePublicStat.getOrganDomain() + " has " + childOrgans.size() + " child !!!!");
-                if (childOrgans != null) {
-                    childOrgans.forEach(childOrgan -> {
-                        EPublicStat childPublicStat = callStatStoredProcedure(fromDate, toDate, session, childOrgan);
-                        ePublicStats.add(childPublicStat);
-                        contacts.removeIf(o -> o.getDomain().equals(childPublicStat.getOrganDomain()));
-                    });
-                }
-            });*//*
-
-            if (!hasKeyword) {
-                EPublicStat ePublicStat = new EPublicStat();
-                ePublicStat.setLastUpdate(new Date());
-                ePublicStat.setOrganDomain(PropsUtil.get("edoc.domain.vpubnd.1"));
-                ePublicStat.setOrganName(vpubndName);
-                ePublicStat.setSent(vpubnd_sent);
-                ePublicStat.setReceived(vpubnd_received);
-                long total = vpubnd_sent + vpubnd_received;
-                ePublicStat.setTotal(total);
-                ePublicStats.add(ePublicStat);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error get stat document detail cause " + e);
-        } finally {
-            edocDailyCounterDao.closeCurrentSession(session);
-        }
-        return ePublicStats;
-    }*/
-
-    /*private EPublicStat callStatStoredProcedure (Date fromDate, Date toDate, Session session, OrganizationCacheEntry contact) {
+    private EPublicStat callStatStoredProcedure (Date fromDate, Date toDate, Session session, OrganizationCacheEntry contact) {
 
         StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
         storedProcedureQuery.registerStoredProcedureParameter("fromDate", java.sql.Date.class, ParameterMode.IN);
@@ -297,10 +261,9 @@ public class EdocDailyCounterService {
             ePublicStat.setReceived(received);
             long total = sent + received;
             ePublicStat.setTotal(total);
-            //ePublicStats.add(ePublicStat);
             return ePublicStat;
         }
-    }*/
+    }
 
     public List<EdocStatisticDetail> getStatisticSentReceivedExtDetail(String fromDate, String toDate, String organDomain) {
         Map<String, EdocStatisticDetail> dailyCounterMap = new HashMap<>();
@@ -383,7 +346,10 @@ public class EdocDailyCounterService {
 
     public static void main(String[] args) {
         EdocDailyCounterService edocDailyCounterService = new EdocDailyCounterService();
-        System.out.println(new Gson().toJson(edocDailyCounterService.getStatisticSentReceivedExtDetail("2020-12-01", "2020-12-31", null)));
+        Date fromDateValue = DateUtils.parse("01-03-2021");
+        Date toDateValue = DateUtils.parse("13-03-2021");
+        //System.out.println(new Gson().toJson(edocDailyCounterService.getStatisticSentReceivedExtDetail("2020-12-01", "2020-12-31", null)));
+        System.out.println(new Gson().toJson(edocDailyCounterService.getStatsDetail(fromDateValue, toDateValue, null)));
     }
 
     public EPublic getStat() {

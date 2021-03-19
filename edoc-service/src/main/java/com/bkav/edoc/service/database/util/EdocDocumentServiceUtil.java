@@ -126,11 +126,11 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocumentNotTaken(paginationCriteria);
     }
 
-    /*public static List<DocumentCacheEntry> getAlldocumentNotTaken() {
-        return DOCUMENT_SERVICE.getAllDocumentNotTaken();
-    }*/
-
     public static int countDocumentsNotTaken(PaginationCriteria paginationCriteria) {
         return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);
+    }
+
+    public static MessageHeader getMessageHeaderByDOcumentID(long documentId) {
+        return DOCUMENT_SERVICE.getDocumentById(documentId);
     }
 }

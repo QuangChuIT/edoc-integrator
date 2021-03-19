@@ -30,6 +30,10 @@
     <!-- Custom CSS -->
     <link href="<c:url value="/asset/css/report.css"/>" rel="stylesheet">
     <link href="<c:url value="/asset/css/startmin.css"/>" rel="stylesheet">
+
+    <!--TreeGrid CSS-->
+    <link href="<c:url value="/asset/css/TreeGrid/ej.web.all.min.css"/>" rel="stylesheet">
+    <link href="<c:url value="/asset/css/TreeGrid/ej.responsive.css"/>" rel="stylesheet">
 </head>
 <body>
 <div id="wrapper">
@@ -135,6 +139,14 @@
         </div>
     </form>
 </script>
+<script id="edocPublicStatDetailTmpl" type="text/x-jquery-tmpl">
+    <div>
+        {{if childOrgan.size() > 0}}
+            {{each childOrgan}}
+            {{/each}}
+        {{/if}}
+    </div>
+</script>
 <%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
@@ -149,11 +161,15 @@
 <%--JQuery template--%>
 <script src="<c:url value="/asset/js/jquery.tmpl.min.js"/>"></script>
 <script src="<c:url value="/asset/js/datetime.js" />"></script>
-<!-- DataTables JavaScript -->
+<!-- TreeGrid datatable-->
+<script src="<c:url value="/asset/js/TreeGrid/jquery.easing.1.3.min.js"/>"></script>
+<script src="<c:url value="/asset/js/TreeGrid/jsrender.min.js"/>"></script>
+<script src="<c:url value="/asset/js/TreeGrid/ej.web.all.min.js"/>"></script>
+<%--<!-- DataTables JavaScript -->
 <script src="<c:url value="/asset/js/dataTables/jquery.dataTables.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/dataTables.bootstrap.min.js"/>"></script>
 <script src="<c:url value="/asset/js/dataTables/dataTables.responsive.min.js"/>"></script>
-<script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>
+<script src="<c:url value="/asset/js/dataTables/responsive.bootstrap.min.js"/>"></script>--%>
 <!-- Custom Theme JavaScript -->
 <script src="<c:url value="/asset/js/report.js" />"></script>
 <script src="<c:url value="/asset/js/trace.js" />"></script>

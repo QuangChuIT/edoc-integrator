@@ -400,12 +400,12 @@ public class EdocController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getOrganizations(HttpServletRequest request,
-                                   @RequestParam(value = "domain") String domain) {
+                                   @RequestParam(value = "organId") String organId) {
         LOGGER.info("----------------------- Get Organizations Invoke --------------------");
         GetOrganizationResp organizationResp = new GetOrganizationResp();
         List<Error> errors = new ArrayList<>();
         try {
-            List<EdocDynamicContact> contacts = EdocDynamicContactServiceUtil.getAllChildOrgan(domain);
+            List<EdocDynamicContact> contacts = EdocDynamicContactServiceUtil.getAllChildOrgan(organId);
             List<Organization> organizations = new ArrayList<>();
             contacts.forEach(contact -> {
                 Organization organization = new Organization(contact.getDomain(), contact.getInCharge(), contact.getName(),

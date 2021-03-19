@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DynamicService extends AbstractMediator implements ManagedLifecycle {
@@ -281,6 +282,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     }
 
     private Map<String, Object> confirmReceived(Document envelop) {
+        LOGGER.info("Confirm Received Invoker at " + SIMPLE_DATE_FORMAT.format(new Date()));
         Map<String, Object> map = new HashMap<>();
 
         Report report;
@@ -376,7 +378,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             // update trace
             LOGGER.info(status.toString());
             boolean isExists = traceService.exists(status.getFrom().getOrganId(),
-                    status.getResponseFor().getOrganId(), status.getResponseFor().getCode(), GetterUtil.getInteger(status.getStatusCode(), 1));
+                    status.getResponseFor().getOrganId(),
+                    status.getResponseFor().getCode(), GetterUtil.getInteger(status.getStatusCode(), 1));
             if (isExists) {
                 LOGGER.warn("Exist trace on esb with code " + status.getResponseFor().getCode() + " from_organ_domain "
                         + status.getFrom().getOrganId() + " to_organ_domain "
@@ -668,12 +671,12 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 boolean sendVPCP = toesVPCP.size() > 0;
                 // not send to vpcp -> save to cache
                 if (!sendVPCP) {
-                    LOGGER.info("Not send document to VPCP !!!!!!!!");
+                    LOGGER.info("Not send document to VPCP with document id " + strDocumentId);
                     LOGGER.info(messageHeader.getToes());
                     // save envelop file to cache
                     saveEnvelopeFileCache(envelop, strDocumentId.toString());
                 } else {
-                    LOGGER.info("------------------------- Send to VPCP -------------------------------");
+                    LOGGER.info("------------------------- Send to VPCP ------------------------------- " + strDocumentId);
                     // Send to vpcp
                     if (attachmentCacheEntries.size() > 0) {
                         messageHeader.setToes(toesVPCP);
@@ -778,29 +781,34 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     }
 
     private void updateReceivedNotify(Report report, CheckPermission checkPermission) {
-        if (report.isIsSuccess()) {
-            String cacheKey = MemcachedKey.getKey(checkPermission.getOrganId(), MemcachedKey.ORGAN_RECEIVED_REPORT);
-            Boolean isReceivedNotification = (Boolean) MemcachedUtil.getInstance().read(cacheKey);
-            if (isReceivedNotification != null) {
-                if (!isReceivedNotification) {
-                    LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
-                    EdocDynamicContact edocDynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
-                    edocDynamicContact.setReceiveNotify(true);
-                    edocDynamicContactService.updateContact(edocDynamicContact);
-                    LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
-                    MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
-                }
-            } else {
-                EdocDynamicContact dynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
-                if (!dynamicContact.getReceiveNotify()) {
-                    LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
-                    dynamicContact.setReceiveNotify(true);
-                    edocDynamicContactService.updateContact(dynamicContact);
-                    LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
-                    MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
+        boolean isEnable = GetterUtil.getBoolean(PropsUtil.get("edoc.update.received.notification"), false);
+        if (isEnable) {
+            LOGGER.info("Running update received notification for organization request to edoc !!!!");
+            if (report.isIsSuccess()) {
+                String cacheKey = MemcachedKey.getKey(checkPermission.getOrganId(), MemcachedKey.ORGAN_RECEIVED_REPORT);
+                Boolean isReceivedNotification = (Boolean) MemcachedUtil.getInstance().read(cacheKey);
+                if (isReceivedNotification != null) {
+                    if (!isReceivedNotification) {
+                        LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
+                        EdocDynamicContact edocDynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
+                        edocDynamicContact.setReceiveNotify(true);
+                        edocDynamicContactService.updateContact(edocDynamicContact);
+                        LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
+                        MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
+                    }
+                } else {
+                    EdocDynamicContact dynamicContact = edocDynamicContactService.getDynamicContactByDomain(checkPermission.getOrganId());
+                    if (!dynamicContact.getReceiveNotify()) {
+                        LOGGER.info("Prepare update received notification for dynamic contact " + checkPermission.getOrganId() + " !!!!!");
+                        dynamicContact.setReceiveNotify(true);
+                        edocDynamicContactService.updateContact(dynamicContact);
+                        LOGGER.info("Update success received notification for organization " + checkPermission.getOrganId());
+                        MemcachedUtil.getInstance().create(cacheKey, MemcachedKey.CHECK_ALLOW_TIME_LIFE, true);
+                    }
                 }
             }
         }
+
     }
 
     /**
@@ -840,6 +848,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
     }
 
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private static final XmlChecker xmlChecker = new XmlChecker();
     private static final ExtractMime extractMime = new ExtractMime();
     private static final Checker checker = new Checker();

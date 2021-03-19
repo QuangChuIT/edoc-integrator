@@ -1,6 +1,5 @@
 package com.bkav.edoc.service.database.daoimpl;
 
-import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.dao.EdocDocumentDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.HibernateUtil;
@@ -14,7 +13,10 @@ import javax.persistence.StoredProcedureQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> implements EdocDocumentDao {
 
@@ -129,6 +131,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
     public EdocDocument searchDocumentByOrganDomainAndCode(String fromOrganDomain, String toOrganDomain, String code) {
         Session currentSession = openCurrentSession();
+        EdocDocument document = null;
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
@@ -138,17 +141,25 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             query.setParameter("code", code);
             List<EdocDocument> result = query.list();
             if (result != null && result.size() > 0) {
-                return result.get(0);
-            } else {
-                return null;
+                if (result.size() == 1) {
+                    document = result.get(0);
+                } else {
+                    for (EdocDocument doc : result) {
+                        String toOrganDoc = doc.getToOrganDomain();
+                        if (fromOrganDomain.equals(toOrganDoc)) {
+                            document = doc;
+                            break;
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Error find document by organ domain an code with organ domain "
                     + toOrganDomain + " code " + code + " cause " + Arrays.toString(e.getStackTrace()));
-            return null;
         } finally {
             closeCurrentSession(currentSession);
         }
+        return document;
     }
 
 
@@ -281,7 +292,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return 0;
     }
 
-    public List<Long> getDocCodeByOrganDomain (String fromDate, String toDate, String organDomain) {
+    public List<Long> getDocCodeByOrganDomain(String fromDate, String toDate, String organDomain) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
@@ -300,7 +311,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return null;
     }
 
-    public List<EdocDocument> getDocumentByDate (Date date) {
+    public List<EdocDocument> getDocumentByDate(Date date) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
@@ -326,8 +337,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
                 sql.append("Select distinct date(ed.createDate) from EdocDocument ed");
                 Query<Date> query = session.createQuery(sql.toString(), Date.class);
                 return query.getResultList();
-            }
-            else {
+            } else {
                 sql.append("Select distinct date(ed.createDate) from EdocDocument ed where date(ed.createDate) >= :fromDate and date(createDate) <= :toDate");
                 Query<Date> query = session.createQuery(sql.toString(), Date.class);
                 query.setParameter("fromDate", fromDate);
@@ -342,7 +352,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return new ArrayList<>();
     }
 
-    public List<String> getDocCodeByCounterDate (Date _counterDate) {
+    public List<String> getDocCodeByCounterDate(Date _counterDate) {
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();

@@ -312,7 +312,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             }
 
             if (errorList.isEmpty()) {
-                LOGGER.info("--------------------------------- Confirm Receiver Invoke by " + organId + " : " + documentId + " ----------------------------------");
+                LOGGER.info("--------------------------------- Confirm Receiver Invoke by "
+                        + organId + " : " + documentId + " ----------------------------------");
                 // remove pending document
                 notificationService.removePendingDocId(organId, documentId);
                /* // TODO if document of VPCP send request confirm done or fail

@@ -193,7 +193,6 @@ let organManage = {
         let agency = checkAgencySelected();
         let receiveNotify = checkReceivedNotify();
         let sendToVPCP = checkSendToVPCP();
-
         let contactRequest = {
             "id": id,
             "name": name,
@@ -212,6 +211,9 @@ let organManage = {
             url: "/contact/-/update/contact",
             data: JSON.stringify(contactRequest),
             cache: false,
+            beforeSend: function () {
+                $("#overlay").show();
+            },
             success: function (response) {
                 if (response.code === 200) {
                     $.notify(organ_message.organ_edit_success, "success");
@@ -223,9 +225,11 @@ let organManage = {
             error: function (error) {
                 $.notify(organ_message.organ_edit_fail, "error");
             }
-        });
-        $('#formEditOrgan').modal('toggle');
-        organManage.renderOrganDatatable();
+        }).done(function () {
+            $("#overlay").hide();
+            $('#formEditOrgan').modal('toggle');
+            organManage.renderOrganDatatable();
+        })
     },
     deleteOrgan: function (organId) {
         let instance = this;
@@ -397,13 +401,13 @@ $(document).on('click', '#exportOrganToExcel', function (e) {
             link.style.display = 'none';
             link.setAttribute('href', href);
             link.click();
+            $.notify(organ_message.organ_export_to_excel_success, "success");
         },
         error: (e) => {
             $.notify(organ_message.organ_export_to_excel_fail, "error");
         }
     }).done(function () {
         $("#overlay").hide();
-        $.notify(organ_message.organ_export_to_excel_success, "success");
     });
 })
 
@@ -424,7 +428,6 @@ $(document).on("click", "#btn-addOrgan-cancel", function (event) {
 $(document).on('click', '#btn-edit-organ-confirm', function (e) {
     e.preventDefault();
     let organId = $(this).attr("data-id");
-
     organManage.editOrgan(organId);
 })
 $(document).on('click', '#btn-edit-organ-cancel', function (e) {

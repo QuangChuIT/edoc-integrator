@@ -383,7 +383,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
         EdocDocumentDaoImpl edocDocumentDao = new EdocDocumentDaoImpl();
         //System.out.println(edocDocumentDao.getDateInRange(yes, no));
-        System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
+        //System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentDaoImpl.class);

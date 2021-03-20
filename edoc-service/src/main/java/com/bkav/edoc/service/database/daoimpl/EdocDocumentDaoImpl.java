@@ -131,7 +131,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
     public EdocDocument searchDocumentByOrganDomainAndCode(String fromOrganDomain, String toOrganDomain, String code) {
         Session currentSession = openCurrentSession();
-        EdocDocument edocDocument = null;
+        EdocDocument document = null;
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT ed FROM EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain " +
@@ -142,13 +142,14 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             List<EdocDocument> result = query.list();
             if (result != null && result.size() > 0) {
                 // neu danh sach van ban la 1 -> van ban duoc gui tu EOF hoac 1-1 nguoc lai lay chinh xac van ban theo from, to
+
                 if (result.size() == 1) {
-                    edocDocument = result.get(0);
+                    document = result.get(0);
                 } else {
-                    for (EdocDocument document : result) {
-                        String toOrgan = document.getToOrganDomain();
-                        if (toOrgan.equals(fromOrganDomain)) {
-                            edocDocument = document;
+                    for (EdocDocument doc : result) {
+                        String toOrganDoc = doc.getToOrganDomain();
+                        if (fromOrganDomain.equals(toOrganDoc)) {
+                            document = doc;
                             break;
                         }
                     }
@@ -160,7 +161,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         } finally {
             closeCurrentSession(currentSession);
         }
-        return edocDocument;
+        return document;
     }
 
 
@@ -394,7 +395,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
         EdocDocumentDaoImpl edocDocumentDao = new EdocDocumentDaoImpl();
         //System.out.println(edocDocumentDao.getDateInRange(yes, no));
-        System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
+        //System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentDaoImpl.class);

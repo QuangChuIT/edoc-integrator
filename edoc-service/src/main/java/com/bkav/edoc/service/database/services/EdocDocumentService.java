@@ -222,38 +222,6 @@ public class EdocDocumentService {
         return entries;
     }
 
-    /*public List<DocumentCacheEntry> getAllDocumentNotTaken() {
-        List<DocumentCacheEntry> documentsClone = new ArrayList<>();
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            List<EdocDocument> documents = documentDaoImpl.getAllDocumentNotTaken();
-            documents.forEach(document -> {
-                String toOrgans = document.getToOrganDomain();
-                List<String> toOrganList = Arrays.asList(toOrgans.split("#"));
-                toOrganList.forEach(toOrgan -> {
-                    EdocNotification edocNotification = edocNotificationDao.getOrganHasEdocNotTaken(document.getDocumentId(), toOrgan);
-                    if (!edocNotification.getTaken()) {
-                        EdocDocument edocDocumentClone = new EdocDocument();
-                        try {
-                            edocDocumentClone = (EdocDocument) document.clone();
-                            edocDocumentClone.setToOrganDomain(toOrgan);
-                            DocumentCacheEntry documentCacheEntry = MapperUtil.documentToCached(edocDocumentClone);
-                            documentsClone.add(documentCacheEntry);
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            });
-        } catch (Exception e) {
-            LOGGER.error(e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return documentsClone;
-    }*/
-
     public int countDocumentsNotTaken(PaginationCriteria paginationCriteria) {
         Session session = documentDaoImpl.openCurrentSession();
         int result = 0;

@@ -8,6 +8,8 @@ public class RedisKey {
 
     public final static String GET_DOCUMENT_KEY = "GetDocument_";
 
+    public final static String GET_DOCUMENT_EDXML_KEY = "GetDocumentEDXML_";
+
     public final static String GET_PENDING_KEY = "GetPendingDocument_";
 
     public final static String GET_TRACE_KEY = "GetTrace_";

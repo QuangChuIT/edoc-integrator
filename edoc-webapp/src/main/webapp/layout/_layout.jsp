@@ -859,7 +859,8 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-8 col-sm-6 col-xs-12">
-                                        <span class="from-to">${fromOrgan.name} -> ${toOrgan.name}</span>
+                                        <%--<span class="from-to">${fromOrgan.name} -> ${toOrgan.name}</span>--%>
+                                        <span class="from-to">${fromOrgan.name}
                                     </div>
                                     <div class="col-md-2 col-sm-6 col-xs-12 text-center">
                                         ${getStatusOfTrace(statusCode)}
@@ -890,7 +891,8 @@
                         {{each notifications}}
                             <div class="form-group">
                                 <div class="col-md-8 col-sm-6 col-xs-12">
-                                    <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
+                                    <%--<span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>--%>
+                                    <span class="from-to">${fromOrgan.name}</span>
                                 </div>
                                 <div class="col-md-2 col-sm-6 col-xs-12 text-center">
                                     {{if taken == false}}

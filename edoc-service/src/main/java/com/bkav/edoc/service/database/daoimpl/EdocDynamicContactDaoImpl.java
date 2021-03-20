@@ -82,10 +82,6 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
         return builder.toString();
     }
 
-    public static void main(String[] args) {
-        System.out.println(new EdocDynamicContactDaoImpl().getDynamicContactsByAgency(true).size());
-    }
-
     @Override
     public Long countOrgan(boolean agency) {
         Session currentSession = openCurrentSession();
@@ -226,6 +222,11 @@ public class EdocDynamicContactDaoImpl extends RootDaoImpl<EdocDynamicContact, L
             closeCurrentSession(session);
         }
         return new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        EdocDynamicContactDaoImpl edocDynamicContactDao = new EdocDynamicContactDaoImpl();
+        System.out.println(edocDynamicContactDao.getAllChildrenContact("000.00.").size());
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDynamicContactDaoImpl.class);

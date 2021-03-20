@@ -68,6 +68,7 @@ let edocDocument = {
                             case "resend":
                                 console.log(id);
                                 //reSendDocument(id);
+                                reSendToVPCP(id);
                                 break;
                             case "delete":
                                 instance.deleteDocument(id);
@@ -378,7 +379,7 @@ let edocDocument = {
                             window.localEdocStorage.clearAttachments();
                             $.notify(app_message.edoc_publish_document_success, "success");
                             $('#edocFormAdd').modal('toggle');
-                            edocDocument.renderDatatable();
+                            edocDocument.renderDatatable(fromOrgan, toOrgan, docCode);
                         }
                         // $('#edoc-add-document').empty();
                         localEdocStorage.clearAttachments();
@@ -781,6 +782,31 @@ function reSendDocument (documentId) {
             backdrop: 'static',
             keyboard: false
         })
+    });
+}
+
+function reSendToVPCP (id) {
+    let url = "/resend/toVPVP";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: {"documentId": id},
+        beforeSend: function () {
+            $("#overlay-edoc-not-taken").show();
+        },
+        success: function (response) {
+            if (response.code === 200)
+                $.notify(response.message, "success");
+            else if (response.code === 400)
+                $.notify(response.message, "error");
+            else
+                $.notify(response.message, "error");
+        },
+        error: function (error) {
+            $.notify(app_message.edoc_resend_document_vpcp_fail, "error");
+        }
+    }).done(function () {
+        $("#overlay-edoc-not-taken").hide()
     });
 }
 

@@ -250,23 +250,12 @@ public class Attachment {
 
     @Override
     public String toString() {
-        try {
-            return MoreObjects.toStringHelper(super.getClass())
-                    .add("contentType", this.contentType)
-                    .add("name", this.name).add("format", this.format)
-                    .add("description", this.description)
-                    .add("content", this.content)
-                    .add("fileLength", this.inputStream.available())
-                    .toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return MoreObjects.toStringHelper(super.getClass())
-                    .add("contentType", this.contentType)
-                    .add("name", this.name).add("format", this.format)
-                    .add("description", this.description)
-                    .add("content", this.content)
-                    .toString();
-        }
+        return MoreObjects.toStringHelper(super.getClass())
+                .add("contentType", this.contentType)
+                .add("name", this.name).add("format", this.format)
+                .add("description", this.description)
+                .add("content", this.content)
+                .toString();
     }
 
     protected Element accumulateWithoutPrefix(Element element, String elementName, String value) {

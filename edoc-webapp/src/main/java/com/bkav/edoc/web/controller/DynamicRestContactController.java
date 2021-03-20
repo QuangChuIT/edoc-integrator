@@ -108,6 +108,7 @@ public class DynamicRestContactController {
                 errors = validateUtil.validateAddOrgan(contactRequest);
                 if (errors.size() == 0) {
                     EdocDynamicContact organ = EdocDynamicContactServiceUtil.findDynamicContactById(contactRequest.getId());
+                    boolean sendToVPCP = organ.getSendToVPCP();
                     organ.setDomain(contactRequest.getDomain());
                     organ.setName(contactRequest.getName());
                     organ.setAddress(contactRequest.getAddress());
@@ -117,26 +118,35 @@ public class DynamicRestContactController {
                     organ.setReceiveNotify(contactRequest.getReceiveNotify());
                     organ.setSendToVPCP(contactRequest.getSendToVPCP());
                     organ.setModifiedDate(new Date());
-                    organ.setSendToVPCP(contactRequest.getSendToVPCP());
-                    if (!contactRequest.getTelephone().equals(""))
-                        organ.setTelephone(contactRequest.getTelephone());
 
-                    EdocDynamicContactServiceUtil.updateContact(organ);
+                    int checkSendVPCPOnChange = Boolean.compare(sendToVPCP, contactRequest.getSendToVPCP());
+                    if (checkSendVPCPOnChange == 0) {
+                        if (!contactRequest.getTelephone().equals(""))
+                            organ.setTelephone(contactRequest.getTelephone());
 
-                    if (!contactRequest.getSendToVPCP()) {
-                        String jsonHeader = "{\"AgencyCode\":\"" + contactRequest.getDomain() + "\"}";
-                        DeleteAgencyResult deleteResult = ServiceVPCP.getInstance().DeleteAgencyRegister(jsonHeader);
-                        message = messageSourceUtil.getMessage("organ.delete.vpcp", new Object[]{deleteResult.getStatus()});
+                        EdocDynamicContactServiceUtil.updateContact(organ);
                     } else {
-                        AgencyRegisterRequetVPCP agencyRegister = new AgencyRegisterRequetVPCP();
-                        agencyRegister.setName(contactRequest.getName());
-                        agencyRegister.setCode(contactRequest.getDomain());
-                        agencyRegister.setPcode(PropsUtil.get("VPCP.systemId"));
-                        agencyRegister.setMobile(contactRequest.getTelephone());
-                        agencyRegister.setMail(contactRequest.getEmail());
-                        agencyRegister.setFax("");
-                        RegisterAgencyResult registerResult = ServiceVPCP.getInstance().AgencyRegister(new Gson().toJson(agencyRegister));
-                        message = messageSourceUtil.getMessage("organ.register.to.vpcp", new Object[]{registerResult.getStatus()});
+                        organ.setSendToVPCP(contactRequest.getSendToVPCP());
+                        if (!contactRequest.getTelephone().equals(""))
+                            organ.setTelephone(contactRequest.getTelephone());
+
+                        EdocDynamicContactServiceUtil.updateContact(organ);
+
+                        if (!contactRequest.getSendToVPCP()) {
+                            String jsonHeader = "{\"AgencyCode\":\"" + contactRequest.getDomain() + "\"}";
+                            DeleteAgencyResult deleteResult = ServiceVPCP.getInstance().DeleteAgencyRegister(jsonHeader);
+                            message = messageSourceUtil.getMessage("organ.delete.vpcp", new Object[]{deleteResult.getErrorDesc()});
+                        } else {
+                            AgencyRegisterRequetVPCP agencyRegister = new AgencyRegisterRequetVPCP();
+                            agencyRegister.setName(contactRequest.getName());
+                            agencyRegister.setCode(contactRequest.getDomain());
+                            agencyRegister.setPcode(PropsUtil.get("VPCP.systemId"));
+                            agencyRegister.setMobile(contactRequest.getTelephone());
+                            agencyRegister.setMail(contactRequest.getEmail());
+                            agencyRegister.setFax("");
+                            RegisterAgencyResult registerResult = ServiceVPCP.getInstance().AgencyRegister(new Gson().toJson(agencyRegister));
+                            message = messageSourceUtil.getMessage("organ.register.to.vpcp", new Object[]{registerResult.getErrorDesc()});
+                        }
                     }
                     //message = messageSourceUtil.getMessage("organ.message.edit.success", null);
                 } else {

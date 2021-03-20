@@ -228,6 +228,13 @@
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${org.lombok.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -313,6 +320,7 @@
         <quartz.scheduler.version>2.3.2</quartz.scheduler.version>
         <memcached.version>2.12.3</memcached.version>
         <org.hikaricp.version>3.3.1</org.hikaricp.version>
+        <org.lombok.version>1.18.4</org.lombok.version>
         <!--Maven Plugin Version-->
         <carbon.p2.plugin.version>5.1.2</carbon.p2.plugin.version>
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>

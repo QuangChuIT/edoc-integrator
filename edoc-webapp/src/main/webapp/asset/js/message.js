@@ -36,7 +36,7 @@ let app_message = {
     "edoc_received_message": "Đã nhận về hệ thống",
     "edoc_not_received_message": "Chưa nhận về hệ thống",
     "edoc_delete_document": "Xoá file đính kèm",
-    "edoc_resend_document": "Gửi lại văn bản",
+    "edoc_resend_document": "Gửi lại văn bản lên VPCP",
     "edoc_remove_document" : "Kết thúc văn bản",
     "edoc_download_all_attachment": "Tải xuống tất cả",
     "edoc_document_type": "Loại văn bản",
@@ -67,6 +67,7 @@ let app_message = {
     "edoc_message_send_email_success": "Cảnh báo lên Email thành công !",
     "edoc_organ_taken": "Đã nhận",
     "edoc_organ_not_taken": "Chưa nhận",
+    "edoc_resend_document_vpcp_fail": "Gửi lại văn bản lên VPCP không thành công !",
     //Datatable setting
     "language": {
         "decimal": "",

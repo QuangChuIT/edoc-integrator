@@ -13,7 +13,7 @@ public interface EdocDocumentDao {
                                Date promulgationDate, String fromOrganDomain,
                                String toOrganDomain, List<String> attachmentNames);
 
-    EdocDocument searchDocumentByOrganDomainAndCode(String toOrganDomain, String code);
+    EdocDocument searchDocumentByOrganDomainAndCode(String fromOrganDomain, String toOrganDomain, String code);
 
 
     List<EdocDocument> getAllDocumentList();

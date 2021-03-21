@@ -28,6 +28,8 @@ public class EdocTraceService {
         try {
             // get info from status
             String fromOrganDomain = status.getFrom().getOrganId();
+            // from la don vi gui trace tuong ung voi don vi toOrganDomain trong bang edoc_document
+
             // fromOrganDomain la ma dinh danh cua don vi nhan van ban tuong ung voi truong toOrganDomain trong edoc_document
             String fromOrganName = status.getFrom().getOrganName();
             String fromOrganAdd = status.getFrom().getOrganAdd();
@@ -35,6 +37,8 @@ public class EdocTraceService {
             String fax = status.getFrom().getFax();
             String website = status.getFrom().getWebsite();
             String organInCharge = status.getFrom().getOrganizationInCharge();
+
+            // to la doi vi nhan trace tuong ung voi don vi fromOrganDomain trong bang edoc_document
             // toOrganDomain la ma dinh danh cua don vi gui van ban tuong ung voi truong fromOrganDomain trong edoc_document
             String toOrganDomain = status.getResponseFor().getOrganId();
             String code = status.getResponseFor().getCode();

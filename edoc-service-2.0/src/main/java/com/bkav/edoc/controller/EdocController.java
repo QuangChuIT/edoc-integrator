@@ -41,6 +41,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -369,7 +370,7 @@ public class EdocController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public String getOrganizations(HttpServletRequest request,
-                                   @RequestParam(value = "organId") String organId) {
+                                   @RequestParam(value = "organId") @Nullable String organId) {
         LOGGER.info("----------------------- Get Organizations Invoke --------------------");
         GetOrganizationResp organizationResp = new GetOrganizationResp();
         List<Error> errors = new ArrayList<>();
@@ -386,7 +387,7 @@ public class EdocController {
             organizationResp.setErrors(new ArrayList<>());
             organizationResp.setStatus("Success");
         } catch (Exception e) {
-            errors.add(new Error("ConfirmReceived", e.getMessage()));
+            errors.add(new Error("GetOrganizations", e.getMessage()));
             organizationResp.setCode("9999");
             organizationResp.setErrors(errors);
             organizationResp.setStatus("Fail");

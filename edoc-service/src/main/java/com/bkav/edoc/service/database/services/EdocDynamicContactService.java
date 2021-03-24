@@ -5,16 +5,19 @@ import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.MapperUtil;
+import com.bkav.edoc.service.kernel.util.Validator;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import org.apache.log4j.Logger;
-import org.aspectj.weaver.ast.Or;
 import org.hibernate.Session;
 
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EdocDynamicContactService {
     private static final EdocDynamicContactDaoImpl dynamicContactDaoImpl = new EdocDynamicContactDaoImpl();
@@ -293,41 +296,46 @@ public class EdocDynamicContactService {
         return dynamicContactDaoImpl.getAllDomain();
     }
 
-    public List<EdocDynamicContact> getAllChildOrgan (String parentDomain) {
+    public List<EdocDynamicContact> getAllChildOrgan(String parentDomain) {
         List<EdocDynamicContact> childOrgans;
-        int index = 0;
-
-        String[] parentOrganSplit = parentDomain.split("\\.");
-        if (parentOrganSplit[0].equals("000")) {
-            if (parentOrganSplit[1].equals("00")) {
-                if (parentOrganSplit[2].equals("00")) {
-                    index = 3;
-                } else
-                    index = 2;
-            } else
-                index = 1;
+        if (Validator.isNullOrEmpty(parentDomain)) {
+            childOrgans = dynamicContactDaoImpl.getDynamicContactsByAgency(true);
         } else {
-            return null;
+            int index = 0;
+
+            String[] parentOrganSplit = parentDomain.split("\\.");
+            if (parentOrganSplit[0].equals("000")) {
+                if (parentOrganSplit[1].equals("00")) {
+                    if (parentOrganSplit[2].equals("00")) {
+                        index = 3;
+                    } else
+                        index = 2;
+                } else
+                    index = 1;
+            } else {
+                return null;
+            }
+
+            StringBuilder regexParent = new StringBuilder();
+            for (int i = index; i < parentOrganSplit.length; i++) {
+                regexParent.append(parentOrganSplit[i]);
+                if (i == 3)
+                    break;
+                regexParent.append(".");
+            }
+            childOrgans = dynamicContactDaoImpl.getAllChildrenContact(regexParent.toString());
         }
 
-        String regexParent = "";
-        for (int i = index; i < parentOrganSplit.length; i++) {
-            regexParent += parentOrganSplit[i];
-            if (i == 3)
-                break;
-            regexParent += ".";
-        }
-        childOrgans = dynamicContactDaoImpl.getAllChildrenContact(regexParent);
         return childOrgans;
     }
 
     public static void main(String[] args) {
         String parent = "000.00.33.A53";
         EdocDynamicContactService edocDynamicContactService = new EdocDynamicContactService();
-        List<EdocDynamicContact> childrent =  edocDynamicContactService.getAllChildOrgan(parent);
+        List<EdocDynamicContact> childrent = edocDynamicContactService.getAllChildOrgan(parent);
         if (childrent != null) {
             System.out.println("List childrent: ");
-            for (EdocDynamicContact contact: childrent) {
+            for (EdocDynamicContact contact : childrent) {
                 if (!contact.getDomain().equals(parent)) {
                     System.out.println(contact.getDomain());
                 }

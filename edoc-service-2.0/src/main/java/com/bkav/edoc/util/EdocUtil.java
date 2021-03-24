@@ -2,9 +2,12 @@ package com.bkav.edoc.util;
 
 import com.bkav.edoc.service.commonutil.Checker;
 import com.bkav.edoc.service.kernel.util.Validator;
+import com.bkav.edoc.service.redis.RedisKey;
+import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.xml.base.header.CheckPermission;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Report;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -21,6 +24,15 @@ public class EdocUtil {
             map.put(key, value);
         }
         return map;
+    }
+
+    public static void saveEdxmlFilePathToCache(long documentId, String filePath) {
+        try {
+            RedisUtil.getInstance().set(RedisKey.getKey(String.valueOf(documentId), RedisKey.GET_DOCUMENT_EDXML_KEY), filePath);
+            LOGGER.info("Save success file path " + filePath + " to cache for documentId " + documentId);
+        } catch (Exception e) {
+            LOGGER.error("Error save EdXML file path to cache with document id " + documentId + " cause " + e.getMessage());
+        }
     }
 
     public static List<Error> validateHeader(Map<String, String> header) {
@@ -51,4 +63,6 @@ public class EdocUtil {
         }
         return errors;
     }
+
+    private final static Logger LOGGER = Logger.getLogger(EdocUtil.class);
 }

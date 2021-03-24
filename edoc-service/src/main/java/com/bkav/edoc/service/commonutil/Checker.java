@@ -54,9 +54,9 @@ public class Checker {
 
         errorList.addAll(checkContent(messageHeader.getContent()));
 
-        errorList.addAll(checkToPlace(messageHeader.getToPlaces()));
+        /*errorList.addAll(checkToPlace(messageHeader.getToPlaces()));*/
 
-        errorList.addAll(checkOtherInfo(messageHeader.getOtherInfo()));
+        /*errorList.addAll(checkOtherInfo(messageHeader.getOtherInfo()));*/
 
         if (errorList.size() > 0) {
 
@@ -243,15 +243,15 @@ public class Checker {
      */
     private List<Error> checkFrom(Organization from) throws Exception {
 
-        List<Error> errorList = new ArrayList<Error>();
+        List<Error> errorList = new ArrayList<>();
 
         errorList.addAll(checkOrganId(from.getOrganId(), true));
 
         errorList.addAll(checkOrganName(from.getOrganName(), true));
 
-        errorList.addAll(checkOrganizationInCharge(from.getOrganizationInCharge()));
-
         errorList.addAll(checkOrganAdd(from.getOrganAdd(), true));
+
+        /*errorList.addAll(checkOrganizationInCharge(from.getOrganizationInCharge()));
 
         errorList.addAll(checkEmail(from.getEmail(), true));
 
@@ -259,7 +259,7 @@ public class Checker {
 
         errorList.addAll(checkFax(from.getFax(), true));
 
-        errorList.addAll(checkWebsite(from.getWebsite(), true));
+        errorList.addAll(checkWebsite(from.getWebsite(), true));*/
 
         return errorList;
     }
@@ -305,13 +305,13 @@ public class Checker {
 
         errorList.addAll(checkOrganAdd(to.getOrganAdd(), false));
 
-        errorList.addAll(checkEmail(to.getEmail(), false));
+        /*errorList.addAll(checkEmail(to.getEmail(), false));
 
         errorList.addAll(checkTelephone(to.getTelephone(), false));
 
         errorList.addAll(checkFax(to.getFax(), false));
 
-        errorList.addAll(checkWebsite(to.getWebsite(), false));
+        errorList.addAll(checkWebsite(to.getWebsite(), false));*/
 
         return errorList;
     }
@@ -360,7 +360,7 @@ public class Checker {
 
         List<Error> errorList = new ArrayList<>();
 
-        errorList.addAll(checkProPlace(proInfo.getPlace()));
+        /*errorList.addAll(checkProPlace(proInfo.getPlace()));*/
 
         errorList.addAll(checkProDate(proInfo.getPromulgationDateValue()));
 

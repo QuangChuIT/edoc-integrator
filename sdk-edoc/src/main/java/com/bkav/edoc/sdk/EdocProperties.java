@@ -49,4 +49,13 @@ public class EdocProperties {
         this.storeFilePath = storeFilePath;
     }
 
+    @Override
+    public String toString() {
+        return "EdocProperties{" +
+                "endpoint='" + endpoint + '\'' +
+                ", organId='" + organId + '\'' +
+                ", token='" + token + '\'' +
+                ", storeFilePath='" + storeFilePath + '\'' +
+                '}';
+    }
 }

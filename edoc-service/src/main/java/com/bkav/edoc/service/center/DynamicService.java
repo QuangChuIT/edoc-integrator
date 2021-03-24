@@ -312,7 +312,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             }
 
             if (errorList.isEmpty()) {
-                LOGGER.info("--------------------------------- Confirm Receiver Invoke by " + organId + " : " + documentId + " ----------------------------------");
+                LOGGER.info("--------------------------------- Confirm Receiver Invoke by "
+                        + organId + " : " + documentId + " ----------------------------------");
                 // remove pending document
                 notificationService.removePendingDocId(organId, documentId);
                /* // TODO if document of VPCP send request confirm done or fail
@@ -680,17 +681,18 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     // Send to vpcp
                     if (attachmentCacheEntries.size() > 0) {
                         messageHeader.setToes(toesVPCP);
+                        document.setSendExt(true);
                         SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendDocument(messageHeader, traceHeaderList, attachmentCacheEntries);
                         if (sendEdocResult != null) {
                             LOGGER.info("-------------------- Send to VPCP status " + sendEdocResult.getStatus());
                             LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
                             LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
-                            document.setSendExt(true);
                             document.setDocumentExtId(sendEdocResult.getDocID());
-                            documentService.updateDocument(document);
                         } else {
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
+                            document.setDocumentExtId("");
                         }
+                        documentService.updateDocument(document);
                     }
                 }
 

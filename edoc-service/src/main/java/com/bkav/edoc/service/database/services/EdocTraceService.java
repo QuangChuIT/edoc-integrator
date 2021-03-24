@@ -28,12 +28,18 @@ public class EdocTraceService {
         try {
             // get info from status
             String fromOrganDomain = status.getFrom().getOrganId();
+            // from la don vi gui trace tuong ung voi don vi toOrganDomain trong bang edoc_document
+
+            // fromOrganDomain la ma dinh danh cua don vi nhan van ban tuong ung voi truong toOrganDomain trong edoc_document
             String fromOrganName = status.getFrom().getOrganName();
             String fromOrganAdd = status.getFrom().getOrganAdd();
             String telephone = status.getFrom().getTelephone();
             String fax = status.getFrom().getFax();
             String website = status.getFrom().getWebsite();
             String organInCharge = status.getFrom().getOrganizationInCharge();
+
+            // to la doi vi nhan trace tuong ung voi don vi fromOrganDomain trong bang edoc_document
+            // toOrganDomain la ma dinh danh cua don vi gui van ban tuong ung voi truong fromOrganDomain trong edoc_document
             String toOrganDomain = status.getResponseFor().getOrganId();
             String code = status.getResponseFor().getCode();
             String documentId = status.getResponseFor().getDocumentId();
@@ -57,7 +63,7 @@ public class EdocTraceService {
             String mobile = status.getStaffInfo().getMobile();
             String staff = status.getStaffInfo().getStaff();
             // search document by from organ domain and code
-            EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, code);
+            EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(fromOrganDomain, toOrganDomain, code);
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
                 errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));

@@ -460,8 +460,15 @@ public class MapperUtil {
     public static EdocDocumentDetail modelToDocumentDetail(MessageHeader messageHeader) {
         // get info of document detail
         String content = messageHeader.getContent();
-        String signerCompetence = messageHeader.getSignerInfo().getCompetence();
-        String signerPosition = messageHeader.getSignerInfo().getPosition();
+        String signerCompetence = "";
+        String signerPosition = "";
+        String singerFullName = "";
+        if (messageHeader.getSignerInfo() != null) {
+            signerCompetence = messageHeader.getSignerInfo().getCompetence();
+            signerPosition = messageHeader.getSignerInfo().getPosition();
+            singerFullName = messageHeader.getSignerInfo().getFullName();
+        }
+
         Date dueDate = messageHeader.getDueDate();
         StringBuilder toPlacesBuffer = new StringBuilder();
         String toPlaceStr = "";
@@ -475,7 +482,6 @@ public class MapperUtil {
         }
 
         OtherInfo otherInfo = messageHeader.getOtherInfo();
-
         List<String> appendixes = otherInfo.getAppendixes();
         StringBuilder appendixesStringBuilder = new StringBuilder();
         String appendixesStr = "";
@@ -491,7 +497,6 @@ public class MapperUtil {
         String typerNotation = messageHeader.getOtherInfo().getTyperNotation();
         int pageAmount = messageHeader.getOtherInfo().getPageAmount();
         int promulgationAmount = messageHeader.getOtherInfo().getPromulgationAmount();
-        String singerFullName = messageHeader.getSignerInfo().getFullName();
         int steeringTypeInt = messageHeader.getSteeringType();
         EdocDocumentDetail.SteeringType steeringType = EdocDocumentDetail.SteeringType.values()[steeringTypeInt];
         List<ResponseFor> responseFors = messageHeader.getResponseFor();

@@ -236,6 +236,7 @@ public class EdocController {
         List<Error> errors = new ArrayList<>();
         List<Long> notifications;
         String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
+        LOGGER.info("organid -------------------------------" + organId);
         try {
             String messageType = headerMap.get(EdocServiceConstant.MESSAGE_TYPE);
             if (!Validator.isNullOrEmpty(messageType) && (messageType.equals("EDOC") || messageType.equals("STATUS"))) {

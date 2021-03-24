@@ -139,15 +139,6 @@
         </div>
     </form>
 </script>
-<script id="edocPublicStatDetailTmpl" type="text/x-jquery-tmpl">
-    <div>
-        {{if childOrgan.size() > 0}}
-            {{each childOrgan}}
-            {{/each}}
-        {{/if}}
-    </div>
-</script>
-<%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
 <script src="<c:url value="/asset/js/jquery.cookie.js"/>"></script>
@@ -173,6 +164,5 @@
 <!-- Custom Theme JavaScript -->
 <script src="<c:url value="/asset/js/report.js" />"></script>
 <script src="<c:url value="/asset/js/trace.js" />"></script>
-<script src="<c:url value="/asset/js/datetime.js" />"></script>
 </body>
 </html>

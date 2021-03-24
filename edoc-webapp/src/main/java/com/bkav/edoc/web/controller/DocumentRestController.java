@@ -346,7 +346,7 @@ public class DocumentRestController {
                     LOGGER.info("Not re-send document to VPCP cause list toesVPCP = 0 !!!!!!!!");
                     LOGGER.info(messageHeader.getToes());
                 } else {
-                    LOGGER.info("------------------------- Re-Send document to VPCP -------------------------------");
+                    LOGGER.info("------------------------- Re-Send document to VPCP ---------------------" + messageHeader.getDocumentId());
                     // Send to vpcp
                     if (attachmentCacheEntries.size() > 0) {
                         messageHeader.setToes(toesVPCP);
@@ -358,7 +358,11 @@ public class DocumentRestController {
                             document.setSendExt(true);
                             document.setDocumentExtId(sendEdocResult.getDocID());
                             EdocDocumentServiceUtil.updateDocument(document);
-                            response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
+                            if (sendEdocResult.getStatus().equals("FAIL")) {
+                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
+                            } else {
+                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
+                            }
                             return new ResponseEntity<>(response, HttpStatus.OK);
                         } else {
                             LOGGER.error("------------------------- Error re-send document to VPCP with document Id " + documentId);

@@ -18,6 +18,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ExcelService {
 
@@ -515,6 +516,9 @@ public class ExcelService {
             eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword);
         else
             eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate, keyword);
+
+        List<EPublicStat> sortedListStat = eStats.stream().sorted(Comparator.comparing(EPublicStat::getTotal).reversed()).collect(Collectors.toList());
+
         Workbook workbook = new XSSFWorkbook();
 
         Sheet sheet = workbook.createSheet("Thống kê văn bản điện tử");
@@ -550,7 +554,7 @@ public class ExcelService {
         style.setWrapText(true);
         int numRow = 1;
 
-        for (EPublicStat ePublicStat : eStats) {
+        for (EPublicStat ePublicStat : sortedListStat) {
             Row row = sheet.createRow(numRow);
 
             Cell cell = row.createCell(0);

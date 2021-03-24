@@ -32,9 +32,9 @@ public class EdocDailyCounterService {
 
     public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
-        /*int vpubnd_sent = 0;
-        int vpubnd_received = 0;
-        String vpubndName = "";*/
+        vpubnd_sent = 0;
+        vpubnd_received = 0;
+        vpubndName = "";
         boolean hasKeyword = false;
         List<OrganizationCacheEntry> contacts;
 
@@ -54,6 +54,9 @@ public class EdocDailyCounterService {
 
                 EPublicStat parentOrgan = callStatStoredProcedure(fromDate, toDate, session, contact);
                 //Set<OrganizationCacheEntry>
+
+                if (parentOrgan == null)
+                    continue;
 
                 String regex = "." + organId.split("\\.")[2] +
                         "." + organId.split("\\.")[3];
@@ -247,7 +250,7 @@ public class EdocDailyCounterService {
         if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.0")) ||
                 contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
             if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1")))  {
-                vpubndName += contact.getName();
+                vpubndName = contact.getName();
             }
             vpubnd_sent += sent;
             vpubnd_received += received;

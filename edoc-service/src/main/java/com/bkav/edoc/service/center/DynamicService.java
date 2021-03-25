@@ -692,6 +692,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
                             document.setDocumentExtId("");
                         }
+                        Date now = new Date();
+                        document.setModifiedDate(now);
                         documentService.updateDocument(document);
                     }
                 }

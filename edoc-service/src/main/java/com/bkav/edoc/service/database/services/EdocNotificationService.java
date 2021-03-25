@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
+import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
@@ -24,6 +25,7 @@ import java.util.*;
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
     private final EdocDynamicContactDaoImpl edocDynamicContactDao = new EdocDynamicContactDaoImpl();
+    private final EdocDocumentDaoImpl documentDao = new EdocDocumentDaoImpl();
 
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
@@ -189,7 +191,21 @@ public class EdocNotificationService {
                     }
                 }
             }
-            LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
+            List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
+            documents.forEach(document -> {
+                EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
+                if (sentContact != null) {
+                    LOGGER.info("------------------------------ Send VPCP Fail with document id: " + document.getDocumentId());
+                    TelegramMessage telegramMessage = new TelegramMessage();
+                    telegramMessage.setReceiverId(document.getToOrganDomain());
+                    telegramMessage.setReceiverName(sentContact.getName());
+                    telegramMessage.setDocument(document);
+                    telegramMessage.setCreateDate(document.getCreateDate());
+                    telegramMessages.add(telegramMessage);
+                }
+            });
+
+            LOGGER.info("------------------------ Telegram messages " + telegramMessages.size() + "---------------------------");
             return telegramMessages;
         } catch (Exception e) {
             LOGGER.error(e);

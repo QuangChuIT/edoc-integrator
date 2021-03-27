@@ -29,7 +29,6 @@ public class EdocTraceService {
             // get info from status
             String fromOrganDomain = status.getFrom().getOrganId();
             // from la don vi gui trace tuong ung voi don vi toOrganDomain trong bang edoc_document
-
             // fromOrganDomain la ma dinh danh cua don vi nhan van ban tuong ung voi truong toOrganDomain trong edoc_document
             String fromOrganName = status.getFrom().getOrganName();
             String fromOrganAdd = status.getFrom().getOrganAdd();

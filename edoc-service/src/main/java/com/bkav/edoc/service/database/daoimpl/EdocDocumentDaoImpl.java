@@ -142,7 +142,6 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             List<EdocDocument> result = query.list();
             if (result != null && result.size() > 0) {
                 // neu danh sach van ban la 1 -> van ban duoc gui tu EOF hoac 1-1 nguoc lai lay chinh xac van ban theo from, to
-
                 if (result.size() == 1) {
                     document = result.get(0);
                 } else {

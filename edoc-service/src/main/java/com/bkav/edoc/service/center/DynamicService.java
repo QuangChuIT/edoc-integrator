@@ -83,7 +83,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
         try {
             Document document = xmlUtil.convertToDocument(messageContext.getEnvelope());
-
+            LOGGER.info("Request message ----------------------> " + messageContext.getEnvelope().toString());
             switch (soapAction) {
                 case EdXmlConstant.SEND_DOCUMENT_ACTION:
                     LOGGER.info("-------------------------- Send document ------------------------");
@@ -236,6 +236,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             }
             updateReceivedNotify(report, checkPermission);
             String organId = extractMime.getOrganId(envelop, EdXmlConstant.GET_TRACE);
+            Date fromDate = extractMime.getTimeStamp(envelop, EdXmlConstant.GET_TRACE);
             if (organId == null || organId.isEmpty()) {
                 errorList.add(new Error("M.OrganId", "OrganId is required."));
 

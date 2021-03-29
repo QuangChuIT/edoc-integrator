@@ -3,12 +3,14 @@
  */
 package com.bkav.edoc.service.mineutil;
 
+import com.bkav.edoc.service.kernel.util.Validator;
 import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.CheckPermission;
 import com.bkav.edoc.service.xml.base.header.SignatureEdoc;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import org.apache.log4j.Logger;
@@ -21,6 +23,7 @@ import javax.activation.DataHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +129,39 @@ public class ExtractMime {
         }
 
         return null;
+    }
+
+
+    /**
+     *
+     * @param envelope - soap envelop
+     * @param documentName - Root tag to get content
+     * @return Date
+     */
+    public Date getTimeStamp(Document envelope, String documentName) {
+
+        Date result = null;
+
+        org.jdom2.Document domEnvDoc = XmlUtil.convertFromDom(envelope);
+
+        Element envElement = domEnvDoc.getRootElement();
+
+        Namespace envNs = envElement.getNamespace();
+
+        Element body = getSingerElement(envElement, EdXmlConstant.BODY_TAG,
+                envNs);
+        if (body != null) {
+            Element element = getSingerElement(body,
+                    documentName, null);
+            if (element != null) {
+                String valueStr = element.getChildText("TimeStamp", null);
+                if (!Validator.isNullOrEmpty(valueStr)) {
+                    result = DateUtils.parse(valueStr, DateUtils.DEFAULT_DATETIME_FORMAT);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**

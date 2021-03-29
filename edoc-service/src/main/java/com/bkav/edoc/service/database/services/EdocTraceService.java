@@ -63,6 +63,12 @@ public class EdocTraceService {
             String staff = status.getStaffInfo().getStaff();
             // search document by from organ domain and code
             EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(fromOrganDomain, toOrganDomain, code);
+            List<EdocDocument> documents = documentDaoImpl.searchDocumentByDocumentId(documentId);
+            if (documents.size() > 0) {
+                for(EdocDocument doc : documents){
+
+                }
+            }
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
                 errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));
@@ -144,9 +150,9 @@ public class EdocTraceService {
         }
     }
 
-    public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
+    public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId, Date fromTime) {
 
-        return traceDaoImpl.getEdocTracesByOrganId(responseForOrganId);
+        return traceDaoImpl.getEdocTracesByOrganId(responseForOrganId, fromTime);
     }
 
     /**

@@ -251,7 +251,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             }
 
             // get trace
-            traces = traceService.getEdocTracesByOrganId(organId);
+            traces = traceService.getEdocTracesByOrganId(organId, fromDate);
             if (traces == null) {
                 traces = new ArrayList<>();
             }

@@ -5,6 +5,7 @@ import com.bkav.edoc.service.database.services.EdocTraceService;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public class EdocTraceServiceUtil {
@@ -14,8 +15,8 @@ public class EdocTraceServiceUtil {
         return EDOC_TRACE_SERVICE.updateTrace(messageStatus, errorList);
     }
 
-    public static List<EdocTrace> getEdocTracesByOrganId(String organId) {
-        return EDOC_TRACE_SERVICE.getEdocTracesByOrganId(organId);
+    public static List<EdocTrace> getEdocTracesByOrganId(String organId, Date fromTime) {
+        return EDOC_TRACE_SERVICE.getEdocTracesByOrganId(organId, fromTime);
     }
 
     public static EdocTrace getEdocTrace(long traceId) {

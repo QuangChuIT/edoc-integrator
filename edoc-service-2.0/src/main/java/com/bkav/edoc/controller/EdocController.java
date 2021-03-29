@@ -252,7 +252,7 @@ public class EdocController {
                     }
                     LOGGER.info("Get Pending Doc Ids Success " + notifications);
                 } else {
-                    List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId);
+                    List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId, null);
                     notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
                     LOGGER.info("Get Pending Trace Ids Success " + notifications);
                 }

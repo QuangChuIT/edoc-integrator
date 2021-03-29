@@ -163,6 +163,29 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return document;
     }
 
+    @Override
+    public List<EdocDocument> searchDocumentByDocumentId(String documentId) {
+        Session currentSession = openCurrentSession();
+        List<EdocDocument> documents = null;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT ed FROM EdocDocument ed where edXMLDocId like :documentId");
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("documentId", documentId);
+            List<EdocDocument> result = query.list();
+            if (result == null) {
+                documents = new ArrayList<>();
+            } else {
+                documents = result;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error find document by document id cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+        return documents;
+    }
+
 
     @Override
     public List<EdocDocument> getAllDocumentList() {

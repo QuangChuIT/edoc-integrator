@@ -67,15 +67,6 @@ let organManage = {
             paging: true,
             info: false,
             columns: [
-                /*{
-                    "data": null,
-                    "orderable": false,
-                    "render": (data, type, row) => {
-                        if (type === 'display')
-                            return $('#organSelect').tmpl(data).html();
-                        return data;
-                    }
-                },*/
                 {
                     "name": "name",
                     "title": organ_message.table_header_name,
@@ -108,7 +99,19 @@ let organManage = {
                             return organ_message.organ_status_deactive;
                         }
                     }
-                }
+                },
+                {
+                    "name": "agency",
+                    "title": organ_message.organ_table_agency,
+                    "data": null,
+                    "render": function (data) {
+                        if (data.isAgency === true) {
+                            return organ_message.organ_agency;
+                        } else {
+                            return organ_message.organ_not_agency;
+                        }
+                    }
+                },
             ],
             language: app_message.language,
             order: [[3, "desc"]]

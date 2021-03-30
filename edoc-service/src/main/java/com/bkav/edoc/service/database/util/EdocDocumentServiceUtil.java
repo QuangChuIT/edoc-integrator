@@ -130,6 +130,8 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);
     }
 
+
+
     public static MessageHeader getMessageHeaderByDOcumentID(long documentId) {
         return DOCUMENT_SERVICE.getDocumentById(documentId);
     }

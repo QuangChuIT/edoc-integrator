@@ -409,6 +409,7 @@ let edocDocument = {
             })
         }
     }
+
 };
 let draftDocument = {
     draftDocumentId: null,

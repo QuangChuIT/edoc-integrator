@@ -379,6 +379,20 @@ public class DocumentRestController {
         }
     }
 
+    @RequestMapping(value = "/documents/-/not/sendVPCP",method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String getAllDocumentNotSentVPCP(HttpServletRequest request) {
+        DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        int totalCount = EdocDocumentServiceUtil.countDocumentsNotTaken(pagination);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotTaken(pagination);
+        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
+        dataTableResult.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(entries);
+        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
+        return new Gson().toJson(dataTableResult);
+    }
+
     @RequestMapping(value = "/send/telegram")
     public HttpStatus sendNotTakenToTelegram() {
         try {

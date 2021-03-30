@@ -62,8 +62,14 @@ public class EdocTraceService {
             String email = status.getStaffInfo().getEmail();
             String mobile = status.getStaffInfo().getMobile();
             String staff = status.getStaffInfo().getStaff();
+            EdocDocument edocDocument;
+
             // search document by from organ domain and code
-            EdocDocument edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(fromOrganDomain, toOrganDomain, code);
+            if (statusCode == 13) {
+                edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(toOrganDomain, fromOrganDomain, code);
+            } else {
+                edocDocument = documentDaoImpl.searchDocumentByOrganDomainAndCode(fromOrganDomain, toOrganDomain, code);
+            }
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
                 errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));

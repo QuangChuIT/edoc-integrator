@@ -31,6 +31,27 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             Query<Long> query = currentSession.createQuery(sql.toString(), Long.class);
             query.setParameter("receiverId", organId);
             query.setParameter("taken", false);
+            LOGGER.info("---------------Get Pending document has size: " + query.list().size());
+            return query.list();
+        } catch (Exception e) {
+            LOGGER.error("Error when get document pending for organ " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
+        return null;
+    }
+
+    public List<EdocDocument> getDocumentByOrganId(String organId) {
+        Session currentSession = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en.document FROM EdocNotification en where en.receiverId=:receiverId and en.taken=:taken");
+            Query<EdocDocument> query = currentSession.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("receiverId", organId);
+            query.setParameter("taken", false);
+            LOGGER.info("---------------Get Pending document has size: " + query.list().size());
             return query.list();
         } catch (Exception e) {
             LOGGER.error("Error when get document pending for organ " + organId + " cause " + Arrays.toString(e.getStackTrace()));

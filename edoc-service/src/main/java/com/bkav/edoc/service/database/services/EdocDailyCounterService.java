@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.services;
 
+import com.bkav.edoc.service.commonutil.Checker;
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDailyCounterDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
@@ -13,6 +14,7 @@ import org.hibernate.Session;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EdocDailyCounterService {
     private final EdocDailyCounterDaoImpl edocDailyCounterDao = new EdocDailyCounterDaoImpl();
@@ -30,7 +32,7 @@ public class EdocDailyCounterService {
         edocDailyCounterDao.createDailyCounter(dailyCounter);
     }
 
-    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword) {
+    public List<EPublicStat> getStatsDetail(Date fromDate, Date toDate, String keyword, boolean isGetAllAgency) {
         List<EPublicStat> ePublicStats = new ArrayList<>();
         vpubnd_sent = 0;
         vpubnd_received = 0;
@@ -40,14 +42,18 @@ public class EdocDailyCounterService {
 
         Session session = edocDailyCounterDao.openCurrentSession();
         try {
-            if (keyword == null) {
-                contacts = edocDynamicContactService.getLevel3Contact();
-                //contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
+            if (isGetAllAgency) {
+                contacts = edocDynamicContactService.getDynamicContactsByAgency(true);
+            } else {
+                if (keyword == null) {
+                    contacts = edocDynamicContactService.getLevel3Contact();
+                }
+                else {
+                    hasKeyword = true;
+                    contacts = edocDynamicContactService.getOrganByKeyword(keyword);
+                }
             }
-            else {
-                hasKeyword = true;
-                contacts = edocDynamicContactService.getOrganByKeyword(keyword);
-            }
+            contacts = contacts.stream().filter(o -> !((o.getDomain().charAt(10)) == 'A')).collect(Collectors.toList());
 
             for (OrganizationCacheEntry contact : contacts) {
                 String organId = contact.getDomain();
@@ -75,49 +81,6 @@ public class EdocDailyCounterService {
 
                 parentOrgan.setChildOrgan(childOrganStatSet);
                 ePublicStats.add(parentOrgan);
-
-                /*StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetStat");
-                storedProcedureQuery.registerStoredProcedureParameter("fromDate", java.sql.Date.class, ParameterMode.IN);
-                storedProcedureQuery.registerStoredProcedureParameter("toDate", java.sql.Date.class, ParameterMode.IN);
-                storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
-                storedProcedureQuery.registerStoredProcedureParameter("totalSent", Integer.class, ParameterMode.OUT);
-                storedProcedureQuery.registerStoredProcedureParameter("totalReceived", Integer.class, ParameterMode.OUT);
-                if(fromDate == null || toDate == null){
-                    java.sql.Date date = null;
-                    storedProcedureQuery.setParameter("fromDate", date);
-                    storedProcedureQuery.setParameter("toDate", date);
-                } else {
-                    storedProcedureQuery.setParameter("fromDate", fromDate);
-                    storedProcedureQuery.setParameter("toDate", toDate);
-                }
-
-                storedProcedureQuery.setParameter("organId", organId);
-                int sent = 0;
-                int received = 0;
-                if(storedProcedureQuery.getOutputParameterValue("totalSent") != null){
-                    sent = (Integer) storedProcedureQuery.getOutputParameterValue("totalSent");
-                }
-                if( storedProcedureQuery.getOutputParameterValue("totalReceived") != null){
-                    received = (Integer) storedProcedureQuery.getOutputParameterValue("totalReceived");
-                }
-                if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.0")) ||
-                        contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
-                    if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1")))  {
-                        vpubndName += contact.getName();
-                    }
-                    vpubnd_sent += sent;
-                    vpubnd_received += received;
-                } else {
-                    EPublicStat ePublicStat = new EPublicStat();
-                    ePublicStat.setLastUpdate(new Date());
-                    ePublicStat.setOrganDomain(organId);
-                    ePublicStat.setOrganName(contact.getName());
-                    ePublicStat.setSent(sent);
-                    ePublicStat.setReceived(received);
-                    long total = sent + received;
-                    ePublicStat.setTotal(total);
-                    ePublicStats.add(ePublicStat);
-                }*/
             }
             if (!hasKeyword || keyword.equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
                 EPublicStat ePublicStat = new EPublicStat();
@@ -352,7 +315,7 @@ public class EdocDailyCounterService {
         Date fromDateValue = DateUtils.parse("01-03-2021");
         Date toDateValue = DateUtils.parse("13-03-2021");
         //System.out.println(new Gson().toJson(edocDailyCounterService.getStatisticSentReceivedExtDetail("2020-12-01", "2020-12-31", null)));
-        System.out.println(new Gson().toJson(edocDailyCounterService.getStatsDetail(fromDateValue, toDateValue, null)));
+        System.out.println(new Gson().toJson(edocDailyCounterService.getStatsDetail(fromDateValue, toDateValue, null, false)));
     }
 
     public EPublic getStat() {

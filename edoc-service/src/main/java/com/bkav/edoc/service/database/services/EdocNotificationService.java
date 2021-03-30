@@ -21,6 +21,7 @@ import org.hibernate.Session;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -85,6 +86,10 @@ public class EdocNotificationService {
      */
     public List<Long> getDocumentIdsByOrganId(String organId) {
         return notificationDaoImpl.getDocumentIdsByOrganId(organId);
+    }
+
+    public List<EdocDocument> getDocumentByOrganId (String organId) {
+        return notificationDaoImpl.getDocumentByOrganId(organId);
     }
 
     /**
@@ -191,10 +196,10 @@ public class EdocNotificationService {
                     }
                 }
             }
-            List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
+            /*List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
             documents.forEach(document -> {
-                EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
-                if (sentContact != null) {
+                EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(document.getToOrganDomain());
+                if (sentContact != null && !sentContact.getAgency()) {
                     LOGGER.info("------------------------------ Send VPCP Fail with document id: " + document.getDocumentId());
                     TelegramMessage telegramMessage = new TelegramMessage();
                     telegramMessage.setReceiverId(document.getToOrganDomain());
@@ -203,7 +208,7 @@ public class EdocNotificationService {
                     telegramMessage.setCreateDate(document.getCreateDate());
                     telegramMessages.add(telegramMessage);
                 }
-            });
+            });*/
 
             LOGGER.info("------------------------ Telegram messages " + telegramMessages.size() + "---------------------------");
             return telegramMessages;

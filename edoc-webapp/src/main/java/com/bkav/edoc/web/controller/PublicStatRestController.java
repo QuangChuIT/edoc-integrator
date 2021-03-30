@@ -40,21 +40,22 @@ public class PublicStatRestController {
     public List<EPublicStat> getStatDetail(@RequestParam(value = "fromDate", required = false) String fromDate,
                                            @RequestParam(value = "toDate", required = false) String toDate,
                                            @RequestParam(value = "keyword", required = false) String keyword) {
+        boolean isGetAllAgency = false;
         if (keyword == null) {
             if (fromDate == null || toDate == null) {
-                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, null);
+                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, null, isGetAllAgency);
             } else {
                 Date fromDateValue = DateUtils.parse(fromDate);
                 Date toDateValue = DateUtils.parse(toDate);
-                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, null);
+                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, null, isGetAllAgency);
             }
         } else {
             if (fromDate == null || toDate == null) {
-                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword);
+                return EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword, isGetAllAgency);
             } else {
                 Date fromDateValue = DateUtils.parse(fromDate);
                 Date toDateValue = DateUtils.parse(toDate);
-                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, keyword);
+                return EdocDailyCounterServiceUtil.getStatsDetail(fromDateValue, toDateValue, keyword, isGetAllAgency);
             }
         }
     }

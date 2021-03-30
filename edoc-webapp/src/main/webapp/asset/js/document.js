@@ -54,7 +54,6 @@ let edocDocument = {
         instance.appSetting.dataTable = $('#dataTables-edoc').DataTable({
             serverSide: true,
             processing: true,
-            pageLength: 25,
             ajax: {
                 url: url,
                 type: "POST"
@@ -91,6 +90,7 @@ let edocDocument = {
             },
             rowId: "documentId",
             responsive: true,
+            pageLength: 25,
             autoWidth: false,
             ordering: true,
             bDestroy: true,
@@ -125,7 +125,7 @@ let edocDocument = {
                     "title": app_message.table_header_documentCate,
                     "data": null,
                     "render": function (data) {
-                        return data.documentTypeName === null ? app_message.edoc_no_data : data.documentTypeName;
+                        return $('#edocDocTypeNameTemplate').tmpl(data).html();
                     }
                 },
                 {

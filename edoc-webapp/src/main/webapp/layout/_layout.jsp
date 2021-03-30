@@ -950,9 +950,16 @@
             <span>${shortenSubject.trim()}</span>
         </a>
     </div>
-
 </script>
-
+<script id="edocDocTypeNameTemplate" type="text/x-jquery-tmpl">
+    <div>
+        {{if documentTypeName}}
+            <span>${documentTypeName}</span>
+        {{else}}
+           <span>${app_message.no_data}</span>
+        {{/if}}
+    </div>
+</script>
 <script id="edocCreateDateTemplate" type="text/x-jquery-tmpl">
     <div>
         <a href="javascript:void(0)" title="${createDate}" data-id="${documentId}"

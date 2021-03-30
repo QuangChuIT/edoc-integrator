@@ -91,9 +91,11 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     map = sendDocument(document, inMessageContext);
                     break;
                 case EdXmlConstant.GET_PENDING_DOCUMENT_ACTION:
+                    LOGGER.info("------------------------ Get Pending documents -------------------");
                     map = getPendingDocumentIds(document);
                     break;
                 case EdXmlConstant.GET_DOCUMENT_ACTION:
+                    LOGGER.info("------------------------ Get documents -------------------");
                     map = getDocument(document);
                     break;
                 case EdXmlConstant.UPDATE_TRACE_ACTION:
@@ -734,6 +736,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         report = checker.checkPermission(checkPermission);
 
         if (!report.isIsSuccess()) {
+            LOGGER.warn("--------------- Get pending permission " + report.isIsSuccess());
             Document bodyChildDocument = xmlUtil.convertEntityToDocument(
                     Report.class, report);
 
@@ -759,6 +762,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             notifications = CommonUtil.convertToListLong(obj);
         } else {
             try {
+                LOGGER.info("---------------Start getDocument with organ: " + organId);
                 notifications = notificationService.getDocumentIdsByOrganId(organId);
             } catch (Exception e) {
                 log.error(e);

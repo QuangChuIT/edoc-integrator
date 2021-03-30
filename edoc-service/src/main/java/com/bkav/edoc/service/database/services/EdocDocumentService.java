@@ -23,7 +23,6 @@ import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
-import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -32,7 +31,7 @@ import org.hibernate.query.Query;
 
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
-import javax.print.Doc;
+import javax.print.Doc;;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
@@ -93,6 +92,11 @@ public class EdocDocumentService {
             query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                int moreResult = countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                return (result + moreResult);
+            }
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -169,6 +173,14 @@ public class EdocDocumentService {
                         entries.add(documentCacheEntry);
                     }
                 }
+            }
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                List<DocumentCacheEntry> totalDocList = new ArrayList<>();
+                totalDocList.addAll(entries);
+                totalDocList.addAll(entryList);
+                return totalDocList;
             }
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
@@ -390,6 +402,7 @@ public class EdocDocumentService {
 
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
+            //int countOrganA = 0;
             for (Organization to : organToPending) {
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
@@ -397,7 +410,17 @@ public class EdocDocumentService {
                 notification.setModifiedDate(currentDate);
                 notification.setSendNumber(0);
                 notification.setDueDate(dueDate);
-                notification.setReceiverId(to.getOrganId());
+                if (to.getOrganId().charAt(10) == 'A') {
+                    notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                    /*if (countOrganA == 0) {
+                        notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                        countOrganA++;
+                    } else {
+                        continue;
+                    }*/
+                } else {
+                    notification.setReceiverId(to.getOrganId());
+                }
                 notification.setDocument(document);
                 notification.setTaken(false);
                 currentSession.persist(notification);

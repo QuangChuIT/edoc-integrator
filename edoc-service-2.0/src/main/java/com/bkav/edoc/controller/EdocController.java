@@ -3,6 +3,8 @@ package com.bkav.edoc.controller;
 import com.bkav.edoc.payload.*;
 import com.bkav.edoc.service.commonutil.Checker;
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
+import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
+import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocTrace;
@@ -232,8 +234,9 @@ public class EdocController {
     public String getPendingDocIDs(HttpServletRequest request) {
         LOGGER.info("----------------------- Get Pending Doc Ids Invoke --------------------");
         Map<String, String> headerMap = EdocUtil.getHeaders(request);
-        GetPendingDocIDsResp getPendingDocIDsResp = new GetPendingDocIDsResp();
+        GetPendingDocResp getPendingDocResp = new GetPendingDocResp();
         List<Error> errors = new ArrayList<>();
+        List<GetPendingResult> getPendingResults = new ArrayList<>();
         List<Long> notifications;
         String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
         LOGGER.info("organid -------------------------------" + organId);
@@ -243,37 +246,57 @@ public class EdocController {
                 if (messageType.equals("EDOC")) {
                     List obj = RedisUtil.getInstance().get(RedisKey.getKey(organId, RedisKey.GET_PENDING_KEY), List.class);
                     if (obj != null && obj.size() > 0) {
+                        List<GetPendingResult> pendingCacheResult = new ArrayList<>();
                         notifications = CommonUtil.convertToListLong(obj);
+                        notifications.forEach(notification -> {
+                            DocumentCacheEntry documentCacheEntry = EdocDocumentServiceUtil.getDocumentById(notification);
+                            OrganizationCacheEntry toOrgan = documentCacheEntry.getToOrgan().get(0);
+                            String toOrganId = toOrgan.getDomain();
+                            GetPendingResult pendingResult = new GetPendingResult();
+                            pendingResult.setDocId(documentCacheEntry.getDocumentId());
+                            pendingResult.setOrganId(toOrganId);
+                            pendingCacheResult.add(pendingResult);
+                        });
                     } else {
-                        notifications = EdocNotificationServiceUtil.getDocumentIdsByOrganId(organId);
+                        List<EdocDocument> documents = EdocNotificationServiceUtil.getDocumentByOrganId(organId);
+                        LOGGER.info("---------------- Get pending document with organ " + organId + " with size " + documents.size());
+                        documents.forEach(document -> {
+                            GetPendingResult result = new GetPendingResult();
+                            result.setDocId(document.getDocumentId());
+                            result.setOrganId(document.getToOrganDomain());
+                            getPendingResults.add(result);
+                        });
+                        //notifications = EdocNotificationServiceUtil.getDocumentIdsByOrganId(organId);
                     }
-                    if (notifications == null) {
-                        notifications = new ArrayList<>();
-                    }
-                    LOGGER.info("Get Pending Doc Ids Success " + notifications);
+                    LOGGER.info("Get Pending Doc Ids Success: " + new Gson().toJson(getPendingResults));
                 } else {
+                    GetPendingDocIDsResp getPendingDocIDsResp = new GetPendingDocIDsResp();
                     List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId);
                     notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
                     LOGGER.info("Get Pending Trace Ids Success " + notifications);
+                    getPendingDocIDsResp.setStatus("Success");
+                    getPendingDocIDsResp.setDocIDs(notifications);
+                    getPendingDocIDsResp.setCode("0");
+                    return new Gson().toJson(getPendingDocIDsResp);
                 }
-                getPendingDocIDsResp.setStatus("Success");
-                getPendingDocIDsResp.setDocIDs(notifications);
-                getPendingDocIDsResp.setCode("0");
+                getPendingDocResp.setStatus("Success");
+                getPendingDocResp.setPendingResult(getPendingResults);
+                getPendingDocResp.setCode("0");
             } else {
                 errors.add(new Error("MessageType", "UnSupport Message Type"));
-                getPendingDocIDsResp.setStatus("Error");
-                getPendingDocIDsResp.setDocIDs(new ArrayList<>());
-                getPendingDocIDsResp.setCode("9999");
+                getPendingDocResp.setStatus("Error");
+                getPendingDocResp.setPendingResult(new ArrayList<>());
+                getPendingDocResp.setCode("9999");
             }
-            getPendingDocIDsResp.setErrors(errors);
+            getPendingDocResp.setErrors(errors);
         } catch (Exception e) {
             LOGGER.error("Get pending doc ids for organ " + organId + " cause " + e.getMessage());
             errors.add(new Error("GetPending", e.getMessage()));
-            getPendingDocIDsResp.setStatus("Error");
-            getPendingDocIDsResp.setCode("9999");
-            getPendingDocIDsResp.setErrors(errors);
+            getPendingDocResp.setStatus("Error");
+            getPendingDocResp.setCode("9999");
+            getPendingDocResp.setErrors(errors);
         }
-        return gson.toJson(getPendingDocIDsResp);
+        return gson.toJson(getPendingDocResp);
     }
 
     /**

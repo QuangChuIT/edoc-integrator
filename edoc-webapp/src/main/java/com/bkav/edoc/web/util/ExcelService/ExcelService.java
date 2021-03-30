@@ -512,10 +512,11 @@ public class ExcelService {
 
     public void ExportDailyCounterToExcel(HttpServletResponse response, Date fromDate, Date toDate, String keyword) throws IOException {
         List<EPublicStat> eStats;
+        boolean isGetAllAgency = true;
         if (fromDate == null || toDate == null)
-            eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword);
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(null, null, keyword, isGetAllAgency);
         else
-            eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate, keyword);
+            eStats = EdocDailyCounterServiceUtil.getStatsDetail(fromDate, toDate, keyword, isGetAllAgency);
 
         List<EPublicStat> sortedListStat = eStats.stream().sorted(Comparator.comparing(EPublicStat::getTotal).reversed()).collect(Collectors.toList());
 

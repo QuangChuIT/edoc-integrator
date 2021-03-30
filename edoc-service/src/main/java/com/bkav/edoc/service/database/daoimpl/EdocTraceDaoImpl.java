@@ -28,9 +28,10 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
                 sql.append("SELECT et FROM EdocTrace et where " +
                         "(et.toOrganDomain=:responseForOrganId or et.fromOrganDomain=:fromOrganId) and et.enable=:enable order by et.timeStamp DESC");
             }
+            LOGGER.info(sql.toString());
             Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
             query.setParameter("responseForOrganId", responseForOrganId);
-            query.setParameter("fromOrganDomain", responseForOrganId);
+            query.setParameter("fromOrganId", responseForOrganId);
             if (fromTime != null) {
                 query.setParameter("fromTime", fromTime);
             } else {
@@ -39,10 +40,10 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
             return query.list();
         } catch (Exception e) {
             LOGGER.error(e);
-            return new ArrayList<>();
         } finally {
             closeCurrentSession(currentSession);
         }
+        return new ArrayList<>();
     }
 
 

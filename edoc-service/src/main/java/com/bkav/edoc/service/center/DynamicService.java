@@ -249,17 +249,17 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                 return map;
             }
-
+            LOGGER.info("Get trace for " + organId + " from date " + fromDate);
             // get trace
             traces = traceService.getEdocTracesByOrganId(organId, fromDate);
-            if (traces == null) {
-                traces = new ArrayList<>();
-            }
+            LOGGER.info("Number traces get " + traces.size());
 
             List<MessageStatus> statuses = mapper.traceInfoToStatusEntity(traces);
             GetTraceResponse response = new ResponseUtil().createGetTraceResponse(statuses);
             // disable traces after get traces
-            traceService.disableEdocTrace(traces);
+            if (fromDate == null) {
+                traceService.disableEdocTrace(traces);
+            }
             try {
                 responseDocument = xmlUtil.convertEntityToDocument(GetTraceResponse.class, response);
             } catch (Exception ex) {
@@ -379,25 +379,28 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
             List<Error> errors = new ArrayList<>();
             // update trace
             LOGGER.info(status.toString());
-            boolean isExists = traceService.exists(status.getFrom().getOrganId(),
-                    status.getResponseFor().getOrganId(),
-                    status.getResponseFor().getCode(), GetterUtil.getInteger(status.getStatusCode(), 1));
-            if (isExists) {
-                LOGGER.warn("Exist trace on esb with code " + status.getResponseFor().getCode() + " from_organ_domain "
-                        + status.getFrom().getOrganId() + " to_organ_domain "
-                        + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode());
-                errorList.add(new Error("M.UpdateTraces", "Exist trace on esb with code "
-                        + status.getResponseFor().getCode() + " from_organ_domain "
-                        + status.getFrom().getOrganId() + " to_organ_domain "
-                        + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode()));
+            if (GetterUtil.getInteger(status.getStatusCode()) != 5) {
+                boolean isExists = traceService.exists(status.getFrom().getOrganId(),
+                        status.getResponseFor().getOrganId(),
+                        status.getResponseFor().getCode(), GetterUtil.getInteger(status.getStatusCode(), 1));
+                if (isExists) {
+                    LOGGER.warn("Exist trace on esb with code " + status.getResponseFor().getCode() + " from_organ_domain "
+                            + status.getFrom().getOrganId() + " to_organ_domain "
+                            + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode());
+                    errorList.add(new Error("M.UpdateTraces", "Exist trace on esb with code "
+                            + status.getResponseFor().getCode() + " from_organ_domain "
+                            + status.getFrom().getOrganId() + " to_organ_domain "
+                            + status.getResponseFor().getOrganId() + " status code " + status.getResponseFor().getCode()));
 
-                report = new Report(false, new ErrorList(errorList));
+                    report = new Report(false, new ErrorList(errorList));
 
-                bodyChildDocument = xmlUtil.convertEntityToDocument(
-                        Report.class, report);
-                map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
-                return map;
+                    bodyChildDocument = xmlUtil.convertEntityToDocument(
+                            Report.class, report);
+                    map.put(StringPool.CHILD_BODY_KEY, bodyChildDocument);
+                    return map;
+                }
             }
+
             EdocTrace trace = traceService.updateTrace(status, errors);
             if (errors.size() > 0) {
                 report = new Report(false, new ErrorList(errors));

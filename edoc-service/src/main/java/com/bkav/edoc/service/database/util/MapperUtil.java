@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MapperUtil {
     private static final EdocDynamicContactService EDOC_DYNAMIC_CONTACT_SERVICE = new EdocDynamicContactService();
@@ -198,6 +199,7 @@ public class MapperUtil {
                 for (EdocTrace edocTrace : edocTraces) {
                     TraceCacheEntry traceCacheEntry = MapperUtil.modelToTraceCache(edocTrace);
                     traceCacheEntry.setDocumentId(document.getDocumentId());
+                    LOGGER.info("------------ Trace Timestamp: " + edocTrace.getTimeStamp());
                     traces.add(traceCacheEntry);
                 }
             }

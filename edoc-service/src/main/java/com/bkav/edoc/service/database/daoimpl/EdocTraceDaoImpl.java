@@ -8,6 +8,7 @@ import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements EdocTraceDao {
@@ -16,21 +17,33 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         super(EdocTrace.class);
     }
 
-    public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId) {
+    public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId, Date fromTime) {
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain=:responseForOrganId and et.enable=:enable order by et.timeStamp DESC");
+            if (fromTime != null) {
+                sql.append("SELECT et FROM EdocTrace et where " +
+                        "(et.toOrganDomain=:responseForOrganId or et.fromOrganDomain=:fromOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+            } else {
+                sql.append("SELECT et FROM EdocTrace et where " +
+                        "(et.toOrganDomain=:responseForOrganId or et.fromOrganDomain=:fromOrganId) and et.enable=:enable order by et.timeStamp DESC");
+            }
+            LOGGER.info(sql.toString());
             Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
             query.setParameter("responseForOrganId", responseForOrganId);
-            query.setParameter("enable", true);
+            query.setParameter("fromOrganId", responseForOrganId);
+            if (fromTime != null) {
+                query.setParameter("fromTime", fromTime);
+            } else {
+                query.setParameter("enable", true);
+            }
             return query.list();
         } catch (Exception e) {
             LOGGER.error(e);
-            return new ArrayList<>();
         } finally {
             closeCurrentSession(currentSession);
         }
+        return new ArrayList<>();
     }
 
 

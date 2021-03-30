@@ -142,7 +142,6 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             List<EdocDocument> result = query.list();
             if (result != null && result.size() > 0) {
                 // neu danh sach van ban la 1 -> van ban duoc gui tu EOF hoac 1-1 nguoc lai lay chinh xac van ban theo from, to
-
                 if (result.size() == 1) {
                     document = result.get(0);
                 } else {
@@ -163,20 +162,6 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         }
         return document;
     }
-
-    /*public EdocDocument searchDocumentByEdXMLId(String fromOrganDomain, String toOrganDomain, String docCode) {
-        Session session = openCurrentSession();
-        EdocDocument document = null;
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("Select ed From EdocDocument ed where ed.edXMLDocId = concat(:fromOrgan, ',', :sentDate, ',', :docCode, '#', :toOrgan)");
-            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
-
-        } catch (Exception e) {
-            LOGGER.error("Error find document by organ domain an edxml id with organ domain ");
-        }
-    }*/
-
 
     @Override
     public List<EdocDocument> getAllDocumentList() {

@@ -4,10 +4,12 @@ import com.bkav.edoc.service.resource.StringPool;
 import com.bkav.edoc.service.xml.base.BaseElement;
 import com.bkav.edoc.service.xml.base.util.BaseXmlUtils;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
+import com.bkav.edoc.service.xml.status.header.DateAdapter;
 import com.google.common.base.MoreObjects;
 import org.jdom2.Element;
 
 import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 
 @XmlRootElement(name = "ResponseFor", namespace = StringPool.TARGET_NAMESPACE)
@@ -20,6 +22,7 @@ public class ResponseFor extends BaseElement {
     @XmlElement(name = "Code")
     private String code;
     @XmlElement(name = "PromulgationDate")
+    @XmlJavaTypeAdapter(DateAdapter.class)
     private Date promulgationDate;
     @XmlElement(name = "DocumentId")
     private String documentId;

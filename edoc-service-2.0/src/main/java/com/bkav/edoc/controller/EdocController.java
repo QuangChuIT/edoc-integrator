@@ -271,7 +271,7 @@ public class EdocController {
                     LOGGER.info("Get Pending Doc Ids Success: " + new Gson().toJson(getPendingResults));
                 } else {
                     GetPendingDocIDsResp getPendingDocIDsResp = new GetPendingDocIDsResp();
-                    List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId);
+                    List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId, null);
                     notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
                     LOGGER.info("Get Pending Trace Ids Success " + notifications);
                     getPendingDocIDsResp.setStatus("Success");

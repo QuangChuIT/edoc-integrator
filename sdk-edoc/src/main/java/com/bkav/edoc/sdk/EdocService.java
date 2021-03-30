@@ -33,16 +33,18 @@ public class EdocService {
         if (config == null) {
             throw new IllegalArgumentException("Edoc Client config must initialize");
         }
+        System.out.println("------------ Config------------");
+        System.out.println(config);
         this.headers = new HashMap<>();
         this.edocProperties = config;
-        this.endpoint = this.edocProperties.getEndpoint();
-        this.organId = this.edocProperties.getOrganId();
-        this.token = this.edocProperties.getToken();
-        this.storeFilePath = this.edocProperties.getStoreFilePath();
+        this.endpoint = config.getEndpoint();
+        this.organId = config.getOrganId();
+        this.token = config.getToken();
+        this.storeFilePath = config.getStoreFilePath();
         this.headers.put("organId", this.organId);
         this.headers.put("Authorization", this.token);
         this.headers.put("user_agent", this.user_agent);
-        this.http = new HttpImpl(this.edocProperties);
+        this.http = new HttpImpl(config);
     }
 
     public GetOrganizationResp getOrganization(String organId) {

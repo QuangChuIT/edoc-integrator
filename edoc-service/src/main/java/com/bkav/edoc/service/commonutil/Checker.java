@@ -191,6 +191,9 @@ public class Checker {
             if (keyInfo != null) {
                 if (keyInfo.getOrganId() != null && keyInfo.getToken() != null) {
                     boolean result = edocDynamicContactService.checkPermission(keyInfo.getOrganId(), keyInfo.getToken());
+                    if (!result) {
+                        errorList.add(new Error("Permission", "The organization does not have permission to connect to the ESB!"));
+                    }
                     report = new Report(result, new ErrorList(errorList));
                 } else {
                     errorList.add(new Error("CheckSignature", "OrganId or Token is required"));

@@ -385,6 +385,23 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         return new ArrayList<>();
     }
 
+    public List<EdocDocument> getDocumentNotSentToVPCP () {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ed from EdocDocument ed Where ed.sendExt = :sendExt and ed.documentExtId = :documentExtId");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("sendExt", true);
+            query.setParameter("documentExtId", "");
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         String yesterday = "2021-01-26";
         java.sql.Date yes = java.sql.Date.valueOf(yesterday);
@@ -393,7 +410,7 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
 
         EdocDocumentDaoImpl edocDocumentDao = new EdocDocumentDaoImpl();
         //System.out.println(edocDocumentDao.getDateInRange(yes, no));
-        //System.out.println(edocDocumentDao.getAllDocumentNotTaken().size());
+        System.out.println(edocDocumentDao.getDocumentNotSentToVPCP().size());
     }
 
     private static final Logger LOGGER = Logger.getLogger(EdocDocumentDaoImpl.class);

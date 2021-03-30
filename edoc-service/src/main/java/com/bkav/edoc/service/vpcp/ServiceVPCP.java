@@ -44,6 +44,7 @@ public class ServiceVPCP {
         String filePath = content.getContent().getPath();
         JSONObject header = new JSONObject();
         header.put("from", messageHeader.getFrom().getOrganId());
+        /*header.put("from", "000.00.13.H53");*/
         header.put("servicetype", "eDoc");
         header.put("messagetype", MessageType.edoc);
         return this.knobstickServiceImp.sendEdoc(header.toString(), filePath);

@@ -101,6 +101,11 @@
                         <spring:message code="menu.documents.not.taken"/>
                     </a>
                 </li>
+                <li>
+                    <a href="javascript:void(0)" data-mode="not-send-vpcp" id="edoc-not-sent-vpcp">
+                        <spring:message code="menu.document.not.send.vpcp"/>
+                    </a>
+                </li>
             </ul>
             <!-- /.nav-second-level -->
         </li>

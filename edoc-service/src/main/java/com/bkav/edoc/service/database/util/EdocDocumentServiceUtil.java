@@ -11,11 +11,8 @@ import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
-import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 
-import javax.print.Doc;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.getDocByCodeAndDomain(docCode, organDomain);
     }
 
-    public static boolean checkExistDocument(String documentId){
+    public static boolean checkExistDocument(String documentId) {
         return DOCUMENT_SERVICE.checkExistDocument(documentId);
     }
 
@@ -106,19 +103,19 @@ public class EdocDocumentServiceUtil {
     }
 
 
-    public static List<EdocDocument> getDocumentByDate (Date date) {
+    public static List<EdocDocument> getDocumentByDate(Date date) {
         return DOCUMENT_SERVICE.getDocumentByDate(date);
     }
 
-    public static void getDailycounterDocument(Date fromDate, Date toDate) {
-        DOCUMENT_SERVICE.getDailycounterDocument(fromDate, toDate);
+    public static void getDailyCounterDocument(Date fromDate, Date toDate) {
+        DOCUMENT_SERVICE.getDailyCounterDocument(fromDate, toDate);
     }
 
     public static boolean checkNewDocument(TraceHeaderList traceHeaderList) {
         return DOCUMENT_SERVICE.checkNewDocument(traceHeaderList);
     }
 
-    public static List<String> getDocCodeByCounterDate (Date _counterDate) {
+    public static List<String> getDocCodeByCounterDate(Date _counterDate) {
         return DOCUMENT_SERVICE.getDocCodeByCounterDate(_counterDate);
     }
 

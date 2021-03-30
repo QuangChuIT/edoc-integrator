@@ -5,7 +5,6 @@ import com.bkav.edoc.service.commonutil.XmlGregorianCalendarUtil;
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
-import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
 import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.AppUtil;
@@ -22,6 +21,7 @@ import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.resource.QueryString;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.util.CommonUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
@@ -31,8 +31,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.persistence.ParameterMode;
-import javax.persistence.StoredProcedureQuery;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
@@ -41,7 +39,6 @@ import java.util.stream.Collectors;
 
 public class EdocDocumentService {
     private final EdocDocumentDaoImpl documentDaoImpl = new EdocDocumentDaoImpl();
-    private final EdocNotificationDaoImpl edocNotificationDao = new EdocNotificationDaoImpl();
     private final Mapper mapper = new Mapper();
     private final Checker checker = new Checker();
 
@@ -93,6 +90,11 @@ public class EdocDocumentService {
             query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                int moreResult = countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                return (result + moreResult);
+            }
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -103,34 +105,8 @@ public class EdocDocumentService {
         return result;
     }
 
-    public List<EdocDocument> getDocumentList() {
-        Session session = documentDaoImpl.openCurrentSession();
-        try {
-            StoredProcedureQuery storedProcedureQuery = session.createStoredProcedureQuery("GetDocumentsInbox", EdocDocument.class);
-            storedProcedureQuery.registerStoredProcedureParameter("mode", String.class, ParameterMode.IN);
-            storedProcedureQuery.registerStoredProcedureParameter("organId", String.class, ParameterMode.IN);
-            storedProcedureQuery.registerStoredProcedureParameter("orderBy", String.class, ParameterMode.IN);
-            storedProcedureQuery.registerStoredProcedureParameter("offset", Integer.class, ParameterMode.IN);
-            storedProcedureQuery.registerStoredProcedureParameter("size", Integer.class, ParameterMode.IN);
-            storedProcedureQuery.registerStoredProcedureParameter("totalRecords", Integer.class, ParameterMode.OUT);
-            storedProcedureQuery.setParameter("mode", "inbox");
-            storedProcedureQuery.setParameter("organId", "000.00.20.H36");
-            storedProcedureQuery.setParameter("orderBy", "subject desc");
-            storedProcedureQuery.setParameter("offset", 1);
-            storedProcedureQuery.setParameter("size", 10);
-            List<EdocDocument> documents = storedProcedureQuery.getResultList();
-
-            int count = (Integer) storedProcedureQuery.getOutputParameterValue("totalRecords");
-            return documents;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-            documentDaoImpl.closeCurrentSession(session);
-        }
-    }
-
-    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
+    public List<DocumentCacheEntry> getDocumentsFilter(PaginationCriteria paginationCriteria, String organId,
+                                                       String mode, String toOrgan, String fromOrgan, String docCode) {
         List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
         try {
@@ -170,6 +146,14 @@ public class EdocDocumentService {
                     }
                 }
             }
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                List<DocumentCacheEntry> totalDocList = new ArrayList<>();
+                totalDocList.addAll(entries);
+                totalDocList.addAll(entryList);
+                return totalDocList;
+            }
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -179,7 +163,6 @@ public class EdocDocumentService {
         }
         return entries;
     }
-
 
 
     public List<DocumentCacheEntry> getDocumentNotTaken(PaginationCriteria paginationCriteria) {
@@ -390,6 +373,7 @@ public class EdocDocumentService {
 
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
+            //int countOrganA = 0;
             for (Organization to : organToPending) {
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
@@ -397,7 +381,11 @@ public class EdocDocumentService {
                 notification.setModifiedDate(currentDate);
                 notification.setSendNumber(0);
                 notification.setDueDate(dueDate);
-                notification.setReceiverId(to.getOrganId());
+                if (to.getOrganId().charAt(10) == 'A') {
+                    notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                } else {
+                    notification.setReceiverId(to.getOrganId());
+                }
                 notification.setDocument(document);
                 notification.setTaken(false);
                 currentSession.persist(notification);
@@ -431,14 +419,14 @@ public class EdocDocumentService {
     /**
      * check document is exist
      *
-     * @param subject
-     * @param codeNumber
-     * @param codeNotation
-     * @param promulgationDateStr
-     * @param fromOrganDomain
-     * @param tos
-     * @param attachmentNames
-     * @return
+     * @param subject             - subject document
+     * @param codeNumber          - code number of document
+     * @param codeNotation        - code notation of document
+     * @param promulgationDateStr - Promulgation Date String
+     * @param fromOrganDomain     - From Organ Domain
+     * @param tos                 - List To Organization
+     * @param attachmentNames     - List Attachment Name
+     * @return boolean
      */
     public boolean checkExistDocument(String subject, String codeNumber, String codeNotation,
                                       String promulgationDateStr, String fromOrganDomain, List<Organization> tos, List<String> attachmentNames) {
@@ -475,9 +463,9 @@ public class EdocDocumentService {
     }
 
     /**
-     * @param documentId
-     * @param fromOrganDomain
-     * @param sentDate
+     * @param documentId      - document id
+     * @param fromOrganDomain - From Organ Domain
+     * @param sentDate        - Sent Date
      */
     public void saveGetDocumentCache(long documentId, String fromOrganDomain, Date sentDate) {
         Map<String, Object> cacheThis = new HashMap<>();
@@ -491,23 +479,26 @@ public class EdocDocumentService {
     /**
      * save pending document for to domain -> cache
      *
-     * @param tos
-     * @param docId
+     * @param tos   - List To Organ
+     * @param docId Document Id
      */
     public void savePendingDocumentCache(List<Organization> tos, long docId) {
         for (Organization to : tos) {
+            String organId = to.getOrganId();
+            if (organId.charAt(10) == 'A') {
+                organId = PropsUtil.get("edoc.domain.A.parent");
+            }
             // TODO: Cache
-            List obj = RedisUtil.getInstance().get(RedisKey.getKey(to.getOrganId(), RedisKey.GET_PENDING_KEY), List.class);
+            List obj = RedisUtil.getInstance().get(RedisKey.getKey(organId, RedisKey.GET_PENDING_KEY), List.class);
             // if data in cache not exist, create new
             if (obj == null) {
-
                 List<Long> documentIds = new ArrayList<>();
                 documentIds.add(docId);
                 RedisUtil.getInstance().set(RedisKey.getKey(to.getOrganId(), RedisKey.GET_PENDING_KEY), documentIds);
                 LOGGER.info("List document pending null create new and save to cached with size " + documentIds.size() + " save to domain " + to.getOrganId());
             } else {
                 // add document id to old list in cache
-                List<Long> oldDocumentIds = null;
+                List<Long> oldDocumentIds;
                 oldDocumentIds = (List<Long>) obj;
                 LOGGER.info("List document pending in cache  for organ domain " + to.getOrganId() + " with size " + oldDocumentIds.size());
                 oldDocumentIds.add(docId);
@@ -521,6 +512,10 @@ public class EdocDocumentService {
     private void saveAllowGetDocumentCache(List<Organization> toOrgans, long documentId) {
         for (Organization to : toOrgans) {
             String organId = to.getOrganId();
+            // check if send to group config
+            if (organId.charAt(10) == 'A') {
+                organId = PropsUtil.get("edoc.domain.A.parent");
+            }
             Boolean allowObj = RedisUtil.getInstance().get(RedisKey.getKey(organId
                     + documentId, RedisKey.CHECK_ALLOW_KEY), Boolean.class);
             if (allowObj == null) {
@@ -534,8 +529,8 @@ public class EdocDocumentService {
     /**
      * save pending document for to domain -> cache
      *
-     * @param tos
-     * @param docId
+     * @param tos   List To Organ
+     * @param docId DocumentId
      */
     public void savePendingDocumentCacheFromWeb(List<String> tos, long docId) {
         for (String to : tos) {
@@ -693,11 +688,11 @@ public class EdocDocumentService {
         return documentDaoImpl.countReceivedExtDoc(fromDate, toDate, received_ext, organDomain);
     }
 
-    public List<Long> getDocCodeByOrganDomain (String fromDate, String toDate, String organDomain) {
+    public List<Long> getDocCodeByOrganDomain(String fromDate, String toDate, String organDomain) {
         return documentDaoImpl.getDocCodeByOrganDomain(fromDate, toDate, organDomain);
     }
 
-    public List<EdocDocument> getDocumentByDate (Date date) {
+    public List<EdocDocument> getDocumentByDate(Date date) {
         return documentDaoImpl.getDocumentByDate(date);
     }
 
@@ -705,7 +700,7 @@ public class EdocDocumentService {
         return documentDaoImpl.getDocumentsByDocCode(docCode);
     }
 
-    public void getDailycounterDocument(Date fromDate, Date toDate) {
+    public void getDailyCounterDocument(Date fromDate, Date toDate) {
         List<Date> dateList = documentDaoImpl.getDateInRange(fromDate, toDate);
         dateList.forEach(date -> {
             _counterDate = date;
@@ -720,7 +715,7 @@ public class EdocDocumentService {
 
                     String toOrgans = document.getToOrganDomain();
                     List<String> toOrganList = Arrays.asList(toOrgans.split("#"));
-                    toOrganList.stream().filter(toOrgan -> checkAgencyOrgan(toOrgan))
+                    toOrganList.stream().filter(this::checkAgencyOrgan)
                             .forEach(toOrgan -> countReceived(toOrgan, dailyCounterMap));
                 });
                 if (checkAgencyOrgan(fromOrgan.get()))
@@ -785,7 +780,7 @@ public class EdocDocumentService {
         dailyCounterMap.put(organDomain, dailyCounter);
     }
 
-    public List<String> getDocCodeByCounterDate (Date _counterDate) {
+    public List<String> getDocCodeByCounterDate(Date _counterDate) {
         return documentDaoImpl.getDocCodeByCounterDate(_counterDate);
     }
 
@@ -800,7 +795,7 @@ public class EdocDocumentService {
         Date date = cal.getTime();
 
         EdocDocumentService edocDocumentService = new EdocDocumentService();
-        //edocDocumentService.getDailycounterDocument(yes, no);
+        //edocDocumentService.getDailyCounterDocument(yes, no);
         System.out.println(edocDocumentService.getDocCodeByCounterDate(date));
     }*/
 

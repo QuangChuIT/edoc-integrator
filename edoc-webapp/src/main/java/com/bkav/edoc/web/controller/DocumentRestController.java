@@ -346,7 +346,7 @@ public class DocumentRestController {
                     LOGGER.info("Not re-send document to VPCP cause list toesVPCP = 0 !!!!!!!!");
                     LOGGER.info(messageHeader.getToes());
                 } else {
-                    LOGGER.info("------------------------- Re-Send document to VPCP -------------------------------");
+                    LOGGER.info("------------------------- Re-Send document to VPCP ---------------------" + messageHeader.getDocumentId());
                     // Send to vpcp
                     if (attachmentCacheEntries.size() > 0) {
                         messageHeader.setToes(toesVPCP);
@@ -358,7 +358,11 @@ public class DocumentRestController {
                             document.setSendExt(true);
                             document.setDocumentExtId(sendEdocResult.getDocID());
                             EdocDocumentServiceUtil.updateDocument(document);
-                            response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
+                            if (sendEdocResult.getStatus().equals("FAIL")) {
+                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
+                            } else {
+                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
+                            }
                             return new ResponseEntity<>(response, HttpStatus.OK);
                         } else {
                             LOGGER.error("------------------------- Error re-send document to VPCP with document Id " + documentId);
@@ -373,6 +377,20 @@ public class DocumentRestController {
             response = new Response(500, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/documents/-/not/sendVPCP",method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public String getAllDocumentNotSentVPCP(HttpServletRequest request) {
+        DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
+        PaginationCriteria pagination = datatableRequest.getPaginationRequest();
+        int totalCount = EdocDocumentServiceUtil.countDocumentsNotTaken(pagination);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotTaken(pagination);
+        DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
+        dataTableResult.setDraw(datatableRequest.getDraw());
+        dataTableResult.setListOfDataObjects(entries);
+        dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
+        return new Gson().toJson(dataTableResult);
     }
 
     @RequestMapping(value = "/send/telegram")

@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.util;
 
+import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EmailRequest;
 import com.bkav.edoc.service.database.entity.TelegramMessage;
@@ -29,8 +30,17 @@ public class EdocNotificationServiceUtil {
     public static boolean checkExistNotification(String organ, long docId) {
         return NOTIFICATION_SERVICE.checkExistNotification(organ, docId);
     }
+
     public static List<Long> getDocumentIdsByOrganId(String organId) {
         return NOTIFICATION_SERVICE.getDocumentIdsByOrganId(organId);
+    }
+
+    public static List<EdocNotification> getNotificationsByOrganId(String organId) {
+        return NOTIFICATION_SERVICE.getNotificationsByOrganId(organId);
+    }
+
+    public static List<EdocDocument> getDocumentByOrganId(String organId) {
+        return NOTIFICATION_SERVICE.getDocumentByOrganId(organId);
     }
 
     public static void removePendingDocId(String organId, long docId) {

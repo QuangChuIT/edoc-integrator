@@ -89,16 +89,18 @@
                     {{if traces.length > 0}}
                         {{each traces}}
                             <div class="form-group">
+                                <div class="col-md-12 col-xs-12">
+                                    <span class="from-to">${fromOrgan.name}</span>
+                                </div>
                                 <div class="row">
                                     <div class="staff-comment col-md-8 col-xs-7" id="trace_${traceId}">
                                             <div class="staff-handler>
-
                                                 <span><i class="fa fa-info-circle fa-fw"></i>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>
                                             </div>
                                             <div class="staff-comment">
                                                 <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
                                             </div>
-                                </div>
+                                    </div>
                                     <div class="col-md-2 col-xs-3 text-center">
                                         ${getStatusOfTrace(statusCode)}
                                     </div>
@@ -109,14 +111,14 @@
                                         <span>${convertToDate(timeStamp).formatDate()}</span>
                                     </div>
                                 </div>
-
                             </div>
                         {{/each}}
                     {{else}}
                         {{each notifications}}
                             <div class="form-group">
                                 <div class="col-md-8 col-xs-12">
-                                    <span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>
+                                    <%--<span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>--%>
+                                    <span class="from-to">${fromOrgan.name}</span>
                                 </div>
                                 <div class="col-md-2 col-xs-12 text-center">
                                     {{if taken == false}}
@@ -139,15 +141,6 @@
         </div>
     </form>
 </script>
-<script id="edocPublicStatDetailTmpl" type="text/x-jquery-tmpl">
-    <div>
-        {{if childOrgan.size() > 0}}
-            {{each childOrgan}}
-            {{/each}}
-        {{/if}}
-    </div>
-</script>
-<%--Jquery--%>
 <script src="<c:url value="/asset/js/jquery.min.js"/>"></script>
 <script src="<c:url value="/asset/js/message.js"/>"></script>
 <script src="<c:url value="/asset/js/jquery.cookie.js"/>"></script>
@@ -173,6 +166,5 @@
 <!-- Custom Theme JavaScript -->
 <script src="<c:url value="/asset/js/report.js" />"></script>
 <script src="<c:url value="/asset/js/trace.js" />"></script>
-<script src="<c:url value="/asset/js/datetime.js" />"></script>
 </body>
 </html>

@@ -36,8 +36,7 @@ public class CommonUtil {
         return result;
     }
 
-    public static List<AttachmentCacheEntry
-            > convertToListAttachment(List list) {
+    public static List<AttachmentCacheEntry> convertToListAttachment(List list) {
         if (list == null) return null;
         List<AttachmentCacheEntry> result = new ArrayList<>();
         for (Object item : list) {
@@ -65,8 +64,8 @@ public class CommonUtil {
     /**
      * get to organ domain from list tos
      *
-     * @param toes
-     * @return
+     * @param toes - list to organ
+     * @return String
      */
     public static String getToOrganDomain(List<Organization> toes) {
 
@@ -84,8 +83,8 @@ public class CommonUtil {
     }
 
     /**
-     * @param traceHeaderList
-     * @return
+     * @param traceHeaderList - trace header list object
+     * @return businessInfo
      */
     public static String getBusinessInfo(TraceHeaderList traceHeaderList) {
         if (traceHeaderList.getBusiness() == null) return null;

@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.services;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
+import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocDynamicContactDaoImpl;
 import com.bkav.edoc.service.database.daoimpl.EdocNotificationDaoImpl;
 import com.bkav.edoc.service.database.entity.*;
@@ -24,6 +25,7 @@ import java.util.*;
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
     private final EdocDynamicContactDaoImpl edocDynamicContactDao = new EdocDynamicContactDaoImpl();
+    private final EdocDocumentDaoImpl documentDao = new EdocDocumentDaoImpl();
 
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
@@ -44,8 +46,8 @@ public class EdocNotificationService {
     /**
      * remove pending document
      *
-     * @param domain
-     * @param documentId
+     * @param domain     Organ Domain
+     * @param documentId Document Id
      */
     public void removePendingDocId(String domain, long documentId) {
         LOGGER.info("------------------------ Prepare remove pending document with document id " + documentId + " : " + domain + " ------------------------");
@@ -58,8 +60,8 @@ public class EdocNotificationService {
     /**
      * remove pending document in cache
      *
-     * @param domain
-     * @param documentId
+     * @param domain     OrganDomain
+     * @param documentId DocumentID
      */
     private void removePendingDocumentIdInCache(String domain, long documentId) {
         List obj = RedisUtil.getInstance().get(RedisKey.getKey(domain,
@@ -78,19 +80,33 @@ public class EdocNotificationService {
     /**
      * get document id by domain
      *
-     * @param organId
-     * @return
+     * @param organId OrganId
+     * @return List
      */
     public List<Long> getDocumentIdsByOrganId(String organId) {
         return notificationDaoImpl.getDocumentIdsByOrganId(organId);
     }
 
     /**
+     * get document id by domain
+     *
+     * @param organId Organ Domain
+     * @return List
+     */
+    public List<EdocNotification> getNotificationsByOrganId(String organId) {
+        return notificationDaoImpl.getNotificationsByOrganId(organId);
+    }
+
+    public List<EdocDocument> getDocumentByOrganId(String organId) {
+        return notificationDaoImpl.getDocumentByOrganId(organId);
+    }
+
+    /**
      * check allow of this domain with document
      *
-     * @param documentId
-     * @param organId
-     * @return
+     * @param documentId Document Id
+     * @param organId Organ Domain
+     * @return boolean
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
 
@@ -189,7 +205,21 @@ public class EdocNotificationService {
                     }
                 }
             }
-            LOGGER.info("------------------------ telegram messages " + telegramMessages.size() + "---------------------------");
+            /*List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
+            documents.forEach(document -> {
+                EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(document.getToOrganDomain());
+                if (sentContact != null && !sentContact.getAgency()) {
+                    LOGGER.info("------------------------------ Send VPCP Fail with document id: " + document.getDocumentId());
+                    TelegramMessage telegramMessage = new TelegramMessage();
+                    telegramMessage.setReceiverId(document.getToOrganDomain());
+                    telegramMessage.setReceiverName(sentContact.getName());
+                    telegramMessage.setDocument(document);
+                    telegramMessage.setCreateDate(document.getCreateDate());
+                    telegramMessages.add(telegramMessage);
+                }
+            });*/
+
+            LOGGER.info("------------------------ Telegram messages " + telegramMessages.size() + "---------------------------");
             return telegramMessages;
         } catch (Exception e) {
             LOGGER.error(e);

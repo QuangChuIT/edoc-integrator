@@ -53,8 +53,6 @@ let edocReport = {
             }
         });
 
-        console.log(jsonData);
-
         instance.appSetting.dataTable = $('#edocReportTable').ejTreeGrid({
             dataSource: jsonData,
             treeColumnIndex: 0,
@@ -65,16 +63,21 @@ let edocReport = {
             pageSettings: {
                 pageCount: 5,
                 pageSizeMode: "all",
-                pageSize: "25",
+                pageSize: "23",
             },
             allowColumnResize: true,
             //enableCollapseAll: true,
             childMapping: "childOrgan",
+            sortSettings: {
+                sortedColumns: [
+                    { field: "total", direction: ej.sortOrder.Descending }
+                ]
+            },
             columns: [
                 { field: "organName", headerText: app_message.edoc_organ_name, width: "550px" },
                 { field: "sent", headerText: app_message.edoc_organ_sent },
                 { field: "received", headerText: app_message.edoc_organ_received },
-                { field: "total", headerText: app_message.edoc_organ_total }
+                { field: "total", headerText: app_message.edoc_organ_total}
             ],
         });
         if (fromDate !== "" && toDate !== "") {
@@ -164,11 +167,8 @@ $(document).ready(function () {
         } else {
             localStorage.removeItem("fromDateReport");
             localStorage.removeItem("toDateReport");
-            localStorage.removeItem("keyword");
             localStorage.setItem("fromDateReport", fromDate);
             localStorage.setItem("toDateReport", toDate);
-            localStorage.setItem("keyword", keyword);
-            //edocReport.appSetting.dataTable.clear();
             edocReport.renderReportTable(fromDate, toDate, keyword);
         }
     });
@@ -179,9 +179,6 @@ $(document).ready(function () {
         let toDate = localStorage.getItem("toDateReport");
         edocReport.exportExcel(fromDate, toDate);
     })
-
-    $("#edocReportTable_ConfirmDialog_wrapper").remove();
-    $(".xdsoft_datetimepicker").remove();
 });
 
 String.format = function () {

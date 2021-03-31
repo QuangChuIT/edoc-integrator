@@ -81,6 +81,12 @@
             </table>
         </div>
     </div>
+    <div class="edoc-table-not-sendPCP">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-not-sendVPCP">
+            </table>
+        </div>
+    </div>
     <div class="edoc-statistic">
         <div class="table-responsive">
             <div class="row user-import" id="search-statistic-header">

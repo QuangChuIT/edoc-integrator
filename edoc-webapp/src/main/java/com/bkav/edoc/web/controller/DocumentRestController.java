@@ -384,8 +384,8 @@ public class DocumentRestController {
     public String getAllDocumentNotSentVPCP(HttpServletRequest request) {
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
-        int totalCount = EdocDocumentServiceUtil.countDocumentsNotTaken(pagination);
-        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotTaken(pagination);
+        int totalCount = EdocDocumentServiceUtil.countDocumentsNotendVPCP(pagination);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotendVPCP(pagination);
         DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);

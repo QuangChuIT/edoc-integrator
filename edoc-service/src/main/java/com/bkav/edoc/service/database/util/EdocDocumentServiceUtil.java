@@ -130,7 +130,13 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);
     }
 
+    public static List<DocumentCacheEntry> getDocumentsNotendVPCP(PaginationCriteria paginationCriteria) {
+        return DOCUMENT_SERVICE.getDocumentNotendVPCP(paginationCriteria);
+    }
 
+    public static int countDocumentsNotendVPCP(PaginationCriteria paginationCriteria) {
+        return DOCUMENT_SERVICE.countDocumentNotendVPCP(paginationCriteria);
+    }
 
     public static MessageHeader getMessageHeaderByDOcumentID(long documentId) {
         return DOCUMENT_SERVICE.getDocumentById(documentId);

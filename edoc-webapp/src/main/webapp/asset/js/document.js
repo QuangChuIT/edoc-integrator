@@ -275,6 +275,97 @@ let edocDocument = {
         });
     },
 
+    renderNotSendVpcpDatatable: () => {
+        let instance = this;
+        instance.dataTable = $('#dataTables-edoc-not-sendVPCP').DataTable({
+            serverSide: true,
+            processing: true,
+            pageLength: 15,
+            ajax: {
+                url: "/documents/-/not/sendVPCP",
+                type: "POST"
+            },
+            drawCallback: function() {
+                $(this).contextMenu({
+                    selector: 'tbody tr td',
+                    callback: (key, options) => {
+                        let id = options.$trigger[0].parentElement.id;
+                        switch (key) {
+                            case "resend":
+                                console.log(id);
+                                //reSendDocument(id);
+                                reSendToVPCP(id);
+                                break;
+                            case "delete":
+                                instance.deleteDocument(id);
+                                break;
+                        }
+                        //edocDocument.deleteDocument(id);
+                    },
+                    items: {
+                        "resend": {name: app_message.edoc_resend_document, icon: "fa-repeat"},
+                        "delete": {name: app_message.edoc_remove_document, icon: "delete"}
+                    }
+                });
+            },
+            rowId: "documentId",
+            responsive: true,
+            autoWidth: false,
+            ordering: true,
+            bDestroy: true,
+            searching: true,
+            lengthChange: false,
+            paging: true,
+            info: true,
+            columns: [
+                {
+                    "name": "ed.subject",
+                    "title": app_message.edoc_table_header_subject,
+                    "data": null,
+                    "render": function (data) {
+                        return $('#edocSubjectTemplate').tmpl(data).html();
+                    }
+                },
+                {
+                    "name": "ed.from_organ_domain",
+                    "title": app_message.edoc_table_header_fromOrgan,
+                    "data": "fromOrgan.name"
+                },
+                {
+                    "name": "ed.to_organ_domain",
+                    "title": app_message.edoc_table_header_toOrgan,
+                    "data": "toOrgan[0].name"
+                },
+                {
+                    "name": "ed.doc_code",
+                    "title": app_message.table_header_code,
+                    "data": null,
+                    "render": function (data) {
+                        return data.codeNumber + "/" + data.codeNotation;
+                    }
+                },
+                {
+                    "name": "ed.create_date",
+                    "title": app_message.table_header_createDate,
+                    "data": null,
+                    "render": function (data) {
+                        return $('#edocCreateDateTemplate').tmpl(data).html();
+                    }
+                }
+            ],
+            language: app_message.language,
+            order: [[4, 'desc']],
+            createdRow: (row, data) => {
+                // Set the data-status attribute, and add a class
+                if (data["visited"] === false) {
+                    $(row).addClass("not-visited");
+                } else {
+                    $(row).addClass("visited");
+                }
+            }
+        });
+    },
+
     getCookie: function (key, defaultValue) {
         let keyEQ = key + "=";
         let cookies = document.cookie.split(';');
@@ -631,6 +722,9 @@ $(document).ready(function () {
                 $("#warning-document-not-taken").show();
                 edocDocument.renderNotTakenDatatable();
                 $(".edoc-table-not-taken").show();
+            } else if (dataMode === "not-send-vpcp") {
+                edocDocument.renderNotSendVpcpDatatable();
+                $('.edoc-table-not-sendPCP').show();
             } else {
                 edocDocument.renderDatatable(fromOrgan, toOrgan, docCode);
                 $(".edoc-table").show();

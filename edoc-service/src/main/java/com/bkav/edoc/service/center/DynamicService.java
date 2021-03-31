@@ -22,6 +22,7 @@ import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.base.header.*;
+import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.service.xml.ed.Ed;
 import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
@@ -319,6 +320,53 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                         + organId + " : " + documentId + " ----------------------------------");
                 // remove pending document
                 notificationService.removePendingDocId(organId, documentId);
+                LOGGER.info("Building trace received and  to database for organ " + organId);
+                // TODO auto add trace received(01) for this document
+                EdocDocument document = documentService.getDocument(documentId);
+                if (document != null) {
+                    MessageStatus messageStatus = new MessageStatus();
+                    messageStatus.setDescription("Da nhan van ban ve he thong");
+                    messageStatus.setTimestamp(new Date());
+                    messageStatus.setStatusCode("1");
+
+                    String fromOrgan = document.getFromOrganDomain();
+                    String docCode = document.getDocCode();
+                    Date promulgationDate = document.getPromulgationDate();
+                    String edXMLDocumentId = fromOrgan + "," + DateUtils.format(document.getPromulgationDate(), DateUtils.DEFAULT_DATE_FORMAT) + "," + docCode;
+                    EdocDynamicContact toContact = edocDynamicContactService.getDynamicContactByDomain(organId);
+
+                    ResponseFor responseFor = new ResponseFor();
+                    responseFor.setCode(docCode);
+                    responseFor.setDocumentId(edXMLDocumentId);
+                    responseFor.setOrganId(fromOrgan);
+                    responseFor.setPromulgationDate(promulgationDate);
+
+                    Organization organization = new Organization();
+                    organization.setEmail(toContact.getEmail());
+                    organization.setFax(toContact.getFax());
+                    organization.setOrganAdd(toContact.getAddress());
+                    organization.setOrganId(organId);
+                    organization.setOrganizationInCharge(toContact.getInCharge());
+                    organization.setOrganName(toContact.getName());
+                    organization.setTelephone(toContact.getTelephone());
+                    organization.setWebsite(toContact.getWebsite());
+
+                    StaffInfo staffInfo = new StaffInfo();
+                    staffInfo.setDepartment(toContact.getName());
+                    staffInfo.setDepartmentId("");
+                    staffInfo.setEmail(toContact.getEmail());
+                    staffInfo.setStaff("EdocAdapter");
+                    staffInfo.setMobile("");
+                    staffInfo.setStaffId("");
+
+                    messageStatus.setStaffInfo(staffInfo);
+                    messageStatus.setFrom(organization);
+                    messageStatus.setResponseFor(responseFor);
+                    traceService.updateTrace(messageStatus, errorList);
+                } else {
+                    errorList.add(new Error("M.ConfirmReceived", "Not found document with document id " + documentId));
+                }
+
                /* // TODO if document of VPCP send request confirm done or fail
                 EdocDocument document = documentService.getDocument(documentId);
                 if (document.isReceivedExt()) {
@@ -826,9 +874,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     /**
      * save envelop file to cache
      *
-     * @param document
-     * @param strDocumentId
-     * @throws Exception
+     * @param document      - Document Id
+     * @param strDocumentId - Document Id String
      */
     private void saveEnvelopeFileCache(Document document, String strDocumentId) {
         try {

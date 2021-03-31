@@ -55,6 +55,8 @@ public class EdocNotificationService {
         removePendingDocumentIdInCache(domain, documentId);
         // remove in db
         this.removePendingDocumentId(domain, documentId);
+        // auto add trace received
+
     }
 
     /**
@@ -105,7 +107,7 @@ public class EdocNotificationService {
      * check allow of this domain with document
      *
      * @param documentId Document Id
-     * @param organId Organ Domain
+     * @param organId    Organ Domain
      * @return boolean
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
@@ -141,7 +143,6 @@ public class EdocNotificationService {
                         MemcachedUtil.getInstance().update(cacheKey, MemcachedKey.SEND_DOCUMENT_TIME_LIFE, documentCacheUpdate);
                     }
                 }
-
             } else {
                 LOGGER.error("M.RemovePending. Not found edoc_notification to remove pending by document " + documentId + " receiver id " + domain);
             }

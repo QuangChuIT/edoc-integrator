@@ -3,13 +3,13 @@ package com.bkav.edoc.payload;
 import java.util.List;
 
 public class GetPendingDocResp extends BaseResp{
-    private List<GetPendingResult> pendingResult;
+    private List<GetPendingResult> data;
 
     public List<GetPendingResult> getPendingResult() {
-        return pendingResult;
+        return data;
     }
 
     public void setPendingResult(List<GetPendingResult> pendingResult) {
-        this.pendingResult = pendingResult;
+        this.data = pendingResult;
     }
 }

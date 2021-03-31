@@ -3,13 +3,15 @@ package com.bkav.edoc.service.database.daoimpl;
 import com.bkav.edoc.service.database.dao.EdocNotificationDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocNotification;
-import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long> implements EdocNotificationDao {
 
@@ -61,6 +63,33 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
             }
         }
         return null;
+    }
+
+    @Override
+    public List<EdocNotification> getNotificationsByOrganId(String organId) {
+        Session currentSession = openCurrentSession();
+        List<EdocNotification> notifications = null;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT en FROM EdocNotification en where en.receiverId=:receiverId and en.taken=:taken");
+            Query<EdocNotification> query = currentSession.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("receiverId", organId);
+            query.setParameter("taken", false);
+            List<EdocNotification> result = query.getResultList();
+            if (result == null) {
+                notifications = new ArrayList<>();
+            } else {
+                notifications = result;
+            }
+            LOGGER.info("---------------Get Pending document has size: " + notifications.size());
+        } catch (Exception e) {
+            LOGGER.error("Error when get document pending for organ " + organId + " cause " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (currentSession != null) {
+                currentSession.close();
+            }
+        }
+        return notifications;
     }
 
     /**
@@ -209,21 +238,21 @@ public class EdocNotificationDaoImpl extends RootDaoImpl<EdocNotification, Long>
     }
 
     public boolean checkExistNotification(String organDomain, long documentId) {
-       Session session = openCurrentSession();
-       try {
-           StringBuilder sql = new StringBuilder();
-           sql.append("Select en from EdocNotification en where en.receiverId = :organDomain and en.document.documentId =:documentId");
-           Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
-           query.setParameter("organDomain", organDomain);
-           query.setParameter("documentId", documentId);
-           if (query.getResultList().size() > 0)
-               return true;
-       } catch (Exception e) {
-           LOGGER.error(e);
-       } finally {
-           closeCurrentSession(session);
-       }
-       return false;
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select en from EdocNotification en where en.receiverId = :organDomain and en.document.documentId =:documentId");
+            Query<EdocNotification> query = session.createQuery(sql.toString(), EdocNotification.class);
+            query.setParameter("organDomain", organDomain);
+            query.setParameter("documentId", documentId);
+            if (query.getResultList().size() > 0)
+                return true;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(session);
+        }
+        return false;
     }
 
     /*public List<EdocNotification> getEdocNotificationNotTaken(PaginationCriteria paginationCriteria) {

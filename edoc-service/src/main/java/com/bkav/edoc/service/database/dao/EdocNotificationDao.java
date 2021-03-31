@@ -13,6 +13,8 @@ public interface EdocNotificationDao {
 
     List<EdocDocument> getDocumentByOrganId(String organId);
 
+    List<EdocNotification> getNotificationsByOrganId(String organId);
+
     boolean checkAllowWithDocument(long documentId, String organId);
 
     void setNotificationTaken(long documentId, String organId) throws SQLException;

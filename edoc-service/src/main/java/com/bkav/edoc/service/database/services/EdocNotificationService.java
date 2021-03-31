@@ -21,7 +21,6 @@ import org.hibernate.Session;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
@@ -47,8 +46,8 @@ public class EdocNotificationService {
     /**
      * remove pending document
      *
-     * @param domain
-     * @param documentId
+     * @param domain     Organ Domain
+     * @param documentId Document Id
      */
     public void removePendingDocId(String domain, long documentId) {
         LOGGER.info("------------------------ Prepare remove pending document with document id " + documentId + " : " + domain + " ------------------------");
@@ -61,8 +60,8 @@ public class EdocNotificationService {
     /**
      * remove pending document in cache
      *
-     * @param domain
-     * @param documentId
+     * @param domain     OrganDomain
+     * @param documentId DocumentID
      */
     private void removePendingDocumentIdInCache(String domain, long documentId) {
         List obj = RedisUtil.getInstance().get(RedisKey.getKey(domain,
@@ -81,23 +80,33 @@ public class EdocNotificationService {
     /**
      * get document id by domain
      *
-     * @param organId
-     * @return
+     * @param organId OrganId
+     * @return List
      */
     public List<Long> getDocumentIdsByOrganId(String organId) {
         return notificationDaoImpl.getDocumentIdsByOrganId(organId);
     }
 
-    public List<EdocDocument> getDocumentByOrganId (String organId) {
+    /**
+     * get document id by domain
+     *
+     * @param organId Organ Domain
+     * @return List
+     */
+    public List<EdocNotification> getNotificationsByOrganId(String organId) {
+        return notificationDaoImpl.getNotificationsByOrganId(organId);
+    }
+
+    public List<EdocDocument> getDocumentByOrganId(String organId) {
         return notificationDaoImpl.getDocumentByOrganId(organId);
     }
 
     /**
      * check allow of this domain with document
      *
-     * @param documentId
-     * @param organId
-     * @return
+     * @param documentId Document Id
+     * @param organId Organ Domain
+     * @return boolean
      */
     public boolean checkAllowWithDocument(long documentId, String organId) {
 

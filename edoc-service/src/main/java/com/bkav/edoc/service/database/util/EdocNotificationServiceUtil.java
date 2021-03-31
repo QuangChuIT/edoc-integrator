@@ -35,6 +35,10 @@ public class EdocNotificationServiceUtil {
         return NOTIFICATION_SERVICE.getDocumentIdsByOrganId(organId);
     }
 
+    public static List<EdocNotification> getNotificationsByOrganId(String organId) {
+        return NOTIFICATION_SERVICE.getNotificationsByOrganId(organId);
+    }
+
     public static List<EdocDocument> getDocumentByOrganId(String organId) {
         return NOTIFICATION_SERVICE.getDocumentByOrganId(organId);
     }

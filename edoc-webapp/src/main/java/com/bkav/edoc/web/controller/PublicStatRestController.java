@@ -1,19 +1,14 @@
 package com.bkav.edoc.web.controller;
 
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
-import com.bkav.edoc.service.database.entity.EPublic;
-import com.bkav.edoc.service.database.entity.EPublicStat;
-import com.bkav.edoc.service.database.entity.EdocStatisticDetail;
-import com.bkav.edoc.service.database.entity.User;
+import com.bkav.edoc.service.database.entity.*;
+import com.bkav.edoc.service.database.util.EdocAttachmentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.PropsUtil;
-import com.bkav.edoc.service.database.entity.EdocAttachment;
-import com.bkav.edoc.service.database.entity.EdocDocument;
-import com.bkav.edoc.service.database.util.EdocAttachmentServiceUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.InputStreamResource;
@@ -94,7 +89,7 @@ public class PublicStatRestController {
 
         Long id = new Long(userId);
         User user = UserServiceUtil.findUserById(id);
-        if(user == null) {
+        if (user == null) {
             LOGGER.error("Not found user with id " + id + " !!!!!!!!!!!!!");
         } else {
             if (user.getUsername().equals(PropsUtil.get("user.admin.username"))) {
@@ -195,7 +190,7 @@ public class PublicStatRestController {
         if (fromDate != null && toDate != null) {
             Date fromDateValue = DateUtils.parse(fromDate);
             Date toDateValue = DateUtils.parse(toDate);
-            EdocDocumentServiceUtil.getDailycounterDocument(fromDateValue, toDateValue);
+            EdocDocumentServiceUtil.getDailyCounterDocument(fromDateValue, toDateValue);
             return HttpStatus.OK;
         }
         return HttpStatus.BAD_REQUEST;

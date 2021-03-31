@@ -7,6 +7,7 @@ import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.OrganizationCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
 import com.bkav.edoc.service.database.services.EdocDocumentService;
@@ -85,14 +86,6 @@ public class EdocController {
         SendDocResp sendDocResp = new SendDocResp();
         try {
             String organId = headers.get(EdocServiceConstant.ORGAN_ID);
-            /*String hashFile = headers.get("hash-edoc");
-            if (Validator.isNullOrEmpty(hashFile)) {
-                errors.add(new Error("BadRequest", "Bad Request"));
-                sendDocResp.setStatus("Fail");
-                sendDocResp.setCode("9999");
-                sendDocResp.setErrors(errors);
-                return gson.toJson(sendDocResp);
-            }*/
             String messageType = headers.get(EdocServiceConstant.MESSAGE_TYPE);
             if (Validator.isNullOrEmpty(messageType) || !EdocServiceConstant.MESSAGE_TYPES.contains(messageType)) {
                 errors.add(new Error("BadRequest", "Bad Request"));
@@ -133,14 +126,6 @@ public class EdocController {
             LOGGER.info("Save edoc file success with size " + size);
             File file = new File(specPath);
             InputStream fileInputStream = new FileInputStream(file);
-            /*String hash = ShaUtil.generateSHA256(inputStream);*/
-            /*if (hash.equals(hashFile)) {
-                errors.add(new Error("EdocHash", "Edoc file hash not match"));
-                sendDocResp.setCode("9999");
-                sendDocResp.setStatus("Error");
-                sendDocResp.setDocId(0L);
-                return gson.toJson(sendDocResp);
-            }*/
             // process add edoc
             if (messageType.equals(MessageType.EDOC.name())) {
                 Ed ed = EdXmlParser.getInstance().parse(fileInputStream);
@@ -239,14 +224,13 @@ public class EdocController {
         List<GetPendingResult> getPendingResults = new ArrayList<>();
         List<Long> notifications;
         String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
-        LOGGER.info("organid -------------------------------" + organId);
+        LOGGER.info("OrganID request -------------------------------" + organId);
         try {
             String messageType = headerMap.get(EdocServiceConstant.MESSAGE_TYPE);
             if (!Validator.isNullOrEmpty(messageType) && (messageType.equals("EDOC") || messageType.equals("STATUS"))) {
                 if (messageType.equals("EDOC")) {
                     List obj = RedisUtil.getInstance().get(RedisKey.getKey(organId, RedisKey.GET_PENDING_KEY), List.class);
                     if (obj != null && obj.size() > 0) {
-                        List<GetPendingResult> pendingCacheResult = new ArrayList<>();
                         notifications = CommonUtil.convertToListLong(obj);
                         notifications.forEach(notification -> {
                             DocumentCacheEntry documentCacheEntry = EdocDocumentServiceUtil.getDocumentById(notification);
@@ -255,15 +239,15 @@ public class EdocController {
                             GetPendingResult pendingResult = new GetPendingResult();
                             pendingResult.setDocId(documentCacheEntry.getDocumentId());
                             pendingResult.setOrganId(toOrganId);
-                            pendingCacheResult.add(pendingResult);
+                            getPendingResults.add(pendingResult);
                         });
                     } else {
-                        List<EdocDocument> documents = EdocNotificationServiceUtil.getDocumentByOrganId(organId);
-                        LOGGER.info("---------------- Get pending document with organ " + organId + " with size " + documents.size());
-                        documents.forEach(document -> {
+                        List<EdocNotification> edocNotifications = EdocNotificationServiceUtil.getNotificationsByOrganId(organId);
+                        LOGGER.info("---------------- Get pending document with organ " + organId + " with size " + edocNotifications.size());
+                        edocNotifications.forEach(notification -> {
                             GetPendingResult result = new GetPendingResult();
-                            result.setDocId(document.getDocumentId());
-                            result.setOrganId(document.getToOrganDomain());
+                            result.setDocId(notification.getDocument().getDocumentId());
+                            result.setOrganId(notification.getDocument().getToOrganDomain());
                             getPendingResults.add(result);
                         });
                         //notifications = EdocNotificationServiceUtil.getDocumentIdsByOrganId(organId);

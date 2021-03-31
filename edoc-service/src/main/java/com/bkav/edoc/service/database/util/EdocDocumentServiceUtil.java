@@ -127,8 +127,12 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.countDocumentsNotTaken(paginationCriteria);
     }
 
-    public static List<DocumentCacheEntry> getDocumentsNotendVPCP(PaginationCriteria paginationCriteria) {
-        return DOCUMENT_SERVICE.getDocumentNotendVPCP(paginationCriteria);
+    public static List<EdocDocument> getAllDocumentNotSendVPCP() {
+        return DOCUMENT_SERVICE.getAllDocumentNotSendVPCP();
+    }
+
+    public static List<DocumentCacheEntry> getDocumentsNotSendVPCP(PaginationCriteria paginationCriteria) {
+        return DOCUMENT_SERVICE.getDocumentNotSendVPCP(paginationCriteria);
     }
 
     public static int countDocumentsNotendVPCP(PaginationCriteria paginationCriteria) {

@@ -83,6 +83,12 @@
     </div>
     <div class="edoc-table-not-sendPCP">
         <div class="table-responsive">
+            <div class="row user-import" id="resend-documents-not-sendVPCP">
+                <button class="btn btn-primary import-excel-button" id="resend-document-vpcp">
+                    <i class="fa fa-repeat"></i>
+                    <spring:message code="edoc.resend.documents.to.vpcp"/>
+                </button>
+            </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-not-sendVPCP">
             </table>
         </div>

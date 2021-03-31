@@ -359,7 +359,7 @@ public class DocumentRestController {
                             document.setDocumentExtId(sendEdocResult.getDocID());
                             EdocDocumentServiceUtil.updateDocument(document);
                             if (sendEdocResult.getStatus().equals("FAIL")) {
-                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
+                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", new Object[]{sendEdocResult.getErrorDesc()}));
                             } else {
                                 response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
                             }
@@ -369,7 +369,7 @@ public class DocumentRestController {
                         }
                     }
                 }
-                response = new Response(403, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
+                response = new Response(403, errors, messageSourceUtil.getMessage("edoc.resend.fail", null));
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         } catch (Exception e) {
@@ -385,12 +385,75 @@ public class DocumentRestController {
         DatatableRequest<DocumentCacheEntry> datatableRequest = new DatatableRequest<>(request);
         PaginationCriteria pagination = datatableRequest.getPaginationRequest();
         int totalCount = EdocDocumentServiceUtil.countDocumentsNotendVPCP(pagination);
-        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotendVPCP(pagination);
+        List<DocumentCacheEntry> entries = EdocDocumentServiceUtil.getDocumentsNotSendVPCP(pagination);
         DataTableResult<DocumentCacheEntry> dataTableResult = new DataTableResult<>();
         dataTableResult.setDraw(datatableRequest.getDraw());
         dataTableResult.setListOfDataObjects(entries);
         dataTableResult = new CommonUtils<DocumentCacheEntry>().getDataTableResult(dataTableResult, entries, totalCount, datatableRequest);
         return new Gson().toJson(dataTableResult);
+    }
+
+    @RequestMapping(value = "/resendAll/VPCP", method = RequestMethod.POST, produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Response> resendAllToVPCP() {
+        List<String> errors = new ArrayList<>();
+        Response response;
+        List<EdocDocument> documentNotSendToVPCPs = EdocDocumentServiceUtil.getAllDocumentNotSendVPCP();
+        try {
+            if (documentNotSendToVPCPs.size() == 0) {
+                String message = messageSourceUtil.getMessage("edoc.not.has.document.notsend.vpcp", null);
+                errors.add(message);
+                response = new Response(400, errors, message);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                long success = 0, fail = 0;
+                LOGGER.info("----------------- Start re-send documents to VPCP with size: " + documentNotSendToVPCPs.size());
+                for (EdocDocument document: documentNotSendToVPCPs) {
+                    long documentId = document.getDocumentId();
+                    MessageHeader messageHeader = EdocDocumentServiceUtil.getMessageHeaderByDOcumentID(documentId);
+                    TraceHeaderList traceHeaderList = EdocTraceHeaderListServiceUtil.getTraceHeaderListByDocumentId(documentId);
+                    List<EdocAttachment> attachments = EdocAttachmentServiceUtil.getAttachmentByDocumentId(documentId);
+                    List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
+                    attachments.forEach(attachment -> {
+                        AttachmentCacheEntry attachmentCacheEntry = MapperUtil.modelToAttachmentCache(attachment);
+                        attachmentCacheEntries.add(attachmentCacheEntry);
+                    });
+
+                    List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
+                    boolean sendVPCP = toesVPCP.size() > 0;
+
+                    if (!sendVPCP) {
+                        LOGGER.info("----------------- Not re-send document to VPCP cause list toesVPCP = 0 !!!!!!!!");
+                        LOGGER.info(messageHeader.getToes());
+                    } else {
+                        LOGGER.info("------------------------- Re-Send documents to VPCP ---------------------" + messageHeader.getDocumentId());
+                        // Send to vpcp
+                        if (attachmentCacheEntries.size() > 0) {
+                            messageHeader.setToes(toesVPCP);
+                            SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendDocument(messageHeader, traceHeaderList, attachmentCacheEntries);
+                            if (sendEdocResult != null) {
+                                LOGGER.info("-------------------- Re-send document to VPCP status " + sendEdocResult.getStatus());
+                                LOGGER.info("-------------------- Re-send document to VPCP Desc: " + sendEdocResult.getErrorDesc());
+                                LOGGER.info("-------------------- Re-send document to VPCP DocID: " + sendEdocResult.getDocID());
+                                document.setSendExt(true);
+                                document.setDocumentExtId(sendEdocResult.getDocID());
+                                EdocDocumentServiceUtil.updateDocument(document);
+                                if (sendEdocResult.getStatus().equals("FAIL")) fail++;
+                                else success++;
+                            } else {
+                                LOGGER.error("------------------------- Error re-send document to VPCP with document Id " + documentId);
+                            }
+                        }
+                    }
+                };
+                LOGGER.info("------------------------------ Finish re-send document to VPCP---------------------------------");
+                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resned.vpcp.result", new Object[]{success, fail}));
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Not re-send document to VPCP cause " + e);
+            response = new Response(500, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", null));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/send/telegram")

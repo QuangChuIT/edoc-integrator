@@ -573,7 +573,7 @@ $(document).ready(function () {
     $("#toOrgan").select2({
         tags: true
     });
-    $("#dataTables-edoc, #dataTables-edoc-notTaken").on('click', 'tbody>tr', function () {
+    $("#dataTables-edoc, #dataTables-edoc-notTaken, #dataTables-edoc-not-sendVPCP").on('click', 'tbody>tr', function () {
         let documentId = $(this).attr("id");
         $.get("/document/" + documentId, function (data) {
             data.attachments.forEach(function (key, index) {
@@ -723,6 +723,7 @@ $(document).ready(function () {
                 edocDocument.renderNotTakenDatatable();
                 $(".edoc-table-not-taken").show();
             } else if (dataMode === "not-send-vpcp") {
+                $('#resend-documents-not-sendVPCP').show();
                 edocDocument.renderNotSendVpcpDatatable();
                 $('.edoc-table-not-sendPCP').show();
             } else {
@@ -761,6 +762,25 @@ $(document).ready(function () {
     $("#detail-report").on("click", function (e) {
         e.preventDefault();
     });
+
+    $("#resend-document-vpcp").on('click', function () {
+        $.ajax({
+            url: "/resendAll/VPCP",
+            type: "POST",
+            beforeSend: function () {
+                $("#overlay").show();
+            },
+            success: function (response) {
+                console.log(response);
+                $.notify(response.message, "success");
+            },
+            error: function (error) {
+                $.notify(error.errors, "error");
+            }
+        }).done(function () {
+            $("#overlay").hide();
+        });
+    })
 
     $("#put-to-telegram").on('click', function(e) {
         e.preventDefault();

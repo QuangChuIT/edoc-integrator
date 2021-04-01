@@ -224,6 +224,59 @@ public class EdocDocumentService {
         return result;
     }
 
+    public List<EdocDocument> getAllDocumentNotSendVPCP() {
+        return documentDaoImpl.getDocumentNotSentToVPCP();
+    }
+
+    public List<DocumentCacheEntry> getDocumentNotSendVPCP(PaginationCriteria paginationCriteria) {
+        List<DocumentCacheEntry> entries = new ArrayList<>();
+        Session session = documentDaoImpl.openCurrentSession();
+        try {
+            String queryDocumentNotTaken = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_NOT_SEND_VPCP, paginationCriteria);
+            Query<EdocDocument> query = session.createNativeQuery(queryDocumentNotTaken, EdocDocument.class);
+            query.setParameter("vpcpRegex", "000.00.00.G");
+            int pageNumber = paginationCriteria.getPageNumber();
+            int pageSize = paginationCriteria.getPageSize();
+            query.setFirstResult(pageNumber);
+            query.setMaxResults(pageSize);
+            List<EdocDocument> documents = query.getResultList();
+            if (documents.size() > 0) {
+                documents.forEach(document -> {
+                    DocumentCacheEntry documentCacheEntry = MapperUtil.documentToCached(document);
+                    if (documentCacheEntry != null) {
+                        entries.add(documentCacheEntry);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error get documents not taken " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return entries;
+    }
+
+    public int countDocumentNotendVPCP(PaginationCriteria paginationCriteria) {
+        Session session = documentDaoImpl.openCurrentSession();
+        int result = 0;
+        try {
+            session.beginTransaction();
+            String queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_NOT_SEND_VPCP, paginationCriteria);
+            Query query = session.createNativeQuery(queryDocument);
+            query.setParameter("vpcpRegex", "000.00.00.G");
+            BigInteger count = (BigInteger) query.getSingleResult();
+            result = count.intValue();
+        } catch (Exception e) {
+            LOGGER.error("Error count documents not taken " + Arrays.toString(e.getStackTrace()));
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return result;
+    }
+
     public EdocDocument addDocument(MessageHeader messageHeader, TraceHeaderList traces, List<Attachment> attachments,
                                     StringBuilder outDocumentId, List<AttachmentCacheEntry> edocAttachmentCacheEntries, List<Error> errors) {
         Session currentSession = documentDaoImpl.openCurrentSession();

@@ -2043,6 +2043,10 @@ input:checked + .slider:before {
     display: none;
 }
 
+#resend-documents-not-sendVPCP {
+    display: none;
+}
+
 .edoc-taken {
     color: #004CFF;
 }

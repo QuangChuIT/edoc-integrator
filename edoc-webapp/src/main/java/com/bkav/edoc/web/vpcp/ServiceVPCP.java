@@ -21,8 +21,6 @@ import com.bkav.edoc.service.xml.ed.parser.EdXmlParser;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.bkav.edoc.web.util.TokenUtil;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.vpcp.services.AgencyServiceImp;
 import com.vpcp.services.KnobstickServiceImp;
 import com.vpcp.services.VnptProperties;
@@ -34,7 +32,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ServiceVPCP {
@@ -181,6 +181,7 @@ public class ServiceVPCP {
                             LOGGER.info(pStart + "status:" + getEdocResult.getStatus());
                             LOGGER.info(pStart + "Desc:" + getEdocResult.getErrorDesc());
                             LOGGER.info(pStart + "file:" + getEdocResult.getFilePath());
+                            EdocDocument document = null;
                             if (getEdocResult.getStatus().equals("OK")) {
                                 // TODO insert to database
                                 //parse data from edxml
@@ -201,8 +202,16 @@ public class ServiceVPCP {
                                 StringBuilder documentEsbId = new StringBuilder();
                                 List<Error> errors = new ArrayList<>();
                                 List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
-                                EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader,
-                                        traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
+                                // only check exist with new document
+                                if (EdocDocumentServiceUtil.checkNewDocument(traceHeaderList)) {
+                                    // check exist document
+                                    if (EdocDocumentServiceUtil.checkExistDocument(messageHeader.getDocumentId())) {
+                                        LOGGER.info("Exist document with document id " + messageHeader.getDocumentId() + " on Esb !!!!!");
+                                    }
+                                } else {
+                                    document = EdocDocumentServiceUtil.addDocument(messageHeader,
+                                            traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
+                                }
                                 if (document != null) {
                                     LOGGER.info("Save document from vpcp successfully from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
                                     document.setDocumentExtId(item.getId());

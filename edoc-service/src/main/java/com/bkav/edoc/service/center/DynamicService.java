@@ -84,7 +84,11 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
         try {
             Document document = xmlUtil.convertToDocument(messageContext.getEnvelope());
-            LOGGER.info("Request message ----------------------> " + messageContext.getEnvelope().toString());
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("Request message ----------------------> " + messageContext.getEnvelope().toString());
+            }
+
             switch (soapAction) {
                 case EdXmlConstant.SEND_DOCUMENT_ACTION:
                     LOGGER.info("-------------------------- Send document ------------------------");
@@ -463,7 +467,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                     String edxmlDocumentId = responseFor.getDocumentId();
                     boolean existDocument = documentService.checkExistDocument(edxmlDocumentId);
                     if (existDocument) {
-                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(status, PropsUtil.get("edoc.edxml.file.location"));
+                        String edocEdXMLFilePath = PropsUtil.get("VPCP.attachment.dir");
+                        SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendStatus(status, edocEdXMLFilePath);
                         if (sendEdocResult != null) {
                             LOGGER.info("-------------------- Send status to VPCP status " + sendEdocResult.getStatus());
                             LOGGER.info("-------------------- Send status to VPCP Desc: " + sendEdocResult.getErrorDesc());

@@ -212,7 +212,6 @@ public class ServiceVPCP {
                                     document = EdocDocumentServiceUtil.addDocument(messageHeader,
                                             traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
                                 }
-
                                 if (document != null) {
                                     LOGGER.info("Save document from vpcp successfully from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
                                     document.setDocumentExtId(item.getId());

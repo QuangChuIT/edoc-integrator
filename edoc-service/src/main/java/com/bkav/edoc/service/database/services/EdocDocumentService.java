@@ -12,6 +12,7 @@ import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.MapperUtil;
 import com.bkav.edoc.service.executor.ExecutorServiceUtil;
+import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.mineutil.Mapper;
@@ -427,6 +428,8 @@ public class EdocDocumentService {
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
             //int countOrganA = 0;
+            // get turn on vnpt request with group organ domain
+            boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
             for (Organization to : organToPending) {
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
@@ -434,8 +437,12 @@ public class EdocDocumentService {
                 notification.setModifiedDate(currentDate);
                 notification.setSendNumber(0);
                 notification.setDueDate(dueDate);
-                if (to.getOrganId().charAt(10) == 'A') {
-                    notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                if (turnOn) {
+                    if (to.getOrganId().charAt(10) == 'A') {
+                        notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                    } else {
+                        notification.setReceiverId(to.getOrganId());
+                    }
                 } else {
                     notification.setReceiverId(to.getOrganId());
                 }

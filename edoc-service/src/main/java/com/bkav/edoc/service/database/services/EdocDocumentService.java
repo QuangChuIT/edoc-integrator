@@ -497,7 +497,7 @@ public class EdocDocumentService {
 
     public boolean checkExistDocument(String edXmlDocumentId) {
         EdocDocument check = documentDaoImpl.checkExistDocument(edXmlDocumentId);
-        return check != null;
+        return (check != null);
     }
 
     public boolean checkNewDocument(TraceHeaderList traceHeaderList) {

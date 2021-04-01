@@ -97,9 +97,9 @@
                                             <div class="staff-handler>
                                                 <span><i class="fa fa-info-circle fa-fw"></i>${app_message.edoc_main_handler}</span> <span><b>${staffName}</b></span>
                                             </div>
-                                            <div class="staff-comment">
+                                            <%--<div class="staff-comment">
                                                 <span>${app_message.edoc_handler_comment}</span> <span class="comment-trace">${comment}</span>
-                                            </div>
+                                            </div>--%>
                                     </div>
                                     <div class="col-md-2 col-xs-3 text-center">
                                         ${getStatusOfTrace(statusCode)}

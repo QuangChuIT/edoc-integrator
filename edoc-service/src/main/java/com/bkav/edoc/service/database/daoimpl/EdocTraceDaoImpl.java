@@ -23,10 +23,10 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
             StringBuilder sql = new StringBuilder();
             if (fromTime != null) {
                 sql.append("SELECT et FROM EdocTrace et where " +
-                        "(et.toOrganDomain=:responseForOrganId or et.fromOrganDomain=:fromOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                        "(et.toOrganDomain=:responseForOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
             } else {
                 sql.append("SELECT et FROM EdocTrace et where " +
-                        "(et.toOrganDomain=:responseForOrganId or et.fromOrganDomain=:fromOrganId) and et.enable=:enable order by et.timeStamp DESC");
+                        "(et.toOrganDomain=:responseForOrganId) and et.enable=:enable order by et.timeStamp DESC");
             }
             LOGGER.info(sql.toString());
             Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);

@@ -26,10 +26,11 @@ public class SendEmailJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         LOGGER.info("Check send email at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
         boolean runScheduler = GetterUtil.getBoolean(PropsUtil.get("edoc.app.schedule.run.daily.sendmail"), true);
+        LOGGER.info("------------ Send email has stopped !!!!!!!!!!!! ------------------");
         if(runScheduler){
-            LOGGER.info("Run scheduler send email !!!!!!!!!");
-            sendEmailBean.runScheduleSendEmail();
-            LOGGER.info("End scheduler send email !!!!!!!!!");
+            /*LOGGER.info("Run scheduler send email !!!!!!!!!");
+            //sendEmailBean.runScheduleSendEmail();
+            LOGGER.info("End scheduler send email !!!!!!!!!");*/
         }
     }
 

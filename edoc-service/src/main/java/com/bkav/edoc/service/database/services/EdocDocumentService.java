@@ -428,6 +428,8 @@ public class EdocDocumentService {
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
             //int countOrganA = 0;
+            // get check organization
+            boolean isTayNinh = GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false);
             // get turn on vnpt request with group organ domain
             boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
             for (Organization to : organToPending) {
@@ -437,14 +439,33 @@ public class EdocDocumentService {
                 notification.setModifiedDate(currentDate);
                 notification.setSendNumber(0);
                 notification.setDueDate(dueDate);
-                if (turnOn) {
-                    if (to.getOrganId().charAt(10) == 'A') {
-                        notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                if (isTayNinh) {
+                    if (turnOn) {
+                        // tay ninh
+                        if (to.getOrganId().charAt(10) == 'A') {
+                            notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                        } else {
+                            notification.setReceiverId(to.getOrganId());
+                        }
                     } else {
                         notification.setReceiverId(to.getOrganId());
                     }
                 } else {
-                    notification.setReceiverId(to.getOrganId());
+                    if (turnOn) {
+                        String[] subDomain = to.getOrganId().split("\\.");
+                        String childDomain = subDomain[2] + "." + subDomain[3];
+                        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                        boolean hasParent = listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
+                        int count = 0;
+                        if (hasParent && count == 0) {
+                            notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                            count++;
+                        } else {
+                            notification.setReceiverId(to.getOrganId());
+                        }
+                    } else {
+                        notification.setReceiverId(to.getOrganId());
+                    }
                 }
                 notification.setDocument(document);
                 notification.setTaken(false);
@@ -844,8 +865,20 @@ public class EdocDocumentService {
         return documentDaoImpl.getDocCodeByCounterDate(_counterDate);
     }
 
-    /*public static void main(String[] args) {
-        String yesterday = "2021-01-26";
+    public boolean testCheck(String domain) {
+
+        String[] subDomain = domain.split("\\.");
+        String childDomain = subDomain[2] + "." + subDomain[3];
+        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+        return listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
+        /*for (String s: listParentDomain) {
+            if (s.trim().contains(childDomain))
+                return true;
+        }*/
+    }
+
+    public static void main(String[] args) {
+        /*String yesterday = "2021-01-26";
         java.sql.Date yes = java.sql.Date.valueOf(yesterday);
         String now = "2021-01-28";
         java.sql.Date no = java.sql.Date.valueOf(now);
@@ -856,8 +889,16 @@ public class EdocDocumentService {
 
         EdocDocumentService edocDocumentService = new EdocDocumentService();
         //edocDocumentService.getDailyCounterDocument(yes, no);
-        System.out.println(edocDocumentService.getDocCodeByCounterDate(date));
-    }*/
+        System.out.println(edocDocumentService.getDocCodeByCounterDate(date));*/
+
+        EdocDocumentService edocDocumentService = new EdocDocumentService();
+        String domain = "000.01.79.H36";
+        if (edocDocumentService.testCheck(domain)) {
+            System.out.println("True!!");
+        } else {
+            System.out.println("False");
+        }
+    }
 
 
     private Date _counterDate;

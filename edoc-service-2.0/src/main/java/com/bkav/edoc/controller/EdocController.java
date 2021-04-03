@@ -16,6 +16,7 @@ import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
 import com.bkav.edoc.service.database.util.EdocTraceServiceUtil;
+import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.kernel.util.Validator;
 import com.bkav.edoc.service.mineutil.Mapper;
 import com.bkav.edoc.service.redis.RedisKey;
@@ -23,6 +24,7 @@ import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.util.CommonUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.Content;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
@@ -57,10 +59,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -232,23 +231,65 @@ public class EdocController {
                     List obj = RedisUtil.getInstance().get(RedisKey.getKey(organId, RedisKey.GET_PENDING_KEY), List.class);
                     if (obj != null && obj.size() > 0) {
                         notifications = CommonUtil.convertToListLong(obj);
+                        LOGGER.info("------------------ Get pending document with organ " + organId + " with size " + notifications + " in cache!!!!!!!!!!!");
                         notifications.forEach(notification -> {
                             DocumentCacheEntry documentCacheEntry = EdocDocumentServiceUtil.getDocumentById(notification);
-                            OrganizationCacheEntry toOrgan = documentCacheEntry.getToOrgan().get(0);
-                            String toOrganId = toOrgan.getDomain();
-                            GetPendingResult pendingResult = new GetPendingResult();
-                            pendingResult.setDocId(documentCacheEntry.getDocumentId());
-                            pendingResult.setOrganId(toOrganId);
-                            getPendingResults.add(pendingResult);
+                            if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {
+                                OrganizationCacheEntry toOrgan = documentCacheEntry.getToOrgan().get(0);
+                                String toOrganId = toOrgan.getDomain();
+                                GetPendingResult pendingResult = new GetPendingResult();
+                                pendingResult.setDocId(documentCacheEntry.getDocumentId());
+                                pendingResult.setOrganId(toOrganId);
+                                getPendingResults.add(pendingResult);
+                            } else {
+                                List<OrganizationCacheEntry> listToOrgan = documentCacheEntry.getToOrgan();
+                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                                listToOrgan.forEach(toOrgan -> {
+                                    GetPendingResult pendingResult = new GetPendingResult();
+                                    if (GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false)) {
+                                        if (listParentDomain.stream().anyMatch(s -> toOrgan.getDomain().contains(s))) {
+                                            pendingResult.setDocId(documentCacheEntry.getDocumentId());
+                                            pendingResult.setOrganId(toOrgan.getDomain());
+                                            getPendingResults.add(pendingResult);
+                                        }
+                                    } else {
+                                        pendingResult.setDocId(documentCacheEntry.getDocumentId());
+                                        pendingResult.setOrganId(toOrgan.getDomain());
+                                        getPendingResults.add(pendingResult);
+                                    }
+                                });
+                            }
                         });
                     } else {
                         List<EdocNotification> edocNotifications = EdocNotificationServiceUtil.getNotificationsByOrganId(organId);
                         LOGGER.info("---------------- Get pending document with organ " + organId + " with size " + edocNotifications.size());
                         edocNotifications.forEach(notification -> {
-                            GetPendingResult result = new GetPendingResult();
-                            result.setDocId(notification.getDocument().getDocumentId());
-                            result.setOrganId(notification.getDocument().getToOrganDomain());
-                            getPendingResults.add(result);
+                            if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {
+                                GetPendingResult result = new GetPendingResult();
+                                result.setDocId(notification.getDocument().getDocumentId());
+                                result.setOrganId(notification.getDocument().getToOrganDomain());
+                                getPendingResults.add(result);
+                            } else {
+                                List<String> toOrganList = Arrays.asList(notification.getDocument().getToOrganDomain().split("#"));
+                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                                toOrganList.forEach(toOrgan -> {
+                                    GetPendingResult result = new GetPendingResult();
+                                    if (GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false)) {
+                                        String[] subDomain = toOrgan.split("\\.");
+                                        String childDomain = subDomain[2] + "." + subDomain[3];
+                                        if (listParentDomain.stream().anyMatch(s -> s.contains(childDomain))) {
+                                            result.setDocId(notification.getDocument().getDocumentId());
+                                            result.setOrganId(toOrgan);
+                                            getPendingResults.add(result);
+                                            LOGGER.info("-------- Get document pending by VNPT request with organ: " + toOrgan);
+                                        }
+                                    } else {
+                                        result.setDocId(notification.getDocument().getDocumentId());
+                                        result.setOrganId(toOrgan);
+                                        getPendingResults.add(result);
+                                    }
+                                });
+                            }
                         });
                         //notifications = EdocNotificationServiceUtil.getDocumentIdsByOrganId(organId);
                     }

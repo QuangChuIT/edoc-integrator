@@ -54,6 +54,7 @@ let app_message = {
     "edoc_main_handler": "Người xử lý chính:",
     "edoc_handler_comment": "Ý kiến người xử lý chính:",
     "edoc_no_data" : "No data",
+    "edoc_status": "Trạng thái",
     // custom config
     "edoc_new_document": "new-document",
     "edoc_organ_name": "Tên đơn vị",

@@ -2057,3 +2057,7 @@ input:checked + .slider:before {
 #meter {
     width: 100%;
 }
+
+#time-trace {
+    font-size: 90%;
+}

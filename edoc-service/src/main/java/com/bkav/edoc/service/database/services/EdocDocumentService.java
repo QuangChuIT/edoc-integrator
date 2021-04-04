@@ -427,11 +427,11 @@ public class EdocDocumentService {
 
             Set<EdocNotification> notifications = new HashSet<>();
             // Insert Notification
-            //int countOrganA = 0;
             // get check organization
             boolean isTayNinh = GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false);
             // get turn on vnpt request with group organ domain
             boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
+            int countOrgan = 0;
             for (Organization to : organToPending) {
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
@@ -451,15 +451,19 @@ public class EdocDocumentService {
                         notification.setReceiverId(to.getOrganId());
                     }
                 } else {
+                    // lamdong
                     if (turnOn) {
                         String[] subDomain = to.getOrganId().split("\\.");
                         String childDomain = subDomain[2] + "." + subDomain[3];
                         List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
                         boolean hasParent = listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
-                        int count = 0;
-                        if (hasParent && count == 0) {
-                            notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
-                            count++;
+                        if (hasParent) {
+                            if (countOrgan == 0) {
+                                notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                                countOrgan++;
+                            } else {
+                                continue;
+                            }
                         } else {
                             notification.setReceiverId(to.getOrganId());
                         }
@@ -892,7 +896,7 @@ public class EdocDocumentService {
         System.out.println(edocDocumentService.getDocCodeByCounterDate(date));*/
 
         EdocDocumentService edocDocumentService = new EdocDocumentService();
-        String domain = "000.01.79.H36";
+        String domain = "000.01.77.H36";
         if (edocDocumentService.testCheck(domain)) {
             System.out.println("True!!");
         } else {

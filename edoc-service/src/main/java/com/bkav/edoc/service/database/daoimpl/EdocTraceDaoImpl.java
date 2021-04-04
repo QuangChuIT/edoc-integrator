@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocTraceDao;
 import com.bkav.edoc.service.database.entity.EdocTrace;
+import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -21,6 +22,8 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
+            String parentDomain = PropsUtil.get("edoc.domain.A.parent");
+
             if (fromTime != null) {
                 sql.append("SELECT et FROM EdocTrace et where " +
                         "(et.toOrganDomain=:responseForOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");

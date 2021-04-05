@@ -247,7 +247,9 @@ public class EdocController {
                                 listToOrgan.forEach(toOrgan -> {
                                     GetPendingResult pendingResult = new GetPendingResult();
                                     if (GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false)) {
-                                        if (listParentDomain.stream().anyMatch(s -> toOrgan.getDomain().contains(s))) {
+                                        String[] subDomain = toOrgan.getDomain().split("\\.");
+                                        String childDomain = subDomain[2] + "." + subDomain[3];
+                                        if (listParentDomain.stream().anyMatch(s -> s.contains(childDomain))) {
                                             pendingResult.setDocId(documentCacheEntry.getDocumentId());
                                             pendingResult.setOrganId(toOrgan.getDomain());
                                             getPendingResults.add(pendingResult);

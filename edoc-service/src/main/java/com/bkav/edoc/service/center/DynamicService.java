@@ -66,6 +66,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
         SynapseLog synLog = getLog(messageContext);
 
+
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Log mediator");
 
@@ -558,6 +559,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                     return map;
                 }
+
                 List<Attachment> attachmentsByEntity = attachmentService.getAttachmentsByDocumentId(documentId);
                 // get saved doc in cache
                 String savedDocStr = RedisUtil.getInstance().get(RedisKey

@@ -11,6 +11,7 @@ import com.bkav.edoc.service.memcached.MemcachedKey;
 import com.bkav.edoc.service.memcached.MemcachedUtil;
 import com.bkav.edoc.service.redis.RedisKey;
 import com.bkav.edoc.service.redis.RedisUtil;
+import com.bkav.edoc.service.util.PropsUtil;
 import com.bkav.edoc.service.xml.base.header.Error;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import org.apache.log4j.Logger;
@@ -81,7 +82,11 @@ public class EdocTraceService {
             edocTrace.setFromOrganDomain(fromOrganDomain);
             edocTrace.setOrganName(fromOrganName);
             edocTrace.setOrganAdd(fromOrganAdd);
-            edocTrace.setToOrganDomain(toOrganDomain);
+            if (toOrganDomain.equals(PropsUtil.get("edoc.domain.A53.regex")) && !toOrganDomain.equals(PropsUtil.get("edoc.domain.01.A53"))) {
+                edocTrace.setToOrganDomain(PropsUtil.get("edoc.domain.A.parent"));
+            } else {
+                edocTrace.setToOrganDomain(toOrganDomain);
+            }
             edocTrace.setCode(code);
             edocTrace.setPromulgationDate(promulgationDate);
             edocTrace.setEdxmlDocumentId(documentId);

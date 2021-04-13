@@ -95,6 +95,7 @@ public class SendMessageToTelegramBean {
         String urlString = "https://api.telegram.org/bot%s/sendMessage";
 
         String result = "";
+        String host = PropsUtil.get("telegram.message.host");
         String chatId = PropsUtil.get("telegram.message.chatid");
         String token = PropsUtil.get("telegram.message.token");
 

@@ -79,6 +79,10 @@ public class MapperUtil {
                 if (toOrganCache.getId() != null) {
                     toContacts.add(toOrganCache);
                 }
+                else {
+                    LOGGER.error("-------------- Not found to organ with domain " + toDomain + " in document id " + document.getDocumentId());
+                    return null;
+                }
             }
             EdocPriority priority = EDOC_PRIORITY_SERVICE.findById(document.getPriority());
             documentCacheEntry.setPriority(priority);

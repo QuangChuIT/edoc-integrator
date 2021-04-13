@@ -330,9 +330,17 @@ public class EdocDailyCounterService {
 
     public String getSentReceivedForChart(int year, String organDomain) {
         Map<String, List<Long>> map = new HashMap<>();
-        List<Long> sent = edocDailyCounterDao.getSentByMonth(year, organDomain);
+        List<Long> sent, moreSent;
+        List<Long> received, moreReceived;
+        sent = edocDailyCounterDao.getSentByMonth(year, organDomain);
+        received = edocDailyCounterDao.getReceivedByMonth(year, organDomain);
+        /*if (organDomain.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+            moreSent = edocDailyCounterDao.getSentByMonth(year, PropsUtil.get("edoc.domain.vpubnd.1"));
+            sent.addAll(moreSent);
+            moreReceived = edocDailyCounterDao.getSentByMonth(year, PropsUtil.get("edoc.domain.vpubnd.1"));
+            received.addAll(moreReceived);
+        }*/
         map.put("sent", sent);
-        List<Long> received = edocDailyCounterDao.getReceivedByMonth(year, organDomain);
         map.put("received", received);
         return new Gson().toJson(map);
     }

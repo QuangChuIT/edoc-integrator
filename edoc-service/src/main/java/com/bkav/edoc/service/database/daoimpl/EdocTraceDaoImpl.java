@@ -2,6 +2,8 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocTraceDao;
 import com.bkav.edoc.service.database.entity.EdocTrace;
+import com.bkav.edoc.service.util.PropsUtil;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -21,23 +23,38 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            if (fromTime != null) {
-                sql.append("SELECT et FROM EdocTrace et where " +
-                        "(et.toOrganDomain=:responseForOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+            Query<EdocTrace> query;
+            if (responseForOrganId.equals(PropsUtil.get("edoc.domain.A.parent")) && !responseForOrganId.equals(PropsUtil.get("edoc.domain.01.A53"))) {
+                if (fromTime != null) {
+                    sql.append("SELECT et FROM EdocTrace et where not (et.toOrganDomain = :exceptOrgan) and " +
+                            "(et.toOrganDomain like concat('%',:responseForOrganId, '%')) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                } else {
+                    sql.append("SELECT et FROM EdocTrace et where not (et.toOrganDomain = :exceptOrgan) and " +
+                            "(et.toOrganDomain like concat('%',:responseForOrganId, '%')) and et.enable=:enable order by et.timeStamp DESC");
+                }
+                responseForOrganId = PropsUtil.get("edoc.domain.A53.regex");
+                query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+                query.setParameter("exceptOrgan", PropsUtil.get("edoc.domain.01.A53"));
+                query.setParameter("responseForOrganId", responseForOrganId);
             } else {
-                sql.append("SELECT et FROM EdocTrace et where " +
-                        "(et.toOrganDomain=:responseForOrganId) and et.enable=:enable order by et.timeStamp DESC");
+                if (fromTime != null) {
+                    sql.append("SELECT et FROM EdocTrace et where " +
+                            "(et.toOrganDomain=:responseForOrganId) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                } else {
+                    sql.append("SELECT et FROM EdocTrace et where " +
+                            "(et.toOrganDomain=:responseForOrganId) and et.enable=:enable order by et.timeStamp DESC");
+                }
+                query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+                query.setParameter("responseForOrganId", responseForOrganId);
             }
-            LOGGER.info(sql.toString());
-            Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
-            query.setParameter("responseForOrganId", responseForOrganId);
-            query.setParameter("fromOrganId", responseForOrganId);
+            //query.setParameter("fromOrganId", responseForOrganId);
             if (fromTime != null) {
                 query.setParameter("fromTime", fromTime);
             } else {
                 query.setParameter("enable", true);
             }
-            return query.list();
+            LOGGER.info(query);
+            return query.getResultList();
         } catch (Exception e) {
             LOGGER.error(e);
         } finally {
@@ -46,6 +63,11 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         return new ArrayList<>();
     }
 
+    public static void main(String[] args) {
+        EdocTraceDaoImpl edocTraceDao = new EdocTraceDaoImpl();
+        String json = new Gson().toJson(edocTraceDao.getEdocTracesByOrganId("000.A53.000", null));
+        System.out.println(json);
+    }
 
     public void disableEdocTrace(EdocTrace trace) {
         try {

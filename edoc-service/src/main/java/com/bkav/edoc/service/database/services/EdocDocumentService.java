@@ -86,16 +86,25 @@ public class EdocDocumentService {
             }
             Query query = session.createNativeQuery(queryDocument);
             query.setParameter("organDomain", organId);
+            if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    query.setParameter("organDomain1", GetterUtil.getString(PropsUtil.get("edoc.domain.vpubnd.1")));
+                } else {
+                    query.setParameter("organDomain1", null);
+                }
+            } else {
+                query.setParameter("organDomain1", null);
+            }
             query.setParameter("toOrgan", toOrgan);
             query.setParameter("fromOrgan", fromOrgan);
             query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
-            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+            /*if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
                 organId = PropsUtil.get("edoc.domain.vpubnd.1");
                 int moreResult = countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
                 return (result + moreResult);
-            }
+            }*/
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -131,12 +140,26 @@ public class EdocDocumentService {
             }
             Query<EdocDocument> query = session.createNativeQuery(queryDocument, EdocDocument.class);
             query.setParameter("organDomain", organId);
+            if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    query.setParameter("organDomain1", GetterUtil.getString(PropsUtil.get("edoc.domain.vpubnd.1")));
+                } else {
+                    query.setParameter("organDomain1", null);
+                }
+            } else {
+                query.setParameter("organDomain1", null);
+            }
             query.setParameter("toOrgan", toOrgan);
             query.setParameter("fromOrgan", fromOrgan);
             query.setParameter("docCode", docCode);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
             query.setFirstResult(pageNumber);
+            /*if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0")) || organId.equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
+                    pageSize = pageSize/2;
+                }
+            }*/
             query.setMaxResults(pageSize);
             List<EdocDocument> documents = query.getResultList();
             if (documents.size() > 0) {
@@ -147,14 +170,13 @@ public class EdocDocumentService {
                     }
                 }
             }
-            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
-                organId = PropsUtil.get("edoc.domain.vpubnd.1");
-                List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
-                List<DocumentCacheEntry> totalDocList = new ArrayList<>();
-                totalDocList.addAll(entries);
-                totalDocList.addAll(entryList);
-                return totalDocList;
-            }
+            /*if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                    List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                    entries.addAll(entryList);
+                }
+            }*/
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -433,6 +455,7 @@ public class EdocDocumentService {
             boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
             int countOrgan = 0;
             for (Organization to : organToPending) {
+                LOGGER.info("------------------ Insert into notification with document id " + docId + ", receriver id " + to.getOrganId());
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
                 notification.setDateCreate(currentDate);
@@ -442,7 +465,7 @@ public class EdocDocumentService {
                 if (isTayNinh) {
                     if (turnOn) {
                         // tay ninh
-                        if (to.getOrganId().charAt(10) == 'A') {
+                        if (to.getOrganId().charAt(10) == 'A' && !to.getOrganId().equals(PropsUtil.get("edoc.domain.01.A53"))) {
                             notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
                         } else {
                             notification.setReceiverId(to.getOrganId());

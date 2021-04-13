@@ -66,7 +66,6 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
         SynapseLog synLog = getLog(messageContext);
 
-
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Log mediator");
 
@@ -749,6 +748,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                             LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
                             LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
                             document.setDocumentExtId(sendEdocResult.getDocID());
+
                         } else {
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
                             document.setDocumentExtId("");

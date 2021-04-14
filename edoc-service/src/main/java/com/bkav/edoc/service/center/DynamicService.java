@@ -324,48 +324,12 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                         + organId + " : " + documentId + " ----------------------------------");
                 // remove pending document
                 notificationService.removePendingDocId(organId, documentId);
+                LOGGER.info("-------------- Remove pending success for document with id " + documentId + ": " + organId);
                 LOGGER.info("Building trace received and  to database for organ " + organId);
                 // TODO auto add trace received(01) for this document
                 EdocDocument document = documentService.getDocument(documentId);
                 if (document != null) {
-                    MessageStatus messageStatus = new MessageStatus();
-                    messageStatus.setDescription("Da nhan van ban ve he thong");
-                    messageStatus.setTimestamp(new Date());
-                    messageStatus.setStatusCode("1");
-
-                    String fromOrgan = document.getFromOrganDomain();
-                    String docCode = document.getDocCode();
-                    Date promulgationDate = document.getPromulgationDate();
-                    String edXMLDocumentId = fromOrgan + "," + DateUtils.format(document.getPromulgationDate(), DateUtils.DEFAULT_DATE_FORMAT) + "," + docCode;
-                    EdocDynamicContact toContact = edocDynamicContactService.getDynamicContactByDomain(organId);
-
-                    ResponseFor responseFor = new ResponseFor();
-                    responseFor.setCode(docCode);
-                    responseFor.setDocumentId(edXMLDocumentId);
-                    responseFor.setOrganId(fromOrgan);
-                    responseFor.setPromulgationDate(promulgationDate);
-
-                    Organization organization = new Organization();
-                    organization.setEmail(toContact.getEmail());
-                    organization.setFax(toContact.getFax());
-                    organization.setOrganAdd(toContact.getAddress());
-                    organization.setOrganId(organId);
-                    organization.setOrganizationInCharge(toContact.getInCharge());
-                    organization.setOrganName(toContact.getName());
-                    organization.setTelephone(toContact.getTelephone());
-                    organization.setWebsite(toContact.getWebsite());
-
-                    StaffInfo staffInfo = new StaffInfo();
-                    staffInfo.setDepartment(toContact.getName());
-                    staffInfo.setDepartmentId("");
-                    staffInfo.setEmail(toContact.getEmail());
-                    staffInfo.setStaff("EdocAdapter");
-                    staffInfo.setMobile("");
-                    staffInfo.setStaffId("");
-
-                    messageStatus.setStaffInfo(staffInfo);
-                    messageStatus.setFrom(organization);
-                    messageStatus.setResponseFor(responseFor);
+                    MessageStatus messageStatus = createConfirmTrace(document, organId);
                     traceService.updateTrace(messageStatus, errorList);
                 } else {
                     errorList.add(new Error("M.ConfirmReceived", "Not found document with document id " + documentId));
@@ -747,6 +711,17 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                             LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
                             LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
                             document.setDocumentExtId(sendEdocResult.getDocID());
+                            toesVPCP.forEach(to -> {
+                                MessageStatus messageStatus = createConfirmTrace(document, to.getOrganId());
+                                traceService.updateTrace(messageStatus, errorList);
+                            });
+                            if (sendEdocResult.getStatus().equals("FAIL")) {
+                                document.setSendSuccess(false);
+                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                            } else {
+                                document.setSendSuccess(true);
+                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                            }
                         } else {
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
                             document.setDocumentExtId("");
@@ -899,6 +874,48 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         }
     }
 
+    private MessageStatus createConfirmTrace(EdocDocument document, String organId) {
+        MessageStatus messageStatus = new MessageStatus();
+        messageStatus.setDescription("Da nhan van ban ve he thong");
+        messageStatus.setTimestamp(new Date());
+        messageStatus.setStatusCode("1");
+
+        String fromOrgan = document.getFromOrganDomain();
+        String docCode = document.getDocCode();
+        Date promulgationDate = document.getPromulgationDate();
+        String edXMLDocumentId = fromOrgan + "," + DateUtils.format(document.getPromulgationDate(), DateUtils.DEFAULT_DATE_FORMAT) + "," + docCode;
+        EdocDynamicContact toContact = edocDynamicContactService.getDynamicContactByDomain(organId);
+
+        ResponseFor responseFor = new ResponseFor();
+        responseFor.setCode(docCode);
+        responseFor.setDocumentId(edXMLDocumentId);
+        responseFor.setOrganId(fromOrgan);
+        responseFor.setPromulgationDate(promulgationDate);
+
+        Organization organization = new Organization();
+        organization.setEmail(toContact.getEmail());
+        organization.setFax(toContact.getFax());
+        organization.setOrganAdd(toContact.getAddress());
+        organization.setOrganId(organId);
+        organization.setOrganizationInCharge(toContact.getInCharge());
+        organization.setOrganName(toContact.getName());
+        organization.setTelephone(toContact.getTelephone());
+        organization.setWebsite(toContact.getWebsite());
+
+        StaffInfo staffInfo = new StaffInfo();
+        staffInfo.setDepartment(toContact.getName());
+        staffInfo.setDepartmentId("");
+        staffInfo.setEmail(toContact.getEmail());
+        staffInfo.setStaff("EdocAdapter");
+        staffInfo.setMobile("");
+        staffInfo.setStaffId("");
+
+        messageStatus.setStaffInfo(staffInfo);
+        messageStatus.setFrom(organization);
+        messageStatus.setResponseFor(responseFor);
+
+        return messageStatus;
+    }
 
     private static final Logger LOGGER = Logger.getLogger(DynamicService.class);
 

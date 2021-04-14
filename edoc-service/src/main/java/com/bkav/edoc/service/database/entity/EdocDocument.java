@@ -31,6 +31,8 @@ public class EdocDocument implements Serializable, Cloneable {
     private boolean receivedExt;
     private String fromOrganDomain;
     private Boolean visible;
+    private Boolean sendSuccess;
+    private String transactionStatus;
     @JsonIgnore
     private EdocDocumentDetail documentDetail;
     @JsonIgnore
@@ -276,6 +278,22 @@ public class EdocDocument implements Serializable, Cloneable {
         this.docCode = docCode;
     }
 
+    public Boolean getSendSuccess() {
+        return sendSuccess;
+    }
+
+    public void setSendSuccess(Boolean sendSuccess) {
+        this.sendSuccess = sendSuccess;
+    }
+
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
     public Object clone() throws CloneNotSupportedException {
         Object clone = super.clone();
         EdocDocument obj = new EdocDocument();
@@ -307,6 +325,8 @@ public class EdocDocument implements Serializable, Cloneable {
         obj.setTraces(this.traces);
         obj.setVisible(this.visible);
         obj.setVisited(this.visited);
+        obj.setSendSuccess(this.sendSuccess);
+        obj.setTransactionStatus(this.transactionStatus);
         return obj;
     }
 }

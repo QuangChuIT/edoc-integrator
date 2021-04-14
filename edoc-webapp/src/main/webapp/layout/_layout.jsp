@@ -973,6 +973,17 @@
         </a>
     </div>
 </script>
+<script id="sendVPCPStatusTemplate" type="text/x-jquery-tmpl">
+    <div>
+        {{if sendSuccess}}
+            <span style="color:green">${app_message.edoc_send_vpcp_status_success}</span>
+        {{else}}
+            <span style="color:red">${app_message.edoc_send_vpcp_status_fail} - </span>
+            <br>
+            <span style="color:black">${transactionStatus}</span>
+        {{/if}}
+    </div>
+</script>
 <script id="userFullNameTemplate" type="text/x-jquery-tmpl">
     <div>
         <a href="javascript:void(0)" title="${displayName}" data-id="${userId}"

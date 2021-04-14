@@ -69,6 +69,8 @@ let app_message = {
     "edoc_organ_taken": "Đã nhận",
     "edoc_organ_not_taken": "Chưa nhận",
     "edoc_resend_document_vpcp_fail": "Gửi lại văn bản lên VPCP không thành công !",
+    "edoc_send_vpcp_status_success": "Thành công",
+    "edoc_send_vpcp_status_fail": "Thất bại",
     //Datatable setting
     "language": {
         "decimal": "",

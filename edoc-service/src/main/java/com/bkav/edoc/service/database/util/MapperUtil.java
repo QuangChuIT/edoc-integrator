@@ -94,6 +94,8 @@ public class MapperUtil {
                 documentDetailCacheEntry = MapperUtil.modelToDocumentDetailCached(document.getDocumentDetail());
             }
             documentCacheEntry.setDocumentDetail(documentDetailCacheEntry);
+            documentCacheEntry.setSendSuccess(document.getSendSuccess());
+            documentCacheEntry.setTransactionStatus(document.getTransactionStatus());
             /*Set<EdocAttachment> attachments = document.getAttachments();
             List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
             if (attachments.size() > 0) {

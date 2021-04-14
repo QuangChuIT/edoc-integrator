@@ -337,6 +337,14 @@ let edocDocument = {
                     }
                 },
                 {
+                    "name": "ed.transaction_status",
+                    "title": "Trạng thái",
+                    "data": null,
+                    "render": function(data) {
+                        return $('#sendVPCPStatusTemplate').tmpl(data).html();
+                    }
+                },
+                {
                     "name": "ed.create_date",
                     "title": app_message.table_header_createDate,
                     "data": null,

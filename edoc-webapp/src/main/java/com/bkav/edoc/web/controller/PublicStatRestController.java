@@ -6,6 +6,7 @@ import com.bkav.edoc.service.database.util.EdocAttachmentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDailyCounterServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.UserServiceUtil;
+import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import com.bkav.edoc.web.util.ExcelUtil;
 import com.bkav.edoc.web.util.PropsUtil;
@@ -73,6 +74,9 @@ public class PublicStatRestController {
         } else {
             if (user.getUsername().equals(PropsUtil.get("user.admin.username"))) {
                 results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, "");
+            } else if (user.getDynamicContact().getDomain().equals(com.bkav.edoc.service.util.PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, user.getDynamicContact().getDomain());
+                //moreResults = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, GetterUtil.getString(com.bkav.edoc.service.util.PropsUtil.get("edoc.domain.vpubnd.1")));
             } else {
                 results = EdocDailyCounterServiceUtil.getSentReceivedForChart(year, user.getDynamicContact().getDomain());
             }

@@ -15,7 +15,7 @@
     String userLoginCookie = CookieUtil.getValue(request, OAuth2Constants.USER_LOGIN);
     String userLogin = new String(Base64.decode(userLoginCookie), StandardCharsets.UTF_8);
     UserCacheEntry user = new Gson().fromJson(userLogin, UserCacheEntry.class);
-    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getDyCacheEntriesByAgency(true);
+    List<OrganizationCacheEntry> organizationCacheEntries = EdocDynamicContactServiceUtil.getAllContacts();
 %>
 <nav class="navbar navbar-default nav-top-header" id="header-nav">
     <div class="navbar-header edoc-header">

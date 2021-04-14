@@ -350,22 +350,28 @@ public class DocumentRestController {
                     // Send to vpcp
                     if (attachmentCacheEntries.size() > 0) {
                         messageHeader.setToes(toesVPCP);
+                        document.setSendExt(true);
                         SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendDocument(messageHeader, traceHeaderList, attachmentCacheEntries);
                         if (sendEdocResult != null) {
                             LOGGER.info("-------------------- Re-send document to VPCP status " + sendEdocResult.getStatus());
                             LOGGER.info("-------------------- Re-send document to VPCP Desc: " + sendEdocResult.getErrorDesc());
                             LOGGER.info("-------------------- Re-send document to VPCP DocID: " + sendEdocResult.getDocID());
-                            document.setSendExt(true);
                             document.setDocumentExtId(sendEdocResult.getDocID());
-                            EdocDocumentServiceUtil.updateDocument(document);
                             if (sendEdocResult.getStatus().equals("FAIL")) {
-                                response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", new Object[]{sendEdocResult.getErrorDesc()}));
+                                document.setSendSuccess(false);
+                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                                response = new Response(400, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.fail", new Object[]{sendEdocResult.getErrorDesc()}));
                             } else {
+                                document.setSendSuccess(true);
+                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
                                 response = new Response(200, errors, messageSourceUtil.getMessage("edoc.resend.tovpcp.success", null));
                             }
+                            EdocDocumentServiceUtil.updateDocument(document);
                             return new ResponseEntity<>(response, HttpStatus.OK);
                         } else {
                             LOGGER.error("------------------------- Error re-send document to VPCP with document Id " + documentId);
+                            response = new Response(404, errors, messageSourceUtil.getMessage("edoc.resend.null.fail", null));
+                            return new ResponseEntity<>(response, HttpStatus.OK);
                         }
                     }
                 }
@@ -429,16 +435,23 @@ public class DocumentRestController {
                         // Send to vpcp
                         if (attachmentCacheEntries.size() > 0) {
                             messageHeader.setToes(toesVPCP);
+                            document.setSendExt(true);
                             SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendDocument(messageHeader, traceHeaderList, attachmentCacheEntries);
                             if (sendEdocResult != null) {
                                 LOGGER.info("-------------------- Re-send document to VPCP status " + sendEdocResult.getStatus());
                                 LOGGER.info("-------------------- Re-send document to VPCP Desc: " + sendEdocResult.getErrorDesc());
                                 LOGGER.info("-------------------- Re-send document to VPCP DocID: " + sendEdocResult.getDocID());
-                                document.setSendExt(true);
                                 document.setDocumentExtId(sendEdocResult.getDocID());
+                                if (sendEdocResult.getStatus().equals("FAIL")) {
+                                    document.setSendSuccess(false);
+                                    document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                                    fail++;
+                                } else {
+                                    document.setSendSuccess(true);
+                                    document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                                    success++;
+                                }
                                 EdocDocumentServiceUtil.updateDocument(document);
-                                if (sendEdocResult.getStatus().equals("FAIL")) fail++;
-                                else success++;
                             } else {
                                 LOGGER.error("------------------------- Error re-send document to VPCP with document Id " + documentId);
                             }

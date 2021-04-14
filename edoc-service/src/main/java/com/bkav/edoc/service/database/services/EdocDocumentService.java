@@ -86,16 +86,25 @@ public class EdocDocumentService {
             }
             Query query = session.createNativeQuery(queryDocument);
             query.setParameter("organDomain", organId);
+            if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    query.setParameter("organDomain1", GetterUtil.getString(PropsUtil.get("edoc.domain.vpubnd.1")));
+                } else {
+                    query.setParameter("organDomain1", null);
+                }
+            } else {
+                query.setParameter("organDomain1", null);
+            }
             query.setParameter("toOrgan", toOrgan);
             query.setParameter("fromOrgan", fromOrgan);
             query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
-            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+            /*if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
                 organId = PropsUtil.get("edoc.domain.vpubnd.1");
                 int moreResult = countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
                 return (result + moreResult);
-            }
+            }*/
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -131,12 +140,26 @@ public class EdocDocumentService {
             }
             Query<EdocDocument> query = session.createNativeQuery(queryDocument, EdocDocument.class);
             query.setParameter("organDomain", organId);
+            if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    query.setParameter("organDomain1", GetterUtil.getString(PropsUtil.get("edoc.domain.vpubnd.1")));
+                } else {
+                    query.setParameter("organDomain1", null);
+                }
+            } else {
+                query.setParameter("organDomain1", null);
+            }
             query.setParameter("toOrgan", toOrgan);
             query.setParameter("fromOrgan", fromOrgan);
             query.setParameter("docCode", docCode);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
             query.setFirstResult(pageNumber);
+            /*if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0")) || organId.equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
+                    pageSize = pageSize/2;
+                }
+            }*/
             query.setMaxResults(pageSize);
             List<EdocDocument> documents = query.getResultList();
             if (documents.size() > 0) {
@@ -147,14 +170,13 @@ public class EdocDocumentService {
                     }
                 }
             }
-            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
-                organId = PropsUtil.get("edoc.domain.vpubnd.1");
-                List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
-                List<DocumentCacheEntry> totalDocList = new ArrayList<>();
-                totalDocList.addAll(entries);
-                totalDocList.addAll(entryList);
-                return totalDocList;
-            }
+            /*if (organId != null) {
+                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
+                    organId = PropsUtil.get("edoc.domain.vpubnd.1");
+                    List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
+                    entries.addAll(entryList);
+                }
+            }*/
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -409,20 +431,28 @@ public class EdocDocumentService {
                 }
             }
             document.setAttachments(edocAttachmentSet);
-
-            List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
-            List<Organization> toOrganizations = messageHeader.getToes();
+            List<Organization> toes = messageHeader.getToes();
+            LOGGER.info("-------------- List to organization ---------- "
+                    + toes.toString() + "with document code " + docCode + " and form organ "
+                    + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
+            List<Organization> toesVPCP = checker.checkSendToVPCP(toes);
+            LOGGER.info("------------ Bkav List Organ send to VPCP --------- " +
+                    toesVPCP.toString() + "with document code " + docCode + " and form organ "
+                    + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             List<Organization> organToPending = new ArrayList<>();
             if (toesVPCP.size() > 0) {
                 List<String> organDomains = toesVPCP.stream().map(Organization::getOrganId).collect(Collectors.toList());
-                for (Organization organization : toOrganizations) {
+                for (Organization organization : toes) {
                     if (!organDomains.contains(organization.getOrganId())) {
                         organToPending.add(organization);
                     }
                 }
             } else {
-                organToPending = toOrganizations;
+                organToPending = toes;
             }
+            LOGGER.info("------------ Bkav List Organ save to notification table --------- " +
+                    organToPending.toString() + "with document code " + docCode + " and form organ " +
+                    messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             Date dueDate = messageHeader.getDueDate();
 
             Set<EdocNotification> notifications = new HashSet<>();
@@ -432,7 +462,10 @@ public class EdocDocumentService {
             // get turn on vnpt request with group organ domain
             boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
             int countOrgan = 0;
+            LOGGER.info("---------- Bkav Prepare insert notification with size " +
+                    organToPending.size() + " to database --------" + " document id " + document.getDocumentId());
             for (Organization to : organToPending) {
+                LOGGER.info("------------------ Insert into notification with document id " + docId + ", receiver id " + to.getOrganId());
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
                 notification.setDateCreate(currentDate);
@@ -442,7 +475,7 @@ public class EdocDocumentService {
                 if (isTayNinh) {
                     if (turnOn) {
                         // tay ninh
-                        if (to.getOrganId().charAt(10) == 'A') {
+                        if (to.getOrganId().charAt(10) == 'A' && !to.getOrganId().equals(PropsUtil.get("edoc.domain.01.A53"))) {
                             notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
                         } else {
                             notification.setReceiverId(to.getOrganId());
@@ -478,6 +511,9 @@ public class EdocDocumentService {
                         + " and code " + document.getDocCode());
                 notifications.add(notification);
             }
+            LOGGER.info("---------- Bkav List notification before save to database size "
+                    + notifications.size() + "with document code " + docCode
+                    + " and form organ " + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             // save pending document to cache
             savePendingDocumentCache(organToPending, docId);
             document.setNotifications(notifications);

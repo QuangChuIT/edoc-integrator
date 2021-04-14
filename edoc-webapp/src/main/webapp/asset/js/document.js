@@ -75,22 +75,14 @@ let edocDocument = {
                         }
                     },
                     items: {
-                        /*"edit": {name: "Edit", icon: "edit"},
-                        /*"cut": {name: "Cut", icon: "cut"},
-                        copy: {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},*/
                         "resend": {name: app_message.edoc_resend_document, icon: "fa-repeat"},
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
-                        /*"sep1": "---------",*/
-                        /*"quit": {name: "Quit", icon: function(){
-                                return 'context-menu-icon context-menu-icon-quit';
-                            }}*/
                     }
                 });
             },
             rowId: "documentId",
             responsive: true,
-            pageLength: 25,
+            pageLength: 24,
             autoWidth: false,
             ordering: true,
             bDestroy: true,
@@ -342,6 +334,14 @@ let edocDocument = {
                     "data": null,
                     "render": function (data) {
                         return data.codeNumber + "/" + data.codeNotation;
+                    }
+                },
+                {
+                    "name": "ed.transaction_status",
+                    "title": "Trạng thái",
+                    "data": null,
+                    "render": function(data) {
+                        return $('#sendVPCPStatusTemplate').tmpl(data).html();
                     }
                 },
                 {

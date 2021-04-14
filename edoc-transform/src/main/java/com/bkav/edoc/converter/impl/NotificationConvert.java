@@ -19,7 +19,7 @@ public class NotificationConvert {
 
     public void getNotification() throws SQLException, ParseException {
 
-        String strDate = "2021-01-25";
+        String strDate = "2021-04-05";
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date date = df.parse(strDate);
 
@@ -40,8 +40,8 @@ public class NotificationConvert {
                     edocNotification.setDateCreate(document.getCreateDate());
                     edocNotification.setModifiedDate(document.getModifiedDate());
                     edocNotification.setDocument(document);
-                    edocNotification.setTaken(false);
-                    //EdocNotificationServiceUtil.addNotification(edocNotification);
+                    edocNotification.setTaken(true);
+                    EdocNotificationServiceUtil.addNotification(edocNotification);
                     i++;
                     LOGGER.info("Created notification with organ domain: " + domain);
                 }

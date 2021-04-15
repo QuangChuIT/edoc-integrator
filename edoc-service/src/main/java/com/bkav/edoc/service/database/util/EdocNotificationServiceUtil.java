@@ -27,6 +27,10 @@ public class EdocNotificationServiceUtil {
         return NOTIFICATION_SERVICE.getTelegramMessages();
     }
 
+    public static List<TelegramMessage> telegramScheduleDocumentNotSendVPCP() {
+        return NOTIFICATION_SERVICE.getTelegramMessagesForDocumentNotSendVPCP();
+    }
+
     public static boolean checkExistNotification(String organ, long docId) {
         return NOTIFICATION_SERVICE.checkExistNotification(organ, docId);
     }

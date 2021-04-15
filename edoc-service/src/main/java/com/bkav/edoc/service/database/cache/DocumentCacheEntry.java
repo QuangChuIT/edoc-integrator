@@ -36,6 +36,8 @@ public class DocumentCacheEntry implements Serializable {
     private List<NotificationCacheEntry> notifications;
     private List<TraceCacheEntry> traces;
     private List<AttachmentCacheEntry> attachments;
+    private Boolean sendSuccess;
+    private String transactionStatus;
 
     public DocumentCacheEntry() {
     }
@@ -254,5 +256,21 @@ public class DocumentCacheEntry implements Serializable {
 
     public void setDocCode(String docCode) {
         this.docCode = docCode;
+    }
+
+    public Boolean getSendSuccess() {
+        return sendSuccess;
+    }
+
+    public void setSendSuccess(Boolean sendSuccess) {
+        this.sendSuccess = sendSuccess;
+    }
+
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
     }
 }

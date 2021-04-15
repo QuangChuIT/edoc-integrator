@@ -55,5 +55,7 @@
             </key>
             <one-to-many class="com.bkav.edoc.service.database.entity.EdocAttachment"/>
         </set>
+        <property name="sendSuccess" type="boolean" column="send_success"/>
+        <property name="transactionStatus" type="string" column="transaction_status"/>
     </class>
 </hibernate-mapping>

@@ -10,8 +10,8 @@ import com.bkav.edoc.service.database.entity.EdocDynamicContact;
 import com.bkav.edoc.service.database.entity.EdocNotification;
 import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
-import com.bkav.edoc.service.database.services.EdocDocumentService;
 import com.bkav.edoc.service.database.services.EdocTraceHeaderListService;
+import com.bkav.edoc.service.database.services.EdocDocumentService;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
@@ -25,6 +25,7 @@ import com.bkav.edoc.service.resource.EdXmlConstant;
 import com.bkav.edoc.service.util.AttachmentGlobalUtil;
 import com.bkav.edoc.service.util.CommonUtil;
 import com.bkav.edoc.service.util.PropsUtil;
+import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import com.bkav.edoc.service.xml.base.Content;
 import com.bkav.edoc.service.xml.base.attachment.Attachment;
 import com.bkav.edoc.service.xml.base.header.Error;
@@ -41,6 +42,7 @@ import com.bkav.edoc.util.EdocServiceConstant;
 import com.bkav.edoc.util.EdocUtil;
 import com.bkav.edoc.util.MessageType;
 import com.google.gson.Gson;
+import com.vpcp.services.model.SendEdocResult;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -54,13 +56,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/EdocService")
@@ -72,6 +70,7 @@ public class EdocController {
     private final EdocAttachmentService attachmentService = new EdocAttachmentService();
     private final AttachmentGlobalUtil attUtil = new AttachmentGlobalUtil();
     private final Mapper mapper = new Mapper();
+    private static final Checker checker = new Checker();
 
     @Value("${edoc.edxml.file.location}")
     private String eDocPath;
@@ -165,6 +164,42 @@ public class EdocController {
                         sendDocResp.setStatus("Success");
                         sendDocResp.setDocId(document.getDocumentId());
                         EdocUtil.saveEdxmlFilePathToCache(document.getDocumentId(), dataPath);
+                        List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
+                        boolean sendVPCP = toesVPCP.size() > 0;
+                        // not send to vpcp -> save to cache
+                        if (!sendVPCP) {
+                            LOGGER.info("Not send document to VPCP with document id " + documentEsbId);
+                            LOGGER.info(messageHeader.getToes());
+                            // save envelop file to cache
+                            //saveEnvelopeFileCache(envelop, strDocumentId.toString());
+                        } else {
+                            LOGGER.info("---------------------- Send to VPCP ------------------------------- " + documentEsbId);
+                            // Send to vpcp
+                            if (attachmentCacheEntries.size() > 0) {
+                                messageHeader.setToes(toesVPCP);
+                                document.setSendExt(true);
+                                SendEdocResult sendEdocResult = ServiceVPCP.getInstance().sendDocument(messageHeader, traceHeaderList, attachmentCacheEntries);
+                                if (sendEdocResult != null) {
+                                    LOGGER.info("-------------------- Send to VPCP status " + sendEdocResult.getStatus());
+                                    LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
+                                    LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
+                                    document.setDocumentExtId(sendEdocResult.getDocID());
+                                    if (sendEdocResult.getStatus().equals("FAIL")) {
+                                        document.setSendSuccess(false);
+                                        document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                                    } else {
+                                        document.setSendSuccess(true);
+                                        document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                                    }
+                                } else {
+                                    LOGGER.error("------------------------- Error send document to VPCP with document Id " + documentEsbId);
+                                    document.setDocumentExtId("");
+                                }
+                                Date now = new Date();
+                                document.setModifiedDate(now);
+                                documentService.updateDocument(document);
+                            }
+                        }
                     } else {
                         errors.add(new Error("SendDocument", "Send document error docCode " + messageHeader.getCode().toString()));
                         errors.addAll(errorList);
@@ -183,6 +218,7 @@ public class EdocController {
                 MessageStatus status = StatusXmlParser.parse(fileInputStream);
                 LOGGER.info("Parser success status from file " + specPath);
                 Report report = CHECKER.checkMessageStatus(status);
+                LOGGER.info("Check message status success !!!!");
                 if (!report.isIsSuccess()) {
                     errors.addAll(report.getErrorList().getErrors());
                     sendDocResp.setStatus("Fail");
@@ -297,14 +333,16 @@ public class EdocController {
                     }
                     LOGGER.info("Get Pending Doc Ids Success: " + new Gson().toJson(getPendingResults));
                 } else {
-                    GetPendingDocIDsResp getPendingDocIDsResp = new GetPendingDocIDsResp();
                     List<EdocTrace> traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId, null);
-                    notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
-                    LOGGER.info("Get Pending Trace Ids Success " + notifications);
-                    getPendingDocIDsResp.setStatus("Success");
-                    getPendingDocIDsResp.setDocIDs(notifications);
-                    getPendingDocIDsResp.setCode("0");
-                    return new Gson().toJson(getPendingDocIDsResp);
+                    //notifications = traces.stream().map(EdocTrace::getTraceId).collect(Collectors.toList());
+                    traces.forEach(trace -> {
+                        GetPendingResult result = new GetPendingResult();
+                        result.setDocId(trace.getTraceId());
+                        result.setOrganId(trace.getToOrganDomain());
+                        getPendingResults.add(result);
+                        LOGGER.info("------------- Get trace success for organ " + trace.getToOrganDomain() + " and code " + trace.getCode());
+                    });
+                    LOGGER.info("--------------- Get Pending trace success with size: " + getPendingResults.size());
                 }
                 getPendingDocResp.setStatus("Success");
                 getPendingDocResp.setPendingResult(getPendingResults);
@@ -396,6 +434,7 @@ public class EdocController {
         String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
         try {
             String docIdValue = headerMap.get(EdocServiceConstant.DOC_ID);
+            LOGGER.info("------------ Confirm Receiver for document with id " + docIdValue);
             if (Validator.isNullOrEmpty(docIdValue)) {
                 errors.add(new Error("DocID", "Invalid DocID"));
                 confirmReceivedResp.setCode("9999");
@@ -407,8 +446,10 @@ public class EdocController {
                 confirmReceivedResp.setStatus("Success");
                 confirmReceivedResp.setErrors(new ArrayList<>());
                 confirmReceivedResp.setCode("0");
+                LOGGER.info("-----------Confirm Receiver success for document with id " + docIdValue);
             }
         } catch (Exception e) {
+            LOGGER.error("-------------- Confirm Receiver for document with organ domain " + organId + " cause " + e.toString());
             errors.add(new Error("ConfirmReceived", e.getMessage()));
             confirmReceivedResp.setCode("9999");
             confirmReceivedResp.setErrors(errors);

@@ -73,8 +73,10 @@ public class Checker {
         boolean isSuccess = true;
 
         errorList.addAll(checkFrom(messageStatus.getFrom()));
+        LOGGER.info("Check From in messageStatus success !!!!!");
 
         errorList.addAll(checkResponseFor(messageStatus.getResponseFor()));
+        LOGGER.info("Check responseFor in messageStatus success !!!!!");
         if (Validator.isNullOrEmpty(messageStatus.getStatusCode())) {
             errorList.add(new Error("MessageHeader.StatusCode", "StatusCode is required"));
         }
@@ -252,7 +254,7 @@ public class Checker {
 
         errorList.addAll(checkOrganName(from.getOrganName(), true));
 
-        errorList.addAll(checkOrganAdd(from.getOrganAdd(), true));
+        //errorList.addAll(checkOrganAdd(from.getOrganAdd(), true));
 
         /*errorList.addAll(checkOrganizationInCharge(from.getOrganizationInCharge()));
 

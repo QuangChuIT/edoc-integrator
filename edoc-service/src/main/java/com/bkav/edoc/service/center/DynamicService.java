@@ -31,6 +31,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
@@ -915,7 +916,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     }
 
     /*private static final Logger LOGGER = Logger.getLogger(DynamicService.class);*/
-    private static final Log LOGGER = LogFactory.getLog(DynamicService.class);
+    private static final Logger LOGGER = Logger.getLogger(DynamicService.class);
 
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {

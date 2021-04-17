@@ -29,7 +29,8 @@ import com.bkav.edoc.service.xml.status.header.MessageStatus;
 import com.vpcp.services.model.SendEdocResult;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
@@ -522,6 +523,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
 
                     return map;
                 }
+
                 List<Attachment> attachmentsByEntity = attachmentService.getAttachmentsByDocumentId(documentId);
                 // get saved doc in cache
                 String savedDocStr = RedisUtil.getInstance().get(RedisKey
@@ -715,13 +717,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                                 MessageStatus messageStatus = createConfirmTrace(document, to.getOrganId());
                                 traceService.updateTrace(messageStatus, errorList);
                             });
-                            if (sendEdocResult.getStatus().equals("FAIL")) {
-                                document.setSendSuccess(false);
-                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
-                            } else {
-                                document.setSendSuccess(true);
-                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
-                            }
+                            document.setSendSuccess(!sendEdocResult.getStatus().equals("FAIL"));
+                            document.setTransactionStatus(sendEdocResult.getErrorDesc());
                         } else {
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
                             document.setDocumentExtId("");
@@ -917,7 +914,8 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         return messageStatus;
     }
 
-    private static final Logger LOGGER = Logger.getLogger(DynamicService.class);
+    /*private static final Logger LOGGER = Logger.getLogger(DynamicService.class);*/
+    private static final Log LOGGER = LogFactory.getLog(DynamicService.class);
 
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {

@@ -27,6 +27,7 @@ public class EdocTraceService {
     public EdocTrace updateTrace(MessageStatus status, List<Error> errors) {
         Session currentSession = traceDaoImpl.openCurrentSession();
         try {
+            LOGGER.info("------------------- Start insert trace get from VPCP to database ------------------------");
             // get info from status
             String fromOrganDomain = status.getFrom().getOrganId();
             // from la don vi gui trace tuong ung voi don vi toOrganDomain trong bang edoc_document
@@ -72,7 +73,8 @@ public class EdocTraceService {
             }
             if (edocDocument == null) {
                 LOGGER.warn("Not found document with document code " + code + " to organ domain " + toOrganDomain + " !!!!!!!!!!!!!!!!!!");
-                errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code " + code + " to organ domain " + toOrganDomain + "!!!"));
+                errors.add(new Error("M.UpdateStatusDoc", "Not found document with document code "
+                        + code + " to organ domain " + toOrganDomain + "!!!"));
                 return null;
             } else {
                 LOGGER.info("Q.UpdateTrace found document with from organ " + toOrganDomain + " and code " + code);

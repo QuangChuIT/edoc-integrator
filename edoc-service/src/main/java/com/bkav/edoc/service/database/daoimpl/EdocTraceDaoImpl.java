@@ -23,6 +23,7 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         Session currentSession = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
+
             Query<EdocTrace> query;
             if (responseForOrganId.equals(PropsUtil.get("edoc.domain.A.parent")) && !responseForOrganId.equals(PropsUtil.get("edoc.domain.01.A53"))) {
                 if (fromTime != null) {

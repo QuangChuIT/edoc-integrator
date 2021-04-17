@@ -169,7 +169,7 @@ public class ServiceVPCP {
             if (getReceivedEdocResult.getKnobsticks().size() > 0) {
                 for (Knobstick item : getReceivedEdocResult.getKnobsticks()) {
                     try {
-                        LOGGER.info("Prepare get document from VPCP with docId: " + item.getId());
+                        LOGGER.info("Prepare get document from VPCP with docId: " + item.getId() + " from " + item.getFrom() + " to " + item.getTo());
                         JSONObject getDocumentHeader = new JSONObject();
                         String attachmentDir = PropsUtil.get("VPCP.attachment.dir");
                         getDocumentHeader.put("filePath", attachmentDir);
@@ -287,7 +287,7 @@ public class ServiceVPCP {
                         String attachmentDir = PropsUtil.get("VPCP.attachment.dir");
                         getStatusHeader.put("filePath", attachmentDir);
                         getStatusHeader.put("docId", item.getId());
-                        LOGGER.info("Prepare get detail status from vpcp with status id " + item.getId() + " !!!!!!!!!!!!!!!!!!!!!!");
+                        LOGGER.info("Prepare get detail status from vpcp with status id " + item.getId() + " from " + item.getFrom() + " to " + item.getTo());
                         GetEdocResult getEdocResult = this.knobstickServiceImp.getEdoc(getStatusHeader.toString());
                         String status = "";
                         if (getEdocResult != null) {

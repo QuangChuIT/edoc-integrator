@@ -34,6 +34,7 @@ import org.hibernate.query.Query;
 
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -63,25 +64,28 @@ public class EdocDocumentService {
 
     public int countDocumentsFilter(PaginationCriteria paginationCriteria, String organId, String mode, String toOrgan, String fromOrgan, String docCode) {
         Session session = documentDaoImpl.openCurrentSession();
+        String condition = "and";
+        if (organId != null)
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) condition = "or";
         int result = 0;
         try {
             session.beginTransaction();
             String queryDocument = "";
             switch (mode) {
                 case EdXmlConstant.INBOX_MODE:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.OUTBOX:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_OUTBOX_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_OUTBOX_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.INBOX_NOT_RECEIVED:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_NOT_RECEIVER_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_NOT_RECEIVER_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.INBOX_RECEIVED:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_RECEIVER_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_INBOX_RECEIVER_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.DRAFT:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_DRAFT_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_DRAFT_TMP, paginationCriteria, condition);
                     break;
             }
             Query query = session.createNativeQuery(queryDocument);
@@ -100,11 +104,6 @@ public class EdocDocumentService {
             query.setParameter("docCode", docCode);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
-            /*if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
-                organId = PropsUtil.get("edoc.domain.vpubnd.1");
-                int moreResult = countDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
-                return (result + moreResult);
-            }*/
         } catch (Exception e) {
             LOGGER.error("Error count documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -119,23 +118,26 @@ public class EdocDocumentService {
                                                        String mode, String toOrgan, String fromOrgan, String docCode) {
         List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
+        String condition = "and";
+        if (organId != null)
+            if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) condition = "or";
         try {
             String queryDocument = "";
             switch (mode) {
                 case EdXmlConstant.INBOX_MODE:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.OUTBOX:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_OUTBOX_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_OUTBOX_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.INBOX_NOT_RECEIVED:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_NOT_RECEIVER_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_NOT_RECEIVER_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.INBOX_RECEIVED:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_RECEIVER_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_INBOX_RECEIVER_TMP, paginationCriteria, condition);
                     break;
                 case EdXmlConstant.DRAFT:
-                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_DRAFT_TMP, paginationCriteria);
+                    queryDocument = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_DRAFT_TMP, paginationCriteria, condition);
                     break;
             }
             Query<EdocDocument> query = session.createNativeQuery(queryDocument, EdocDocument.class);
@@ -155,11 +157,6 @@ public class EdocDocumentService {
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
             query.setFirstResult(pageNumber);
-            /*if (organId != null) {
-                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0")) || organId.equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
-                    pageSize = pageSize/2;
-                }
-            }*/
             query.setMaxResults(pageSize);
             List<EdocDocument> documents = query.getResultList();
             if (documents.size() > 0) {
@@ -170,13 +167,6 @@ public class EdocDocumentService {
                     }
                 }
             }
-            /*if (organId != null) {
-                if (organId.equals(PropsUtil.get("edoc.domain.vpubnd.0"))) {
-                    organId = PropsUtil.get("edoc.domain.vpubnd.1");
-                    List<DocumentCacheEntry> entryList = getDocumentsFilter(paginationCriteria, organId, mode, toOrgan, fromOrgan, docCode);
-                    entries.addAll(entryList);
-                }
-            }*/
         } catch (Exception e) {
             LOGGER.error("Error get documents filter " + Arrays.toString(e.getStackTrace()));
         } finally {
@@ -193,7 +183,7 @@ public class EdocDocumentService {
         Session session = documentDaoImpl.openCurrentSession();
 
         try {
-            String queryDocumentNotTaken = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_NOT_TAKEN_TMP, paginationCriteria);
+            String queryDocumentNotTaken = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_NOT_TAKEN_TMP, paginationCriteria, null);
             Query<EdocNotification> query = session.createNativeQuery(queryDocumentNotTaken, EdocNotification.class);
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
@@ -233,7 +223,7 @@ public class EdocDocumentService {
         int result = 0;
         try {
             session.beginTransaction();
-            String queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_NOT_TAKEN_TMP, paginationCriteria);
+            String queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_NOT_TAKEN_TMP, paginationCriteria, null);
             Query query = session.createNativeQuery(queryDocument);
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
@@ -255,9 +245,8 @@ public class EdocDocumentService {
         List<DocumentCacheEntry> entries = new ArrayList<>();
         Session session = documentDaoImpl.openCurrentSession();
         try {
-            String queryDocumentNotTaken = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_NOT_SEND_VPCP, paginationCriteria);
+            String queryDocumentNotTaken = AppUtil.buildPaginatedQuery(QueryString.BASE_QUERY_DOCUMENT_NOT_SEND_VPCP, paginationCriteria, null);
             Query<EdocDocument> query = session.createNativeQuery(queryDocumentNotTaken, EdocDocument.class);
-            query.setParameter("vpcpRegex", "000.00.00.G");
             int pageNumber = paginationCriteria.getPageNumber();
             int pageSize = paginationCriteria.getPageSize();
             query.setFirstResult(pageNumber);
@@ -285,9 +274,8 @@ public class EdocDocumentService {
         int result = 0;
         try {
             session.beginTransaction();
-            String queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_NOT_SEND_VPCP, paginationCriteria);
+            String queryDocument = AppUtil.buildPaginatedQuery(QueryString.QUERY_COUNT_DOCUMENT_NOT_SEND_VPCP, paginationCriteria, null);
             Query query = session.createNativeQuery(queryDocument);
-            query.setParameter("vpcpRegex", "000.00.00.G");
             BigInteger count = (BigInteger) query.getSingleResult();
             result = count.intValue();
         } catch (Exception e) {
@@ -431,20 +419,28 @@ public class EdocDocumentService {
                 }
             }
             document.setAttachments(edocAttachmentSet);
-
-            List<Organization> toesVPCP = checker.checkSendToVPCP(messageHeader.getToes());
-            List<Organization> toOrganizations = messageHeader.getToes();
+            List<Organization> toes = messageHeader.getToes();
+            LOGGER.info("-------------- List to organization ---------- "
+                    + toes.toString() + "with document code " + docCode + " and form organ "
+                    + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
+            List<Organization> toesVPCP = checker.checkSendToVPCP(toes);
+            LOGGER.info("------------ Bkav List Organ send to VPCP --------- " +
+                    toesVPCP.toString() + "with document code " + docCode + " and form organ "
+                    + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             List<Organization> organToPending = new ArrayList<>();
             if (toesVPCP.size() > 0) {
                 List<String> organDomains = toesVPCP.stream().map(Organization::getOrganId).collect(Collectors.toList());
-                for (Organization organization : toOrganizations) {
+                for (Organization organization : toes) {
                     if (!organDomains.contains(organization.getOrganId())) {
                         organToPending.add(organization);
                     }
                 }
             } else {
-                organToPending = toOrganizations;
+                organToPending = toes;
             }
+            LOGGER.info("------------ Bkav List Organ save to notification table --------- " +
+                    organToPending.toString() + "with document code " + docCode + " and form organ " +
+                    messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             Date dueDate = messageHeader.getDueDate();
 
             Set<EdocNotification> notifications = new HashSet<>();
@@ -454,8 +450,10 @@ public class EdocDocumentService {
             // get turn on vnpt request with group organ domain
             boolean turnOn = GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false);
             int countOrgan = 0;
+            LOGGER.info("---------- Bkav Prepare insert notification with size " +
+                    organToPending.size() + " to database --------" + " document id " + document.getDocumentId());
             for (Organization to : organToPending) {
-                LOGGER.info("------------------ Insert into notification with document id " + docId + ", receriver id " + to.getOrganId());
+                LOGGER.info("------------------ Insert into notification with document id " + docId + ", receiver id " + to.getOrganId());
                 EdocNotification notification = new EdocNotification();
                 Date currentDate = new Date();
                 notification.setDateCreate(currentDate);
@@ -501,6 +499,9 @@ public class EdocDocumentService {
                         + " and code " + document.getDocCode());
                 notifications.add(notification);
             }
+            LOGGER.info("---------- Bkav List notification before save to database size "
+                    + notifications.size() + "with document code " + docCode
+                    + " and form organ " + messageHeader.getFrom().toString() + " document id " + document.getDocumentId());
             // save pending document to cache
             savePendingDocumentCache(organToPending, docId);
             document.setNotifications(notifications);

@@ -120,22 +120,21 @@
                     {{else}}
                         {{each notifications}}
                             <div class="form-group">
-                                <div class="col-md-8 col-xs-12">
+                                <div class="col-md-12 col-xs-12">
                                     <%--<span class="from-to">${fromOrgan.name} -> ${toOrganization.name}</span>--%>
-                                    <span class="from-to">${fromOrgan.name}</span>
+                                    <span class="from-to">${toOrganization.name}</span>
                                 </div>
-                                <div class="col-md-2 col-xs-12 text-center">
-                                    {{if taken == false}}
-                                        ${app_message.edoc_not_received_message}
-                                    {{else}}
-                                        ${app_message.edoc_received_message}
-                                    {{/if}}
-                                </div>
-                                <div class="col-md-1 col-xs-12 text-center">
-                                    <span>${convertToDate(modifiedDate).formatTime()}</span>
-                                </div>
-                                <div class="col-md-1 col-xs-12 text-right" >
-                                    <span>${convertToDate(modifiedDate).formatDate()}</span>
+                                <div class="row">
+                                    <div class="staff-comment col-md-7 col-xs-7" id="trace_${traceId}">
+                                        {{if taken == false}}
+                                            <span>${app_message.edoc_status}: <b>${app_message.edoc_not_received_message}</b></span>
+                                        {{else}}
+                                            <span>${app_message.edoc_status}: <b>${app_message.edoc_received_message}</b></span>
+                                        {{/if}}
+                                    </div>
+                                    <div class="col-md-5 col-xs-5 text-right" id="time-trace">
+                                        <span><i class="fa fa-clock-o"></i> ${convertToDate(modifiedDate).formatDate()} ${convertToDate(modifiedDate).formatTime()}</span>
+                                    </div>
                                 </div>
                             </div>
                         {{/each}}

@@ -122,7 +122,7 @@ public class MessageStatus extends BaseElement {
                     List<Element> elements = header.getChildren();
                     if (elements != null && elements.size() > 0) {
                         for (Element item : elements) {
-                            if ("Status".equals(item.getName())) {
+                            if ("Status".equals(item.getName()) || "MessageHeader".equals(item.getName())) {
                                 return item;
                             }
                         }

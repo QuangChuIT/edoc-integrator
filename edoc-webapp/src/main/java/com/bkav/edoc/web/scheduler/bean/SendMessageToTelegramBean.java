@@ -34,7 +34,6 @@ public class SendMessageToTelegramBean {
     private MessageSourceUtil messageSourceUtil;
 
     public void runScheduleSendMessageToTelegram() {
-        LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
         try {
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -15);
@@ -43,6 +42,7 @@ public class SendMessageToTelegramBean {
             String warningMessage = "";
             int i = 1;
 
+            LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
             List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend();
             if (messageObject.size() == 0) {
                 LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
@@ -83,9 +83,49 @@ public class SendMessageToTelegramBean {
                 }
                 sendTelegramMessage(detailMessageOrgan);
                 //System.out.println(detailMessageOrgan);
-
-                LOGGER.info("--------------------------------------------------- Done ----------------------------------------------------");
             }
+            /*warningMessage = "";
+
+            // Notification to Telegram for docuemtn not send to VPCP
+            LOGGER.info("--------------------- Start scheduler notification document not send to VPCP ------------------------");
+            List<TelegramMessage> messageListNotSendVPCP = EdocNotificationServiceUtil.telegramScheduleDocumentNotSendVPCP();
+            if (messageObject.size() == 0) {
+                LOGGER.info("ALL OF DOCUMENT SEND TO VPCP SUCCESS !!!!!!!");
+                warningMessage += messageSourceUtil.getMessage("edoc.title.all.send.vpcp", new Object[]{SIMPLE_DATE_FORMAT.format(today)});
+                sendTelegramMessage(warningMessage);
+                //System.out.println(warningMessage);
+            } else {
+                warningMessage += messageSourceUtil.getMessage("edoc.title.telegram.vpcp",
+                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
+                sendTelegramMessage(warningMessage);
+                //System.out.println(warningMessage);
+
+                String detailMessageOrgan = "";
+                for (TelegramMessage telegramMessage : messageObject) {
+                    detailMessageOrgan += messageSourceUtil.getMessage("edoc.title.telegram.header",
+                            new Object[]{i, telegramMessage.getReceiverName()});
+                    EdocDocument document = telegramMessage.getDocument();
+                    LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not send document to VPCP with code " + document.getDocCode());
+
+                    String doc_code = document.getDocCode();
+                    EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
+                    String sender = senderOrgan.getName();
+                    String value = document.getDocumentId() + "," + doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
+                    String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
+                    detailMessageOrgan += msg;
+                    if (detailMessageOrgan.length() > 3500) {
+                        sendTelegramMessage(detailMessageOrgan);
+                        //System.out.println(detailMessageOrgan);
+                        detailMessageOrgan = "";
+                    }
+                    TimeUnit.SECONDS.sleep(2);
+                    i++;
+                    //}
+                }
+                sendTelegramMessage(detailMessageOrgan);
+                //System.out.println(detailMessageOrgan);
+            }*/
+            LOGGER.info("--------------------------------------- Done schedule send to telegram -----------------------------------------");
         } catch (Exception e) {
             LOGGER.error("Not send message to telegram cause " + e);
         }

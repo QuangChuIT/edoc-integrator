@@ -862,6 +862,7 @@
                                         <%--<span class="from-to">${fromOrgan.name} -> ${toOrgan.name}</span>--%>
                                         <span class="from-to">${fromOrgan.name}
                                     </div>
+
                                     <div class="col-md-2 col-sm-6 col-xs-12 text-center">
                                         ${getStatusOfTrace(statusCode)}
                                     </div>

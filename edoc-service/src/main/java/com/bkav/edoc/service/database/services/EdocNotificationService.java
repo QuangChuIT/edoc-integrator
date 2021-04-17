@@ -1,5 +1,6 @@
 package com.bkav.edoc.service.database.services;
 
+import com.bkav.edoc.service.commonutil.Checker;
 import com.bkav.edoc.service.database.cache.DocumentCacheEntry;
 import com.bkav.edoc.service.database.cache.NotificationCacheEntry;
 import com.bkav.edoc.service.database.daoimpl.EdocDocumentDaoImpl;
@@ -17,15 +18,18 @@ import com.bkav.edoc.service.redis.RedisUtil;
 import com.bkav.edoc.service.util.CommonUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.annotations.Check;
 
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EdocNotificationService {
     private final EdocNotificationDaoImpl notificationDaoImpl = new EdocNotificationDaoImpl();
     private final EdocDynamicContactDaoImpl edocDynamicContactDao = new EdocDynamicContactDaoImpl();
     private final EdocDocumentDaoImpl documentDao = new EdocDocumentDaoImpl();
+    private final Checker checker = new Checker();
 
     public void addNotification(EdocNotification edocNotification) {
         Session currentSession = notificationDaoImpl.openCurrentSession();
@@ -221,6 +225,35 @@ public class EdocNotificationService {
             });*/
 
             LOGGER.info("------------------------ Telegram messages " + telegramMessages.size() + "---------------------------");
+            return telegramMessages;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return telegramMessages;
+        }
+    }
+
+    public List<TelegramMessage> getTelegramMessagesForDocumentNotSendVPCP() {
+        List<TelegramMessage> telegramMessages = new ArrayList<>();
+        try {
+            List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
+            documents.forEach(document -> {
+                String[] toOrganList = document.getToOrganDomain().split("#");
+                List<String> toOrgans = Arrays.asList(toOrganList);
+                toOrgans.forEach(toOrgan -> {
+                    EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(toOrgan);
+                    if (sentContact != null && !sentContact.getAgency()) {
+                        LOGGER.info("------------------------------ Send VPCP Fail with document id: " + document.getDocumentId());
+                        TelegramMessage telegramMessage = new TelegramMessage();
+                        telegramMessage.setReceiverId(toOrgan);
+                        telegramMessage.setReceiverName(sentContact.getName());
+                        telegramMessage.setDocument(document);
+                        telegramMessage.setCreateDate(document.getCreateDate());
+                        telegramMessages.add(telegramMessage);
+                    }
+                });
+            });
+
+            LOGGER.info("------------------------ Telegram messages not send VPCP has size: " + telegramMessages.size() + "---------------------------");
             return telegramMessages;
         } catch (Exception e) {
             LOGGER.error(e);

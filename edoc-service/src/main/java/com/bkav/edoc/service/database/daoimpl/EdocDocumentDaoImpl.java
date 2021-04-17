@@ -390,13 +390,8 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("Select ed from EdocDocument ed where ed.toOrganDomain like concat('%', :toOrganRegex, '%') and " +
-                    "((ed.sendExt = :notSend and ed.documentExtId = :documentExtIdNULL)" +
-                    "or (ed.sendExt = :sendFail and ed.documentExtId = :documentExtId))");
+            sql.append("Select ed from EdocDocument ed where ed.sendExt = :sendFail and ed.documentExtId = :documentExtId");
             Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
-            query.setParameter("notSend", false);
-            query.setParameter("documentExtIdNULL", "NULL");
-            query.setParameter("toOrganRegex", "000.00.00.G");
             query.setParameter("sendFail", true);
             query.setParameter("documentExtId", "");
             return query.getResultList();

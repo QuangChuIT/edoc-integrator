@@ -308,6 +308,7 @@ public class DynamicRestContactController {
             Response response = new Response(code, errors, message);
             return new ResponseEntity<>(response, HttpStatus.valueOf(code));
         } catch (Exception e) {
+            logger.error("---------------- Create new organ fail cause " + e.getMessage());
             errors.add(messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             Response response = new Response(500, errors, messageSourceUtil.getMessage("edoc.message.error.exception", new Object[]{e.getMessage()}));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);

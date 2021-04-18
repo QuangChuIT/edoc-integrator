@@ -207,8 +207,13 @@ public class ServiceVPCP {
                                     // check exist document
                                     if (EdocDocumentServiceUtil.checkExistDocument(messageHeader.getDocumentId())) {
                                         LOGGER.info("Exist document with document id " + messageHeader.getDocumentId() + " on Esb !!!!!");
+                                    } else {
+                                        LOGGER.info("--------- Prepare to save the document to the database ------ " + messageHeader.getDocumentId());
+                                        document = EdocDocumentServiceUtil.addDocument(messageHeader,
+                                                traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
                                     }
                                 } else {
+                                    LOGGER.info("--------- Prepare to save the document to the database ------ " + messageHeader.getDocumentId());
                                     document = EdocDocumentServiceUtil.addDocument(messageHeader,
                                             traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errors);
                                 }

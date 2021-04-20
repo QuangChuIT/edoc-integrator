@@ -64,10 +64,28 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         return new ArrayList<>();
     }
 
+    public List<EdocTrace> getEdocTracesByTraceId(long docId) {
+        Session currentSession = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT et FROM EdocTrace et where et.enable=:enable and et.traceId = :traceId order by et.timeStamp DESC");
+            Query<EdocTrace> query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+            query.setParameter("enable", true);
+            query.setParameter("traceId", docId);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            closeCurrentSession(currentSession);
+        }
+        return new ArrayList<>();
+    }
+
     public static void main(String[] args) {
         EdocTraceDaoImpl edocTraceDao = new EdocTraceDaoImpl();
-        String json = new Gson().toJson(edocTraceDao.getEdocTracesByOrganId("000.A53.000", null));
-        System.out.println(json);
+        //String json = new Gson().toJson(edocTraceDao.getEdocTracesByOrganId("000.A53.000", null));
+        List<EdocTrace> list = edocTraceDao.getEdocTracesByTraceId(18496733);
+        System.out.println(list.size());
     }
 
     public void disableEdocTrace(EdocTrace trace) {

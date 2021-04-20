@@ -84,11 +84,12 @@ public class EdocTraceService {
             edocTrace.setFromOrganDomain(fromOrganDomain);
             edocTrace.setOrganName(fromOrganName);
             edocTrace.setOrganAdd(fromOrganAdd);
-            if (toOrganDomain.equals(PropsUtil.get("edoc.domain.A53.regex")) && !toOrganDomain.equals(PropsUtil.get("edoc.domain.01.A53"))) {
+            /*if (toOrganDomain.equals(PropsUtil.get("edoc.domain.A53.regex")) && !toOrganDomain.equals(PropsUtil.get("edoc.domain.01.A53"))) {
                 edocTrace.setToOrganDomain(PropsUtil.get("edoc.domain.A.parent"));
             } else {
                 edocTrace.setToOrganDomain(toOrganDomain);
-            }
+            }*/
+            edocTrace.setToOrganDomain(toOrganDomain);
             edocTrace.setCode(code);
             edocTrace.setPromulgationDate(promulgationDate);
             edocTrace.setEdxmlDocumentId(documentId);
@@ -160,6 +161,11 @@ public class EdocTraceService {
     public List<EdocTrace> getEdocTracesByOrganId(String responseForOrganId, Date fromTime) {
 
         return traceDaoImpl.getEdocTracesByOrganId(responseForOrganId, fromTime);
+    }
+
+    public List<EdocTrace> getEdocTracesByTraceId(long docId) {
+
+        return traceDaoImpl.getEdocTracesByTraceId(docId);
     }
 
     /**

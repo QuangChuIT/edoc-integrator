@@ -60,7 +60,6 @@ public class EdocNotificationService {
         // remove in db
         this.removePendingDocumentId(domain, documentId);
         // auto add trace received
-
     }
 
     /**
@@ -134,6 +133,7 @@ public class EdocNotificationService {
                     notificationDaoImpl.saveOrUpdate(edocNotification);
                     LOGGER.info("Update notification set taken success for notification with document id " + documentId + " : " + edocNotification.getReceiverId());
                     String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
+
                     DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
                     if (documentCacheUpdate != null) {
                         List<NotificationCacheEntry> notificationCacheEntries = documentCacheUpdate.getNotifications();

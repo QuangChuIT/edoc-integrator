@@ -12,6 +12,7 @@ import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
 import com.bkav.edoc.service.database.services.EdocTraceHeaderListService;
 import com.bkav.edoc.service.database.services.EdocDocumentService;
+import com.bkav.edoc.service.database.services.EdocTraceService;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
@@ -66,6 +67,7 @@ public class EdocController {
     private static final Gson gson = new Gson();
     private static final Checker CHECKER = new Checker();
     private final EdocDocumentService documentService = new EdocDocumentService();
+    private final EdocTraceService traceService = new EdocTraceService();
     private final EdocTraceHeaderListService traceHeaderListService = new EdocTraceHeaderListService();
     private final EdocAttachmentService attachmentService = new EdocAttachmentService();
     private final AttachmentGlobalUtil attUtil = new AttachmentGlobalUtil();
@@ -164,7 +166,6 @@ public class EdocController {
                     List<Error> errorList = new ArrayList<>();
                     EdocDocument document = EdocDocumentServiceUtil.addDocument(messageHeader,
                             traceHeaderList, attachments, documentEsbId, attachmentCacheEntries, errorList);
-
                     if (document != null) {
                         LOGGER.info("Save document from  successfully from file  to database document id " + documentEsbId.toString());
                         sendDocResp.setCode("0");
@@ -450,6 +451,15 @@ public class EdocController {
             } else {
                 long docId = Long.parseLong(docIdValue);
                 EdocNotificationServiceUtil.removePendingDocId(organId, docId);
+                List<EdocTrace> traces = null;
+                if (organId.equals(PropsUtil.get("edoc.domain.A.parent"))) {
+                    traces = EdocTraceServiceUtil.getEdocTracesByTraceId(docId);
+                } else {
+                    traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId, null);
+                }
+                if (traces.size() > 0) {
+                    traceService.disableEdocTrace(traces);
+                }
                 confirmReceivedResp.setStatus("Success");
                 confirmReceivedResp.setErrors(new ArrayList<>());
                 confirmReceivedResp.setCode("0");

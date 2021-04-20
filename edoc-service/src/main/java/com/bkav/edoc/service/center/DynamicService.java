@@ -686,6 +686,12 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 // add document, document detail, notification, attachment, trace header list
                 EdocDocument document = documentService.addDocument(messageHeader, traceHeaderList,
                         attachmentsEntity, strDocumentId, attachmentCacheEntries, errorList);
+                String[] listToOrgan = document.getToOrganDomain().split("#");
+                List<String> toOrgans = Arrays.asList(listToOrgan);
+                toOrgans.forEach(toOrgan -> {
+                    MessageStatus messageStatus = createConfirmTrace(document, toOrgan);
+                    traceService.updateTrace(messageStatus, errorList);
+                });
                 if (document == null) {
                     report = new Report(false, new ErrorList(errorList));
 
@@ -715,8 +721,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                             LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
                             document.setDocumentExtId(sendEdocResult.getDocID());
                             toesVPCP.forEach(to -> {
-                                MessageStatus messageStatus = createConfirmTrace(document, to.getOrganId());
-                                traceService.updateTrace(messageStatus, errorList);
+                                LOGGER.info("----- Create trace for document id " + document.getDocumentId() + " ------ " + to.getOrganId());
+                                MessageStatus messageStatusVPCP = createConfirmTrace(document, to.getOrganId());
+                                traceService.updateTrace(messageStatusVPCP, errorList);
                             });
                             document.setSendSuccess(!sendEdocResult.getStatus().equals("FAIL"));
                             document.setTransactionStatus(sendEdocResult.getErrorDesc());
@@ -873,8 +880,9 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
     }
 
     private MessageStatus createConfirmTrace(EdocDocument document, String organId) {
+        LOGGER.info("---------------- Start create confirm trace with document id " + document.getDocumentId() + " ------------ " + organId);
         MessageStatus messageStatus = new MessageStatus();
-        messageStatus.setDescription("Da nhan van ban ve he thong");
+        messageStatus.setDescription("Van ban da nhan ve he thong");
         messageStatus.setTimestamp(new Date());
         messageStatus.setStatusCode("1");
 
@@ -912,6 +920,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         messageStatus.setFrom(organization);
         messageStatus.setResponseFor(responseFor);
 
+        LOGGER.info("-------------------- Create confirm trace success for document id " + document.getDocumentId() + " -------------- " + organId);
         return messageStatus;
     }
 

@@ -34,7 +34,6 @@ import org.hibernate.query.Query;
 
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -554,6 +553,10 @@ public class EdocDocumentService {
     public boolean checkExistDocument(String edXmlDocumentId) {
         EdocDocument check = documentDaoImpl.checkExistDocument(edXmlDocumentId);
         return (check != null);
+    }
+
+    public boolean checkExistDocumentByDocCode(String fromOrgan, String toOrgan, String docCode) {
+        return documentDaoImpl.checkExistDocumentByDocCode(fromOrgan, toOrgan, docCode);
     }
 
     public boolean checkNewDocument(TraceHeaderList traceHeaderList) {

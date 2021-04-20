@@ -686,12 +686,6 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 // add document, document detail, notification, attachment, trace header list
                 EdocDocument document = documentService.addDocument(messageHeader, traceHeaderList,
                         attachmentsEntity, strDocumentId, attachmentCacheEntries, errorList);
-                String[] listToOrgan = document.getToOrganDomain().split("#");
-                List<String> toOrgans = Arrays.asList(listToOrgan);
-                toOrgans.forEach(toOrgan -> {
-                    MessageStatus messageStatus = createConfirmTrace(document, toOrgan);
-                    traceService.updateTrace(messageStatus, errorList);
-                });
                 if (document == null) {
                     report = new Report(false, new ErrorList(errorList));
 

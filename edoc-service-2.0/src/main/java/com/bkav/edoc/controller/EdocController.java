@@ -51,10 +51,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -502,6 +499,35 @@ public class EdocController {
             organizationResp.setStatus("Fail");
         }
         return gson.toJson(organizationResp);
+    }
+
+    @RequestMapping(value = "/checkExistDocument", method = RequestMethod.POST,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public CheckExistDocumentResp checkExistDocument(HttpServletRequest request, @RequestBody CheckExistDocumentRequest ob) {
+        Map<String, String> headerMap = EdocUtil.getHeaders(request);
+        CheckExistDocumentResp checkExistDocumentResp = new CheckExistDocumentResp();
+        List<Error> errors = new ArrayList<>();
+        String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
+        LOGGER.info("--------------- Check exist document with organ: " + organId);
+        try {
+            boolean isExistDocument = EdocDocumentServiceUtil.checkExistDocumentByDocCode(ob.getFromOrgan(), ob.getToOrgan(), ob.getDocCode());
+            if (isExistDocument) {
+                checkExistDocumentResp.setResult(true);
+            } else {
+                checkExistDocumentResp.setResult(false);
+            }
+            checkExistDocumentResp.setStatus("Success");
+            checkExistDocumentResp.setCode("200");
+            checkExistDocumentResp.setErrors(new ArrayList<>());
+        } catch (Exception e) {
+            LOGGER.error("--------------- Error to check exist document cause: " + e.getMessage());
+            errors.add(new Error("CheckExistDocumentException", e.getMessage()));
+            checkExistDocumentResp.setErrors(errors);
+            checkExistDocumentResp.setCode("9999");
+            checkExistDocumentResp.setStatus("Error");
+        }
+        return checkExistDocumentResp;
     }
 
     private GetDocumentResp buildGetDocumentResp(long docId, String messageType, List<Error> errors) {

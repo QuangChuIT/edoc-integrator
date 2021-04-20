@@ -48,6 +48,10 @@ public class EdocDocumentServiceUtil {
         return DOCUMENT_SERVICE.checkExistDocument(documentId);
     }
 
+    public static boolean checkExistDocumentByDocCode(String fromOrgan, String toOrgan, String docCode) {
+        return DOCUMENT_SERVICE.checkExistDocumentByDocCode(fromOrgan, toOrgan, docCode);
+    }
+
     public static EdocDocument getDocument(long documentId) {
         EdocDocument document = DOCUMENT_SERVICE.getDocument(documentId);
         return DOCUMENT_SERVICE.getDocument(documentId);

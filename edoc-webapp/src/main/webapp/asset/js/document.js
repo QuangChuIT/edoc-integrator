@@ -202,9 +202,17 @@ let edocDocument = {
                     selector: 'tbody tr td',
                     callback: (key, options) => {
                         let id = options.$trigger[0].parentElement.id;
-                        edocDocument.deleteDocument(id);
+                        switch (key) {
+                            case "download":
+                                console.log(id);
+                                break;
+                            case "delete":
+                                edocDocument.deleteDocument(id);
+                                break;
+                        }
                     },
                     items: {
+                        "download": {name: app_message.edoc_download_xml, icon: "fa-download"},
                         "delete": {name: app_message.edoc_remove_document, icon: "delete"}
                     }
                 });
@@ -771,7 +779,6 @@ $(document).ready(function () {
                 $("#overlay").show();
             },
             success: function (response) {
-                console.log(response);
                 $.notify(response.message, "success");
             },
             error: function (error) {

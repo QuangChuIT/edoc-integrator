@@ -3,7 +3,6 @@ package com.bkav.edoc.service.database.daoimpl;
 import com.bkav.edoc.service.database.dao.EdocDocumentDao;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.util.HibernateUtil;
-import com.bkav.edoc.service.util.PropsUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,10 +13,7 @@ import javax.persistence.StoredProcedureQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> implements EdocDocumentDao {
 
@@ -401,6 +397,25 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
             closeCurrentSession(session);
         }
         return null;
+    }
+
+    public boolean checkExistDocumentByDocCode(String fromOrgan, String toOrgan, String docCode) {
+        Session session = openCurrentSession();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("Select ed from EdocDocument ed where ed.fromOrganDomain = :fromOrganDomain and ed.toOrganDomain = :toOrganDomain" +
+                    " and ed.docCode = :docCode");
+            Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
+            query.setParameter("fromOrganDomain", fromOrgan);
+            query.setParameter("toOrganDomain", toOrgan);
+            query.setParameter("docCode", docCode);
+            return (query.getResultList().size() > 0);
+        } catch (Exception e) {
+            LOGGER.info("Check exist docuemtn fail cause " + e.getMessage());
+        } finally {
+            closeCurrentSession(session);
+        }
+        return false;
     }
 
     public static void main(String[] args) {

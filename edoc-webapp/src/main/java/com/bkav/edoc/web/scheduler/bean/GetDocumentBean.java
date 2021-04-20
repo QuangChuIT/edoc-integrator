@@ -13,7 +13,7 @@ public class GetDocumentBean {
 
     public void runSchedulerGetDocument() {
         LOGGER.info("Prepare get documents from vpcp at " + DateUtils.format(new Date()));
-        ServiceVPCP.getInstance().GetDocuments();
+        /*ServiceVPCP.getInstance().GetDocuments();*/
         LOGGER.info("Get documents from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
     }
 

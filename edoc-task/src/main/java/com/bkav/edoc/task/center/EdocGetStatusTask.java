@@ -39,13 +39,12 @@ public class EdocGetStatusTask implements Task, ManagedLifecycle {
     public void execute() {
         LOGGER.info("------------------------ Edoc Get Status Task Invoke -----------------------");
         boolean isTurnOn = GetterUtil.getBoolean(this.getTurnOn(), false);
-        LOGGER.info("------------------------ Edoc Get Documents Task Invoke -----------------------");
         if (isTurnOn) {
-            LOGGER.info("Start get documents from vpcp at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
+            LOGGER.info("Start get status from vpcp at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
             ServiceVPCP.getInstance().getStatus();
-            LOGGER.info("Get documents from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
+            LOGGER.info("Get status from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
         } else {
-            LOGGER.info("------------------------ Get Documents from VPCP turn off -----------------------");
+            LOGGER.info("------------------------ Get status from VPCP turn off -----------------------");
         }
     }
 

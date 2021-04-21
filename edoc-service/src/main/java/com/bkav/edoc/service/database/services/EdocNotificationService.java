@@ -60,7 +60,6 @@ public class EdocNotificationService {
         // remove in db
         this.removePendingDocumentId(domain, documentId);
         // auto add trace received
-
     }
 
     /**
@@ -134,6 +133,7 @@ public class EdocNotificationService {
                     notificationDaoImpl.saveOrUpdate(edocNotification);
                     LOGGER.info("Update notification set taken success for notification with document id " + documentId + " : " + edocNotification.getReceiverId());
                     String cacheKey = MemcachedKey.getKey(String.valueOf(documentId), MemcachedKey.DOCUMENT_KEY);
+
                     DocumentCacheEntry documentCacheUpdate = (DocumentCacheEntry) MemcachedUtil.getInstance().read(cacheKey);
                     if (documentCacheUpdate != null) {
                         List<NotificationCacheEntry> notificationCacheEntries = documentCacheUpdate.getNotifications();
@@ -210,19 +210,6 @@ public class EdocNotificationService {
                     }
                 }
             }
-            /*List<EdocDocument> documents = documentDao.getDocumentNotSentToVPCP();
-            documents.forEach(document -> {
-                EdocDynamicContact sentContact = EdocDynamicContactServiceUtil.findContactByDomain(document.getToOrganDomain());
-                if (sentContact != null && !sentContact.getAgency()) {
-                    LOGGER.info("------------------------------ Send VPCP Fail with document id: " + document.getDocumentId());
-                    TelegramMessage telegramMessage = new TelegramMessage();
-                    telegramMessage.setReceiverId(document.getToOrganDomain());
-                    telegramMessage.setReceiverName(sentContact.getName());
-                    telegramMessage.setDocument(document);
-                    telegramMessage.setCreateDate(document.getCreateDate());
-                    telegramMessages.add(telegramMessage);
-                }
-            });*/
 
             LOGGER.info("------------------------ Telegram messages " + telegramMessages.size() + "---------------------------");
             return telegramMessages;

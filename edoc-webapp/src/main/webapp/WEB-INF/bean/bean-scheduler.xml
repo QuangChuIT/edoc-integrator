@@ -36,7 +36,7 @@
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
 
-    <!--Declare scheduler for Get documents from VPCP-->
+   <!-- &lt;!&ndash;Declare scheduler for Get documents from VPCP&ndash;&gt;
     <bean name="getDocumentJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetDocumentJob"/>
         <property name="jobDataMap">
@@ -62,9 +62,9 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
-    </bean>
+    </bean>-->
 
-    <!--Declare scheduler for Get status from VPCP-->
+  <!--  &lt;!&ndash;Declare scheduler for Get status from VPCP&ndash;&gt;
     <bean name="getStatusJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetStatusJob"/>
         <property name="jobDataMap">
@@ -76,7 +76,7 @@
 
     <bean id="getStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="getStatusJobDetail"/>
-        <!--<property name="cronExpression" value="0 */15 * ? * *"/>-->
+        &lt;!&ndash;<property name="cronExpression" value="0 */15 * ? * *"/>&ndash;&gt;
         <property name="cronExpression" value="0 0 2 * * ?"/>
     </bean>
 
@@ -91,7 +91,7 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
-    </bean>
+    </bean>-->
 
     <!--Declare scheduler for Get status from VPCP-->
     <bean name="getOrganJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">

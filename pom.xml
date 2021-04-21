@@ -13,6 +13,7 @@
         <module>edoc-transform</module>
         <module>sdk-edoc</module>
         <module>edoc-service-2.0</module>
+        <module>edoc-task</module>
     </modules>
 
     <packaging>pom</packaging>

@@ -38,15 +38,18 @@ public class EdocUtil {
     public static List<Error> validateHeader(Map<String, String> header) {
         List<Error> errors = new ArrayList<>();
         if (header.size() <= 0) {
+            LOGGER.error("------------ Error cause header is null !!!!");
             errors.add(new Error("Invalid Credentials", "Invalid Credentials. Make sure you have provided the correct security credentials"));
             errors.add(new Error("Invalid Credentials", "Invalid Credentials. Make sure you have provided the correct security credentials"));
         } else {
             String organId = header.get(EdocServiceConstant.ORGAN_ID);
             String token = header.get(EdocServiceConstant.TOKEN);
             if (Validator.isNullOrEmpty(organId)) {
+                LOGGER.error("----------- Error header: organ id is null -------------");
                 errors.add(new Error("Invalid Credentials", "Invalid Credentials. Make sure you have provided the correct security credentials"));
             }
             if (Validator.isNullOrEmpty(token)) {
+                LOGGER.error("----------- Error header: token id is null -------------");
                 errors.add(new Error("Invalid Credentials", "Invalid Credentials. Make sure you have provided the correct security credentials"));
             }
         }

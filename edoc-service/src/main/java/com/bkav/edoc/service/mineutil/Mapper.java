@@ -201,7 +201,10 @@ public class Mapper {
 
     public void parseBusinessInfo(TraceHeaderList traceHeaderList) {
         String businessInfo = traceHeaderList.getBusinessInfo();
-        if (businessInfo == null || businessInfo.isEmpty()) return;
+        if (businessInfo == null || businessInfo.isEmpty()) {
+            LOGGER.error("----- Business info is null !!!!-----------");
+            return;
+        }
         // check business doc type
         if (traceHeaderList.getBusiness().getBusinessDocType() == EdocTraceHeaderList.BusinessDocType.REPLACE.ordinal()) {
             // when replace document, get replacement info set to trace header list

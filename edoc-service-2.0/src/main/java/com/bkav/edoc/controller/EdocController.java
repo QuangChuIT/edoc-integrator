@@ -12,6 +12,7 @@ import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.services.EdocAttachmentService;
 import com.bkav.edoc.service.database.services.EdocTraceHeaderListService;
 import com.bkav.edoc.service.database.services.EdocDocumentService;
+import com.bkav.edoc.service.database.services.EdocTraceService;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
 import com.bkav.edoc.service.database.util.EdocNotificationServiceUtil;
@@ -50,10 +51,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -66,6 +64,7 @@ public class EdocController {
     private static final Gson gson = new Gson();
     private static final Checker CHECKER = new Checker();
     private final EdocDocumentService documentService = new EdocDocumentService();
+    private final EdocTraceService traceService = new EdocTraceService();
     private final EdocTraceHeaderListService traceHeaderListService = new EdocTraceHeaderListService();
     private final EdocAttachmentService attachmentService = new EdocAttachmentService();
     private final AttachmentGlobalUtil attUtil = new AttachmentGlobalUtil();
@@ -97,6 +96,7 @@ public class EdocController {
             Calendar cal = Calendar.getInstance();
             String SEPARATOR = EdXmlConstant.SEPARATOR;
             if (inputStream == null) {
+                LOGGER.info("--------------- Not found edxml file in request !!!!!!!!!-----------------");
                 errors.add(new Error("File Not Found", "Not found edxml file in request"));
                 sendDocResp.setCode("9999");
                 sendDocResp.setStatus("Error");
@@ -105,12 +105,14 @@ public class EdocController {
             }
             String dataPath;
             if (messageType.equals("EDOC")) {
+                LOGGER.info("--------------- Send Document Invoke --------------------");
                 dataPath = organId + SEPARATOR +
                         cal.get(Calendar.YEAR) + SEPARATOR +
                         (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
                         cal.get(Calendar.DAY_OF_MONTH) + SEPARATOR +
                         EdocServiceConstant.SEND_DOCUMENT + docIdUUid + ".edxml";
             } else {
+                LOGGER.info("--------------- Send Status Invoke --------------------");
                 dataPath = organId + SEPARATOR +
                         cal.get(Calendar.YEAR) + SEPARATOR +
                         (cal.get(Calendar.MONTH) + 1) + SEPARATOR +
@@ -127,7 +129,7 @@ public class EdocController {
             // process add edoc
             if (messageType.equals(MessageType.EDOC.name())) {
                 Ed ed = EdXmlParser.getInstance().parse(fileInputStream);
-                LOGGER.info("-------------------- Parser success document --------------------");
+                LOGGER.info("-------------------- Parser document success ------------------");
                 //Get message header
                 MessageHeader messageHeader = (MessageHeader) ed.getHeader().getMessageHeader();
                 // create trace header list
@@ -138,7 +140,9 @@ public class EdocController {
                 // validate edxml file
                 //check message
                 Report reportMessageHeader = CHECKER.checkMessageHeader(messageHeader);
+                LOGGER.info("-------- Check message header: " + reportMessageHeader.isIsSuccess());
                 Report reportTraceHeader = CHECKER.checkTraceHeaderList(traceHeaderList);
+                LOGGER.info("-------- Check trace header list: " + reportTraceHeader.isIsSuccess());
                 if (!reportMessageHeader.isIsSuccess()) {
                     errors.addAll(reportMessageHeader.getErrorList().getErrors());
                 }
@@ -153,6 +157,7 @@ public class EdocController {
                     }
                 }
                 if (errors.size() == 0) {
+                    LOGGER.info("Start to save document to database !!!!!!!!!!!!!");
                     StringBuilder documentEsbId = new StringBuilder();
                     List<AttachmentCacheEntry> attachmentCacheEntries = new ArrayList<>();
                     List<Error> errorList = new ArrayList<>();
@@ -443,6 +448,15 @@ public class EdocController {
             } else {
                 long docId = Long.parseLong(docIdValue);
                 EdocNotificationServiceUtil.removePendingDocId(organId, docId);
+                List<EdocTrace> traces = null;
+                if (organId.equals(PropsUtil.get("edoc.domain.A.parent"))) {
+                    traces = EdocTraceServiceUtil.getEdocTracesByTraceId(docId);
+                } else {
+                    traces = EdocTraceServiceUtil.getEdocTracesByOrganId(organId, null);
+                }
+                if (traces.size() > 0) {
+                    traceService.disableEdocTrace(traces);
+                }
                 confirmReceivedResp.setStatus("Success");
                 confirmReceivedResp.setErrors(new ArrayList<>());
                 confirmReceivedResp.setCode("0");
@@ -487,17 +501,47 @@ public class EdocController {
         return gson.toJson(organizationResp);
     }
 
+    @RequestMapping(value = "/checkExistDocument", method = RequestMethod.POST,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public CheckExistDocumentResp checkExistDocument(HttpServletRequest request, @RequestBody CheckExistDocumentRequest ob) {
+        Map<String, String> headerMap = EdocUtil.getHeaders(request);
+        CheckExistDocumentResp checkExistDocumentResp = new CheckExistDocumentResp();
+        List<Error> errors = new ArrayList<>();
+        String organId = headerMap.get(EdocServiceConstant.ORGAN_ID);
+        LOGGER.info("--------------- Check exist document with organ: " + organId);
+        try {
+            boolean isExistDocument = EdocDocumentServiceUtil.checkExistDocumentByDocCode(ob.getFromOrgan(), ob.getToOrgan(), ob.getDocCode());
+            if (isExistDocument) {
+                checkExistDocumentResp.setResult(true);
+            } else {
+                checkExistDocumentResp.setResult(false);
+            }
+            checkExistDocumentResp.setStatus("Success");
+            checkExistDocumentResp.setCode("200");
+            checkExistDocumentResp.setErrors(new ArrayList<>());
+        } catch (Exception e) {
+            LOGGER.error("--------------- Error to check exist document cause: " + e.getMessage());
+            errors.add(new Error("CheckExistDocumentException", e.getMessage()));
+            checkExistDocumentResp.setErrors(errors);
+            checkExistDocumentResp.setCode("9999");
+            checkExistDocumentResp.setStatus("Error");
+        }
+        return checkExistDocumentResp;
+    }
+
     private GetDocumentResp buildGetDocumentResp(long docId, String messageType, List<Error> errors) {
         GetDocumentResp getDocumentResp = new GetDocumentResp();
         try {
             if (messageType.equals("EDOC")) {
                 MessageHeader messageHeader = documentService.getDocumentById(docId);
-                LOGGER.info("Get message header success for document id " + docId);
+                LOGGER.info("Get message header success for document id " + docId + ": " + messageHeader.toString());
                 TraceHeaderList traceHeaderList = traceHeaderListService.getTraceHeaderListByDocId(docId);
-                LOGGER.info("Get trace header list success for document id " + docId);
+                LOGGER.info("Get trace header list success for document id " + docId + ": " + traceHeaderList.toString());
                 List<Attachment> attachmentsByEntity = attachmentService.getAttachmentsByDocumentId(docId);
-                LOGGER.info("Get list attachment success for document id " + docId);
+                LOGGER.info("Get list attachment success for document id " + docId + " with size " + attachmentsByEntity.size());
                 if (messageHeader != null && traceHeaderList != null && attachmentsByEntity.size() > 0) {
+                    LOGGER.info("Start parse business info for document id " + docId);
                     mapper.parseBusinessInfo(traceHeaderList);
                     Ed ed = new Ed(new Header(messageHeader, traceHeaderList), attachmentsByEntity);
                     LOGGER.info("Initial Ed success for document id " + docId + " !!!!!!!!!!!!!!!!!!!!!!!!");

@@ -93,14 +93,22 @@ public class AppUtil {
      * @param paginationCriteria the pagination criteria
      * @return the string
      */
-    public static String buildPaginatedQuery(String baseQuery, PaginationCriteria paginationCriteria) {
+    public static String buildPaginatedQuery(String baseQuery, PaginationCriteria paginationCriteria, String condition) {
         String finalQuery = null;
         if (!AppUtil.isObjectEmpty(paginationCriteria)) {
-            finalQuery = baseQuery
-                    .replaceAll("#WHERE_CLAUSE#",
-                            ((AppUtil.isObjectEmpty(paginationCriteria.getFilterByClause())) ? "" : " AND ")
-                                    + paginationCriteria.getFilterByClause())
-                    .replaceAll("#ORDER_CLASUE#", paginationCriteria.getOrderByClause());
+            if (condition != null) {
+                finalQuery = baseQuery.replaceAll("#CONDITION", condition)
+                        .replaceAll("#WHERE_CLAUSE#",
+                                ((AppUtil.isObjectEmpty(paginationCriteria.getFilterByClause())) ? "" : " AND ")
+                                        + paginationCriteria.getFilterByClause())
+                        .replaceAll("#ORDER_CLASUE#", paginationCriteria.getOrderByClause());
+            } else {
+                finalQuery = baseQuery
+                        .replaceAll("#WHERE_CLAUSE#",
+                                ((AppUtil.isObjectEmpty(paginationCriteria.getFilterByClause())) ? "" : " AND ")
+                                        + paginationCriteria.getFilterByClause())
+                        .replaceAll("#ORDER_CLASUE#", paginationCriteria.getOrderByClause());
+            }
         }
         return (null == finalQuery) ? baseQuery : finalQuery;
     }

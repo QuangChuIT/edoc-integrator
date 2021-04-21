@@ -209,7 +209,8 @@ public class MapperUtil {
                     traces.add(traceCacheEntry);
                 }
             }
-            traces.sort(Comparator.comparing(TraceCacheEntry::getTimeStamp));
+            traces.sort(Comparator.comparing(TraceCacheEntry::getTraceId).thenComparing(TraceCacheEntry::getTimeStamp));
+
             documentCacheEntry.setTraces(traces);
             TraceHeaderListCacheEntry traceHeaderListCacheEntry = MapperUtil.modelToTraceHeaderListCache(document.getTraceHeaderList());
             traceHeaderListCacheEntry.setDocumentId(document.getDocumentId());

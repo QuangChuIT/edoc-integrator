@@ -19,6 +19,10 @@ public class EdocTraceServiceUtil {
         return EDOC_TRACE_SERVICE.getEdocTracesByOrganId(organId, fromTime);
     }
 
+    public static List<EdocTrace> getEdocTracesByTraceId(long docId) {
+        return EDOC_TRACE_SERVICE.getEdocTracesByTraceId(docId);
+    }
+
     public static EdocTrace getEdocTrace(long traceId) {
         return EDOC_TRACE_SERVICE.getTrace(traceId);
     }

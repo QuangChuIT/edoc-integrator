@@ -57,10 +57,6 @@ public class SendMessageToTelegramBean {
 
                 String detailMessageOrgan = "";
                 for (TelegramMessage telegramMessage : messageObject) {
-                    /*EdocDynamicContact receiverContact = EdocDynamicContactServiceUtil.findContactByDomain(telegramMessage.getReceiverId());
-                    if (receiverContact.getReceiveNotify()) {
-
-                     */
                         detailMessageOrgan += messageSourceUtil.getMessage("edoc.title.telegram.header",
                                 new Object[]{i, telegramMessage.getReceiverName()});
                         EdocDocument document = telegramMessage.getDocument();

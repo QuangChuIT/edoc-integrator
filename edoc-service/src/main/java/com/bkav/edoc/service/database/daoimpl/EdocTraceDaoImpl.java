@@ -25,17 +25,16 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
             StringBuilder sql = new StringBuilder();
 
             Query<EdocTrace> query;
-            if (responseForOrganId.equals(PropsUtil.get("edoc.domain.A.parent")) && !responseForOrganId.equals(PropsUtil.get("edoc.domain.01.A53"))) {
+            if (responseForOrganId.equals(PropsUtil.get("edoc.domain.A.parent"))) {
                 if (fromTime != null) {
-                    sql.append("SELECT et FROM EdocTrace et where not (et.toOrganDomain = :exceptOrgan) and " +
-                            "(et.toOrganDomain like concat('%',:responseForOrganId, '%')) and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                    sql.append("SELECT et FROM EdocTrace et where (et.toOrganDomain like concat('%',:responseForOrganId, '%')) " +
+                            "and et.timeStamp >= :fromTime order by et.timeStamp DESC");
                 } else {
-                    sql.append("SELECT et FROM EdocTrace et where not (et.toOrganDomain = :exceptOrgan) and " +
-                            "(et.toOrganDomain like concat('%',:responseForOrganId, '%')) and et.enable=:enable order by et.timeStamp DESC");
+                    sql.append("SELECT et FROM EdocTrace et where (et.toOrganDomain like concat('%',:responseForOrganId, '%')) " +
+                            "and et.enable=:enable order by et.timeStamp DESC");
                 }
                 responseForOrganId = PropsUtil.get("edoc.domain.A53.regex");
                 query = currentSession.createQuery(sql.toString(), EdocTrace.class);
-                query.setParameter("exceptOrgan", PropsUtil.get("edoc.domain.01.A53"));
                 query.setParameter("responseForOrganId", responseForOrganId);
             } else {
                 if (fromTime != null) {

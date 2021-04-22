@@ -1,6 +1,7 @@
 package com.bkav.edoc.task.center;
 
 import com.bkav.edoc.service.kernel.util.GetterUtil;
+import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
 import org.apache.log4j.Logger;
 import org.apache.synapse.ManagedLifecycle;
@@ -22,7 +23,8 @@ public class EdocGetDocumentTask implements Task, ManagedLifecycle {
         LOGGER.info("------------------------ Edoc Get Documents Task Invoke -----------------------");
         if (isTurnOn) {
             LOGGER.info("Start get documents from vpcp at " + DateUtils.format(new Date(), DateUtils.DEFAULT_DATETIME_FORMAT));
-
+            ServiceVPCP.getInstance().GetDocuments();
+            LOGGER.info("Get documents from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
         } else {
             LOGGER.info("------------------------ Get Documents from VPCP turn off -----------------------");
         }

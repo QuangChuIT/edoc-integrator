@@ -3,8 +3,10 @@ package com.bkav.edoc.service.vpcp;
 import com.bkav.edoc.service.database.cache.AttachmentCacheEntry;
 import com.bkav.edoc.service.database.entity.EdocDocument;
 import com.bkav.edoc.service.database.entity.EdocDynamicContact;
+import com.bkav.edoc.service.database.entity.EdocTrace;
 import com.bkav.edoc.service.database.util.EdocDocumentServiceUtil;
 import com.bkav.edoc.service.database.util.EdocDynamicContactServiceUtil;
+import com.bkav.edoc.service.database.util.EdocTraceServiceUtil;
 import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.util.CommonUtil;
 import com.bkav.edoc.service.util.PropsUtil;
@@ -20,6 +22,7 @@ import com.bkav.edoc.service.xml.ed.header.MessageHeader;
 import com.bkav.edoc.service.xml.ed.parser.EdXmlParser;
 import com.bkav.edoc.service.xml.status.builder.StatusXmlBuilder;
 import com.bkav.edoc.service.xml.status.header.MessageStatus;
+import com.bkav.edoc.service.xml.status.parser.StatusXmlParser;
 import com.vpcp.services.KnobstickServiceImp;
 import com.vpcp.services.VnptProperties;
 import com.vpcp.services.model.*;
@@ -94,7 +97,7 @@ public class ServiceVPCP {
 
     public void GetDocuments() {
         // Get list documents sent from VPCP
-        LOGGER.info("Invoke GetDocuments from VPCP !!!!!");
+        LOGGER.info("----------------- Invoke GetDocuments from VPCP ----------------");
         JSONObject getDocumentsHeader = new JSONObject();
         getDocumentsHeader.put("servicetype", "eDoc");
         getDocumentsHeader.put("messagetype", MessageType.edoc);
@@ -120,19 +123,24 @@ public class ServiceVPCP {
                             LOGGER.info(pStart + "file:" + getEdocResult.getFilePath());
                             EdocDocument document = null;
                             if (getEdocResult.getStatus().equals("OK")) {
+                                LOGGER.info("Get successfully document from VPCP with docId: "
+                                        + item.getId() + " from " + item.getFrom() + " to " + item.getTo());
                                 // TODO insert to database
                                 //parse data from edxml
                                 File file = new File(getEdocResult.getFilePath());
                                 InputStream inputStream = new FileInputStream(file);
                                 Ed ed = EdXmlParser.getInstance().parse(inputStream);
-                                LOGGER.info("Parser success document from file " + getEdocResult.getFilePath());
+                                LOGGER.info("Parser successfully document from file " + getEdocResult.getFilePath());
                                 //Get message header
                                 MessageHeader messageHeader = (MessageHeader) ed.getHeader().getMessageHeader();
+                                LOGGER.info("Get successfully MessageHeader from file " + getEdocResult.getFilePath());
                                 // create trace header list
                                 //Get trace header list
                                 TraceHeaderList traceHeaderList = ed.getHeader().getTraceHeaderList();
+                                LOGGER.info("Get successfully TraceHeader from file " + getEdocResult.getFilePath());
                                 //Get attachment
                                 List<Attachment> attachments = ed.getAttachments();
+                                LOGGER.info("Get successfully Attachments from file " + getEdocResult.getFilePath());
                                 //filter list organ of current organ on esb
                                 List<Organization> thisOrganizations = filterOrgan(messageHeader.getToes());
                                 messageHeader.setToes(thisOrganizations);
@@ -187,6 +195,86 @@ public class ServiceVPCP {
         } else {
             LOGGER.error("Get list document from vpcp null !!!!");
         }
+    }
+
+    public void getStatus() {
+        // Get list status sent from VPCP
+        LOGGER.info("Invoke GetStatus from VPCP !!!!!");
+        JSONObject getListStatusHeader = new JSONObject();
+        getListStatusHeader.put("servicetype", "eDoc");
+        getListStatusHeader.put("messagetype", MessageType.status);
+        GetReceivedEdocResult getReceivedEdocResult = this.knobstickServiceImp.getReceivedEdocList(getListStatusHeader.toString());
+        if (getReceivedEdocResult != null) {
+            LOGGER.info(pStart + "status:" + getReceivedEdocResult.getStatus());
+            LOGGER.info(pStart + "Desc:" + getReceivedEdocResult.getErrorDesc());
+            LOGGER.info(pStart + "Size:" + getReceivedEdocResult.getKnobsticks().size());
+            if (getReceivedEdocResult.getKnobsticks().size() > 0) {
+                for (Knobstick item : getReceivedEdocResult.getKnobsticks()) {
+                    try {
+                        LOGGER.info("Prepare get status from VPCP with docId: " + item.getId());
+                        JSONObject getStatusHeader = new JSONObject();
+                        String attachmentDir = PropsUtil.get("VPCP.attachment.dir");
+                        getStatusHeader.put("filePath", attachmentDir);
+                        getStatusHeader.put("docId", item.getId());
+                        LOGGER.info("Prepare get detail status from vpcp with status id " + item.getId() + " from " + item.getFrom() + " to " + item.getTo());
+                        GetEdocResult getEdocResult = this.knobstickServiceImp.getEdoc(getStatusHeader.toString());
+                        String status = "";
+                        if (getEdocResult != null) {
+                            LOGGER.info(pStart + "status:" + getReceivedEdocResult.getStatus());
+                            LOGGER.info(pStart + "Desc:" + getReceivedEdocResult.getErrorDesc());
+                            LOGGER.info(pStart + "Size:" + getReceivedEdocResult.getKnobsticks().size());
+                            if (getEdocResult.getStatus().equals("OK")) {
+                                // TODO insert to database
+                                //parse data from edxml
+                                File file = new File(getEdocResult.getFilePath());
+                                InputStream inputStream = new FileInputStream(file);
+                                MessageStatus messageStatus = StatusXmlParser.parse(inputStream);
+                                LOGGER.info("Parser success status from file " + getEdocResult.getFilePath());
+                                LOGGER.info(messageStatus.toString());
+                                List<Error> errors = new ArrayList<>();
+                                EdocTrace edocTrace = EdocTraceServiceUtil.addTrace(messageStatus, errors);
+                                if (edocTrace != null) {
+                                    LOGGER.info("Save successfully MessageStatus from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
+                                    status = "done";
+                                } else {
+                                    LOGGER.error("Save fail MessageStatus from file " + getEdocResult.getFilePath() + " to database !!!!!!!!");
+                                    status = "fail";
+                                }
+                            } else {
+                                status = "fail";
+                                LOGGER.error("Get status from vpcp with documentId : " + item.getId() + " error !!!!!!!");
+                            }
+                            GetChangeStatusResult changeStatusResult = this.updateStatus(status, item.getId());
+                            LOGGER.info("Change status result code ---------------> " + changeStatusResult.getStatus());
+                            LOGGER.info("Change status result error code ---------------> " + changeStatusResult.getErrorCode());
+                            LOGGER.info("Change status result error desc ---------------> " + changeStatusResult.getErrorDesc());
+                        } else {
+                            LOGGER.error("Get document result null for docId -------------------> " + item.getId());
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error get list status from VPCP " + e);
+                    }
+                }
+            }
+        } else {
+            LOGGER.error("Get list status from vpcp null !!!!");
+        }
+    }
+
+    public GetChangeStatusResult updateStatus(String statusCode, String documentId) {
+        JSONObject header = new JSONObject();
+        header.put("status", statusCode);
+        header.put("docid", documentId);
+        // Update Status after received document
+        GetChangeStatusResult GetChangeStatusResult = this.knobstickServiceImp.updateStatus(header.toString());
+        if (GetChangeStatusResult != null) {
+            LOGGER.info("---------------" + "status:" + GetChangeStatusResult.getStatus());
+            LOGGER.info("---------------" + "Desc:" + GetChangeStatusResult.getErrorDesc());
+            LOGGER.info("---------------" + "status:" + GetChangeStatusResult.getErrorCode());
+        } else {
+            LOGGER.error("Error when update status for documentId " + documentId);
+        }
+        return GetChangeStatusResult;
     }
 
     private List<Organization> filterOrgan(List<Organization> organizations) {

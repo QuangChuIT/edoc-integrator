@@ -52,6 +52,7 @@ let app_message = {
     "edoc_status_recover": "Lấy lại",
     "edoc_status_accept_recover": "Đồng ý lấy lại/ cập nhật văn bản",
     "edoc_status_refuse_recover": "Từ chối lấy lại/ cập nhật văn bản",
+    "edoc_status_send_fail": "Thất bại",
     "edoc_main_handler": "Người xử lý chính:",
     "edoc_handler_comment": "Ý kiến người xử lý chính:",
     "edoc_no_data" : "No data",

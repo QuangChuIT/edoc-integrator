@@ -88,6 +88,10 @@
                     <i class="fa fa-repeat"></i>
                     <spring:message code="edoc.resend.documents.to.vpcp"/>
                 </button>
+                <button class="btn btn-primary import-excel-button" id="put-to-telegram-vpcp">
+                    <i class="fa fa-telegram"></i>
+                    <spring:message code="edoc.not.taken.warning.telegram"/>
+                </button>
             </div>
             <table class="table table-striped table-bordered table-hover custom-datatable" id="dataTables-edoc-not-sendVPCP">
             </table>

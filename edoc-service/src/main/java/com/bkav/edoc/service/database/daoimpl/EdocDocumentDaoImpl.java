@@ -386,10 +386,13 @@ public class EdocDocumentDaoImpl extends RootDaoImpl<EdocDocument, Long> impleme
         Session session = openCurrentSession();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("Select ed from EdocDocument ed where ed.sendExt = :sendFail and ed.documentExtId = :documentExtId");
+            sql.append("Select ed from EdocDocument ed where ed.sendExt = :sendFail and ed.documentExtId = :documentExtId " +
+                    "and ed.sendSuccess = :sendSuccess and (not ed.transactionStatus = :transaction)");
             Query<EdocDocument> query = session.createQuery(sql.toString(), EdocDocument.class);
             query.setParameter("sendFail", true);
             query.setParameter("documentExtId", "");
+            query.setParameter("sendSuccess", false);
+            query.setParameter("transaction", "");
             return query.getResultList();
         } catch (Exception e) {
             LOGGER.error(e);

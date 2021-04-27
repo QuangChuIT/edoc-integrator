@@ -331,7 +331,7 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 // TODO auto add trace received(01) for this document
                 EdocDocument document = documentService.getDocument(documentId);
                 if (document != null) {
-                    MessageStatus messageStatus = createConfirmTrace(document, organId);
+                    MessageStatus messageStatus = createConfirmTrace(document, organId, true);
                     traceService.updateTrace(messageStatus, errorList);
                 } else {
                     errorList.add(new Error("M.ConfirmReceived", "Not found document with document id " + documentId));
@@ -714,13 +714,26 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                             LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
                             LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
                             document.setDocumentExtId(sendEdocResult.getDocID());
-                            toesVPCP.forEach(to -> {
-                                LOGGER.info("----- Create trace for document id " + document.getDocumentId() + " ------ " + to.getOrganId());
-                                MessageStatus messageStatusVPCP = createConfirmTrace(document, to.getOrganId());
-                                traceService.updateTrace(messageStatusVPCP, errorList);
-                            });
-                            document.setSendSuccess(!sendEdocResult.getStatus().equals("FAIL"));
-                            document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                            if (sendEdocResult.getStatus().equals("FAIL") || sendEdocResult.getStatus() == null) {
+                                toesVPCP.forEach(to -> {
+                                    LOGGER.info("----- Create fail trace for document id " + document.getDocumentId() + " ------ " + to.getOrganId());
+                                    MessageStatus messageStatusVPCP = createConfirmTrace(document, to.getOrganId(), false);
+                                    traceService.updateTrace(messageStatusVPCP, errorList);
+                                });
+                            } else {
+                                toesVPCP.forEach(to -> {
+                                    LOGGER.info("----- Create trace for document id " + document.getDocumentId() + " ------ " + to.getOrganId());
+                                    MessageStatus messageStatusVPCP = createConfirmTrace(document, to.getOrganId(), true);
+                                    traceService.updateTrace(messageStatusVPCP, errorList);
+                                });
+                            }
+                            if (sendEdocResult.getStatus() != null) {
+                                document.setSendSuccess(!sendEdocResult.getStatus().equals("FAIL"));
+                                document.setTransactionStatus(sendEdocResult.getErrorDesc());
+                            } else {
+                                document.setSendSuccess(false);
+                                document.setTransactionStatus("");
+                            }
                         } else {
                             LOGGER.error("------------------------- Error send document to VPCP with document Id " + strDocumentId);
                             document.setDocumentExtId("");
@@ -873,12 +886,17 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
         }
     }
 
-    private MessageStatus createConfirmTrace(EdocDocument document, String organId) {
+    private MessageStatus createConfirmTrace(EdocDocument document, String organId, boolean status) {
         LOGGER.info("---------------- Start create confirm trace with document id " + document.getDocumentId() + " ------------ " + organId);
         MessageStatus messageStatus = new MessageStatus();
-        messageStatus.setDescription("Van ban da nhan ve he thong");
+        if (status) {
+            messageStatus.setDescription("Da nhan van ban ve he thong");
+            messageStatus.setStatusCode("1");
+        } else {
+            messageStatus.setDescription("Gui that bai");
+            messageStatus.setStatusCode("999");
+        }
         messageStatus.setTimestamp(new Date());
-        messageStatus.setStatusCode("1");
 
         String fromOrgan = document.getFromOrganDomain();
         String docCode = document.getDocCode();

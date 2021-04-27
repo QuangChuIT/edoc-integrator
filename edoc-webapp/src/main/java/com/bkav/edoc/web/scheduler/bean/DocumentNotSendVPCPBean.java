@@ -26,68 +26,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Component("sendTelegramMessageBean")
-public class SendMessageToTelegramBean {
-
+@Component("sendTelegramDocumentVPCPBean")
+public class DocumentNotSendVPCPBean {
     @Autowired
     private MessageSourceUtil messageSourceUtil;
 
-    public void runScheduleSendMessageToTelegram() {
-        try {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -15);
-            Date yesterday = cal.getTime();
-            Date today = new Date();
-            String warningMessage = "";
-            int i = 1;
-
-            LOGGER.info("--------------------- Start scheduler notification send document not taken ------------------------");
-            List<TelegramMessage> messageObject = EdocNotificationServiceUtil.telegramScheduleSend();
-            if (messageObject.size() == 0) {
-                LOGGER.info("ALL OF ORGANIZATION TAKEN DOCUMENT!!!!!!!");
-                warningMessage += messageSourceUtil.getMessage("edoc.title.all.taken", new Object[]{SIMPLE_DATE_FORMAT.format(today)});
-                sendTelegramMessage(warningMessage);
-                //System.out.println(warningMessage);
-            } else {
-                warningMessage += messageSourceUtil.getMessage("edoc.title.telegram",
-                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageObject.size()});
-                sendTelegramMessage(warningMessage);
-                //System.out.println(warningMessage);
-
-                String detailMessageOrgan = "";
-                for (TelegramMessage telegramMessage : messageObject) {
-                        detailMessageOrgan += messageSourceUtil.getMessage("edoc.title.telegram.header",
-                                new Object[]{i, telegramMessage.getReceiverName()});
-                        EdocDocument document = telegramMessage.getDocument();
-                        LOGGER.info("Organ with domain " + telegramMessage.getReceiverId() + " not taken document with code " + document.getDocCode());
-
-                        String doc_code = document.getDocCode();
-                        EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
-                        String sender = senderOrgan.getName();
-                        String value = document.getDocumentId() + "," + doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessage.getCreateDate()) + ")";
-                        String msg = messageSourceUtil.getMessage("edoc.telegram.detail.msg", new Object[]{sender, value});
-                        detailMessageOrgan += msg;
-                        if (detailMessageOrgan.length() > 3500) {
-                            sendTelegramMessage(detailMessageOrgan);
-                            //System.out.println(detailMessageOrgan);
-                            detailMessageOrgan = "";
-                        }
-                        TimeUnit.SECONDS.sleep(1);
-                        i++;
-                }
-                sendTelegramMessage(detailMessageOrgan);
-                //System.out.println(detailMessageOrgan);
-            }
-            TimeUnit.MINUTES.sleep(2);
-            LOGGER.info("--------------------------------------- Done schedule send to telegram document not taken -----------------------------------------");
-            runScheduleDocumentNotSendVPCP();
-            LOGGER.info("--------------------------------------- Done schedule send to telegram document send VPCp fail -----------------------------------------");
-        } catch (Exception e) {
-            LOGGER.error("Not send message to telegram cause " + e);
-        }
-    }
-
-    private void runScheduleDocumentNotSendVPCP () {
+    public void runScheduleDocumentNotSendVPCP () {
         try {
             Date today = new Date();
             String warningMessageVPCP = "";
@@ -115,10 +59,10 @@ public class SendMessageToTelegramBean {
                     String sender = senderOrgan.getName();
                     String value = document.getDocumentId() + "," + doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessageVPCP.getCreateDate()) + ")";
                     detailMessageOrganVPCP += messageSourceUtil.getMessage("edoc.title.telegram.vpcp.header",
-                            new Object[]{i, telegramMessageVPCP.getReceiverName(), value});
+                            new Object[]{i, sender, value});
                     LOGGER.info("Organ with domain " + telegramMessageVPCP.getReceiverId() + " not send document to VPCP with code " + doc_code);
                     String transactionStatus = document.getTransactionStatus();
-                    String msg = messageSourceUtil.getMessage("edoc.telegram.vpcp.detail.msg", new Object[]{sender, transactionStatus});
+                    String msg = messageSourceUtil.getMessage("edoc.telegram.vpcp.detail.msg", new Object[]{telegramMessageVPCP.getReceiverName(), transactionStatus});
                     detailMessageOrganVPCP += msg;
                     if (detailMessageOrganVPCP.length() > 3500) {
                         sendTelegramMessage(detailMessageOrganVPCP);
@@ -182,5 +126,5 @@ public class SendMessageToTelegramBean {
     }
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private final static Logger LOGGER = Logger.getLogger(SendMessageToTelegramBean.class);
+    private final static Logger LOGGER = Logger.getLogger(DocumentNotSendVPCPBean.class);
 }

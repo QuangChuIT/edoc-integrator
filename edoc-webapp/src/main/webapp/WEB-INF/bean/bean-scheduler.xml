@@ -36,7 +36,7 @@
         <property name="overwriteExistingJobs" value="false"/>
     </bean>
 
-   <!-- &lt;!&ndash;Declare scheduler for Get documents from VPCP&ndash;&gt;
+    <!--Declare scheduler for Get documents from VPCP-->
     <bean name="getDocumentJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetDocumentJob"/>
         <property name="jobDataMap">
@@ -62,9 +62,9 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
-    </bean>-->
+    </bean>
 
-  <!--  &lt;!&ndash;Declare scheduler for Get status from VPCP&ndash;&gt;
+    <!--Declare scheduler for Get status from VPCP-->
     <bean name="getStatusJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="com.bkav.edoc.web.scheduler.GetStatusJob"/>
         <property name="jobDataMap">
@@ -76,7 +76,7 @@
 
     <bean id="getStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="getStatusJobDetail"/>
-        &lt;!&ndash;<property name="cronExpression" value="0 */15 * ? * *"/>&ndash;&gt;
+        <!--<property name="cronExpression" value="0 */15 * ? * *"/>-->
         <property name="cronExpression" value="0 0 2 * * ?"/>
     </bean>
 
@@ -91,7 +91,7 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
         <property name="waitForJobsToCompleteOnShutdown" value="true"/>
         <property name="overwriteExistingJobs" value="false"/>
-    </bean>-->
+    </bean>
 
     <!--Declare scheduler for Get status from VPCP-->
     <bean name="getOrganJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -177,6 +177,37 @@
         <property name="triggers">
             <list>
                 <ref bean="sendTelegramMessageTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="waitForJobsToCompleteOnShutdown" value="true"/>
+        <property name="overwriteExistingJobs" value="false"/>
+    </bean>
+
+    <!--Declare scheduler for send message to telegram warning document not send VPCP by adapter-->
+    <bean name="documentNotSendVPCPJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.bkav.edoc.web.scheduler.DocumentNotSendVPCPJob"/>
+        <property name="jobDataMap">
+            <map>
+                <entry key="sendTelegramDocumentVPCPBean" value-ref="sendTelegramDocumentVPCPBean"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="documentNotSendVPCPTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="documentNotSendVPCPJobDetail"/>
+        <!--<property name="cronExpression" value="0 */30 8-18 ? * *"/>-->
+        <property name="cronExpression" value="0 */38 * ? * *"/>
+        <!--<property name="cronExpression" value="* * 6 * * ?"/>-->
+        <!--<property name="cronExpression" value="0 */2 9-10 ? * *"/>-->
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <property name="configLocation" value="classpath:/quartz-schedule.properties"/>
+        <property name="triggers">
+            <list>
+                <ref bean="documentNotSendVPCPTrigger"/>
             </list>
         </property>
         <property name="autoStartup" value="true"/>

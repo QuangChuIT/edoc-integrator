@@ -189,13 +189,12 @@ public class EdocController {
                                     LOGGER.info("-------------------- Send to VPCP Desc: " + sendEdocResult.getErrorDesc());
                                     LOGGER.info("-------------------- Send to VPCP DocID: " + sendEdocResult.getDocID());
                                     document.setDocumentExtId(sendEdocResult.getDocID());
-                                    if (sendEdocResult.getStatus().equals("FAIL")) {
+                                    if (sendEdocResult.getStatus().equals("FAIL") || sendEdocResult.getStatus() == null) {
                                         document.setSendSuccess(false);
-                                        document.setTransactionStatus(sendEdocResult.getErrorDesc());
                                     } else {
                                         document.setSendSuccess(true);
-                                        document.setTransactionStatus(sendEdocResult.getErrorDesc());
                                     }
+                                    document.setTransactionStatus(sendEdocResult.getErrorDesc());
                                 } else {
                                     LOGGER.error("------------------------- Error send document to VPCP with document Id " + documentEsbId);
                                     document.setDocumentExtId("");

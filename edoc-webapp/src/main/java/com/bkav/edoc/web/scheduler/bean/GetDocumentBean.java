@@ -1,7 +1,7 @@
 package com.bkav.edoc.web.scheduler.bean;
 
+import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
-import com.bkav.edoc.web.vpcp.ServiceVPCP;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class GetDocumentBean {
 
     public void runSchedulerGetDocument() {
         LOGGER.info("Prepare get documents from vpcp at " + DateUtils.format(new Date()));
-        /*ServiceVPCP.getInstance().GetDocuments();*/
+        ServiceVPCP.getInstance().GetDocuments();
         LOGGER.info("Get documents from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
     }
 

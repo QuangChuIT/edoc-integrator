@@ -475,7 +475,7 @@ public class EdocDocumentService {
                     if (turnOn) {
                         String[] subDomain = to.getOrganId().split("\\.");
                         String childDomain = subDomain[2] + "." + subDomain[3];
-                        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
                         boolean hasParent = listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
                         if (hasParent) {
                             if (countOrgan == 0) {
@@ -900,7 +900,10 @@ public class EdocDocumentService {
 
         String[] subDomain = domain.split("\\.");
         String childDomain = subDomain[2] + "." + subDomain[3];
-        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
+        listParentDomain.forEach(str -> {
+            System.out.println(str);
+        });
         return listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
         /*for (String s: listParentDomain) {
             if (s.trim().contains(childDomain))

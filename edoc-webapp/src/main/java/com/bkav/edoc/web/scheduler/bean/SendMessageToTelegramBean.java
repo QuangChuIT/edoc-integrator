@@ -80,59 +80,8 @@ public class SendMessageToTelegramBean {
             }
             TimeUnit.MINUTES.sleep(2);
             LOGGER.info("--------------------------------------- Done schedule send to telegram document not taken -----------------------------------------");
-            runScheduleDocumentNotSendVPCP();
-            LOGGER.info("--------------------------------------- Done schedule send to telegram document send VPCp fail -----------------------------------------");
-        } catch (Exception e) {
+            } catch (Exception e) {
             LOGGER.error("Not send message to telegram cause " + e);
-        }
-    }
-
-    private void runScheduleDocumentNotSendVPCP () {
-        try {
-            Date today = new Date();
-            String warningMessageVPCP = "";
-            int i = 1;
-
-            // Notification to Telegram for docuemtn not send to VPCP
-            LOGGER.info("--------------------- Start scheduler notification document not send to VPCP ------------------------");
-            List<TelegramMessage> messageListNotSendVPCP = EdocNotificationServiceUtil.telegramScheduleDocumentNotSendVPCP();
-            if (messageListNotSendVPCP.size() == 0) {
-                LOGGER.info("ALL OF DOCUMENT SEND TO VPCP SUCCESS !!!!!!!");
-                warningMessageVPCP += messageSourceUtil.getMessage("edoc.title.all.send.vpcp", new Object[]{SIMPLE_DATE_FORMAT.format(today)});
-                sendTelegramMessage(warningMessageVPCP);
-                //System.out.println(warningMessageVPCP);
-            } else {
-                warningMessageVPCP += messageSourceUtil.getMessage("edoc.title.telegram.vpcp",
-                        new Object[]{DateUtils.format(today, DateUtils.VN_DATE_FORMAT), messageListNotSendVPCP.size()});
-                sendTelegramMessage(warningMessageVPCP);
-                //System.out.println(warningMessageVPCP);
-
-                String detailMessageOrganVPCP = "";
-                for (TelegramMessage telegramMessageVPCP : messageListNotSendVPCP) {
-                    EdocDocument document = telegramMessageVPCP.getDocument();
-                    String doc_code = document.getDocCode();
-                    EdocDynamicContact senderOrgan = EdocDynamicContactServiceUtil.findContactByDomain(document.getFromOrganDomain());
-                    String sender = senderOrgan.getName();
-                    String value = document.getDocumentId() + "," + doc_code + "(" + SIMPLE_DATE_FORMAT.format(telegramMessageVPCP.getCreateDate()) + ")";
-                    detailMessageOrganVPCP += messageSourceUtil.getMessage("edoc.title.telegram.vpcp.header",
-                            new Object[]{i, telegramMessageVPCP.getReceiverName(), value});
-                    LOGGER.info("Organ with domain " + telegramMessageVPCP.getReceiverId() + " not send document to VPCP with code " + doc_code);
-                    String transactionStatus = document.getTransactionStatus();
-                    String msg = messageSourceUtil.getMessage("edoc.telegram.vpcp.detail.msg", new Object[]{sender, transactionStatus});
-                    detailMessageOrganVPCP += msg;
-                    if (detailMessageOrganVPCP.length() > 3500) {
-                        sendTelegramMessage(detailMessageOrganVPCP);
-                        //System.out.println(detailMessageOrganVPCP);
-                        detailMessageOrganVPCP = "";
-                    }
-                    TimeUnit.SECONDS.sleep(2);
-                    i++;
-                }
-                sendTelegramMessage(detailMessageOrganVPCP);
-                //System.out.println(detailMessageOrganVPCP);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Not send message to telegram fow document not send VPCP cause " + e);
         }
     }
 

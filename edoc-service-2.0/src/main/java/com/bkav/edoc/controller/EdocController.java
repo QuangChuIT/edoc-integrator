@@ -283,7 +283,7 @@ public class EdocController {
                                 getPendingResults.add(pendingResult);
                             } else {
                                 List<OrganizationCacheEntry> listToOrgan = documentCacheEntry.getToOrgan();
-                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
                                 listToOrgan.forEach(toOrgan -> {
                                     GetPendingResult pendingResult = new GetPendingResult();
                                     if (GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false)) {
@@ -313,7 +313,7 @@ public class EdocController {
                                 getPendingResults.add(result);
                             } else {
                                 List<String> toOrganList = Arrays.asList(notification.getDocument().getToOrganDomain().split("#"));
-                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("#"));
+                                List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
                                 toOrganList.forEach(toOrgan -> {
                                     GetPendingResult result = new GetPendingResult();
                                     if (GetterUtil.getBoolean(PropsUtil.get("edoc.turn.on.vnpt.request"), false)) {

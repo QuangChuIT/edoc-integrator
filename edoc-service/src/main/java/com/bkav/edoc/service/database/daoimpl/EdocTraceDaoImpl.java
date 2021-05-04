@@ -25,22 +25,49 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
         try {
             StringBuilder sql = new StringBuilder();
 
+            // Fix tam code, co thoi gian se toi uu lai code
+            // Se goi Stored procedure
             Query<EdocTrace> query;
             if (responseForOrganId.equals(PropsUtil.get("edoc.domain.A.parent"))) {
-                if (fromTime != null) {
-                    sql.append("SELECT et FROM EdocTrace et where (et.toOrganDomain like concat('%',:responseForOrganId, '%')) " +
-                            "and et.timeStamp >= :fromTime order by et.timeStamp DESC");
-                } else {
-                    sql.append("SELECT et FROM EdocTrace et where (et.toOrganDomain like concat('%',:responseForOrganId, '%')) " +
-                            "and et.enable=:enable order by et.timeStamp DESC");
-                }
                 if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {
+                    if (fromTime != null) {
+                        sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain like concat('%' ,:responseForOrganId, '%') " +
+                                "and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                    } else {
+                        sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain like concat('%' ,:responseForOrganId, '%') " +
+                                "and et.enable=:enable order by et.timeStamp DESC");
+                    }
+                    query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+                    query.setParameter("responseForOrganId", PropsUtil.get("edoc.domain.A53.regex"));
+                } else {
+                    if (fromTime != null) {
+                        sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain like concat('%' ,:responseForOrganId, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId1, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId2, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId3, '%')" +
+                                " and et.timeStamp >= :fromTime order by et.timeStamp DESC");
+                    } else {
+                        sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain like concat('%' ,:responseForOrganId, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId1, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId2, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId3, '%')" +
+                                " and et.enable=:enable order by et.timeStamp DESC");
+                    }
+                    String[] listOrgan = PropsUtil.get("edoc.integrator.center.lamdong").split("\\|");
+                    System.out.println(sql);
+                    query = currentSession.createQuery(sql.toString(), EdocTrace.class);
+                    query.setParameter("responseForOrganId", listOrgan[0]);
+                    query.setParameter("responseForOrganId1", listOrgan[1]);
+                    query.setParameter("responseForOrganId2", listOrgan[2]);
+                    query.setParameter("responseForOrganId3", listOrgan[3]);
+                }
+
+                /*if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {
                     responseForOrganId = PropsUtil.get("edoc.domain.A53.regex");
                 } else {
                     responseForOrganId = PropsUtil.get("edoc.integrator.center.lamdong");
-                }
-                query = currentSession.createQuery(sql.toString(), EdocTrace.class);
-                query.setParameter("responseForOrganId", responseForOrganId);
+                }*/
+
             } else {
                 if (fromTime != null) {
                     sql.append("SELECT et FROM EdocTrace et where " +
@@ -88,7 +115,10 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
     public static void main(String[] args) {
         EdocTraceDaoImpl edocTraceDao = new EdocTraceDaoImpl();
         //String json = new Gson().toJson(edocTraceDao.getEdocTracesByOrganId("000.A53.000", null));
-        List<EdocTrace> list = edocTraceDao.getEdocTracesByTraceId(18496733);
+        List<EdocTrace> list = edocTraceDao.getEdocTracesByOrganId("000.H36.000",null);
+        list.forEach(li -> {
+            System.out.println(li.getFromOrganDomain() + " - " + li.getToOrganDomain());
+        });
         System.out.println(list.size());
     }
 

@@ -1,7 +1,7 @@
 package com.bkav.edoc.web.scheduler.bean;
 
 import com.bkav.edoc.service.xml.base.util.DateUtils;
-import com.bkav.edoc.web.vpcp.ServiceVPCP;
+import com.bkav.edoc.service.vpcp.ServiceVPCP;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ public class GetStatusVPCPBean {
 
     public void runSchedulerGetStatus() {
         LOGGER.info("Prepare get sts from vpcp at " + DateUtils.format(new Date()));
-       /* ServiceVPCP.getInstance().getStatus();*/
+        ServiceVPCP.getInstance().getStatus();
         LOGGER.info("Get status from vpcp at " + DateUtils.format(new Date()) + " done !!!!!!!!!");
     }
 

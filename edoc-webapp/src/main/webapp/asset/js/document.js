@@ -797,7 +797,17 @@ $(document).ready(function () {
             cache: false,
             beforeSend: () => $("#overlay-edoc-not-taken").show(),
             success: () => $.notify(app_message.edoc_message_send_telegram_success, "success")
-        }).done(() => $("#overlay-edoc-not-taken").hide())
+        }).done(function() { $("#overlay-edoc-not-taken").hide()})
+    })
+    $("#put-to-telegram-vpcp").on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/send/telegram/vpcp",
+            cache: false,
+            beforeSend: () => $("#overlay-edoc-not-taken").show(),
+            success: () => $.notify(app_message.edoc_message_send_telegram_success, "success")
+        }).done(function() { $("#overlay-edoc-not-taken").hide()})
     })
     $("#put-to-email").on('click', function(e) {
         e.preventDefault();
@@ -807,7 +817,7 @@ $(document).ready(function () {
             cache: false,
             beforeSend: () => $("#overlay-edoc-not-taken").show(),
             success: () => $.notify(app_message.edoc_message_send_email_success, "success")
-        }).done(() => $("#overlay-edoc-not-taken").hide())
+        }).done(function () {$("#overlay-edoc-not-taken").hide()});
     })
 
     // search filter event
@@ -1056,6 +1066,9 @@ function getStatusOfTrace(statusCode) {
             break;
         case 16:
             message = app_message.edoc_status_refuse_recover;
+            break;
+        case 999:
+            message = app_message.edoc_status_send_fail;
             break;
     }
     return message;

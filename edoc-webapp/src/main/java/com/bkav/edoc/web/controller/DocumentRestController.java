@@ -10,7 +10,6 @@ import com.bkav.edoc.service.database.entity.pagination.PaginationCriteria;
 import com.bkav.edoc.service.database.util.*;
 import com.bkav.edoc.service.kernel.util.Base64;
 import com.bkav.edoc.service.vpcp.ServiceVPCP;
-import com.bkav.edoc.service.xml.base.builder.BuildException;
 import com.bkav.edoc.service.xml.base.header.Organization;
 import com.bkav.edoc.service.xml.base.header.TraceHeaderList;
 import com.bkav.edoc.service.xml.base.util.DateUtils;
@@ -19,6 +18,7 @@ import com.bkav.edoc.web.OAuth2Constants;
 import com.bkav.edoc.web.auth.CookieUtil;
 import com.bkav.edoc.web.payload.DocumentRequest;
 import com.bkav.edoc.web.payload.Response;
+import com.bkav.edoc.web.scheduler.bean.DocumentNotSendVPCPBean;
 import com.bkav.edoc.web.scheduler.bean.EmailSenderBean;
 import com.bkav.edoc.web.scheduler.bean.SendMessageToTelegramBean;
 import com.bkav.edoc.web.util.CommonUtils;
@@ -44,16 +44,19 @@ public class DocumentRestController {
 
     private final SendMessageToTelegramBean sendMessageToTelegramBean;
 
+    private final DocumentNotSendVPCPBean sendTelegramDocumentVPCPBean;
+
     private final EmailSenderBean sendEmailBean;
 
     private final ValidateUtil validateUtil;
 
     private final Checker checker = new Checker();
 
-    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil, SendMessageToTelegramBean sendMessageToTelegramBean, EmailSenderBean sendEmailBean) {
+    public DocumentRestController(MessageSourceUtil messageSourceUtil, ValidateUtil validateUtil, SendMessageToTelegramBean sendMessageToTelegramBean, DocumentNotSendVPCPBean sendTelegramDocumentVPCPBean, EmailSenderBean sendEmailBean) {
         this.messageSourceUtil = messageSourceUtil;
         this.validateUtil = validateUtil;
         this.sendMessageToTelegramBean = sendMessageToTelegramBean;
+        this.sendTelegramDocumentVPCPBean = sendTelegramDocumentVPCPBean;
         this.sendEmailBean = sendEmailBean;
     }
 
@@ -473,6 +476,17 @@ public class DocumentRestController {
     public HttpStatus sendNotTakenToTelegram() {
         try {
             sendMessageToTelegramBean.runScheduleSendMessageToTelegram();
+            return HttpStatus.OK;
+        } catch (Exception e) {
+            LOGGER.error(e);
+            return HttpStatus.BAD_REQUEST;
+        }
+    }
+
+    @RequestMapping(value = "/send/telegram/vpcp")
+    public HttpStatus sendNotSendVPCPToTelegram() {
+        try {
+            sendTelegramDocumentVPCPBean.runScheduleDocumentNotSendVPCP();
             return HttpStatus.OK;
         } catch (Exception e) {
             LOGGER.error(e);

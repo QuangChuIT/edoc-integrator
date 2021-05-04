@@ -2,6 +2,7 @@ package com.bkav.edoc.service.database.daoimpl;
 
 import com.bkav.edoc.service.database.dao.EdocTraceDao;
 import com.bkav.edoc.service.database.entity.EdocTrace;
+import com.bkav.edoc.service.kernel.util.GetterUtil;
 import com.bkav.edoc.service.util.PropsUtil;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
@@ -33,7 +34,11 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
                     sql.append("SELECT et FROM EdocTrace et where (et.toOrganDomain like concat('%',:responseForOrganId, '%')) " +
                             "and et.enable=:enable order by et.timeStamp DESC");
                 }
-                responseForOrganId = PropsUtil.get("edoc.domain.A53.regex");
+                if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {
+                    responseForOrganId = PropsUtil.get("edoc.domain.A53.regex");
+                } else {
+                    responseForOrganId = PropsUtil.get("edoc.integrator.center.lamdong");
+                }
                 query = currentSession.createQuery(sql.toString(), EdocTrace.class);
                 query.setParameter("responseForOrganId", responseForOrganId);
             } else {

@@ -212,11 +212,11 @@ public class EdocDailyCounterService {
         }
         if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.0")) ||
                 contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1"))) {
+            vpubnd_sent += sent;
+            vpubnd_received += received;
             if (contact.getDomain().equals(PropsUtil.get("edoc.domain.vpubnd.1")))  {
                 vpubndName = contact.getName();
             }
-            vpubnd_sent += sent;
-            vpubnd_received += received;
             return null;
         } else {
             EPublicStat ePublicStat = new EPublicStat();

@@ -332,7 +332,12 @@ public class DynamicService extends AbstractMediator implements ManagedLifecycle
                 EdocDocument document = documentService.getDocument(documentId);
                 if (document != null) {
                     MessageStatus messageStatus = createConfirmTrace(document, organId, true);
-                    traceService.updateTrace(messageStatus, errorList);
+                    boolean isExistTrace = traceService.exists(messageStatus.getFrom().getOrganAdd(),
+                            messageStatus.getResponseFor().getOrganId(),
+                            messageStatus.getResponseFor().getCode(),
+                            GetterUtil.getInteger(messageStatus.getStatusCode(), 1));
+                    if (!isExistTrace)
+                        traceService.updateTrace(messageStatus, errorList);
                 } else {
                     errorList.add(new Error("M.ConfirmReceived", "Not found document with document id " + documentId));
                 }

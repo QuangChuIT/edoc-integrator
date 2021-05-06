@@ -45,12 +45,14 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId1, '%')" +
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId2, '%')" +
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId3, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId4, '%')" +
                                 " and et.timeStamp >= :fromTime order by et.timeStamp DESC");
                     } else {
                         sql.append("SELECT et FROM EdocTrace et where et.toOrganDomain like concat('%' ,:responseForOrganId, '%')" +
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId1, '%')" +
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId2, '%')" +
                                 " or et.toOrganDomain like concat('%' ,:responseForOrganId3, '%')" +
+                                " or et.toOrganDomain like concat('%' ,:responseForOrganId4, '%')" +
                                 " and et.enable=:enable order by et.timeStamp DESC");
                     }
                     String[] listOrgan = PropsUtil.get("edoc.integrator.center.lamdong").split("\\|");
@@ -60,6 +62,7 @@ public class EdocTraceDaoImpl extends RootDaoImpl<EdocTrace, Long> implements Ed
                     query.setParameter("responseForOrganId1", listOrgan[1]);
                     query.setParameter("responseForOrganId2", listOrgan[2]);
                     query.setParameter("responseForOrganId3", listOrgan[3]);
+                    query.setParameter("responseForOrganId4", listOrgan[4]);
                 }
 
                 /*if (GetterUtil.getBoolean(PropsUtil.get("edoc.check.organ.is.tayninh"), false)) {

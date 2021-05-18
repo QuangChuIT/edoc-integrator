@@ -13,6 +13,7 @@ public class ContactRequest implements Serializable {
     private boolean agency;
     private boolean receiveNotify;
     private boolean sendToVPCP;
+    private boolean integratorCenter;
 
     public long getId() {
         return id;
@@ -92,5 +93,13 @@ public class ContactRequest implements Serializable {
 
     public void setSendToVPCP(boolean sendToVPCP) {
         this.sendToVPCP = sendToVPCP;
+    }
+
+    public boolean getIntegratorCenter() {
+        return integratorCenter;
+    }
+
+    public void setIntegratorCenter(boolean integratorCenter) {
+        this.integratorCenter = integratorCenter;
     }
 }

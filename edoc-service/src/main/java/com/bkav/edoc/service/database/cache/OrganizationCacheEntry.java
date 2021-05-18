@@ -15,6 +15,7 @@ public class OrganizationCacheEntry implements Serializable {
     private Long parent;
     private boolean isAgency;
     private boolean receivedNotify;
+    private boolean integratorCenter;
 
     public Long getId() {
         return id;
@@ -114,5 +115,13 @@ public class OrganizationCacheEntry implements Serializable {
 
     public void setReceivedNotify(boolean receivedNotify) {
         this.receivedNotify = receivedNotify;
+    }
+
+    public boolean geIntegratorCenter() {
+        return integratorCenter;
+    }
+
+    public void setIntegratorCenter(boolean integratorCenter) {
+        this.integratorCenter = integratorCenter;
     }
 }

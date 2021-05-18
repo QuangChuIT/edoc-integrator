@@ -333,6 +333,7 @@ public class MapperUtil {
             organizationCacheEntry.setStatus(contact.getStatus());
             organizationCacheEntry.setAgency(contact.getAgency());
             organizationCacheEntry.setReceivedNotify(contact.getReceiveNotify());
+            organizationCacheEntry.setIntegratorCenter(contact.getIntegratorCenter());
         } catch (Exception e) {
             LOGGER.error("Error when convert dynamic contact to cached entry cause " + e);
         }

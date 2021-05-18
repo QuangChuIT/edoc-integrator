@@ -180,6 +180,7 @@ let organ_message = {
     "organ_table_header_agency": "Nội tỉnh",
     "organ_table_header_receive_notify": "Nhận thông báo",
     "organ_table_header_send_vpcp": "Liên thông VPCP",
+    "organ_table_header_integrator_center": "Trung tâm liên thông",
     "organ_token": "Token",
     "organ_status": "Trạng thái",
     "organ_table_agency": "Loại đơn vị",

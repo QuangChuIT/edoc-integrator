@@ -1293,6 +1293,27 @@
         </div>
         <br>
         <div class="form-group">
+            <div class="col-md-5 col-sm-6 col-xs-12">
+                <label class="control-label" for="integratorCenterEdit">
+                    ${organ_message.organ_table_header_integrator_center}
+                </label>
+            </div>
+            <div class="col-md-7 col-sm-6 col-xs-12">
+                {{if integratorCenter == true}}
+                <label class="switch">
+                    <input type="checkbox" id="integratorCenterEdit" checked/>
+                    <span class="slider round"></span>
+                </label>
+                {{else integratorCenter == false}}
+                <label class="switch">
+                    <input type="checkbox" id="integratorCenterEdit"/>
+                    <span class="slider round"></span>
+                </label>
+                {{/if}}
+            </div>
+        </div>
+        <br>
+        <div class="form-group">
             <div class="col-md-3 col-sm-6 col-xs-12">
             </div>
             <div class="col-md-9 col-sm-6 col-xs-12">

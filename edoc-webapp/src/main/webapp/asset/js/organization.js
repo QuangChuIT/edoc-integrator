@@ -196,6 +196,7 @@ let organManage = {
         let agency = checkAgencySelected();
         let receiveNotify = checkReceivedNotify();
         let sendToVPCP = checkSendToVPCP();
+        let integratorCenter = checkIntegratorCenter();
         let contactRequest = {
             "id": id,
             "name": name,
@@ -206,7 +207,8 @@ let organManage = {
             "telephone": telephone,
             "agency": agency,
             "receiveNotify": receiveNotify,
-            "sendToVPCP": sendToVPCP
+            "sendToVPCP": sendToVPCP,
+            "integratorCenter": integratorCenter
         };
         $.ajax({
             type: "PUT",
@@ -459,6 +461,15 @@ function checkReceivedNotify() {
 function checkSendToVPCP() {
     if ($("#sendToVPCP").is(":checked") ||
         $("#sendToVPCPEdit").is(":checked")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function checkIntegratorCenter() {
+    if ($("#integratorCenterEdit").is(":checked") ||
+        $("#integratorCenterEdit").is(":checked")) {
         return true;
     } else {
         return false;

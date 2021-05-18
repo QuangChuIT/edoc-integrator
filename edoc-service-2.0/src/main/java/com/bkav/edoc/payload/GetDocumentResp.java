@@ -4,7 +4,6 @@ public class GetDocumentResp extends BaseResp {
     private String data;
 
     public GetDocumentResp() {
-
     }
 
     public String getData() {

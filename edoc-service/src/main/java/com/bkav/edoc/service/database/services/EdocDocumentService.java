@@ -473,11 +473,8 @@ public class EdocDocumentService {
                 } else {
                     // lamdong
                     if (turnOn) {
-                        String[] subDomain = to.getOrganId().split("\\.");
-                        String childDomain = subDomain[2] + "." + subDomain[3];
-                        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
-                        boolean hasParent = listParentDomain.stream().anyMatch(s -> s.contains(childDomain));
-                        if (hasParent) {
+                        EdocDynamicContact contact = EdocDynamicContactServiceUtil.findContactByDomain(to.getOrganId());
+                        if (contact.getIntegratorCenter()) {
                             if (countOrgan == 0) {
                                 notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
                                 countOrgan++;
@@ -487,6 +484,20 @@ public class EdocDocumentService {
                         } else {
                             notification.setReceiverId(to.getOrganId());
                         }
+                        /*String[] subDomain = to.getOrganId().split("\\.");
+                        String childDomain = subDomain[2] + "." + subDomain[3];
+                        List<String> listParentDomain = Arrays.asList(PropsUtil.get("edoc.integrator.center.lamdong").split("\\|"));
+                        boolean hasParent = listParentDomain.stream().anyMatch(s -> s.contains(childDomain) || s.contains(to.getOrganId()));
+                        if (hasParent && !to.getOrganId().equals(PropsUtil.get("edoc.exclude.center.lamdong"))) {
+                            if (countOrgan == 0) {
+                                notification.setReceiverId(PropsUtil.get("edoc.domain.A.parent"));
+                                countOrgan++;
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            notification.setReceiverId(to.getOrganId());
+                        }*/
                     } else {
                         notification.setReceiverId(to.getOrganId());
                     }

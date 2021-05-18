@@ -26,6 +26,7 @@
         <property name="modifiedDate" type="timestamp" column="modified_date"/>
         <property name="receiveNotify" type="boolean" column="receive_notify"/>
         <property name="sendToVPCP" type="boolean" column="send_vpcp"/>
+        <property name="integratorCenter" type="boolean" column="is_integrator_center"/>
         <set name="users" table="user_" cascade="all"
              inverse="true" lazy="true" fetch="select">
             <key>

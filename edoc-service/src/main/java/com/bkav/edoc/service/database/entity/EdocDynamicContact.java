@@ -27,6 +27,7 @@ public class EdocDynamicContact implements Serializable {
     private Date modifiedDate;
     private boolean receiveNotify;
     private boolean sendToVPCP;
+    private boolean integratorCenter;
     @JsonIgnore
     private Set<User> users;
 
@@ -196,4 +197,13 @@ public class EdocDynamicContact implements Serializable {
     public void setSendToVPCP(boolean sendToVPCP) {
         this.sendToVPCP = sendToVPCP;
     }
+
+    public boolean getIntegratorCenter() {
+        return integratorCenter;
+    }
+
+    public void setIntegratorCenter(boolean integratorCenter) {
+        this.integratorCenter = integratorCenter;
+    }
+
 }
